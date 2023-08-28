@@ -1,0 +1,6 @@
+#dev environment files
+.vscode
+
+#project files
+bin
+lib
