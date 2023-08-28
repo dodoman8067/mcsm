@@ -28,4 +28,4 @@ This project is open to contributions. If you find any issues or have suggestion
 
 ## License
 
-This project is licensed under the [Apache License 2.0](LICENSE).
+This project is licensed under the [MIT](LICENSE.md).
