@@ -13,19 +13,19 @@ OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
 EXECUTABLE = $(OUTPUT_DIR)/$(OUTPUT_NAME).exe
 
 # Compiler flags and include directories
-CXXFLAGS = -I$(INCLUDE_DIR)
-LDFLAGS = -L$(LIB_DIR)
+CXXFLAGS = -I$(INCLUDE_DIR) --std=c++17 -O3
+LDFLAGS = -L$(LIB_DIR) -lcurl
 
 # Default target
 all: $(EXECUTABLE)
 
 # Compile source files into object files
 $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
-	$(COMPILER) $(CXXFLAGS) -c $< --std=c++17 -O3 -o $@
+	$(COMPILER) $(CXXFLAGS) -c $< -o $@
 
 # Link object files to create the executable
 $(EXECUTABLE): $(OBJ_FILES)
-	$(COMPILER) $(LDFLAGS) $^ -o $@ -lcurl
+	$(COMPILER) $^ -o $@ $(LDFLAGS)
 
 # Clean the compiled files
 clean:
