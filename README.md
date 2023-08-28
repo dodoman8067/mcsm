@@ -6,15 +6,24 @@ MCSM (MineCraft Server Manager) is a command-line program designed to manage Min
 
 ## Building
 
-The provided Makefile is designed for Windows + MinGW setup. Other platforms may work but you will get NO support by doing this. Before building, ensure you have the necessary dependencies and files in place:
+The provided Makefile is designed for Windows + MinGW setup. Other platforms may work but you will get NO support by doing this. Before building, ensure you have the necessary dependencies and files in place :
 
-1. Build the non-static libcurl library. Place the compiled `.a` file in the `lib` directory and the `.dll` file in the `bin` directory.
+1. Build the non-static dependencies as it showed in the below.
 
-2. Use the provided Makefile to build the project. This may involve running commands in the terminal, such as:
+2. Use the provided Makefile to build the project. This can be done with the following command :
 
     make
 
 3. Run the compiled executable to start using MCSM.
+
+### Dependencies
+
+This project includes the following dependencies :
+
+* [cURL](https://github.com/curl/curl)
+* [nlomann/json](https://github.com/nlohmann/json)
+
+First, build the dependencies and place the `.a` files in the `lib` folder (you can create it yourself), `.dll` files in the `bin` folder and finally, copy include files from the dependency's include folder. (single_include folder if you are copying the nlomann/json library.)
 
 ## Usage
 
