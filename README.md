@@ -23,7 +23,11 @@ This project includes the following dependencies :
 * [cURL](https://github.com/curl/curl)
 * [nlomann/json](https://github.com/nlohmann/json)
 
-First, build the dependencies and place the `.a` files in the `lib` folder (you can create it yourself), `.dll` files in the `bin` folder and finally, copy include files from the dependency's include folder. (single_include folder if you are copying the nlomann/json library.)
+1. Build the dependencies and place the `.a` files into the `lib` folder (which you can create yourself). 
+
+2. Put the `.dll` files in the `bin` folder. Finally, copy the include files from the dependency's `include` folder. 
+
+3. If you are copying the `nlomann/json` library, use the `single_include` folder.
 
 ## Usage
 
