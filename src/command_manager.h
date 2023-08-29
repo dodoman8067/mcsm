@@ -9,13 +9,13 @@
 namespace mcsm {
     class CommandManager {
     private:
-        std::unique_ptr<std::vector<std::unique_ptr<mcsm::Command>>> commands;
-        CURL* curl;
+        static std::unique_ptr<std::vector<std::unique_ptr<mcsm::Command>>> commands;
+        CommandManager();
     public:
-        CommandManager(CURL* curl);
         ~CommandManager();
-        std::vector<std::unique_ptr<mcsm::Command>>& getCommands();
-        void addCommand(std::unique_ptr<mcsm::Command> command);
+        static void init();
+        static std::vector<std::unique_ptr<mcsm::Command>>& getCommands();
+        static void addCommand(std::unique_ptr<mcsm::Command> command);
     };
 };
 

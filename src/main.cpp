@@ -10,7 +10,7 @@
 
 const std::string version = "0.0.1";
 
-std::unique_ptr<mcsm::CommandManager> initCommands(CURL* curl);
+void initCommands(CURL* curl);
 
 int main(int argc, char *argv[]) {
 
@@ -19,7 +19,7 @@ int main(int argc, char *argv[]) {
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
     CURL* curl = curl_easy_init();
-    std::unique_ptr<mcsm::CommandManager> commands = initCommands(curl);
+    initCommands(curl);
     if (curl == nullptr)
     {
         std::cerr << "Error: initializing cURL failed." << std::endl;
@@ -41,7 +41,7 @@ int main(int argc, char *argv[]) {
         std::exit(0);
     }
 
-    for(auto& v : commands->getCommands()){
+    for(auto& v : mcsm::CommandManager::getCommands()){
         if(std::string(argv[1]) == v.get()->getName()){
             std::vector<std::string> args;
             for(int i = 2; i < argc; i++){
@@ -65,15 +65,13 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-std::unique_ptr<mcsm::CommandManager> initCommands(CURL* curl){
-    std::unique_ptr<mcsm::CommandManager> commands = std::make_unique<mcsm::CommandManager>(curl);
+void initCommands(CURL* curl){
+    mcsm::CommandManager::init();
 
     std::unique_ptr<mcsm::TestCommand> testCommand = std::make_unique<mcsm::TestCommand>("test", "hello");
-    commands->addCommand(std::move(testCommand));
+    mcsm::CommandManager::addCommand(std::move(testCommand));
 
     std::unique_ptr<mcsm::VersionCommand> versionCommand = std::make_unique<mcsm::VersionCommand>("version", "Returns version information about this program.", curl, version);
-    commands->addCommand(std::move(versionCommand));
+    mcsm::CommandManager::addCommand(std::move(versionCommand));
 
-
-    return commands;
 }
