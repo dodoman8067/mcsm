@@ -13,7 +13,7 @@ OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
 EXECUTABLE = $(OUTPUT_DIR)/$(OUTPUT_NAME).exe
 
 # Compiler flags and include directories
-CXXFLAGS = -I$(INCLUDE_DIR) --std=c++17 -O3
+CXXFLAGS = -I$(INCLUDE_DIR) -g -Wall --std=c++17 -O3 
 LDFLAGS = -L$(LIB_DIR) -lcurl
 
 # Default target
