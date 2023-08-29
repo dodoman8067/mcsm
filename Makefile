@@ -8,7 +8,7 @@ SRC_DIR = src
 OUTPUT_NAME = mcsm
 
 # List of source files
-SRC_FILES := $(wildcard $(SRC_DIR)/*.cpp)
+SRC_FILES := $(shell dir /s /b $(SRC_DIR)\*.cpp)
 OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(OBJ_DIR)/%.o,$(SRC_FILES))
 EXECUTABLE = $(OUTPUT_DIR)/$(OUTPUT_NAME).exe
 
