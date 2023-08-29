@@ -1,0 +1,27 @@
+#ifndef _RECOURCE_RC_
+#define _RECOURCE_RC_
+
+#define STRING_FILE_DESCRIPTION "A program for managing a Minecraft server"
+#define PRODUCT_NAME "Mcsm"
+
+1 VERSIONINFO
+FILEVERSION 0,0,0,1
+PRODUCTVERSION 0,0,0,1
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904E4"
+        BEGIN
+            VALUE "FileDescription", STRING_FILE_DESCRIPTION
+            VALUE "FileVersion", "0,0,0,1"
+            VALUE "ProductVersion", "0.0.0.1"
+            VALUE "ProductName", PRODUCT_NAME
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+#endif

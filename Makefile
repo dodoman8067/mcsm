@@ -25,10 +25,14 @@ $(OBJ_DIR)/%.o: $(SRC_DIR)/%.cpp
 
 # Link object files to create the executable
 $(EXECUTABLE): $(OBJ_FILES)
-	$(COMPILER) $^ -o $@ $(LDFLAGS)
+	$(COMPILER) $^ -o $@ $(LDFLAGS) bin/resources.res
 
 # Clean the compiled files
 clean:
 	-@del /q $(subst /,\,$(OBJ_FILES)) 2> nul
 
-.PHONY: all clean
+# Compile resources.rc
+assets:
+	-@windres -J rc -O coff -i assets/resources.rc -o bin/resources.res
+
+.PHONY: all clean assets
