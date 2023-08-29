@@ -16,6 +16,8 @@ namespace mcsm {
         static void init();
         static std::vector<std::unique_ptr<mcsm::Command>>& getCommands();
         static void addCommand(std::unique_ptr<mcsm::Command> command);
+        static bool hasCommand(const std::string& name);
+        static std::unique_ptr<mcsm::Command> getCommand(const std::string& name);
     };
 };
 

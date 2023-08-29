@@ -7,6 +7,7 @@
 #include "command.h"
 #include "test_command.h"
 #include "version_command.h"
+#include "help_command.h"
 
 const std::string version = "0.0.1";
 
@@ -74,4 +75,6 @@ void initCommands(CURL* curl){
     std::unique_ptr<mcsm::VersionCommand> versionCommand = std::make_unique<mcsm::VersionCommand>("version", "Returns version information about this program.", curl, version);
     mcsm::CommandManager::addCommand(std::move(versionCommand));
 
+    std::unique_ptr<mcsm::HelpCommand> helpCommand = std::make_unique<mcsm::HelpCommand>("help", "Shows full list of commands.");
+    mcsm::CommandManager::addCommand(std::move(helpCommand));
 }
