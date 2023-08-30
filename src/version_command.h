@@ -8,10 +8,9 @@
 namespace mcsm {
     class VersionCommand : public mcsm::Command {
     private:
-        CURL* curl;
         std::string version;
     public:
-        VersionCommand(const std::string& name, const std::string& description, CURL* curl, const std::string& version);
+        VersionCommand(const std::string& name, const std::string& description, const std::string& version);
         ~VersionCommand();
         void execute(const std::vector<std::string>& args) override;
     };

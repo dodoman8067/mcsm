@@ -1,7 +1,6 @@
 #include "version_command.h"
 
-mcsm::VersionCommand::VersionCommand(const std::string& name, const std::string& description, CURL* curl, const std::string& version) : mcsm::Command(name, description) {
-    this->curl = curl;
+mcsm::VersionCommand::VersionCommand(const std::string& name, const std::string& description, const std::string& version) : mcsm::Command(name, description) {
     this->version = version;
 }
 

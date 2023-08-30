@@ -72,7 +72,7 @@ void initCommands(CURL* curl){
     std::unique_ptr<mcsm::TestCommand> testCommand = std::make_unique<mcsm::TestCommand>("test", "hello");
     mcsm::CommandManager::addCommand(std::move(testCommand));
 
-    std::unique_ptr<mcsm::VersionCommand> versionCommand = std::make_unique<mcsm::VersionCommand>("version", "Returns version information about this program.", curl, version);
+    std::unique_ptr<mcsm::VersionCommand> versionCommand = std::make_unique<mcsm::VersionCommand>("version", "Returns version information about this program.", version);
     mcsm::CommandManager::addCommand(std::move(versionCommand));
 
     std::unique_ptr<mcsm::HelpCommand> helpCommand = std::make_unique<mcsm::HelpCommand>("help", "Shows full list of commands.");
