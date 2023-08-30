@@ -20,7 +20,6 @@ int main(int argc, char *argv[]) {
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
     CURL* curl = curl_easy_init();
-    initCommands(curl);
     if (curl == nullptr)
     {
         std::cerr << "Error: initializing cURL failed." << std::endl;
@@ -35,6 +34,7 @@ int main(int argc, char *argv[]) {
         std::exit(1);
         return 1;
     }
+    initCommands(curl);
 
     if(argc < 2){
         std::cout << "Welcome to MCSM (Minecraft Server Manager)." << std::endl;
