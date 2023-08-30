@@ -13,8 +13,8 @@ BEGIN
         BLOCK "040904E4"
         BEGIN
             VALUE "FileDescription", STRING_FILE_DESCRIPTION
-            VALUE "FileVersion", "0,0,0,1"
-            VALUE "ProductVersion", "0.0.0.1"
+            VALUE "FileVersion", "0,0,1,0"
+            VALUE "ProductVersion", "0.0.1.0"
             VALUE "ProductName", PRODUCT_NAME
         END
     END
