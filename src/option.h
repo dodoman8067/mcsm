@@ -3,6 +3,7 @@
 
 #include <string>
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
 
@@ -10,11 +11,13 @@ namespace mcsm {
     class Option {
     private:
         std::string path;
+        std::string name;
         nlohmann::json data;
+        bool createDirectories(std::string const &dirName, std::error_code &err);
     public:
-        Option(const std::string& path);
+        Option(const std::string& path, const std::string& name);
         ~Option();
-        nlohmann::json getData();
+        nlohmann::json load();
     };
 }
 
