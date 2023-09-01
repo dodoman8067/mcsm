@@ -40,7 +40,6 @@ int main(int argc, char *argv[]) {
     if(argc < 2){
         std::cout << "Welcome to MCSM (Minecraft Server Manager)." << std::endl;
         std::cout << "Type \'mcsm help\' for list of commands." << std::endl; 
-        mcsm::Option option = mcsm::Option("mcsm.option.server.manage.ServerOptions");
         curl_easy_cleanup(curl);
         curl_global_cleanup();
         curl = nullptr;
