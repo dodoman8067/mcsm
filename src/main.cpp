@@ -8,6 +8,7 @@
 #include "test_command.h"
 #include "version_command.h"
 #include "help_command.h"
+#include "option.h"
 
 const std::string version = "0.0.1";
 
@@ -39,6 +40,10 @@ int main(int argc, char *argv[]) {
     if(argc < 2){
         std::cout << "Welcome to MCSM (Minecraft Server Manager)." << std::endl;
         std::cout << "Type \'mcsm help\' for list of commands." << std::endl; 
+        mcsm::Option option = mcsm::Option("mcsm.option.server.manage.ServerOptions");
+        curl_easy_cleanup(curl);
+        curl_global_cleanup();
+        curl = nullptr;
         std::exit(0);
     }
 
@@ -56,11 +61,14 @@ int main(int argc, char *argv[]) {
 
     if(!commandFound){
         std::cout << "Unknown command \"" << argv[1] << "\". " << "Type \'mcsm help\' for list of commands." << std::endl;
+        curl_easy_cleanup(curl);
+        curl_global_cleanup();
+        curl = nullptr;
         std::exit(0); 
     }
-
     curl_easy_cleanup(curl);
     curl_global_cleanup();
+    curl = nullptr;
     
     std::exit(0);
     return 0;
