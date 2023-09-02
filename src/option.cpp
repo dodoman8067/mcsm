@@ -11,6 +11,8 @@ mcsm::Option::Option(const std::string& path, const std::string& name){
     this->name = name1;
 
     this->file = new std::ifstream();
+    this->file->open(this->path, std::ios::out | std::ios::app);
+    this->file->close();
     this->file->open(this->path, std::ios::in | std::ios::out | std::ios::app);
     std::cout << "path: " << this->path << this->name << std::endl;
 }
@@ -18,6 +20,7 @@ mcsm::Option::Option(const std::string& path, const std::string& name){
 mcsm::Option::~Option(){
     this->file->close();
     delete this->file;
+    this->file = nullptr;
 }
 
 bool mcsm::Option::createDirectories(std::string const &dirName, std::error_code &err){
