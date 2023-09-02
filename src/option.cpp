@@ -10,11 +10,13 @@ mcsm::Option::Option(const std::string& path, const std::string& name){
     name1 = name1.append(".json");
     this->name = name1;
 
-    this->file = new std::ifstream(finalPath);
+    this->file = new std::ifstream();
+    this->file->open(this->path, std::ios::in | std::ios::out | std::ios::app);
     std::cout << "path: " << this->path << this->name << std::endl;
 }
 
 mcsm::Option::~Option(){
+    this->file->close();
     delete this->file;
 }
 
