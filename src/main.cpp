@@ -44,6 +44,7 @@ int main(int argc, char *argv[]) {
         curl_global_cleanup();
         curl = nullptr;
         std::exit(0);
+        return 0;
     }
 
     for(auto& v : mcsm::CommandManager::getCommands()){
@@ -63,7 +64,8 @@ int main(int argc, char *argv[]) {
         curl_easy_cleanup(curl);
         curl_global_cleanup();
         curl = nullptr;
-        std::exit(0); 
+        std::exit(0);
+        return 0;
     }
     curl_easy_cleanup(curl);
     curl_global_cleanup();
