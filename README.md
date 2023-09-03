@@ -23,9 +23,9 @@ This project includes the following dependencies :
 * [cURL](https://github.com/curl/curl)
 * [nlohmann/json](https://github.com/nlohmann/json)
 
-1. Build the dependencies and place the `.a` files into the `lib` folder (which you can create yourself). 
+1. Build the dependencies and place the `.a` files into the `lib` folder (which you can create yourself).
 
-2. Copy the include files from the dependency's `include` folder (Copy the `single_include` when including nlohmann/json). 
+2. Copy the include files from the dependency's `include` folder (Copy the `single_include` when including nlohmann/json).
 
 3. Run the cmake command.
 
