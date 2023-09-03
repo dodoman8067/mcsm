@@ -2,7 +2,7 @@
 #include <vector>
 #include <memory>
 #include <string>
-#include "curl_stuff.h"
+#include "util/curl_stuff.h"
 #include "command/command_manager.h"
 #include "command/command.h"
 #include "command/test_command.h"
