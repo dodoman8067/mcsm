@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include "command.h"
-#include "curl_stuff.h"
+#include "../curl_stuff.h"
 
 namespace mcsm {
     class VersionCommand : public mcsm::Command {

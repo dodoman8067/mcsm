@@ -3,7 +3,7 @@
 
 #include <memory>
 #include <vector>
-#include "curl_stuff.h"
+#include "../curl_stuff.h"
 #include "command.h"
 
 namespace mcsm {

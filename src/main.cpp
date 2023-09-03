@@ -3,12 +3,12 @@
 #include <memory>
 #include <string>
 #include "curl_stuff.h"
-#include "command_manager.h"
-#include "command.h"
-#include "test_command.h"
-#include "version_command.h"
-#include "help_command.h"
-#include "option.h"
+#include "command/command_manager.h"
+#include "command/command.h"
+#include "command/test_command.h"
+#include "command/version_command.h"
+#include "command/help_command.h"
+#include "data/option.h"
 
 const std::string version = "0.0.1";
 
