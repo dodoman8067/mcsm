@@ -1,3 +1,4 @@
+#ChatGPT generated Makefile
 # Makefile variables
 LIB_DIR = lib
 INCLUDE_DIR = include

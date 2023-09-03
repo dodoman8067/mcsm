@@ -21,6 +21,8 @@ int main(int argc, char *argv[]) {
     curl_global_init(CURL_GLOBAL_DEFAULT);
 
     CURL* curl = curl_easy_init();
+    //Checks if curl is properly initialized
+    //If not, prints error message and exits
     if (curl == nullptr)
     {
         std::cerr << "Error: initializing cURL failed." << std::endl;
@@ -37,6 +39,7 @@ int main(int argc, char *argv[]) {
     }
     initCommands(curl);
 
+    //Prints default message when no arguments
     if(argc < 2){
         std::cout << "Welcome to MCSM (Minecraft Server Manager)." << std::endl;
         std::cout << "Type \'mcsm help\' for list of commands." << std::endl; 
@@ -47,6 +50,7 @@ int main(int argc, char *argv[]) {
         return 0;
     }
 
+    //If arguments exist, iterates through CommandManager::getCommands()
     for(auto& v : mcsm::CommandManager::getCommands()){
         if(std::string(argv[1]) == v.get()->getName()){
             std::vector<std::string> args;
@@ -59,6 +63,7 @@ int main(int argc, char *argv[]) {
         }
     }
 
+    //If arguments exist but command is not found, prints message and exits
     if(!commandFound){
         std::cout << "Unknown command \"" << argv[1] << "\". " << "Type \'mcsm help\' for list of commands." << std::endl;
         curl_easy_cleanup(curl);
@@ -76,8 +81,10 @@ int main(int argc, char *argv[]) {
 }
 
 void initCommands(CURL* curl){
+    //Initializes CommandManager class
     mcsm::CommandManager::init();
 
+    //Adds command to CommandManager
     std::unique_ptr<mcsm::TestCommand> testCommand = std::make_unique<mcsm::TestCommand>("test", "hello");
     mcsm::CommandManager::addCommand(std::move(testCommand));
 
