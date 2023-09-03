@@ -12,15 +12,18 @@ namespace mcsm {
     private:
         std::string path;
         std::string name;
-        std::ifstream* file;
         nlohmann::json data;
         bool createDirectories(std::string const &dirName, std::error_code &err);
     public:
         Option(const std::string& path, const std::string& name);
         ~Option();
-        nlohmann::json load();
+        nlohmann::json load() const;
+        std::string getPath();
+        std::string getName();
+        nlohmann::json getValue(const std::string& key) const;
+        void setValue(const std::string& key, const nlohmann::json& value);
+        void save(const nlohmann::json& jsonData) const;
     };
 }
-
 
 #endif
