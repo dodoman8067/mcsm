@@ -15,6 +15,7 @@ void mcsm::CommandManager::init(){
 }
 
 void mcsm::CommandManager::addCommand(std::unique_ptr<mcsm::Command> command){
+    if(hasCommand(command->getName())) return;
    commands->push_back(std::move(command));
 }
 
