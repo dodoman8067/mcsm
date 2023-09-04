@@ -1,7 +1,7 @@
 #ifndef _RECOURCE_RC_
 #define _RECOURCE_RC_
 
-#define STRING_FILE_DESCRIPTION "A program for managing a Minecraft server"
+#define STRING_FILE_DESCRIPTION "Minecraft Server Manager"
 #define PRODUCT_NAME "Mcsm"
 
 1 VERSIONINFO
