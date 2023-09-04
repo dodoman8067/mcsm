@@ -10,11 +10,12 @@ void mcsm::HelpCommand::execute(const std::vector<std::string>& args){
         for(auto& command : mcsm::CommandManager::getCommands()){
             std::cout << "    " << command->getName() << " - " << command->getDescription() <<  std::endl;
         }
-        std::exit(0);
     }else{
-        if(!mcsm::CommandManager::hasCommand(args[0])) std::cout << "Unknown command \"" << args[0] << "\". Type 'mcsm help' for list of commands." << std::endl;
+        if(!mcsm::CommandManager::hasCommand(args[0])){
+            std::cout << "Unknown command \"" << args[0] << "\". Type 'mcsm help' for list of commands." << std::endl;
+            std::exit(0);
+        }
         std::unique_ptr<mcsm::Command> command = mcsm::CommandManager::getCommand(args[0]);
         std::cout << command->getName() << " - " << command->getDescription() <<  std::endl;
-        std::exit(0);
     }
 }
