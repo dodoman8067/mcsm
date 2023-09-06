@@ -59,11 +59,16 @@ nlohmann::json mcsm::Option::load() const {
 
 nlohmann::json mcsm::Option::getValue(const std::string& key) const {
     nlohmann::json jsonData = load();
-    if (jsonData.find(key) != jsonData.end()) {
+    if(jsonData.find(key) != jsonData.end()){
         return jsonData[key];
-    } else {
+    }else{
         return nullptr;
     }
+}
+
+bool mcsm::Option::hasValue(const std::string& key) const {
+    nlohmann::json data = load();
+    return data.find(key) != data.end();
 }
 
 void mcsm::Option::setValue(const std::string& key, const nlohmann::json& value){

@@ -20,6 +20,7 @@ namespace mcsm {
         std::string getPath();
         std::string getName();
         nlohmann::json getValue(const std::string& key) const;
+        bool hasValue(const std::string& key) const;
         void setValue(const std::string& key, const nlohmann::json& value);
         void save(const nlohmann::json& jsonData) const;
     };
