@@ -2,6 +2,7 @@
 #define __GET_SERVER_COMMAND_H__
 
 #include "command.h"
+#include <iostream>
 
 namespace mcsm {
     class GetServerCommand : public mcsm::Command {

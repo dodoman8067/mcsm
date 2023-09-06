@@ -1,7 +1,10 @@
 #ifndef __MCSM_SERVER_TYPE_H__
 #define __MCSM_SERVER_TYPE_H__
 
+#include <string>
+
 namespace mcsm {
+    
     enum ServerType {
         VANILLA,
         BUKKIT,
@@ -12,7 +15,7 @@ namespace mcsm {
         FABRIC,
         UNKNOWN
     };
-
+    
     enum BukkitServerType {
         CRAFTBUKKIT,
         SPIGOT,
@@ -22,6 +25,9 @@ namespace mcsm {
         FOLIA,
         UNKNOWN
     };
+
+    mcsm::ServerType getServerType(const std::string& name);
+    std::string getServerType(const mcsm::ServerType& type);
 }
 
 #endif
