@@ -2,6 +2,8 @@
 #define __GENERATE_SERVER_COMMAND_H__
 
 #include "command.h"
+#include <iostream>
+#include <limits>
 
 namespace mcsm {
     class GenerateServerCommand : public Command {

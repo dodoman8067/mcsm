@@ -8,6 +8,7 @@
 #include "command/test_command.h"
 #include "command/version_command.h"
 #include "command/help_command.h"
+#include "command/generate_server_command.h"
 #include "data/option.h"
 
 const std::string version = "0.0.1";
@@ -93,4 +94,7 @@ void initCommands(CURL* curl){
 
     std::unique_ptr<mcsm::HelpCommand> helpCommand = std::make_unique<mcsm::HelpCommand>("help", "Shows full list of commands.");
     mcsm::CommandManager::addCommand(std::move(helpCommand));
+
+    std::unique_ptr<mcsm::GenerateServerCommand> generateServerCommand = std::make_unique<mcsm::GenerateServerCommand>("create", "Generates server.");
+    mcsm::CommandManager::addCommand(std::move(generateServerCommand));
 }

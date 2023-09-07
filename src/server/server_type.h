@@ -22,8 +22,7 @@ namespace mcsm {
         PAPER,
         PURPUR,
         PUFFERFISH,
-        FOLIA,
-        UNKNOWN
+        FOLIA
     };
 
     mcsm::ServerType getServerType(const std::string& name);
