@@ -16,14 +16,7 @@ if(WIN32)
 endif()
 
 # Add CURL library
-set(CURL_LIBRARY ${CMAKE_SOURCE_DIR}/lib)
-set(CURL_INCLUDE_DIR ${CMAKE_SOURCE_DIR}/include)
-
-add_library(CURL::libcurl UNKNOWN IMPORTED)
-set_target_properties(CURL::libcurl PROPERTIES
-    IMPORTED_LOCATION ${CURL_LIBRARY}/libcurl.dll.a
-    INTERFACE_INCLUDE_DIRECTORIES ${CURL_INCLUDE_DIR}
-)
+find_package(CURL REQUIRED CONFIG)
 
 # Add executable
 add_executable(mcsm ${SRC_FILES} ${RESOURCE_FILE})

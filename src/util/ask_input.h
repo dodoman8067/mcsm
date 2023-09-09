@@ -3,9 +3,10 @@
 
 #include <iostream>
 #include <vector>
+#include <string>
 
 namespace mcsm {
-    void askInput(std::vector<std::string>& arguments);
+    void askInput(std::vector<std::string>& arguments, std::string& input, std::string& outputWhenNone);
 }
 
 #endif
