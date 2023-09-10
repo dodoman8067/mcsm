@@ -1,12 +1,12 @@
 #include "os_detection.h"
 
 mcsm::OS mcsm::getCurrentOS() {
-#if TARGET_OS == WINDOWS
+#ifdef _WIN32
     return mcsm::OS::WINDOWS;
-#elif TARGET_OS == UNIX
-    return mcsm::OS::UNIX;
-#elif TARGET_OS == LINUX
-    return mcsm::OS::LINUX;
+#elif __linux__
+    return mcsm::OS::LINUX; // This includes WSL
+#elif __APPLE__
+    return mcsm::OS::MAC;
 #else
     return nullptr;
 #endif
