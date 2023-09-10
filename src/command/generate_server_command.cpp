@@ -41,7 +41,7 @@ void mcsm::GenerateServerCommand::execute(const std::vector<std::string>& args){
         mcsm::askInput(description, input, output);
         std::cout << input << std::endl;
     }else{
-        std::cout << "This command is not quite ready yet! :)" << std::endl;
+        std::cout << "This command is not quite ready yet! :)" << "\n";
     }
 }
 

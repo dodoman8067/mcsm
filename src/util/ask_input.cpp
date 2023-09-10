@@ -24,7 +24,7 @@ SOFTWARE.
 
 void mcsm::askInput(std::vector<std::string>& arguments, std::string& input, const std::string &outputWhenNone){
     for(std::string& s : arguments){
-        std::cout << s << std::endl;
+        std::cout << s << "\n";
     }
     std::cout << " " << std::endl;
     while(true){

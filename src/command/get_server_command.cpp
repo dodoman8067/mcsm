@@ -30,11 +30,11 @@ mcsm::GetServerCommand::~GetServerCommand() {
 
 void mcsm::GetServerCommand::execute(const std::vector<std::string>& args){
     if(args.size() < 1){
-        std::cout << "args is empty" << std::endl;
+        std::cout << "args is empty" << "\n";
     }else{
         for(const std::string& s : args){
-            std::cout << s << std::endl;
+            std::cout << s << "\n";
         }
     }
-    std::cout << this->getDescription() << std::endl;
+    std::cout << this->getDescription() << "\n";
 }

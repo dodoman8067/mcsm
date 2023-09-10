@@ -48,15 +48,15 @@ int main(int argc, char *argv[]) {
     //If not, prints error message and exits
     if (curl == nullptr)
     {
-        std::cerr << "Error: initializing cURL failed." << std::endl;
-        std::cerr << "Possible solutions are : " << std::endl;
-        std::cerr << " " << std::endl;
-        std::cerr << "1.Try re-running the program." << std::endl;
-        std::cerr << "2.Try rebooting the PC." << std::endl;
-        std::cerr << "3.Reinstall the libcurl.dll" << std::endl;
-        std::cerr << "4.Reinstall the entire program." << std::endl;
-        std::cerr << " " << std::endl;
-        std::cerr << "If none of these work, you may find the solution on the internet." << std::endl;
+        std::cerr << "Error: initializing cURL failed.\n";
+        std::cerr << "Possible solutions are : \n";
+        std::cerr << "\n";
+        std::cerr << "1.Try re-running the program.\n";
+        std::cerr << "2.Try rebooting the PC.\n";
+        std::cerr << "3.Reinstall the libcurl.dll\n";
+        std::cerr << "4.Reinstall the entire program.\n";
+        std::cerr << "\n";
+        std::cerr << "If none of these work, you may find the solution on the internet.\n";
         std::exit(1);
         return 1;
     }
@@ -64,8 +64,8 @@ int main(int argc, char *argv[]) {
 
     //Prints default message when no arguments
     if(argc < 2){
-        std::cout << "Welcome to MCSM (Minecraft Server Manager)." << std::endl;
-        std::cout << "Type \'mcsm help\' for list of commands." << std::endl; 
+        std::cout << "Welcome to MCSM (Minecraft Server Manager).\n";
+        std::cout << "Type \'mcsm help\' for list of commands.\n"; 
         curl_easy_cleanup(curl);
         curl_global_cleanup();
         curl = nullptr;
@@ -88,7 +88,7 @@ int main(int argc, char *argv[]) {
 
     //If arguments exist but command is not found, prints message and exits
     if(!commandFound){
-        std::cout << "Unknown command \"" << argv[1] << "\". " << "Type \'mcsm help\' for list of commands." << std::endl;
+        std::cout << "Unknown command \"" << argv[1] << "\". " << "Type \'mcsm help\' for list of commands.\n";
         curl_easy_cleanup(curl);
         curl_global_cleanup();
         curl = nullptr;

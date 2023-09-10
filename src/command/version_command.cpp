@@ -31,6 +31,6 @@ mcsm::VersionCommand::~VersionCommand(){
 }
 
 void mcsm::VersionCommand::execute(const std::vector<std::string>& args){
-    std::cout << "MCSM version : " << version << std::endl;
-    std::cout << "cURL version : " << curl_version() << std::endl;
+    std::cout << "MCSM version : " << version << "\n";
+    std::cout << "cURL version : " << curl_version() << "\n";
 }

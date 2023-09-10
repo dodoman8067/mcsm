@@ -40,7 +40,7 @@ mcsm::Option::Option(const std::string& path, const std::string& name){
         createDirectories(this->path, ec);
         std::ofstream ofs(fullPath);
         if(!ofs.is_open()){
-            std::cerr << "Error: Cannot create directory " << fullPath << std::endl;
+            std::cerr << "Error: Cannot create directory " << fullPath << "\n";
             std::exit(1);
         }
         
@@ -68,7 +68,7 @@ nlohmann::json mcsm::Option::load() const {
     std::string fullPath = this->path + "/" + this->name;
     std::ifstream fileStream(fullPath);
     if (!fileStream.is_open()) {
-        std::cerr << "Error: Cannot load file " << fullPath << std::endl;
+        std::cerr << "Error: Cannot load file " << fullPath << "\n";
         std::exit(1);
     }
 
@@ -101,7 +101,7 @@ void mcsm::Option::setValue(const std::string& key, const nlohmann::json& value)
 
     std::ofstream fileStream(fullPath);
     if (!fileStream.is_open()) {
-        std::cerr << "Error: Cannot open file " << fullPath << std::endl;
+        std::cerr << "Error: Cannot open file " << fullPath << "\n";
         std::exit(1);
     }
 
@@ -116,7 +116,7 @@ void mcsm::Option::save(const nlohmann::json& jsonData) const {
         outFile << jsonData.dump(4); 
         outFile.close();
     }else{
-        std::cerr << "Error: Cannot save file " << fullPath << std::endl;
+        std::cerr << "Error: Cannot save file " << fullPath << "\n";
         std::exit(1);
     }
 }
