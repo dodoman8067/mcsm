@@ -23,7 +23,7 @@ This project includes the following dependencies :
 * [cURL](https://github.com/curl/curl)
 * [nlohmann/json](https://github.com/nlohmann/json)
 
-1. Build static libcurl and install it.
+1. Build static libcurl and install it (with CMake).
 
 2. Copy the include files from the dependency's `include` folder (Copy the `single_include` when including nlohmann/json) and place them to project's `include` folder (you can create it yourself)
 
