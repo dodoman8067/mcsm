@@ -14,7 +14,7 @@ The provided [CMakeLists.txt](CMakeLists.txt) is designed for Windows + MinGW se
 
     cmake -B ./bin
 
-3. Run the compiled executable in the `bin` folder to start using MCSM.
+3. Run the generated build files in bin directory and run `./mcsm` to test programm is sucessfully compiled.
 
 ### Dependencies
 
