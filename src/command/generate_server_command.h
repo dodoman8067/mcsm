@@ -2,6 +2,7 @@
 #define __GENERATE_SERVER_COMMAND_H__
 
 #include "command.h"
+#include "../util/ask_input.h"
 #include <iostream>
 #include <limits>
 

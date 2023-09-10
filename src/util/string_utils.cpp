@@ -10,3 +10,7 @@ bool mcsm::endsWith(const std::string& str, const std::string& value){
     }
     return str.compare(str.length() - value.length(), value.length(), value) == 0;
 }
+
+bool mcsm::isWhitespaceOrEmpty(const std::string& str){
+    return str.find_first_not_of(" \t\n\v\f\r") == std::string::npos;
+}

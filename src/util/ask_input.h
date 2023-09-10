@@ -4,9 +4,10 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include "string_utils.h"
 
 namespace mcsm {
-    void askInput(std::vector<std::string>& arguments, std::string& input, std::string& outputWhenNone);
+    void askInput(std::vector<std::string>& arguments, std::string& input, const std::string &outputWhenNone);
 }
 
 #endif

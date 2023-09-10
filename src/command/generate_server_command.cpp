@@ -7,13 +7,17 @@ mcsm::GenerateServerCommand::~GenerateServerCommand(){}
 void mcsm::GenerateServerCommand::execute(const std::vector<std::string>& args){
     if(args.size() <= 0) {
         std::string input;
-        std::vector<std::string>* description = new std::vector<std::string>();
-        description->push_back("Type a input.");
-        description->push_back("");
-        description->push_back("1.paper");
-        description->push_back("2.spigot");
-        description->push_back("3.bukkit");
-        delete description;
+        std::string output;
+        std::vector<std::string> description = {
+            "Type an input.",
+            "",
+            "1.paper",
+            "2.spigot",
+            "3.bukkit"
+        };
+
+        mcsm::askInput(description, input, output);
+        std::cout << input << std::endl;
     }else{
         std::cout << "This command is not quite ready yet! :)" << std::endl;
     }

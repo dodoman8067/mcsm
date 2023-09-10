@@ -6,6 +6,7 @@
 namespace mcsm {
     bool startsWith(const std::string& str, const std::string& value);
     bool endsWith(const std::string& str, const std::string& value);
+    bool isWhitespaceOrEmpty(const std::string& str);
 }
 
 #endif
