@@ -6,11 +6,11 @@ MCSM (MineCraft Server Manager) is a command-line program designed to manage Min
 
 ## Building
 
-The provided [CMakelists.txt](CMakelists.txt) is designed for Windows + MinGW setup. Other platforms may work but you will get NO support by doing this. Before building, ensure you have the necessary dependencies and files are in place :
+The provided [CMakeLists.txt](CMakeLists.txt) is designed for Windows + MinGW setup. Other platforms may work but you will get NO support by doing this. Before building, ensure you have the necessary dependencies and files are in place :
 
 1. Build the static dependencies as it showed in the below.
 
-2. Use the provided [CMakelists.txt](CMakelists.txt) to build the project. This can be done with the following command :
+2. Use the provided [CMakeLists.txt](CMakeLists.txt) to build the project. This can be done with the following command :
 
     cmake -B ./bin
 
