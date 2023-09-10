@@ -36,6 +36,7 @@ SOFTWARE.
 const std::string version = "0.0.1";
 
 void initCommands(CURL* curl);
+void clearCurl(CURL* curl);
 
 int main(int argc, char *argv[]) {
 
@@ -66,9 +67,7 @@ int main(int argc, char *argv[]) {
     if(argc < 2){
         std::cout << "Welcome to MCSM (Minecraft Server Manager).\n";
         std::cout << "Type \'mcsm help\' for list of commands.\n"; 
-        curl_easy_cleanup(curl);
-        curl_global_cleanup();
-        curl = nullptr;
+        clearCurl(curl);
         std::exit(0);
         return 0;
     }
@@ -89,15 +88,11 @@ int main(int argc, char *argv[]) {
     //If arguments exist but command is not found, prints message and exits
     if(!commandFound){
         std::cout << "Unknown command \"" << argv[1] << "\". " << "Type \'mcsm help\' for list of commands.\n";
-        curl_easy_cleanup(curl);
-        curl_global_cleanup();
-        curl = nullptr;
+        clearCurl(curl);
         std::exit(0);
         return 0;
     }
-    curl_easy_cleanup(curl);
-    curl_global_cleanup();
-    curl = nullptr;
+    clearCurl(curl);
     
     std::exit(0);
     return 0;
@@ -119,4 +114,10 @@ void initCommands(CURL* curl){
 
     std::unique_ptr<mcsm::GenerateServerCommand> generateServerCommand = std::make_unique<mcsm::GenerateServerCommand>("create", "Generates server.");
     mcsm::CommandManager::addCommand(std::move(generateServerCommand));
+}
+
+void clearCurl(CURL* curl){
+    curl_easy_cleanup(curl);
+    curl_global_cleanup();
+    curl = nullptr;
 }
