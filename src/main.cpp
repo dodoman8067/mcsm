@@ -10,7 +10,6 @@
 #include "command/help_command.h"
 #include "command/generate_server_command.h"
 #include "data/option.h"
-#include "os/os_detection.h"
 
 const std::string version = "0.0.1";
 
@@ -47,7 +46,6 @@ int main(int argc, char *argv[]) {
         std::cout << "Type \'mcsm help\' for list of commands." << std::endl; 
         curl_easy_cleanup(curl);
         curl_global_cleanup();
-        std::cout << mcsm::getCurrentOS() << std::endl;
         curl = nullptr;
         std::exit(0);
         return 0;
