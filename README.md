@@ -31,7 +31,7 @@ This project includes the following dependencies :
 
 ## Usage
 
-To use the compiled executable type:
+To use the compiled executable, type:
 
     mcsm help
 
