@@ -24,9 +24,13 @@ SOFTWARE.
 #define __MCSM_JAVA_DETECTION_H__
 
 #include <cstdlib>
+#include <string>
+#include <filesystem>
+#include "../util/string_utils.h"
 
 namespace mcsm {
     bool getJava();
+    std::string getJavaFromPath();
 }
 
 #endif

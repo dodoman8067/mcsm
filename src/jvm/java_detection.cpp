@@ -22,7 +22,18 @@ SOFTWARE.
 
 #include "java_detection.h"
 
-bool getJava(){
+bool mcsm::getJava(){
     int code = std::system("java -version");
     return code == 0;
+}
+
+std::string mcsm::getJavaFromPath(){
+    std::string path = std::getenv("JAVA_HOME");
+    if(mcsm::isWhitespaceOrEmpty(path)){
+        return nullptr;
+    }
+    if(!std::filesystem::exists(path + "/bin")) return nullptr;
+    if(std::filesystem::exists(path + "/bin/java")) return path + "/bin/java";
+    if(std::filesystem::exists(path + "/bin/java.exe")) return path + "/bin/java.exe";
+    return nullptr;
 }

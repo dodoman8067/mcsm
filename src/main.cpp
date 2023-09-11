@@ -32,6 +32,8 @@ SOFTWARE.
 #include "command/help_command.h"
 #include "command/generate_server_command.h"
 #include "data/option.h"
+#include "util/string_utils.h"
+#include "jvm/java_detection.h"
 
 const std::string version = "0.0.1";
 
@@ -66,7 +68,7 @@ int main(int argc, char *argv[]) {
     //Prints default message when no arguments
     if(argc < 2){
         std::cout << "Welcome to MCSM (Minecraft Server Manager).\n";
-        std::cout << "Type \'mcsm help\' for list of commands.\n"; 
+        std::cout << "Type \'mcsm help\' for list of commands.\n";
         clearCurl(curl);
         std::exit(0);
         return 0;
