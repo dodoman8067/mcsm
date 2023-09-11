@@ -36,7 +36,7 @@ SOFTWARE.
 const std::string version = "0.0.1";
 
 void initCommands(CURL* curl);
-void clearCurl(CURL* curl);
+inline void clearCurl(CURL* curl);
 
 int main(int argc, char *argv[]) {
 
@@ -116,7 +116,7 @@ void initCommands(CURL* curl){
     mcsm::CommandManager::addCommand(std::move(generateServerCommand));
 }
 
-void clearCurl(CURL* curl){
+inline void clearCurl(CURL* curl){
     curl_easy_cleanup(curl);
     curl_global_cleanup();
     curl = nullptr;
