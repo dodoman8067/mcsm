@@ -20,8 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __CURL_STUFF_H__
-#define __CURL_STUFF_H__
+#ifndef __MCSM_CURL_STUFF_H__
+#define __MCSM_CURL_STUFF_H__
 
 #include <curl/curl.h>
 #include <curl/curlver.h>

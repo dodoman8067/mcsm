@@ -20,8 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __VERSION_COMMAND_H__
-#define __VERSION_COMMAND_H__
+#ifndef __MCSM_VERSION_COMMAND_H__
+#define __MCSM_VERSION_COMMAND_H__
 
 #include <iostream>
 #include "command.h"

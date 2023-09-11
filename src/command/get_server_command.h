@@ -20,8 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __GET_SERVER_COMMAND_H__
-#define __GET_SERVER_COMMAND_H__
+#ifndef __MCSM_GET_SERVER_COMMAND_H__
+#define __MCSM_GET_SERVER_COMMAND_H__
 
 #include "command.h"
 #include <iostream>

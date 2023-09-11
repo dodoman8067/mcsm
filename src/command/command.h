@@ -20,8 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __COMMAND_H__
-#define __COMMAND_H__
+#ifndef __MCSM_COMMAND_H__
+#define __MCSM_COMMAND_H__
 
 #include <string>
 #include <vector>
