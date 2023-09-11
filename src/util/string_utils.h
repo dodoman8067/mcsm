@@ -24,11 +24,13 @@ SOFTWARE.
 #define __MCSM_STRING_UTILS_H__
 
 #include <string>
+#include <algorithm>
 
 namespace mcsm {
     bool startsWith(const std::string& str, const std::string& value);
     bool endsWith(const std::string& str, const std::string& value);
     bool isWhitespaceOrEmpty(const std::string& str);
+    void replaceAll(std::string& str, const std::string& value, const std::string& replacement);
 }
 
 #endif
