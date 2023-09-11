@@ -25,6 +25,7 @@ SOFTWARE.
 
 #include <string>
 #include <curl/curl.h>
+
 namespace mcsm {
     class VersionGetter {
     
