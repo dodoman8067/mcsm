@@ -15,6 +15,18 @@ if(WIN32)
     set(RESOURCE_FILE ${CMAKE_SOURCE_DIR}/assets/resources.rc)
 endif()
 
+# Set build types when no CMAKE_BUILD_TYPE defined
+if(NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Release)
+endif()
+
+# Sets compiler options
+if(GCC OR MINGW OR CLANG)
+    set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+endif()
+
 # Add CURL library
 find_package(CURL REQUIRED CONFIG)
 
