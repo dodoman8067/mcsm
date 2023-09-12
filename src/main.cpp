@@ -37,7 +37,7 @@ SOFTWARE.
 
 const std::string version = "0.0.1";
 
-inline void initCommands(CURL* curl);
+inline void initCommands();
 inline void clearCurl(CURL* curl);
 
 int main(int argc, char *argv[]) {
@@ -63,7 +63,7 @@ int main(int argc, char *argv[]) {
         std::exit(1);
         return 1;
     }
-    initCommands(curl);
+    initCommands();
 
     //Prints default message when no arguments
     if(argc < 2){
@@ -100,7 +100,7 @@ int main(int argc, char *argv[]) {
     return 0;
 }
 
-inline void initCommands(CURL* curl){
+inline void initCommands(){
     //Initializes CommandManager class
     mcsm::CommandManager::init();
 
