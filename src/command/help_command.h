@@ -34,7 +34,6 @@ namespace mcsm {
         ~HelpCommand();
         void execute(const std::vector<std::string>& args) override;
     private:
-
     };
 }
 

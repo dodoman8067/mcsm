@@ -76,7 +76,7 @@ int main(int argc, char *argv[]) {
 
     //If arguments exist, iterates through CommandManager::getCommands()
     for(auto& v : mcsm::CommandManager::getCommands()){
-        if(std::string(argv[1]) == v.get()->getName()){
+        if(argv[1] == v.get()->getName() || v.get()->hasAliases(argv[1])){
             std::vector<std::string> args;
             for(int i = 2; i < argc; i++){
                 args.push_back(std::string(argv[i]));
@@ -109,6 +109,7 @@ inline void initCommands(CURL* curl){
     mcsm::CommandManager::addCommand(std::move(testCommand));
 
     std::unique_ptr<mcsm::VersionCommand> versionCommand = std::make_unique<mcsm::VersionCommand>("version", "Returns version information about this program.", version);
+    versionCommand->addAliases("ver");
     mcsm::CommandManager::addCommand(std::move(versionCommand));
 
     std::unique_ptr<mcsm::HelpCommand> helpCommand = std::make_unique<mcsm::HelpCommand>("help", "Shows full list of commands.");

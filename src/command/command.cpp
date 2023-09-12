@@ -25,9 +25,15 @@ SOFTWARE.
 mcsm::Command::Command(const std::string& name, const std::string& description){
     this->name = name;
     this->description = description;
+    this->aliases = new std::vector<std::string>();
+    this->aliases->shrink_to_fit();
 }
 
 mcsm::Command::~Command(){
+    if(this->aliases != nullptr){
+        delete this->aliases;
+        this->aliases = nullptr;
+    }
 }
 
 std::string mcsm::Command::getName() const {
@@ -36,4 +42,20 @@ std::string mcsm::Command::getName() const {
 
 std::string mcsm::Command::getDescription() const {
     return this->description;
+}
+
+void mcsm::Command::addAliases(const std::string& value){
+    this->aliases->push_back(value);
+}
+
+bool mcsm::Command::hasAliases(const std::string& value) const{
+    for(std::string& aliases : *this->aliases){
+        if(aliases != value) continue;;
+        return true;
+    }
+    return false;
+}
+
+const std::vector<std::string>& mcsm::Command::getAliases() const {
+    return *this->aliases;
 }

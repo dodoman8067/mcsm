@@ -31,11 +31,15 @@ namespace mcsm {
     private:
         std::string name;
         std::string description;
+        std::vector<std::string>* aliases;
     public:
         Command(const std::string& name, const std::string& description);
         ~Command();
         std::string getName() const;
         std::string getDescription() const;
+        void addAliases(const std::string& value);
+        bool hasAliases(const std::string& value) const;
+        const std::vector<std::string>& getAliases() const;
         virtual void execute(const std::vector<std::string>& args) = 0;
     };
 };
