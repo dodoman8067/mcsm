@@ -4,9 +4,6 @@ project(mcsm)
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 
-# Include directories
-include_directories(${CMAKE_SOURCE_DIR}/include)
-
 # Source files
 file(GLOB_RECURSE SRC_FILES ${CMAKE_SOURCE_DIR}/src/*.cpp)
 
@@ -27,11 +24,13 @@ if(GCC OR MINGW OR CLANG)
     set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 endif()
 
-# Add CURL library
+# Find dependencies
 find_package(CURL REQUIRED CONFIG)
+find_package(nlohmann_json 3.2.0 REQUIRED)
 
 # Add executable
 add_executable(mcsm ${SRC_FILES} ${RESOURCE_FILE})
 
-# Link CURL library
+# Link dependencies
 target_link_libraries(mcsm PRIVATE CURL::libcurl)
+target_link_libraries(mcsm PRIVATE nlohmann_json::nlohmann_json)
