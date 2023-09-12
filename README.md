@@ -6,28 +6,24 @@ MCSM (MineCraft Server Manager) is a command-line program designed to manage Min
 
 ## Building
 
-The provided [CMakeLists.txt](CMakeLists.txt) is designed for Windows + MinGW setup. For Linux, you may build  Before building, ensure you have the necessary dependencies and files are in place :
-
 1. Build the static dependencies as it showed in the below.
 
-2. Use the provided [CMakeLists.txt](CMakeLists.txt) to build the project. This can be done with the following command :
+2. Use the provided [CMakeLists.txt](CMakeLists.txt) to build the project with the following command :
 
     cmake -B ./bin
 
-3. Run the generated build files in bin directory and run `./mcsm` to test program is sucessfully compiled.
+3. Run the generated build files in `bin` directory with `make` and run `./mcsm` to test program is sucessfully compiled.
 
 ### Dependencies
 
-This project includes the following dependencies :
+NOTE: This project only supports external dependencies that is installed with CMake-generated makefiles.
+
+This project requires the following dependencies :
 
 * [cURL](https://github.com/curl/curl)
 * [nlohmann/json](https://github.com/nlohmann/json)
 
-1. Build static libcurl and install it (with CMake).
-
-2. Copy the include files from the dependency's `include` folder (Copy the `single_include` when including nlohmann/json) and place them to project's `include` folder (you can create it yourself)
-
-3. Run the cmake command.
+Before building, you must build them(static libraries if libcurl) and install it with CMake.
 
 ## Usage
 
