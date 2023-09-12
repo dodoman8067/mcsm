@@ -27,10 +27,12 @@ SOFTWARE.
 #include <vector>
 #include "../util/curl_stuff.h"
 #include "command.h"
+#include <iostream>
 
 namespace mcsm {
     class CommandManager {
     private:
+        static bool initialized;
         static std::unique_ptr<std::vector<std::unique_ptr<mcsm::Command>>> commands;
         CommandManager();
     public:

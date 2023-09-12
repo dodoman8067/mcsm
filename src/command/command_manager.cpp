@@ -23,8 +23,10 @@ SOFTWARE.
 #include "command_manager.h"
 
 std::unique_ptr<std::vector<std::unique_ptr<mcsm::Command>>> mcsm::CommandManager::commands;
+bool mcsm::CommandManager::initialized;
 
 mcsm::CommandManager::CommandManager(){
+    initialized = false;
 }
 
 mcsm::CommandManager::~CommandManager(){
@@ -32,8 +34,17 @@ mcsm::CommandManager::~CommandManager(){
 }
 
 void mcsm::CommandManager::init(){
+    if(initialized){
+        std::cerr << "Error: Program's command manager was initialized more than once.\n";
+        std::cerr << "You're not supposed to see this message unless you're using development version.\n";
+        std::cerr << "If you see this message, this might be a software issue or the file is corrupted.\n";
+        std::cerr << "If you think this is a software issue, please open a issue to github https://github.com/dodoman8067/mcsm .\n";
+        std::cerr << "Otherwise, reinstall the entire program.\n";
+        std::exit(1);
+    }
     commands = std::make_unique<std::vector<std::unique_ptr<mcsm::Command>>>();
     commands->shrink_to_fit();
+    initialized = true;
 }
 
 void mcsm::CommandManager::addCommand(std::unique_ptr<mcsm::Command> command){
