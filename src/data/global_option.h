@@ -20,25 +20,27 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __MCSM_OPTION_H__
-#define __MCSM_OPTION_H__
+#ifndef __MCSM_GLOBAL_OPTION_H__
+#define __MCSM_GLOBAL_OPTION_H__
 
 #include <string>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
 #include <nlohmann/json.hpp>
+#include "../util/os/os_detection.h"
 #include "../util/string_utils.h"
 
 namespace mcsm {
-    class Option {
+    class GlobalOption {
     private:
         std::string path;
         std::string name;
         bool createDirectories(std::string const &dirName, std::error_code &err);
+        std::string getDataPathPerOS();
     public:
-        Option(const std::string& path, const std::string& name);
-        ~Option();
+        GlobalOption(const std::string& path, const std::string& name);
+        ~GlobalOption();
         nlohmann::json load() const;
         std::string getPath();
         std::string getName();

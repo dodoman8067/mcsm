@@ -20,12 +20,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "option.h"
+#include "global_option.h"
 
-mcsm::Option::Option(const std::string& path, const std::string& name){
+mcsm::GlobalOption::GlobalOption(const std::string& path, const std::string& name){
     std::string path1 = path;
     std::replace(path1.begin(), path1.end(), '.', '/');
-    std::string finalPath = "./.mcsm" + path1;
+    std::string finalPath = getDataPathPerOS() + path1;
     this->path = finalPath;
 
     std::string name1 = name;
@@ -51,10 +51,37 @@ mcsm::Option::Option(const std::string& path, const std::string& name){
     }
 }
 
-mcsm::Option::~Option(){
+mcsm::GlobalOption::~GlobalOption(){
 }
 
-bool mcsm::Option::createDirectories(std::string const &dirName, std::error_code &err){
+std::string mcsm::GlobalOption::getDataPathPerOS(){
+    std::string returnPath;
+    switch(mcsm::getCurrentOS()){
+        case mcsm::OS::WINDOWS: {
+            std::string windowsPath = getenv("USERPROFILE");
+            windowsPath.append("/AppData/Local/mcsm");
+            mcsm::replaceAll(windowsPath, "\\", "/");
+            returnPath = std::move(windowsPath);
+            break;
+        }
+
+        case mcsm::OS::LINUX: {
+            std::string linuxPath = "~/.local/share/mcsm";
+            returnPath = std::move(linuxPath);
+            break;
+        }
+
+        default: {
+            std::cerr << "Error: This platform isn't supported.\n";
+            std::cerr << "This program only supports Linux and Windows.\n";
+            std::exit(1);
+            break;
+        }
+    }
+    return returnPath;
+}
+
+bool mcsm::GlobalOption::createDirectories(std::string const &dirName, std::error_code &err){
     err.clear();
     if(!std::filesystem::create_directories(dirName, err)){
         if(std::filesystem::exists(dirName)){
@@ -66,7 +93,7 @@ bool mcsm::Option::createDirectories(std::string const &dirName, std::error_code
     return true;
 }
 
-nlohmann::json mcsm::Option::load() const {
+nlohmann::json mcsm::GlobalOption::load() const {
     std::string fullPath = this->path + "/" + this->name;
     std::ifstream fileStream(fullPath);
     if (!fileStream.is_open()) {
@@ -81,7 +108,7 @@ nlohmann::json mcsm::Option::load() const {
     return nlohmann::json::parse(content);
 }
 
-nlohmann::json mcsm::Option::getValue(const std::string& key) const {
+nlohmann::json mcsm::GlobalOption::getValue(const std::string& key) const {
     nlohmann::json jsonData = load();
     if(jsonData.find(key) != jsonData.end()){
         return jsonData[key];
@@ -90,12 +117,12 @@ nlohmann::json mcsm::Option::getValue(const std::string& key) const {
     }
 }
 
-bool mcsm::Option::hasValue(const std::string& key) const {
+bool mcsm::GlobalOption::hasValue(const std::string& key) const {
     nlohmann::json data = load();
     return data.find(key) != data.end();
 }
 
-void mcsm::Option::setValue(const std::string& key, const nlohmann::json& value){
+void mcsm::GlobalOption::setValue(const std::string& key, const nlohmann::json& value){
     nlohmann::json jsonData = load();
     std::string fullPath = this->path + "/" + this->name;
 
@@ -111,7 +138,7 @@ void mcsm::Option::setValue(const std::string& key, const nlohmann::json& value)
     fileStream.close();
 }
 
-void mcsm::Option::save(const nlohmann::json& jsonData) const {
+void mcsm::GlobalOption::save(const nlohmann::json& jsonData) const {
     std::string fullPath = this->path + "/" + this->name;
     std::ofstream outFile(fullPath);
     if (outFile.is_open()) {
@@ -123,10 +150,10 @@ void mcsm::Option::save(const nlohmann::json& jsonData) const {
     }
 }
 
-std::string mcsm::Option::getName(){
+std::string mcsm::GlobalOption::getName(){
     return this->name;
 }
 
-std::string mcsm::Option::getPath(){
+std::string mcsm::GlobalOption::getPath(){
     return this->path;
 }
