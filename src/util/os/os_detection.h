@@ -26,7 +26,6 @@ SOFTWARE.
 namespace mcsm {
     enum OS {
         WINDOWS,
-        MAC,
         LINUX
     };
     OS getCurrentOS();

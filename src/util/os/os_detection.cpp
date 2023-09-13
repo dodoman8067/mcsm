@@ -27,8 +27,6 @@ mcsm::OS mcsm::getCurrentOS() {
     return mcsm::OS::WINDOWS;
 #elif __linux__
     return mcsm::OS::LINUX;
-#elif __APPLE__
-    return mcsm::OS::MAC;
 #else
     return nullptr;
 #endif
