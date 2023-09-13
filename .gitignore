@@ -3,8 +3,12 @@
 
 #project files
 bin
+build
 lib
 include
 
 #runtime files
 .mcsm
+
+#binary files
+*.exe
