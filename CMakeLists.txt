@@ -18,13 +18,13 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # Sets compiler options
-if(GCC OR MINGW OR CLANG)
-    set(CMAKE_CXX_FLAGS "-Wall -Wextra")
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pthread")
     set(CMAKE_CXX_FLAGS_DEBUG "-g")
     set(CMAKE_CXX_FLAGS_RELEASE "-O2")
 endif()
 
-# Find dependencies
+# Find dependencies 
 find_package(CURL REQUIRED CONFIG)
 find_package(nlohmann_json 3.2.0 REQUIRED)
 
@@ -34,3 +34,7 @@ add_executable(mcsm ${SRC_FILES} ${RESOURCE_FILE})
 # Link dependencies
 target_link_libraries(mcsm PRIVATE CURL::libcurl)
 target_link_libraries(mcsm PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(mcsm PRIVATE -static-libstdc++)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc")
+endif()
