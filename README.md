@@ -14,6 +14,19 @@ MCSM (MineCraft Server Manager) is a command-line program designed to manage Min
 
 3. Run the generated build files in `bin` directory with `make` and run `./mcsm` to test program is sucessfully compiled.
 
+## Supported platforms
+
+* OS:
+  * Windows
+  * Linux
+
+* Compilers:
+  * Mingw-w64
+  * GCC
+  * Clang
+
+For those who wonder : MSVC is not supported right now. If you try to build it with MSVC, the program won't be able to run without C++ runtime libraries.
+
 ### Dependencies
 
 NOTE: This project only supports external dependencies that is installed with CMake-generated makefiles.
@@ -23,7 +36,7 @@ This project requires the following dependencies :
 * [cURL](https://github.com/curl/curl)
 * [nlohmann/json](https://github.com/nlohmann/json)
 
-Before building, you must build them(static libraries if libcurl) and install it with CMake.
+Before building, you must build them(static if libcurl) and install it with CMake.
 
 ## Usage
 
