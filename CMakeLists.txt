@@ -19,9 +19,9 @@ endif()
 
 # Sets compiler options
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pthread")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
     set(CMAKE_CXX_FLAGS_DEBUG "-g")
-    set(CMAKE_CXX_FLAGS_RELEASE "-O2")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 endif()
 
 # Find dependencies 
@@ -34,7 +34,7 @@ add_executable(mcsm ${SRC_FILES} ${RESOURCE_FILE})
 # Link dependencies
 target_link_libraries(mcsm PRIVATE CURL::libcurl)
 target_link_libraries(mcsm PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(mcsm PRIVATE -static-libstdc++)
-if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static-libgcc")
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+    message("Detected compiler : " ${CMAKE_CXX_COMPILER_ID} " using -static flags.")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
 endif()
