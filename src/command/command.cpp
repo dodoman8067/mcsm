@@ -45,6 +45,7 @@ std::string mcsm::Command::getDescription() const {
 }
 
 void mcsm::Command::addAliases(const std::string& value){
+    if(mcsm::CommandManager::hasAliasesInGlobal(value)) return;
     this->aliases->push_back(value);
 }
 

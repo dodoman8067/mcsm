@@ -70,6 +70,15 @@ bool mcsm::CommandManager::hasAliases(const std::string& command, const std::str
     return commandInstance->hasAliases(value);
 }
 
+bool mcsm::CommandManager::hasAliasesInGlobal(const std::string& value){
+    for(std::unique_ptr<mcsm::Command>& command : mcsm::CommandManager::getCommands()){
+        if(command->hasAliases(value)){
+            return true;
+        }
+    }
+    return false;
+}
+
 std::unique_ptr<mcsm::Command> mcsm::CommandManager::getCommand(const std::string& name){
     for(auto& command : *commands){
         if(command->getName() != name && !command->hasAliases(name)) continue;

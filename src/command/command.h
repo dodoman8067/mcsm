@@ -43,4 +43,6 @@ namespace mcsm {
         virtual void execute(const std::vector<std::string>& args) = 0;
     };
 };
+
+#include "command_manager.h"
 #endif

@@ -42,6 +42,7 @@ namespace mcsm {
         static void addCommand(std::unique_ptr<mcsm::Command> command);
         static bool hasCommand(const std::string& name);
         static bool hasAliases(const std::string& command, const std::string& value);
+        static bool hasAliasesInGlobal(const std::string& value);
         static std::unique_ptr<mcsm::Command> getCommand(const std::string& name);
     };
 };
