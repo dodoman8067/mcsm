@@ -112,6 +112,12 @@ inline void initCommands(){
     versionCommand->addAliases("ver");
     mcsm::CommandManager::addCommand(std::move(versionCommand));
 
+    std::cout << "cmd1" << "\n";
+    std::cout << mcsm::CommandManager::hasAliases("version", "ver") << "\n";
+    std::cout << "cmd2" << "\n";
+
+    std::cout << "cmd3" << "\n";
+
     std::unique_ptr<mcsm::HelpCommand> helpCommand = std::make_unique<mcsm::HelpCommand>("help", "Shows full list of commands.");
     mcsm::CommandManager::addCommand(std::move(helpCommand));
 

@@ -58,6 +58,7 @@ std::vector<std::unique_ptr<mcsm::Command>>& mcsm::CommandManager::getCommands()
 
 bool mcsm::CommandManager::hasCommand(const std::string& name){
     for(auto& command : *commands){
+        if(command == nullptr) continue;
         if(command->getName() != name && !command->hasAliases(name)) continue;
         return true;
     }
