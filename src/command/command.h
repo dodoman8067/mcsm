@@ -25,7 +25,6 @@ SOFTWARE.
 
 #include <string>
 #include <vector>
-#include <memory>
 
 namespace mcsm {
     class Command {
@@ -44,7 +43,4 @@ namespace mcsm {
         virtual void execute(const std::vector<std::string>& args) = 0;
     };
 };
-
-#include "command_manager.h"
-
 #endif

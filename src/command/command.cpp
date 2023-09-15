@@ -49,10 +49,9 @@ void mcsm::Command::addAliases(const std::string& value){
 }
 
 bool mcsm::Command::hasAliases(const std::string& value) const{
-    for(std::string& alias : *this->aliases){
-        if(alias == value){
-            return true;
-        }
+    for(std::string& aliases : *this->aliases){
+        if(aliases != value) continue;;
+        return true;
     }
     return false;
 }
