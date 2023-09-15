@@ -23,11 +23,11 @@ SOFTWARE.
 #ifndef __MCSM_GLOBAL_OPTION_H__
 #define __MCSM_GLOBAL_OPTION_H__
 
+#include <nlohmann/json.hpp>
 #include <string>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <nlohmann/json.hpp>
 #include "../util/os/os_detection.h"
 #include "../util/string_utils.h"
 

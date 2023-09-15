@@ -23,9 +23,9 @@ SOFTWARE.
 #ifndef __MCSM_COMMAND_MANAGER_H__
 #define __MCSM_COMMAND_MANAGER_H__
 
+#include <curl/curl.h>
 #include <memory>
 #include <vector>
-#include "../util/curl_stuff.h"
 #include "command.h"
 #include <iostream>
 

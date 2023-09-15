@@ -23,11 +23,11 @@ SOFTWARE.
 #ifndef __MCSM_OPTION_H__
 #define __MCSM_OPTION_H__
 
+#include <nlohmann/json.hpp>
 #include <string>
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <nlohmann/json.hpp>
 #include "../util/string_utils.h"
 
 namespace mcsm {

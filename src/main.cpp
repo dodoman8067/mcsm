@@ -20,11 +20,11 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include <curl/curl.h>
 #include <iostream>
 #include <vector>
 #include <memory>
 #include <string>
-#include "util/curl_stuff.h"
 #include "command/command_manager.h"
 #include "command/command.h"
 #include "command/test_command.h"

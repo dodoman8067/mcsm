@@ -25,7 +25,6 @@ SOFTWARE.
 
 #include <iostream>
 #include "command.h"
-#include "../util/curl_stuff.h"
 
 namespace mcsm {
     class VersionCommand : public mcsm::Command {
