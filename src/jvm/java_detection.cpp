@@ -28,12 +28,35 @@ bool mcsm::getJava(){
 }
 
 std::string mcsm::getJavaFromPath(){
-    std::string path = std::getenv("JAVA_HOME");
+    const char* path = std::getenv("JAVA_HOME");
+    if(path == nullptr || path == NULL) return std::move("");
     if(mcsm::isWhitespaceOrEmpty(path)){
-        return nullptr;
+        return std::move("");
     }
-    if(!std::filesystem::exists(path + "/bin")) return nullptr;
-    if(std::filesystem::exists(path + "/bin/java")) return path + "/bin/java";
-    if(std::filesystem::exists(path + "/bin/java.exe")) return path + "/bin/java.exe";
-    return nullptr;
+    std::string strPath = path;
+    if(!std::filesystem::exists(strPath + "/bin")) return std::move("");
+    if(std::filesystem::exists(strPath + "/bin/java")) return std::move(strPath + "/bin/java");
+    if(std::filesystem::exists(strPath + "/bin/java.exe")) return std::move(strPath + "/bin/java.exe");
+    return std::move("");
+}
+
+
+std::string mcsm::detectJava(){
+    std::cout << "[mcsm] Detecting java..\n";
+    if(getJava()){
+        std::cout << "[mcsm] Detected java from command.\n";
+        return std::move("java");
+    }else{
+        std::cout << "[mcsm] Couldn't detect java from command; Looking from JAVA_HOME.\n";
+        std::string str = getJavaFromPath();
+        if(mcsm::isWhitespaceOrEmpty(str)){
+            std::cerr << "[mcsm] JAVA_HOME is not set; Please set an enviroment variable for JAVA_HOME.\n";
+            std::cerr << "[mcsm] Or you may set the JVM path manually.\n";
+            std::exit(1);
+        }else{
+            mcsm::replaceAll(str, "\\", "/");
+            std::cout << "[mcsm] Detected java from JAVA_HOME : " << str << ".\n";
+            return str;
+        }
+    }
 }

@@ -26,11 +26,13 @@ SOFTWARE.
 #include <cstdlib>
 #include <string>
 #include <filesystem>
+#include <iostream>
 #include "../util/string_utils.h"
 
 namespace mcsm {
     bool getJava();
     std::string getJavaFromPath();
+    std::string detectJava();
 }
 
 #endif

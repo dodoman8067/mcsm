@@ -35,6 +35,7 @@ namespace mcsm {
     }
 
     bool isWhitespaceOrEmpty(const std::string& str){
+        if(str.empty()) return true;
         return str.find_first_not_of(" \t\n\v\f\r") == std::string::npos;
     }
 
