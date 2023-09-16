@@ -56,8 +56,7 @@ int main(int argc, char *argv[]) {
         std::cerr << "\n";
         std::cerr << "1.Try re-running the program.\n";
         std::cerr << "2.Try rebooting the PC.\n";
-        std::cerr << "3.Reinstall the libcurl.dll\n";
-        std::cerr << "4.Reinstall the entire program.\n";
+        std::cerr << "3.Try reinstalling the entire program.\n";
         std::cerr << "\n";
         std::cerr << "If none of these work, you may find the solution on the internet.\n";
         std::exit(1);
