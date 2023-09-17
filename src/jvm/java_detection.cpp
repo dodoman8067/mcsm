@@ -43,20 +43,14 @@ std::string mcsm::getJavaFromPath(){
 
 std::string mcsm::detectJava(){
     std::cout << "[mcsm] Detecting java..\n";
-    if(getJava()){
-        std::cout << "[mcsm] Detected java from command.\n";
-        return std::move("java");
+    std::string str = getJavaFromPath();
+    if(mcsm::isWhitespaceOrEmpty(str)){
+        std::cerr << "[mcsm] JAVA_HOME is not set; Please set an enviroment variable for JAVA_HOME.\n";
+        std::cerr << "[mcsm] Or you may set the JVM path manually.\n";
+        std::exit(1);
     }else{
-        std::cout << "[mcsm] Couldn't detect java from command; Looking from JAVA_HOME.\n";
-        std::string str = getJavaFromPath();
-        if(mcsm::isWhitespaceOrEmpty(str)){
-            std::cerr << "[mcsm] JAVA_HOME is not set; Please set an enviroment variable for JAVA_HOME.\n";
-            std::cerr << "[mcsm] Or you may set the JVM path manually.\n";
-            std::exit(1);
-        }else{
-            mcsm::replaceAll(str, "\\", "/");
-            std::cout << "[mcsm] Detected java from JAVA_HOME : " << str << ".\n";
-            return str;
-        }
+        mcsm::replaceAll(str, "\\", "/");
+        std::cout << "[mcsm] Detected java from JAVA_HOME : " << str << ".\n";
+        return str;
     }
 }
