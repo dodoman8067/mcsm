@@ -1,14 +1,81 @@
-#dev environment files
-.vscode
+# Made by ChatGPT
 
-#project files
-bin
-build
-lib
-include
-
-#runtime files
-.mcsm
-
-#binary files
+# C++ specific
+*.out
+*.app
 *.exe
+*.so
+*.dll
+*.dylib
+
+# Compiled source
+*.suo
+*.pdb
+*.idb
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.dylib
+*.so
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lib
+*.a
+
+# Compiled Object files
+*.o
+*.obj
+
+# Compiled build output
+build/
+bin/
+lib/
+
+# Visual Studio files
+.vscode/
+*.sln
+*.vcxproj
+*.vcxproj.filters
+*.vcxproj.user
+*.vcproj
+*.sdf
+*.opensdf
+*.cachefile
+*.VC.db
+
+# Xcode files
+*.xcodeproj
+*.xcworkspace
+*.xcuserdatad
+
+# Code::Blocks
+*.depend
+*.layout
+
+# CMake files
+CMakeFiles/
+CMakeCache.txt
+CMakeScripts/
+CMakeTmp/
+CTestTestfile.cmake
+Testing/
+
+# Sublime Text files
+*.sublime-project
+*.sublime-workspace
+
+# Emacs TAGS
+TAGS
+
+# User-specific files
+*.swp
+*~
+.DS_Store
