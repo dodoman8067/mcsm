@@ -44,7 +44,7 @@ int main(int argc, char *argv[]) {
 
     bool commandFound = false;
 
-    curl_global_init(CURL_GLOBAL_DEFAULT);
+    curl_global_init(CURL_VERSION_THREADSAFE);
 
     CURL* curl = curl_easy_init();
     //Checks if curl is properly initialized
