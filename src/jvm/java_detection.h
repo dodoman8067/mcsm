@@ -28,9 +28,10 @@ SOFTWARE.
 #include <filesystem>
 #include <iostream>
 #include "../util/string_utils.h"
+#include "../util/os/os_detection.h"
 
 namespace mcsm {
-    bool getJava();
+    std::string getJavaFromHome();
     std::string getJavaFromPath();
     std::string detectJava();
 }
