@@ -12,7 +12,7 @@ MCSM (MineCraft Server Manager) is a command-line program designed to manage Min
 
     cmake -B ./bin
 
-3. Run the generated build files in `bin` directory with `make` and run `./mcsm` to test program is sucessfully compiled.
+3. Run the generated build files in `bin` directory and run `./mcsm` to test program is sucessfully compiled.
 
 ## Supported platforms
 
