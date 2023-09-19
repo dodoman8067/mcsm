@@ -11,7 +11,8 @@ namespace mcsm {
         JvmOption();
         ~JvmOption();
         void init();
-        void getJvmPath();
+        std::string getJvmPath();
+        std::string getJvmArguments();
     };
 }
 

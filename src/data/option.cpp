@@ -33,28 +33,12 @@ mcsm::Option::Option(const std::string& path, const std::string& name){
         name1 = name1.append(".json");
     }
     this->name = name1;
-
-    std::string fullPath = this->path + "/" + this->name;
-
-    std::error_code ec;
-
-    if(!std::filesystem::exists(fullPath)){
-        createDirectories(this->path, ec);
-        std::ofstream ofs(fullPath);
-        if(!ofs.is_open()){
-            std::cerr << "Error: Cannot create directory " << fullPath << "\n";
-            std::exit(1);
-        }
-        
-        ofs << "{}";
-        ofs.close();
-    }
 }
 
 mcsm::Option::~Option(){
 }
 
-bool mcsm::Option::createDirectories(std::string const &dirName, std::error_code &err){
+bool mcsm::Option::createDirectories(std::string const &dirName, std::error_code &err) const{
     err.clear();
     if(!std::filesystem::create_directories(dirName, err)){
         if(std::filesystem::exists(dirName)){
@@ -68,6 +52,19 @@ bool mcsm::Option::createDirectories(std::string const &dirName, std::error_code
 
 nlohmann::json mcsm::Option::load() const {
     std::string fullPath = this->path + "/" + this->name;
+    if(!std::filesystem::exists(fullPath)){
+        std::error_code ec;
+        createDirectories(this->path, ec);
+        std::ofstream ofs(fullPath);
+        if(!ofs.is_open()){
+            std::cerr << "Error: Cannot create directory " << fullPath << "\n";
+            std::exit(1);
+        }
+        
+        ofs << "{}";
+        ofs.close();
+    }
+
     std::ifstream fileStream(fullPath);
     if (!fileStream.is_open()) {
         std::cerr << "Error: Cannot load file " << fullPath << "\n";
@@ -93,6 +90,11 @@ nlohmann::json mcsm::Option::getValue(const std::string& key) const {
 bool mcsm::Option::hasValue(const std::string& key) const {
     nlohmann::json data = load();
     return data.find(key) != data.end();
+}
+
+bool mcsm::Option::exists() const{
+    std::string fullPath = this->path + "/" + this->name;
+    return std::filesystem::exists(fullPath);
 }
 
 void mcsm::Option::setValue(const std::string& key, const nlohmann::json& value){

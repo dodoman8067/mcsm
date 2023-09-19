@@ -33,22 +33,6 @@ mcsm::GlobalOption::GlobalOption(const std::string& path, const std::string& nam
         name1 = name1.append(".json");
     }
     this->name = name1;
-
-    std::string fullPath = this->path + "/" + this->name;
-
-    std::error_code ec;
-
-    if(!std::filesystem::exists(fullPath)){
-        createDirectories(this->path, ec);
-        std::ofstream ofs(fullPath);
-        if(!ofs.is_open()){
-            std::cerr << "Error: Cannot create directory " << fullPath << "\n";
-            std::exit(1);
-        }
-        
-        ofs << "{}";
-        ofs.close();
-    }
 }
 
 mcsm::GlobalOption::~GlobalOption(){
@@ -81,7 +65,7 @@ std::string mcsm::GlobalOption::getDataPathPerOS(){
     return returnPath;
 }
 
-bool mcsm::GlobalOption::createDirectories(std::string const &dirName, std::error_code &err){
+bool mcsm::GlobalOption::createDirectories(std::string const &dirName, std::error_code &err) const{
     err.clear();
     if(!std::filesystem::create_directories(dirName, err)){
         if(std::filesystem::exists(dirName)){
@@ -95,6 +79,20 @@ bool mcsm::GlobalOption::createDirectories(std::string const &dirName, std::erro
 
 nlohmann::json mcsm::GlobalOption::load() const {
     std::string fullPath = this->path + "/" + this->name;
+
+    if(!std::filesystem::exists(fullPath)){
+        std::error_code ec;
+        createDirectories(this->path, ec);
+        std::ofstream ofs(fullPath);
+        if(!ofs.is_open()){
+            std::cerr << "Error: Cannot create directory " << fullPath << "\n";
+            std::exit(1);
+        }
+        
+        ofs << "{}";
+        ofs.close();
+    }
+
     std::ifstream fileStream(fullPath);
     if (!fileStream.is_open()) {
         std::cerr << "Error: Cannot load file " << fullPath << "\n";
@@ -120,6 +118,11 @@ nlohmann::json mcsm::GlobalOption::getValue(const std::string& key) const {
 bool mcsm::GlobalOption::hasValue(const std::string& key) const {
     nlohmann::json data = load();
     return data.find(key) != data.end();
+}
+
+bool mcsm::GlobalOption::exists() const {
+    std::string fullPath = this->path + "/" + this->name;
+    return std::filesystem::exists(fullPath);
 }
 
 void mcsm::GlobalOption::setValue(const std::string& key, const nlohmann::json& value){
