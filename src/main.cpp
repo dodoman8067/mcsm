@@ -32,6 +32,7 @@ SOFTWARE.
 #include "command/help_command.h"
 #include "command/generate_server_command.h"
 #include "data/option.h"
+#include "data/options/jvm_option.h"
 #include "util/string_utils.h"
 #include "jvm/java_detection.h"
 
@@ -90,8 +91,8 @@ int main(int argc, char *argv[]) {
     if(!commandFound){
         std::cout << "Unknown command \"" << argv[1] << "\". " << "Type \'mcsm help\' for list of commands.\n";
         clearCurl(curl);
-        std::exit(0);
-        return 0;
+        std::exit(1);
+        return 1;
     }
     clearCurl(curl);
     

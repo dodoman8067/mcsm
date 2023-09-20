@@ -29,9 +29,10 @@ SOFTWARE.
 #include <fstream>
 #include <iostream>
 #include "../util/string_utils.h"
+#include "configurable.h"
 
 namespace mcsm {
-    class Option {
+    class Option : public mcsm::Configurable {
     private:
         std::string path;
         std::string name;
@@ -44,7 +45,7 @@ namespace mcsm {
         std::string getName();
         nlohmann::json getValue(const std::string& key) const;
         bool hasValue(const std::string& key) const;
-        bool exists() const;
+        bool exists() const override;
         void setValue(const std::string& key, const nlohmann::json& value);
         void save(const nlohmann::json& jsonData) const;
     };

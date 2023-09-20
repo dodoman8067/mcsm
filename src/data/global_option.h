@@ -28,11 +28,12 @@ SOFTWARE.
 #include <filesystem>
 #include <fstream>
 #include <iostream>
+#include "configurable.h"
 #include "../util/os/os_detection.h"
 #include "../util/string_utils.h"
 
 namespace mcsm {
-    class GlobalOption {
+    class GlobalOption : public mcsm::Configurable {
     private:
         std::string path;
         std::string name;
