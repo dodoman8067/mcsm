@@ -10,8 +10,6 @@ file(GLOB_RECURSE SRC_FILES ${CMAKE_SOURCE_DIR}/src/*.cpp)
 # Set resources.rc when win32
 if(WIN32)
     set(RESOURCE_FILE ${CMAKE_SOURCE_DIR}/assets/resources.rc)
-elseif(NOT LINUX)
-    message(FATAL_ERROR "This platform is not supported. This program only supports Windows and Linux.")
 endif()
 
 # Set build types when no CMAKE_BUILD_TYPE defined
