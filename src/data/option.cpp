@@ -83,7 +83,7 @@ nlohmann::json mcsm::Option::load() const {
         std::cerr << "3. Trailing Commas: Trailing Commas are not allowed in JSON. Make sure that end of the element doesn't end with comma.\n";
         std::cerr << "4. Incorrect Escape Sequences: Check if all escaped are used properly.\n";
         std::cerr << "5. Data types: Double check each element is storing the correct data types.\n";
-        std::cerr << "6. File Access Permissions: Check if your OS or firewall is blocking the access to the file. This might cause because of creating the file in system directories.\n";
+        std::cerr << "6. File Access Permissions: Check if your OS or security software is blocking the access to the file. This might cause because of creating the file in system directories.\n";
         std::exit(1);
     }
     return finalValue;
