@@ -105,7 +105,14 @@ nlohmann::json mcsm::GlobalOption::load() const {
 
     nlohmann::json finalValue = nlohmann::json::parse(content, nullptr, false);
     if(finalValue.is_discarded()) {
-        std::cerr << "Error: Cannot parse json " << fullPath << "\n";
+        std::cerr << "Error: Failed to parse json " << fullPath << "\n";
+        std::cerr << "There might be many reasons why you see this error.\n";
+        std::cerr << "1. Comments: Comments are not allowed in JSON. If you used the comment syntax in other programming languages, try removing them and try again.\n";
+        std::cerr << "2. Unclosed Brackets: Check if all curly braces '{}' and square brackets '[]' are properly closed.\n";
+        std::cerr << "3. Trailing Commas: Trailing Commas are not allowed in JSON. Make sure that end of the element doesn't end with comma.\n";
+        std::cerr << "4. Incorrect Escape Sequences: Check if all escaped are used properly.\n";
+        std::cerr << "5. Data types: Double check each element is storing the correct data types.\n";
+        std::cerr << "6. File Access Permissions: Check if your OS or firewall is blocking the access to the file. This might cause because of creating the file in system directories.\n";
         std::exit(1);
     }
     return finalValue;
