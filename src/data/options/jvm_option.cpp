@@ -1,9 +1,6 @@
 #include "jvm_option.h"
 
-mcsm::JvmOption::JvmOption(const std::string& name){
-    JvmOption(name, mcsm::SearchTarget::ALL);
-}
-
+mcsm::JvmOption::JvmOption(const std::string& name) : JvmOption(name, mcsm::SearchTarget::ALL) {}
 
 mcsm::JvmOption::JvmOption(const std::string& name, const mcsm::SearchTarget& target){
     this->name = name;
@@ -12,26 +9,23 @@ mcsm::JvmOption::JvmOption(const std::string& name, const mcsm::SearchTarget& ta
             mcsm::GlobalOption globalOption(".jvm.profiles", name);
             if(globalOption.exists()){
                 this->option.reset(new mcsm::GlobalOption(".jvm.profiles", name));
-                break;
-            }
-
-            mcsm::Option option(".jvm.profiles", name);
-            if(option.exists()){
-                this->option.reset(new mcsm::Option(".jvm.profiles", name));   
-                break;
+            } else {
+                this->option.reset(new mcsm::Option(".jvm.profiles", name));
             }
             break;
         }
         case mcsm::SearchTarget::GLOBAL: {
             mcsm::GlobalOption globalOption(".jvm.profiles", name);
-            if(!globalOption.exists()) break;
-            this->option.reset(new mcsm::GlobalOption(".jvm.profiles", name));
+            if(globalOption.exists()){
+                this->option.reset(new mcsm::GlobalOption(".jvm.profiles", name));
+            }
             break;
         }
         case mcsm::SearchTarget::CURRENT: {
             mcsm::Option option(".jvm.profiles", name);
-            if(!option.exists()) break;
-            this->option.reset(new mcsm::Option(".jvm.profiles", name));
+            if(option.exists()){
+                this->option.reset(new mcsm::Option(".jvm.profiles", name));
+            }
             break;
         }
     }
@@ -59,21 +53,64 @@ void mcsm::JvmOption::create(const std::string& jvmPath, const std::string& jvmO
 }
 
 void mcsm::JvmOption::create(const std::string& jvmPath, const std::string& jvmOptions, const std::string& serverOptions, const mcsm::SearchTarget& target){
-    if(exists()) return;
+    //if (exists()) reset();
+
+    std::string filePath;
+    std::string optionName;
+    std::cout << this->name << "\n";
+
+    if(target == mcsm::SearchTarget::CURRENT){
+        // Get the path and name from the Option
+        mcsm::Option option(".jvm.profiles", this->name);
+        filePath = option.getPath();
+        optionName = option.getName();
+    }else{
+        // Get the path and name from the GlobalOption
+        mcsm::GlobalOption globalOption(".jvm.profiles", this->name);
+        filePath = globalOption.getPath();
+        optionName = globalOption.getName();
+    }
+
+    // Check if the file exists and delete it if it does
+    if(std::filesystem::exists(filePath + "/" + optionName)){
+        std::filesystem::remove(filePath + "/" + optionName);
+    }
+
     if(target == mcsm::SearchTarget::ALL) return;
     if(target == mcsm::SearchTarget::CURRENT){
-        mcsm::Option* cOpt = new mcsm::Option(".jvm.profiles", this->name);
+        mcsm::Option* cOpt = new mcsm::Option(".jvm.profiles", optionName);
         cOpt->setValue("path", jvmPath);
         cOpt->setValue("args", jvmOptions);
         cOpt->setValue("server_args", serverOptions);
         this->option.reset(cOpt);
         return;
     }
-    mcsm::GlobalOption* opt = new mcsm::GlobalOption(".jvm.profiles", this->name);
+    mcsm::GlobalOption* opt = new mcsm::GlobalOption(".jvm.profiles", optionName);
     opt->setValue("path", jvmPath);
     opt->setValue("args", jvmOptions);
     opt->setValue("server_args", serverOptions);
     this->option.reset(opt);
+}
+
+void mcsm::JvmOption::reset(){
+    mcsm::GlobalOption* opt = dynamic_cast<mcsm::GlobalOption*>(this->option.get());
+    if(!opt){
+        mcsm::Option* opt2 = dynamic_cast<mcsm::Option*>(this->option.get());
+        if(!opt2){
+            std::cerr << "Error: Both dynamic_cast calls from mcsm::Configurable to mcsm::GlobalOption and mcsm::Option have failed.\n";
+            std::cerr << "Normally, one of these casts should be successful, as both classes extend mcsm::Configurable.\n";
+            std::cerr << "If you see this error, this might be a operating system issue or software's issue.\n";
+            std::cerr << "If you believe that this is a software issue, try downloading a new copy of program in GitHub. If that isn't solving the issue, please report to GitHub. (https://github.com/dodoman8067/mcsm)\n";
+            std::cerr << "Or if you believe that this is operating system's issue, try updating the operating system. If it's not working, try reinstalling the operating system completely.\n";
+            std::cerr << "\n";
+            std::cerr << "Error called from : mcsm::JvmOption::reset()\n";
+            std::exit(1);
+        }
+        std::cout << "c\n";
+        opt2->reset();
+    }
+    std::cout << "d\n";
+    opt->reset();
 }
 
 bool mcsm::JvmOption::exists(){

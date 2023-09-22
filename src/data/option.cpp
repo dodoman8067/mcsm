@@ -97,11 +97,9 @@ bool mcsm::Option::exists() const {
     return std::filesystem::exists(fullPath);
 }
 
-void mcsm::Option::setValue(const std::string& key, const nlohmann::json& value){
-    nlohmann::json jsonData = load();
+void mcsm::Option::setValue(const std::string& key, const nlohmann::json& value) const {
     std::string fullPath = this->path + "/" + this->name;
-
-    jsonData[key] = value;
+    nlohmann::json jsonData = load();
 
     std::ofstream fileStream(fullPath);
     if (!fileStream.is_open()) {
@@ -109,8 +107,8 @@ void mcsm::Option::setValue(const std::string& key, const nlohmann::json& value)
         std::exit(1);
     }
 
-    fileStream << jsonData.dump(4); 
-    fileStream.close();
+    jsonData[key] = value;
+    save(jsonData);
 }
 
 void mcsm::Option::save(const nlohmann::json& jsonData) const {
@@ -123,6 +121,18 @@ void mcsm::Option::save(const nlohmann::json& jsonData) const {
         std::cerr << "Error: Cannot save file " << fullPath << "\n";
         std::exit(1);
     }
+}
+
+void mcsm::Option::reset() const {
+    std::string fullPath = this->path + "/" + this->name;
+    std::ofstream outFile(fullPath);
+    if (outFile.is_open()) {
+        outFile << "{}";
+        outFile.close();
+    }else{
+        std::cerr << "Error: Cannot save file " << fullPath << "\n";
+        std::exit(1);
+    }    
 }
 
 std::string mcsm::Option::getName(){

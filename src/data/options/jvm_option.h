@@ -26,6 +26,7 @@ namespace mcsm {
         void create(const std::string& jvmPath, const SearchTarget& target);
         void create(const std::string& jvmPath, const std::string& jvmOptions, const SearchTarget& target);
         void create(const std::string& jvmPath, const std::string& jvmOptions, const std::string& serverOptions, const SearchTarget& target);
+        void reset();
         bool exists();
         std::string getJvmPath();
         std::string getJvmArguments();

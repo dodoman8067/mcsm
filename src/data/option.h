@@ -46,8 +46,9 @@ namespace mcsm {
         nlohmann::json getValue(const std::string& key) const;
         bool hasValue(const std::string& key) const;
         bool exists() const override;
-        void setValue(const std::string& key, const nlohmann::json& value);
+        void setValue(const std::string& key, const nlohmann::json& value) const;
         void save(const nlohmann::json& jsonData) const;
+        void reset() const;
     };
 }
 

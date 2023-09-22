@@ -31,6 +31,7 @@ SOFTWARE.
 #include "command/version_command.h"
 #include "command/help_command.h"
 #include "command/generate_server_command.h"
+#include "command/jvm_option_generator_command.h"
 #include "data/option.h"
 #include "data/options/jvm_option.h"
 #include "util/string_utils.h"
@@ -117,6 +118,9 @@ inline void initCommands(){
 
     std::unique_ptr<mcsm::GenerateServerCommand> generateServerCommand = std::make_unique<mcsm::GenerateServerCommand>("create", "Generates server.");
     mcsm::CommandManager::addCommand(std::move(generateServerCommand));
+
+    std::unique_ptr<mcsm::JvmOptionGeneratorCommand> jvmOptionGeneratorCommand = std::make_unique<mcsm::JvmOptionGeneratorCommand>("jvm", "Generates jvm config.");
+    mcsm::CommandManager::addCommand(std::move(jvmOptionGeneratorCommand));
 }
 
 inline void clearCurl(CURL* curl){

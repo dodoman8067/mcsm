@@ -34,6 +34,7 @@ namespace mcsm {
     std::string getJavaFromHome();
     std::string getJavaFromPath();
     std::string detectJava();
+    bool isValidJava(const std::string& path);
 }
 
 #endif
