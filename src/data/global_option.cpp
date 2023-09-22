@@ -103,7 +103,12 @@ nlohmann::json mcsm::GlobalOption::load() const {
 
     fileStream.close();
 
-    return nlohmann::json::parse(content);
+    nlohmann::json finalValue = nlohmann::json::parse(content, nullptr, false);
+    if(finalValue.is_discarded()) {
+        std::cerr << "Error: Cannot parse json " << fullPath << "\n";
+        std::exit(1);
+    }
+    return finalValue;
 }
 
 nlohmann::json mcsm::GlobalOption::getValue(const std::string& key) const {

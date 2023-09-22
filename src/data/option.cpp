@@ -74,8 +74,12 @@ nlohmann::json mcsm::Option::load() const {
     std::string content((std::istreambuf_iterator<char>(fileStream)), std::istreambuf_iterator<char>());
 
     fileStream.close();
-
-    return nlohmann::json::parse(content);
+    nlohmann::json finalValue = nlohmann::json::parse(content, nullptr, false);
+    if(finalValue.is_discarded()) {
+        std::cerr << "Error: Cannot parse json " << fullPath << "\n";
+        std::exit(1);
+    }
+    return finalValue;
 }
 
 nlohmann::json mcsm::Option::getValue(const std::string& key) const {
