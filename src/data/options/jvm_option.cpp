@@ -53,25 +53,19 @@ void mcsm::JvmOption::create(const std::string& jvmPath, const std::string& jvmO
 }
 
 void mcsm::JvmOption::create(const std::string& jvmPath, const std::string& jvmOptions, const std::string& serverOptions, const mcsm::SearchTarget& target){
-    //if (exists()) reset();
-
     std::string filePath;
     std::string optionName;
-    std::cout << this->name << "\n";
 
     if(target == mcsm::SearchTarget::CURRENT){
-        // Get the path and name from the Option
         mcsm::Option option(".jvm.profiles", this->name);
         filePath = option.getPath();
         optionName = option.getName();
     }else{
-        // Get the path and name from the GlobalOption
         mcsm::GlobalOption globalOption(".jvm.profiles", this->name);
         filePath = globalOption.getPath();
         optionName = globalOption.getName();
     }
 
-    // Check if the file exists and delete it if it does
     if(std::filesystem::exists(filePath + "/" + optionName)){
         std::filesystem::remove(filePath + "/" + optionName);
     }
@@ -106,10 +100,8 @@ void mcsm::JvmOption::reset(){
             std::cerr << "Error called from : mcsm::JvmOption::reset()\n";
             std::exit(1);
         }
-        std::cout << "c\n";
         opt2->reset();
     }
-    std::cout << "d\n";
     opt->reset();
 }
 
