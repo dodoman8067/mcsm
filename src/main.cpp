@@ -82,7 +82,7 @@ int main(int argc, char *argv[]) {
             for(int i = 2; i < argc; i++){
                 args.push_back(std::string(argv[i]));
             }
-            v.get()->execute(args);
+            v.get()->execute(std::move(args));
             commandFound = true;
             break;
         }

@@ -24,13 +24,14 @@ namespace mcsm {
         ~JvmOption();
         void create();
         void create(const std::string& jvmPath, const SearchTarget& target);
-        void create(const std::string& jvmPath, const std::string& jvmOptions, const SearchTarget& target);
-        void create(const std::string& jvmPath, const std::string& jvmOptions, const std::string& serverOptions, const SearchTarget& target);
+        void create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions, const SearchTarget& target);
+        void create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions, const std::vector<std::string>& serverOptions, const SearchTarget& target);
         void reset();
         bool exists();
         std::string getJvmPath();
-        std::string getJvmArguments();
-        std::string getServerArguments();
+        std::vector<std::string> getJvmArguments();
+        std::vector<std::string> getServerArguments();
+        std::string getProfileName() const;
     };
 }
 

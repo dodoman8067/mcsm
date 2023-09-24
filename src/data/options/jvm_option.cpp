@@ -33,6 +33,13 @@ mcsm::JvmOption::JvmOption(const std::string& name, const mcsm::SearchTarget& ta
 
 void mcsm::JvmOption::create(){
     std::string jvm = mcsm::detectJava();
+    std::vector<std::string> jvmArgs = {
+        "-Xms2G",
+        "-Xmx2G"
+    };
+    std::vector<std::string> serverArgs = {
+        "nogui"
+    };
     if(mcsm::isWhitespaceOrEmpty(jvm)){
         std::cerr << "Error: JVM detection failed.\n";
         std::cerr << "This error can be fixed by setting your JAVA_HOME enviroment variable.\n";
@@ -41,18 +48,28 @@ void mcsm::JvmOption::create(){
         std::cerr << "Error called from : mcsm::JvmOption::create()\n";
         std::exit(1);
     }
-    create(jvm, "-Xms2G -Xmx2G", "nogui", mcsm::SearchTarget::GLOBAL);
+    create(std::move(jvm), std::move(jvmArgs), std::move(serverArgs), mcsm::SearchTarget::GLOBAL);
 }
 
 void mcsm::JvmOption::create(const std::string& jvmPath, const mcsm::SearchTarget& target){
-    create(jvmPath, "-Xms2G -Xmx2G", "nogui", target);
+    std::vector<std::string> jvmArgs = {
+        "-Xms2G",
+        "-Xmx2G"
+    };
+    std::vector<std::string> serverArgs = {
+        "nogui"
+    };
+    create(std::move(jvmPath), std::move(jvmArgs), std::move(serverArgs), std::move(target));
 }
 
-void mcsm::JvmOption::create(const std::string& jvmPath, const std::string& jvmOptions, const mcsm::SearchTarget& target){
-    create(jvmPath, jvmOptions, "nogui", target);
+void mcsm::JvmOption::create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions, const mcsm::SearchTarget& target){
+    std::vector<std::string> serverArgs = {
+        "nogui"
+    };
+    create(std::move(jvmPath), std::move(jvmOptions), std::move(serverArgs), std::move(target));
 }
 
-void mcsm::JvmOption::create(const std::string& jvmPath, const std::string& jvmOptions, const std::string& serverOptions, const mcsm::SearchTarget& target){
+void mcsm::JvmOption::create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions, const std::vector<std::string>& serverOptions, const mcsm::SearchTarget& target){
     std::string filePath;
     std::string optionName;
 
@@ -110,8 +127,9 @@ bool mcsm::JvmOption::exists(){
     return this->option->exists();
 }
 
-std::string mcsm::JvmOption::getJvmArguments(){
-    if(!exists()) return std::move("");
+std::vector<std::string> mcsm::JvmOption::getJvmArguments(){
+    std::vector<std::string> empty;
+    if(!exists()) return empty;
     mcsm::GlobalOption* opt = dynamic_cast<mcsm::GlobalOption*>(this->option.get());
     if(!opt){
         mcsm::Option* opt2 = dynamic_cast<mcsm::Option*>(this->option.get());
@@ -125,10 +143,10 @@ std::string mcsm::JvmOption::getJvmArguments(){
             std::cerr << "Error called from : mcsm::JvmOption::getJvmArguments()\n";
             std::exit(1);
         }
-        if(opt2->getValue("path") == nullptr) return std::move("");
-        return opt2->getValue("path");
+        if(opt2->getValue("args") == nullptr) return empty;
+        return opt2->getValue("args");
     }
-    if(opt->getValue("args") == nullptr) return std::move("");
+    if(opt->getValue("args") == nullptr) return empty;
     return opt->getValue("args");
 }
 
@@ -154,8 +172,9 @@ std::string mcsm::JvmOption::getJvmPath(){
     return opt->getValue("path");
 }
 
-std::string mcsm::JvmOption::getServerArguments(){
-    if(!exists()) return std::move("");
+std::vector<std::string> mcsm::JvmOption::getServerArguments(){
+    std::vector<std::string> empty;
+    if(!exists()) return empty;
     mcsm::GlobalOption* opt = dynamic_cast<mcsm::GlobalOption*>(this->option.get());
     if(!opt){
         mcsm::Option* opt2 = dynamic_cast<mcsm::Option*>(this->option.get());
@@ -169,11 +188,15 @@ std::string mcsm::JvmOption::getServerArguments(){
             std::cerr << "Error called from : mcsm::JvmOption::getServerArguments()\n";
             std::exit(1);
         }
-        if(opt2->getValue("server_args") == nullptr) return std::move("");
+        if(opt2->getValue("server_args") == nullptr) return empty;
         return opt2->getValue("server_args");
     }
-    if(opt->getValue("server_args") == nullptr) return std::move("");
+    if(opt->getValue("server_args") == nullptr) return empty;
     return opt->getValue("server_args");  
+}
+
+std::string mcsm::JvmOption::getProfileName() const {
+    return this->name;
 }
 
 mcsm::JvmOption::~JvmOption(){
