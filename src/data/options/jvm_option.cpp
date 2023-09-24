@@ -143,6 +143,7 @@ std::vector<std::string> mcsm::JvmOption::getJvmArguments(){
             std::cerr << "Error called from : mcsm::JvmOption::getJvmArguments()\n";
             std::exit(1);
         }
+        // I debugged here for more than 2 hours because returning "path" instead of "args"
         if(opt2->getValue("args") == nullptr) return empty;
         return opt2->getValue("args");
     }
