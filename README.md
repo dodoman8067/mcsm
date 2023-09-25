@@ -21,7 +21,7 @@ MCSM (MineCraft Server Manager) is a command-line program designed to manage Min
   * Linux
 
 * Compilers:
-  * Mingw-w64
+  * MinGW-w64
   * GCC
   * Clang
 
