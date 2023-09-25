@@ -29,8 +29,8 @@ mcsm::JvmOptionGeneratorCommand::~JvmOptionGeneratorCommand() {}
 
 void mcsm::JvmOptionGeneratorCommand::execute(const std::vector<std::string>& args) {
     if(args.empty()){
-        std::cout << "Invalid arguments.\n";
-        std::cout << "You must provide alteast profile name.\n";
+        std::cout << "[mcsm] Invalid arguments.\n";
+        std::cout << "[mcsm] You must provide at least profile name.\n";
         std::exit(1);
     }
     if(getSaveTarget(args) == mcsm::SearchTarget::GLOBAL){
