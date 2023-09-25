@@ -26,7 +26,7 @@ endif()
 
 if(CMAKE_BUILD_TYPE MATCHES Release)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
-        message("-- Detected compiler : " ${CMAKE_CXX_COMPILER_ID} " using -static flags.")
+        message("-- Detected compiler : " ${CMAKE_CXX_COMPILER_ID} ". Using -static flags.")
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
     endif()
 endif()
