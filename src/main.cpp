@@ -119,7 +119,9 @@ inline void initCommands(){
     std::unique_ptr<mcsm::GenerateServerCommand> generateServerCommand = std::make_unique<mcsm::GenerateServerCommand>("create", "Generates server.");
     mcsm::CommandManager::addCommand(std::move(generateServerCommand));
 
-    std::unique_ptr<mcsm::JvmOptionGeneratorCommand> jvmOptionGeneratorCommand = std::make_unique<mcsm::JvmOptionGeneratorCommand>("jvm", "Generates jvm config.");
+    std::unique_ptr<mcsm::JvmOptionGeneratorCommand> jvmOptionGeneratorCommand = std::make_unique<mcsm::JvmOptionGeneratorCommand>("genJvmOption", "Generates jvm config.");
+    jvmOptionGeneratorCommand->addAliases("generateJvmOption");
+    jvmOptionGeneratorCommand->addAliases("generateJavaVirtualMachineOption");
     mcsm::CommandManager::addCommand(std::move(jvmOptionGeneratorCommand));
 }
 
