@@ -26,7 +26,7 @@ SOFTWARE.
 #include <curl/curl.h>
 #include <memory>
 #include <vector>
-#include "command.h"
+#include "base/command.h"
 #include <iostream>
 
 namespace mcsm {

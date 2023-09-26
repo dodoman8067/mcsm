@@ -20,19 +20,19 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __MCSM_GET_SERVER_COMMAND_H__
-#define __MCSM_GET_SERVER_COMMAND_H__
+#ifndef __MCSM_VERSION_COMMAND_H__
+#define __MCSM_VERSION_COMMAND_H__
 
-#include "command.h"
 #include <iostream>
+#include "../base/command.h"
 
 namespace mcsm {
-    class GetServerCommand : public mcsm::Command {
+    class VersionCommand : public mcsm::Command {
     private:
-        
+        std::string version;
     public:
-        GetServerCommand(const std::string& name, const std::string& description);
-        ~GetServerCommand();
+        VersionCommand(const std::string& name, const std::string& description, const std::string& version);
+        ~VersionCommand();
         void execute(const std::vector<std::string>& args) override;
     };
 }

@@ -26,12 +26,12 @@ SOFTWARE.
 #include <memory>
 #include <string>
 #include "command/command_manager.h"
-#include "command/command.h"
+#include "command/base/command.h"
 #include "command/test_command.h"
-#include "command/version_command.h"
-#include "command/help_command.h"
-#include "command/generate_server_command.h"
-#include "command/jvm_option_generator_command.h"
+#include "command/util/version_command.h"
+#include "command/util/help_command.h"
+#include "command/server/generate_server_command.h"
+#include "command/server/jvm/jvm_option_generator_command.h"
 #include "data/option.h"
 #include "data/options/jvm_option.h"
 #include "util/string_utils.h"

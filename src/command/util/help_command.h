@@ -23,8 +23,8 @@ SOFTWARE.
 #ifndef __MCSM_HELP_COMMAND_H__
 #define __MCSM_HELP_COMMAND_H__
 
-#include "command.h"
-#include "command_manager.h"
+#include "../base/command.h"
+#include "../command_manager.h"
 #include <iostream>
 
 namespace mcsm {

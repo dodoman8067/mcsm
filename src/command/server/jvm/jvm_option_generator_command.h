@@ -23,8 +23,8 @@ SOFTWARE.
 #ifndef __MCSM_JVM_OPTION_GENERATOR_COMMAND_H__
 #define __MCSM_JVM_OPTION_GENERATOR_COMMAND_H__
 
-#include "command.h"
-#include "../data/options/jvm_option.h"
+#include "../../base/command.h"
+#include "../../../data/options/jvm_option.h"
 
 namespace mcsm {
     class JvmOptionGeneratorCommand : public mcsm::Command {

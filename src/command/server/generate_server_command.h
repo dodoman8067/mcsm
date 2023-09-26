@@ -20,22 +20,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __MCSM_VERSION_COMMAND_H__
-#define __MCSM_VERSION_COMMAND_H__
+#ifndef __MCSM_GENERATE_SERVER_COMMAND_H__
+#define __MCSM_GENERATE_SERVER_COMMAND_H__
 
+#include "../base/command.h"
+#include "../../util/ask_input.h"
 #include <iostream>
-#include "command.h"
+#include <limits>
 
 namespace mcsm {
-    class VersionCommand : public mcsm::Command {
+    class GenerateServerCommand : public Command {
     private:
-        std::string version;
     public:
-        VersionCommand(const std::string& name, const std::string& description, const std::string& version);
-        ~VersionCommand();
+        GenerateServerCommand(const std::string& name, const std::string& description);
+        ~GenerateServerCommand();
         void execute(const std::vector<std::string>& args) override;
+        void stuff(std::string& value);
     };
 }
-
 
 #endif

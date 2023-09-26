@@ -23,7 +23,7 @@ SOFTWARE.
 #ifndef __MCSM_TEST__COMMAND_H__
 #define __MCSM_TEST__COMMAND_H__
 
-#include "command.h"
+#include "base/command.h"
 #include <iostream>
 
 namespace mcsm {

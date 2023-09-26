@@ -20,23 +20,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __MCSM_GENERATE_SERVER_COMMAND_H__
-#define __MCSM_GENERATE_SERVER_COMMAND_H__
+#ifndef __MCSM_COMMAND_H__
+#define __MCSM_COMMAND_H__
 
-#include "command.h"
-#include "../util/ask_input.h"
-#include <iostream>
-#include <limits>
+#include <string>
+#include <vector>
 
 namespace mcsm {
-    class GenerateServerCommand : public Command {
+    class Command {
     private:
+        std::string name;
+        std::string description;
+        std::vector<std::string>* aliases;
     public:
-        GenerateServerCommand(const std::string& name, const std::string& description);
-        ~GenerateServerCommand();
-        void execute(const std::vector<std::string>& args) override;
-        void stuff(std::string& value);
+        Command(const std::string& name, const std::string& description);
+        ~Command();
+        std::string getName() const;
+        std::string getDescription() const;
+        void addAliases(const std::string& value);
+        bool hasAliases(const std::string& value) const;
+        const std::vector<std::string>& getAliases() const;
+        virtual void execute(const std::vector<std::string>& args) = 0;
     };
-}
+};
 
+#include "../command_manager.h"
 #endif
