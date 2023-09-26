@@ -171,7 +171,7 @@ std::vector<std::string> mcsm::JvmOptionGeneratorCommand::getJvmArguments(const 
     return result;
 }
 
-void mcsm::JvmOptionGeneratorCommand::createProfile(const std::vector<std::string>& args, const mcsm::SearchTarget& target){
+inline void mcsm::JvmOptionGeneratorCommand::createProfile(const std::vector<std::string>& args, const mcsm::SearchTarget& target){
     mcsm::JvmOption option(getProfileName(args, target), target);
     std::vector<std::string> jvmArgs = getJvmArguments(args);
     if(jvmArgs.empty()){
