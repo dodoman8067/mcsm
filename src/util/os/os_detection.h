@@ -28,6 +28,8 @@ namespace mcsm {
         WINDOWS,
         LINUX
     };
+    // Returns current operating system this program is running on.
+    // @return current operating system
     OS getCurrentOS();
 }
 
