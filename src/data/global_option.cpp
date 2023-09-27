@@ -50,7 +50,8 @@ std::string mcsm::GlobalOption::getDataPathPerOS(){
         }
 
         case mcsm::OS::LINUX: {
-            std::string linuxPath = "~/.local/share/mcsm";
+            std::string linuxPath = getenv("HOME");
+            linuxPath.append("/.local/share/mcsm");
             returnPath = std::move(linuxPath);
             break;
         }
