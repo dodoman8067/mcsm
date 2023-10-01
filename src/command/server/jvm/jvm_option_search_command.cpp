@@ -20,7 +20,7 @@ void mcsm::JvmOptionSearchCommand::execute(const std::vector<std::string>& args)
     std::cout << "\n";
     int i = 1;
     for(auto& option : options){
-        std::cout << "Result " << i  << " : "<< "\n";
+        std::cout << "Result " << i << " : "<< "\n";
         std::cout << "Name : " << option->getProfileName() << "\n";
         std::cout << "Path : " << option->getProfilePath() << "\n";
         std::cout << "\n";
