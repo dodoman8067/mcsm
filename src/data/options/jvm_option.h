@@ -54,6 +54,7 @@ namespace mcsm {
         std::vector<std::string> getJvmArguments();
         std::vector<std::string> getServerArguments();
         std::string getProfileName() const;
+        std::string getProfilePath() const;
     };
 }
 

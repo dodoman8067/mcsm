@@ -222,6 +222,25 @@ std::string mcsm::JvmOption::getProfileName() const {
     return this->name;
 }
 
+std::string mcsm::JvmOption::getProfilePath() const {
+    mcsm::GlobalOption* opt = dynamic_cast<mcsm::GlobalOption*>(this->option.get());
+    if(!opt){
+        mcsm::Option* opt2 = dynamic_cast<mcsm::Option*>(this->option.get());
+        if(!opt2){
+            std::cerr << "Error: Both dynamic_cast calls from mcsm::Configurable to mcsm::GlobalOption and mcsm::Option have failed.\n";
+            std::cerr << "Normally, one of these casts should be successful, as both classes extend mcsm::Configurable.\n";
+            std::cerr << "If you see this error, this might be a operating system issue or software's issue.\n";
+            std::cerr << "If you believe that this is a software issue, try downloading a new copy of program in GitHub. If that isn't solving the issue, please report to GitHub. (https://github.com/dodoman8067/mcsm)\n";
+            std::cerr << "Or if you believe that this is operating system's issue, try updating the operating system. If it's not working, try reinstalling the operating system completely.\n";
+            std::cerr << "\n";
+            std::cerr << "Error called from : mcsm::JvmOption::getProfilePath()\n";
+            std::exit(1);
+        }
+        return opt2->getPath();
+    }
+    return opt->getPath();  
+}
+
 mcsm::JvmOption::~JvmOption(){
 
 }

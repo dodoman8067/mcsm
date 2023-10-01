@@ -32,6 +32,7 @@ SOFTWARE.
 #include "command/util/help_command.h"
 #include "command/server/generate_server_command.h"
 #include "command/server/jvm/jvm_option_generator_command.h"
+#include "command/server/jvm/jvm_option_search_command.h"
 #include "data/option.h"
 #include "data/options/jvm_option.h"
 #include "util/string_utils.h"
@@ -90,7 +91,7 @@ int main(int argc, char *argv[]) {
 
     //If arguments exist but command is not found, prints message and exits
     if(!commandFound){
-        std::cout << "Unknown command \"" << argv[1] << "\". " << "Type \'mcsm help\' for list of commands.\n";
+        std::cerr << "Unknown command \"" << argv[1] << "\". " << "Type \'mcsm help\' for list of commands.\n";
         clearCurl(curl);
         std::exit(1);
         return 1;
@@ -119,10 +120,17 @@ inline void initCommands(){
     std::unique_ptr<mcsm::GenerateServerCommand> generateServerCommand = std::make_unique<mcsm::GenerateServerCommand>("create", "Generates server.");
     mcsm::CommandManager::addCommand(std::move(generateServerCommand));
 
-    std::unique_ptr<mcsm::JvmOptionGeneratorCommand> jvmOptionGeneratorCommand = std::make_unique<mcsm::JvmOptionGeneratorCommand>("genJvmOption", "Generates jvm config.");
+    std::unique_ptr<mcsm::JvmOptionGeneratorCommand> jvmOptionGeneratorCommand = std::make_unique<mcsm::JvmOptionGeneratorCommand>("genJvmOption", "Generates Java Virtual Machine config.");
     jvmOptionGeneratorCommand->addAliases("generateJvmOption");
     jvmOptionGeneratorCommand->addAliases("generateJavaVirtualMachineOption");
+    jvmOptionGeneratorCommand->addAliases("genjvmoption");
     mcsm::CommandManager::addCommand(std::move(jvmOptionGeneratorCommand));
+
+    std::unique_ptr<mcsm::JvmOptionSearchCommand> jvmProfileSearchCommand = std::make_unique<mcsm::JvmOptionSearchCommand>("searchJvmProfile", "Looks up for Java Virtual Machine profiles.");
+    jvmProfileSearchCommand->addAliases("searchProfile");
+    jvmProfileSearchCommand->addAliases("searchJavaVirtualMachineProfile");
+    jvmProfileSearchCommand->addAliases("searchprofile");
+    mcsm::CommandManager::addCommand(std::move(jvmProfileSearchCommand));
 }
 
 inline void clearCurl(CURL* curl){
