@@ -7,13 +7,13 @@ mcsm::JvmOptionSearchCommand::~JvmOptionSearchCommand() {}
 void mcsm::JvmOptionSearchCommand::execute(const std::vector<std::string>& args){
     if(args.empty()){
         std::cerr << "[mcsm] Invalid arguments.\n";
-        std::cerr << "[mcsm] You must specify the name by --name option.\n";
+        std::cerr << "[mcsm] You must specify a name by --name option.\n";
         std::exit(1);
     }
     std::string name = getProfileName(args);
     std::vector<std::unique_ptr<mcsm::JvmOption>> options = search(getSearchTarget(args), std::move(name));
     if(options.empty()){
-        std::cerr << "[mcsm] No profile was found.\n";
+        std::cerr << "[mcsm] No JVM launch profile found in the given search target.\n";
         std::exit(1);
     }
     std::cout << "[mcsm] Search result : \n";
@@ -59,7 +59,7 @@ std::string mcsm::JvmOptionSearchCommand::getProfileName(const std::vector<std::
             }
         
     }
-    std::cerr << "[mcsm] Name wasn't specified; You must specify the name to continune.\n";
+    std::cerr << "[mcsm] Name not provided; Specify a name to continune.\n";
     std::exit(1);
 }
 

@@ -52,7 +52,7 @@ mcsm::JvmOptionGeneratorCommand::~JvmOptionGeneratorCommand() {}
 void mcsm::JvmOptionGeneratorCommand::execute(const std::vector<std::string>& args) {
     if(args.empty()){
         std::cout << "[mcsm] Invalid arguments.\n";
-        std::cout << "[mcsm] You must provide at least profile name.\n";
+        std::cerr << "[mcsm] You must specify a name by --name option.\n";
         std::exit(1);
     }
     if(getSaveTarget(args) == mcsm::SearchTarget::GLOBAL){
@@ -123,7 +123,7 @@ std::string mcsm::JvmOptionGeneratorCommand::getProfileName(const std::vector<st
             }
         }
     }
-    std::cerr << "[mcsm] Name wasn't specified; You must specify the launch profile name to continue\n";
+    std::cerr << "[mcsm] Name not provided; Specify a name to continune.\n";
     std::exit(1);
 }
 
