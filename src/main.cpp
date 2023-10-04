@@ -33,6 +33,7 @@ SOFTWARE.
 #include "command/server/generate_server_command.h"
 #include "command/server/jvm/jvm_option_generator_command.h"
 #include "command/server/jvm/jvm_option_search_command.h"
+#include "command/server/jvm/jvm_test_command.h"
 #include "data/option.h"
 #include "data/options/jvm_option.h"
 #include "util/string_utils.h"
@@ -131,6 +132,10 @@ inline void initCommands(){
     jvmProfileSearchCommand->addAliases("searchJavaVirtualMachineProfile");
     jvmProfileSearchCommand->addAliases("searchprofile");
     mcsm::CommandManager::addCommand(std::move(jvmProfileSearchCommand));
+
+    std::unique_ptr<mcsm::JvmTestCommand> jvmTestCommand = std::make_unique<mcsm::JvmTestCommand>("performTest", "Tests Java Virtual Machine is valid.");
+    jvmTestCommand->addAliases("performtest");
+    mcsm::CommandManager::addCommand(std::move(jvmTestCommand));
 }
 
 inline void clearCurl(CURL* curl){

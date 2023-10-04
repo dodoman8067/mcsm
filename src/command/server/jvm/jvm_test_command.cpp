@@ -22,11 +22,11 @@ void mcsm::JvmTestCommand::execute(const std::vector<std::string>& args){
 std::unique_ptr<mcsm::JvmOption> mcsm::JvmTestCommand::searchOption(const mcsm::SearchTarget& target, const std::string& name){
     if(target == mcsm::SearchTarget::GLOBAL || target == mcsm::SearchTarget::ALL){
         std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(name, mcsm::SearchTarget::GLOBAL);
-        if(opt->exists()) return std::move(opt);
+        if(opt->exists()) return opt;
     }
     if(target == mcsm::SearchTarget::CURRENT || target == mcsm::SearchTarget::ALL){
         std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(name, mcsm::SearchTarget::CURRENT);
-        if(opt->exists()) return std::move(opt);
+        if(opt->exists()) return opt;
     }
     return nullptr;
 }
