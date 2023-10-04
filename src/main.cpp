@@ -27,7 +27,6 @@ SOFTWARE.
 #include <string>
 #include "command/command_manager.h"
 #include "command/base/command.h"
-#include "command/test_command.h"
 #include "command/util/version_command.h"
 #include "command/util/help_command.h"
 #include "command/server/generate_server_command.h"
@@ -108,9 +107,6 @@ inline void initCommands(){
     mcsm::CommandManager::init();
 
     //Adds command to CommandManager
-    std::unique_ptr<mcsm::TestCommand> testCommand = std::make_unique<mcsm::TestCommand>("test", "hello");
-    mcsm::CommandManager::addCommand(std::move(testCommand));
-
     std::unique_ptr<mcsm::VersionCommand> versionCommand = std::make_unique<mcsm::VersionCommand>("version", "Returns version information about this program.", version);
     versionCommand->addAliases("ver");
     mcsm::CommandManager::addCommand(std::move(versionCommand));
