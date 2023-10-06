@@ -27,27 +27,35 @@ SOFTWARE.
 #include <algorithm>
 
 namespace mcsm {
-    // Returns true when given string starts with specified value.
-    // @param str string to check
-    // @param value value to check
-    // @return true if string starts with specified value, otherwise false
+    /**
+    * @brief Returns true when given string starts with specified value.
+    * @param str string to check
+    * @param value value to check
+    * @return true if string starts with specified value, otherwise false
+    */
     bool startsWith(const std::string& str, const std::string& value);
 
-    // Returns true when given string ends with specified value.
-    // @param str string to check
-    // @param value value to check
-    // @return true if string ends with specified value, otherwise false
+    /**
+    * @brief Returns true when given string ends with specified value.
+    * @param str string to check
+    * @param value value to check
+    * @return true if string ends with specified value, otherwise false
+    */
     bool endsWith(const std::string& str, const std::string& value);
 
-    // Returns true when given string only contains whitespaces(spaces, tabs etc...).
-    // @param str string to check
-    // @return true if string only contains whitespaces, otherwise false
+    /**
+    * @brief Returns true when given string only contains whitespaces(spaces, tabs etc...).
+    * @param str string to check
+    * @return true if string only contains whitespaces, otherwise false
+    */
     bool isWhitespaceOrEmpty(const std::string& str);
 
-    // Replaces all value found in the str variable with replacement value.
-    // @param str string to replace
-    // @param value value that is going to be replaced
-    // @param replacement replacement
+    /**
+    * @brief Replaces all value found in the str variable with replacement value.
+    * @param str string to replace
+    * @param value value that is going to be replaced
+    * @param replacement replacement
+    */
     void replaceAll(std::string& str, const std::string& value, const std::string& replacement);
 }
 
