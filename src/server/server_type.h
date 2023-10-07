@@ -45,24 +45,6 @@ namespace mcsm {
         // Represents unknown type of server
         UNKNOWN
     };
-    
-    // Represents server type that implements bukkit api.
-    enum BukkitServerType {
-        // Represents craftbukkit
-        CRAFTBUKKIT,
-        // Represents spigot
-        SPIGOT,
-        // Represents paper
-        PAPER,
-        // Represents purpur
-        PURPUR,
-        // Represents pufferfish
-        PUFFERFISH,
-        // Represents folia
-        FOLIA,
-        // Represents other types of bukkit server
-        OTHER
-    };
 
     // Returns enum representing server type in string.
     // @param name string to convert to enum
