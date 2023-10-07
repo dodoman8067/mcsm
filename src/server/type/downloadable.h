@@ -15,7 +15,7 @@ namespace mcsm {
         * 
         * @return std::unique_ptr<std::vector<std::string>> 
         */
-        virtual std::unique_ptr<std::vector<std::string>> getAvailableVersions() = 0 const;
+        virtual std::unique_ptr<std::vector<std::string>> getAvailableVersions() = 0;
 
         /**
          * @brief Downloads a server in current directory.
@@ -47,7 +47,7 @@ namespace mcsm {
          * @param version version of the server
          * @return true when version exists, otherwise false
          */
-        virtual bool hasVersion(const std::string& version) = 0 const;
+        virtual bool hasVersion(const std::string& version) = 0;
     };
 }
 

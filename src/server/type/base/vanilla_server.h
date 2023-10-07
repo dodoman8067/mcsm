@@ -3,12 +3,14 @@
 
 #include "../../server.h"
 #include "../downloadable.h"
+#include "../../../data/global_option.h"
 #include <map>
 
 namespace mcsm {
     class VanillaServer : public mcsm::Server, public mcsm::Downloadable {
     private:
-        std::unique_ptr<std::map<const std::string, const std::string>> verisons;
+        std::unique_ptr<std::map<const std::string, const std::string>> versions;
+        void init();
     public:
         VanillaServer();
         ~VanillaServer();
