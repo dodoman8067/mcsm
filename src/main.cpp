@@ -20,7 +20,6 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <curl/curl.h>
 #include <iostream>
 #include <vector>
 #include <memory>
@@ -37,22 +36,21 @@ SOFTWARE.
 #include "data/options/jvm_option.h"
 #include "util/string_utils.h"
 #include "jvm/java_detection.h"
+#include "http/curl_manager.h"
 
 const std::string version = "0.0.1";
 
 inline void initCommands();
-inline void clearCurl(CURL* curl);
 
 int main(int argc, char *argv[]) {
 
     bool commandFound = false;
 
-    curl_global_init(CURL_VERSION_THREADSAFE);
+    bool init = mcsm::initCurl();
 
-    CURL* curl = curl_easy_init();
     //Checks if curl is properly initialized
     //If not, prints error message and exits
-    if (curl == nullptr)
+    if (!init)
     {
         std::cerr << "Error: initializing cURL failed.\n";
         std::cerr << "Possible solutions are : \n";
@@ -71,7 +69,7 @@ int main(int argc, char *argv[]) {
     if(argc < 2){
         std::cout << "Welcome to MCSM (Minecraft Server Manager).\n";
         std::cout << "Type \'mcsm help\' for list of commands.\n";
-        clearCurl(curl);
+        mcsm::clearCurl();
         std::exit(0);
         return 0;
     }
@@ -92,11 +90,11 @@ int main(int argc, char *argv[]) {
     //If arguments exist but command is not found, prints message and exits
     if(!commandFound){
         std::cerr << "Unknown command \"" << argv[1] << "\". " << "Type \'mcsm help\' for list of commands.\n";
-        clearCurl(curl);
+        mcsm::clearCurl();
         std::exit(1);
         return 1;
     }
-    clearCurl(curl);
+    mcsm::clearCurl();
     
     std::exit(0);
     return 0;
@@ -132,10 +130,4 @@ inline void initCommands(){
     std::unique_ptr<mcsm::JvmTestCommand> jvmTestCommand = std::make_unique<mcsm::JvmTestCommand>("performTest", "Tests Java Virtual Machine is valid.");
     jvmTestCommand->addAliases("performtest");
     mcsm::CommandManager::addCommand(std::move(jvmTestCommand));
-}
-
-inline void clearCurl(CURL* curl){
-    curl_easy_cleanup(curl);
-    curl_global_cleanup();
-    curl = nullptr;
 }
