@@ -42,7 +42,13 @@ const std::vector<std::string> availableOptions = {
     "-name",
     "--name",
     "-n",
-    "--n"
+    "--n",
+    "-jargs",
+    "--jargs",
+    "-ja",
+    "--ja" ,
+    "--jvmargs",
+    "-jvmargs"
 };
 
 mcsm::JvmOptionGeneratorCommand::JvmOptionGeneratorCommand(const std::string& name, const std::string& description) : mcsm::Command(name, description) {}
@@ -177,7 +183,8 @@ inline void mcsm::JvmOptionGeneratorCommand::createProfile(const std::vector<std
     if(jvmArgs.empty()){
         jvmArgs.push_back("-Xms2G");
         jvmArgs.push_back("-Xmx2G");
-        std::cout << "[mcsm] No JVM arguments specified; Defaulting to -Xms2G and -Xmx2G.\n";
+        jvmArgs.push_back("-jar");
+        std::cout << "[mcsm] No JVM arguments specified; Defaulting to -Xms2G, -Xmx2G and -jar.\n";
     }
     std::vector<std::string> sargs = getServerArguments(args);
     if(sargs.empty()) {

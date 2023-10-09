@@ -86,7 +86,8 @@ std::string mcsm::JvmTestCommand::getProfileName(const std::vector<std::string>&
 
 inline void mcsm::JvmTestCommand::performTest(std::unique_ptr<mcsm::JvmOption> option){
     std::string jvm = option->getJvmPath();
-    std::cout << "[mcsm] Performing test with the following JVM path : " << jvm << "\n";
+    std::cout << "[mcsm] Profile path " << option->getProfilePath() << "\n";
+    std::cout << "[mcsm] Performing test with the following command : " << jvm << " --version"<< "\n";
     if(mcsm::runCommandQuietly(jvm + " --version") != 0){
         std::cerr << "[mcsm] Test failed : " << jvm << "\n";
         std::exit(1);
