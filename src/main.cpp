@@ -59,7 +59,6 @@ int main(int argc, char *argv[]) {
         std::cerr << "3.Try reinstalling the entire program.\n";
         std::cerr << "\n";
         std::cerr << "If none of these work, you may find the solution on the internet.\n";
-        std::exit(1);
         return 1;
     }
     initCommands();
@@ -69,7 +68,6 @@ int main(int argc, char *argv[]) {
         std::cout << "Welcome to MCSM (Minecraft Server Manager).\n";
         std::cout << "Type \'mcsm help\' for list of commands.\n";
         mcsm::clearCurl();
-        std::exit(0);
         return 0;
     }
 
@@ -90,12 +88,10 @@ int main(int argc, char *argv[]) {
     if(!commandFound){
         std::cerr << "Unknown command \"" << argv[1] << "\". " << "Type \'mcsm help\' for list of commands.\n";
         mcsm::clearCurl();
-        std::exit(1);
         return 1;
     }
     mcsm::clearCurl();
     
-    std::exit(0);
     return 0;
 }
 
