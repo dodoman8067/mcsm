@@ -50,8 +50,7 @@ int main(int argc, char *argv[]) {
 
     //Checks if curl is properly initialized
     //If not, prints error message and exits
-    if (!init)
-    {
+    if (!init){
         std::cerr << "Error: initializing cURL failed.\n";
         std::cerr << "Possible solutions are : \n";
         std::cerr << "\n";
