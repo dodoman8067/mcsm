@@ -29,6 +29,13 @@ void mcsm::VanillaServer::init(){
     map->insert(std::make_pair("1.16.1", "https://piston-data.mojang.com/v1/objects/a412fd69db1f81db3f511c1463fd304675244077/server.jar"));
     map->insert(std::make_pair("1.16", "https://piston-data.mojang.com/v1/objects/a0d03225615ba897619220e256a266cb33a44b6b/server.jar"));
     map->insert(std::make_pair("1.15.2", "https://piston-data.mojang.com/v1/objects/bb2b6b1aefcd70dfd1892149ac3a215f6c636b07/server.jar"));
+    map->insert(std::make_pair("1.15.1", "https://piston-data.mojang.com/v1/objects/4d1826eebac84847c71a77f9349cc22afd0cf0a1/server.jar"));
+    map->insert(std::make_pair("1.15", "https://piston-data.mojang.com/v1/objects/e9f105b3c5c7e85c7b445249a93362a22f62442d/server.jar"));
+    map->insert(std::make_pair("1.14.4", "https://piston-data.mojang.com/v1/objects/3dc3d84a581f14691199cf6831b71ed1296a9fdf/server.jar"));
+    map->insert(std::make_pair("1.14.3", "https://piston-data.mojang.com/v1/objects/d0d0fe2b1dc6ab4c65554cb734270872b72dadd6/server.jar"));
+    map->insert(std::make_pair("1.14.2", "https://piston-data.mojang.com/v1/objects/808be3869e2ca6b62378f9f4b33c946621620019/server.jar"));
+    map->insert(std::make_pair("1.14.1", "https://piston-data.mojang.com/v1/objects/ed76d597a44c5266be2a7fcd77a8270f1f0bc118/server.jar"));
+    map->insert(std::make_pair("1.14", "https://piston-data.mojang.com/v1/objects/f1a0073671057f01aa843443fef34330281333ce/server.jar"));
     mcsm::GlobalOption option(".server.url", "vanilla_server");
     if(!option.hasValue("versions")){
         option.setValue("versions", *map);
