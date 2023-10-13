@@ -46,21 +46,7 @@ int main(int argc, char *argv[]) {
 
     bool commandFound = false;
 
-    bool init = mcsm::initCurl();
-
-    //Checks if curl is properly initialized
-    //If not, prints error message and exits
-    if (!init){
-        std::cerr << "Error: initializing cURL failed.\n";
-        std::cerr << "Possible solutions are : \n";
-        std::cerr << "\n";
-        std::cerr << "1.Try re-running the program.\n";
-        std::cerr << "2.Try rebooting the PC.\n";
-        std::cerr << "3.Try reinstalling the entire program.\n";
-        std::cerr << "\n";
-        std::cerr << "If none of these work, you may find the solution on the internet.\n";
-        return 1;
-    }
+    mcsm::initCurl();
     initCommands();
 
     //Prints default message when no arguments

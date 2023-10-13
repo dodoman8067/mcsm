@@ -63,3 +63,7 @@ void mcsm::VanillaServer::download(const std::string& version, const std::string
 bool mcsm::VanillaServer::hasVersion(const std::string& version){
     return false;
 }
+
+mcsm::ServerType mcsm::VanillaServer::getType() const {
+    return ServerType::VANILLA;
+}

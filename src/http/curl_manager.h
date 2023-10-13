@@ -4,8 +4,7 @@
 #include <curl/curl.h>
 
 namespace mcsm {
-    bool initCurl();
-    CURL* getCurl();
+    void initCurl();
     void clearCurl();
 }
 
