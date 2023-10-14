@@ -35,7 +35,6 @@ SOFTWARE.
 #include "data/options/jvm_option.h"
 #include "util/string_utils.h"
 #include "jvm/java_detection.h"
-#include "http/curl_manager.h"
 #include "http/get.h"
 
 const std::string version = "0.0.1";
