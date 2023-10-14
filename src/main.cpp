@@ -71,10 +71,8 @@ int main(int argc, char *argv[]) {
     //If arguments exist but command is not found, prints message and exits
     if(!commandFound){
         std::cerr << "Unknown command \"" << argv[1] << "\". " << "Type \'mcsm help\' for list of commands.\n";
-        mcsm::clearCurl();
         return 1;
     }
-    mcsm::clearCurl();
     
     return 0;
 }
