@@ -4,6 +4,10 @@ project(mcsm)
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 
+# Set dependencies options
+set(ZLIB_USE_STATIC_LIBS TRUE)
+set(OPENSSL_USE_STATIC_LIBS TRUE)
+
 # Source files
 file(GLOB_RECURSE SRC_FILES ${CMAKE_SOURCE_DIR}/src/*.cpp)
 
@@ -21,7 +25,7 @@ endif()
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
     set(CMAKE_CXX_FLAGS_DEBUG "-g")
-    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -flto -Werror")
+    set(CMAKE_CXX_FLAGS_RELEASE "-O3 -flto")
 endif()
 
 if(CMAKE_BUILD_TYPE MATCHES Release)

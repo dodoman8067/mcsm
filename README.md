@@ -29,7 +29,7 @@ For those who wonder : MSVC is not supported right now. If you try to build it w
 
 ### Dependencies
 
-NOTE: This project only supports external dependencies that is installed with CMake-generated makefiles.
+NOTE: libcurl is built with the following cmake command : 
 
 This project requires the following dependencies :
 
@@ -55,3 +55,5 @@ Currently, you can't contribute to this project because it isn't completed right
 ## License
 
 This project is licensed under the [MIT](LICENSE).
+
+This project also statically linked with libcurl. You can view the LICENSE file [here](https://curl.se/docs/copyright.html).

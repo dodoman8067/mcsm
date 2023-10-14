@@ -37,6 +37,7 @@ SOFTWARE.
 #include "util/string_utils.h"
 #include "jvm/java_detection.h"
 #include "http/curl_manager.h"
+#include "http/get.h"
 
 const std::string version = "0.0.1";
 
@@ -53,6 +54,7 @@ int main(int argc, char *argv[]) {
     if(argc < 2){
         std::cout << "Welcome to MCSM (Minecraft Server Manager).\n";
         std::cout << "Type \'mcsm help\' for list of commands.\n";
+        mcsm::get("https://google.com");
         mcsm::clearCurl();
         return 0;
     }

@@ -2,6 +2,7 @@
 #define __MCSM_GET_H__
 
 #include <string>
+#include <iostream>
 #include <curl/curl.h>
 
 namespace mcsm {
