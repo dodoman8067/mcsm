@@ -19,7 +19,6 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
 #include <iostream>
 #include <vector>
 #include <memory>
@@ -47,15 +46,12 @@ int main(int argc, char *argv[]) {
 
     bool commandFound = false;
 
-    mcsm::initCurl();
     initCommands();
 
     //Prints default message when no arguments
     if(argc < 2){
         std::cout << "Welcome to MCSM (Minecraft Server Manager).\n";
         std::cout << "Type \'mcsm help\' for list of commands.\n";
-        mcsm::get("https://google.com");
-        mcsm::clearCurl();
         return 0;
     }
 

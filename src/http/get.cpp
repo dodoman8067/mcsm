@@ -1,13 +1,13 @@
 #include "get.h"
 
-static size_t writeFunction(void* ptr, size_t size, size_t nmemb, std::string* data) {
-    data->append((char*)ptr, size * nmemb);
-    return size * nmemb;
+static size_t writeFunction(void* contents, size_t size, size_t nmemb, std::string* output) {
+    size_t totalSize = size * nmemb;
+    output->append(static_cast<char*>(contents), totalSize);
+    return totalSize;
 }
 
 const std::string mcsm::get(const std::string& url){
     CURL *curl = curl_easy_init();
-    CURLcode result;
 
     if(!curl){
         std::cerr << "Error: Unable to initialize curl\n";
@@ -16,27 +16,19 @@ const std::string mcsm::get(const std::string& url){
         std::exit(1);
     }
 
-        curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
-        curl_easy_setopt(curl, CURLOPT_VERBOSE, 1);
-        curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 1L);
-        curl_easy_setopt(curl, CURLOPT_USERPWD, "user:pass");
-        curl_easy_setopt(curl, CURLOPT_USERAGENT, "curl/8.4.0");
-        curl_easy_setopt(curl, CURLOPT_MAXREDIRS, 50L);
-        curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
-        
-        std::string response_string;
-        std::string header_string;
-        curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction);
-        curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response_string);
-        curl_easy_setopt(curl, CURLOPT_HEADERDATA, &header_string);
+    std::string response;
 
-    result = curl_easy_perform(curl);
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L); // Follow redirects
+    curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction); //
+    curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
 
-    if(result != CURLE_OK){
-        std::cerr << "Error: Failed to perform GET request with the following error : " << curl_easy_strerror(result) << "\n";
+    CURLcode res = curl_easy_perform(curl);
+
+    if (res != CURLE_OK) {
+        std::cerr << "Error: Failed to perform GET request with the following error : " << curl_easy_strerror(res) << std::endl;
     }
 
     curl_easy_cleanup(curl);
-
-    return response_string;
+    return response;
 }
