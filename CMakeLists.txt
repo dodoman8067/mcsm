@@ -4,7 +4,7 @@ project(mcsm)
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 
-# Set dependencies options
+# Set dependency options
 set(ZLIB_USE_STATIC_LIBS TRUE)
 set(OPENSSL_USE_STATIC_LIBS TRUE)
 
