@@ -45,18 +45,35 @@ std::string mcsm::getJavaFromHome(){
 std::string mcsm::getJavaFromPath(){
     char* path = std::getenv("PATH");
     if (path != nullptr) {
-        std::string pathStr(path);
+        if(mcsm::getCurrentOS() == mcsm::OS::WINDOWS){
+            std::string pathStr(path);
 
-        size_t found = pathStr.find_first_of(';');
-        while (found != std::string::npos) {
-            std::string directory = pathStr.substr(0, found);
-            std::filesystem::path javaPath = std::filesystem::path(directory) / javaExecutable;
-            if (std::filesystem::exists(javaPath)) {
-                return std::move(javaPath.string());
+            size_t found = pathStr.find_first_of(';');
+            while(found != std::string::npos){
+                std::string directory = pathStr.substr(0, found);
+                std::filesystem::path javaPath = std::filesystem::path(directory) / javaExecutable;
+                if(std::filesystem::exists(javaPath)){
+                    return std::move(javaPath.string());
+                }
+
+                pathStr = pathStr.substr(found + 1);
+                found = pathStr.find_first_of(';');
             }
+        }
+        if(mcsm::getCurrentOS() == mcsm::OS::LINUX){
+            std::string pathStr(path);
 
-            pathStr = pathStr.substr(found + 1);
-            found = pathStr.find_first_of(';');
+            size_t found = pathStr.find_first_of(':');
+            while(found != std::string::npos){
+                std::string directory = pathStr.substr(0, found);
+                std::filesystem::path javaPath = std::filesystem::path(directory) / javaExecutable;
+                if(std::filesystem::exists(javaPath)){
+                    return std::move(javaPath.string());
+                }
+
+                pathStr = pathStr.substr(found + 1);
+                found = pathStr.find_first_of(':');
+            }
         }
     }
     return std::move("");
