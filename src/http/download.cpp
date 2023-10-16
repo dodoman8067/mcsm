@@ -20,11 +20,14 @@ void mcsm::download(const std::string& name, const std::string& url, const std::
     }
     CURLcode res;
     std::FILE* file;
+
     file = std::fopen(path.c_str(), "wb");
+
     curl_easy_setopt(curl, CURLOPT_URL, url);
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
+    
     res = curl_easy_perform(curl);
 
     if(res != CURLE_OK){
