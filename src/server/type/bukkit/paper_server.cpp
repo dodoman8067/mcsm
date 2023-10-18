@@ -22,8 +22,14 @@ SOFTWARE.
 
 #include "paper_server.h"
 
-std::string mcsm::PaperServer::getVersion(const std::string& ver) const {
-
+int mcsm::PaperServer::getVersion(const std::string& ver) const {
+    std::string res = mcsm::get("https://api.papermc.io/v2/projects/paper/versions/" + ver);
+    nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
+    if(json["builds"].is_array()){
+        return json["builds"].array()[json["builds"].array().size() - 1];
+    }else{
+        return -1;
+    }
 }
 
 std::unique_ptr<std::vector<std::string>> mcsm::PaperServer::getAvailableVersions() {

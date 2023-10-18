@@ -25,12 +25,14 @@ SOFTWARE.
 
 #include "../base/bukkit_server.h"
 #include "../downloadable.h"
+#include "../../../http/get.h"
 #include <curl/curl.h>
+#include <nlohmann/json.hpp>
 
 namespace mcsm {
     class PaperServer : public mcsm::BukkitServer, public mcsm::Downloadable {
     private:
-        std::string getVersion(const std::string& ver) const;
+        int getVersion(const std::string& ver) const;
     public:
         std::unique_ptr<std::vector<std::string>> getAvailableVersions() override;
         void download(const std::string& version) override;
