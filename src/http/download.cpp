@@ -7,7 +7,7 @@ static size_t writeFunction(void *ptr, size_t size, size_t nmemb, FILE *stream) 
 }
 
 void mcsm::download(const std::string& name, const std::string& url){
-    download(name, url, std::filesystem::current_path().string() + "/" +  name);
+    download(name, url, std::filesystem::current_path().string());
 }
 
 void mcsm::download(const std::string& name, const std::string& url, const std::string& path){
@@ -21,8 +21,8 @@ void mcsm::download(const std::string& name, const std::string& url, const std::
     }
     CURLcode res;
     std::FILE* file;
-
-    file = std::fopen(path.c_str(), "wb");
+    std::string filename = path + "/" + name;
+    file = std::fopen(filename.c_str(), "wb");
 
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
