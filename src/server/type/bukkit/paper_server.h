@@ -32,8 +32,8 @@ SOFTWARE.
 namespace mcsm {
     class PaperServer : public mcsm::BukkitServer, public mcsm::Downloadable {
     private:
-        int getVersion(const std::string& ver) const;
     public:
+        int getVersion(const std::string& ver) const;
         std::unique_ptr<std::vector<std::string>> getAvailableVersions() override;
         void download(const std::string& version) override;
         void download(const std::string& version, const std::string& path) override;
