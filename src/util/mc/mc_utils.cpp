@@ -20,28 +20,48 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __MCSM_PAPER_SERVER_H__
-#define __MCSM_PAPER_SERVER_H__
+#include "mc_utils.h"
 
-#include "../base/bukkit_server.h"
-#include "../downloadable.h"
-#include "../../../http/get.h"
-#include "../../../util/mc/mc_utils.h"
-#include <curl/curl.h>
-#include <nlohmann/json.hpp>
-
-namespace mcsm {
-    class PaperServer : public mcsm::BukkitServer, public mcsm::Downloadable {
-    private:
-    public:
-        int getVersion(const std::string& ver) const;
-        std::unique_ptr<std::vector<std::string>> getAvailableVersions() override;
-        void download(const std::string& version) override;
-        void download(const std::string& version, const std::string& path) override;
-        void download(const std::string& version, const std::string& path, const std::string& name) override;
-        bool hasVersion(const std::string& version) override;
+std::vector<std::string> mcsm::getMinecraftVersions(){
+    std::vector<std::string> versions = {
+        "1.8",
+        "1.8.8",
+        "1.9.4",
+        "1.10.2",
+        "1.11.2",
+        "1.12",
+        "1.12.1",
+        "1.12.2",
+        "1.13",
+        "1.13.1",
+        "1.13.2",
+        "1.14",
+        "1.14.1",
+        "1.14.2",
+        "1.14.3",
+        "1.14.4",
+        "1.15",
+        "1.15.1",
+        "1.15.2",
+        "1.16",
+        "1.16.1",
+        "1.16.2",
+        "1.16.3",
+        "1.16.4",
+        "1.16.5",
+        "1.17",
+        "1.17.1",
+        "1.18",
+        "1.18.1",
+        "1.18.2",
+        "1.19",
+        "1.19.1",
+        "1.19.2",
+        "1.19.3",
+        "1.19.4",
+        "1.20",
+        "1.20.1",
+        "1.20.2"
     };
+    return versions;
 }
-
-
-#endif // __MCSM_PAPER_SERVER_H__
