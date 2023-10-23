@@ -20,24 +20,28 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __MCSM_JVM_OPTION_SEARCH_COMMAND_H__
-#define __MCSM_JVM_OPTION_SEARCH_COMMAND_H__
+#ifndef __MCSM_PAPER_SERVER_H__
+#define __MCSM_PAPER_SERVER_H__
 
-#include "../../base/command.h"
-#include "../../../data/options/jvm_option.h"
+#include <mcsm/server/type/base/bukkit_server.h>
+#include <mcsm/server/type/bukkit/downloadable.h>
+#include <mcsm/http/get.h>
+#include <mcsm/util/mc/mc_utils.h>
+#include <curl/curl.h>
+#include <nlohmann/json.hpp>
 
 namespace mcsm {
-    class JvmOptionSearchCommand : public mcsm::Command {
+    class PaperServer : public mcsm::BukkitServer, public mcsm::Downloadable {
     private:
-        std::vector<std::unique_ptr<mcsm::JvmOption>> search(const mcsm::SearchTarget& target, const std::string& name);
-        std::string getProfileName(const std::vector<std::string>& args) const;
-        mcsm::SearchTarget getSearchTarget(const std::vector<std::string>& args);
     public:
-        JvmOptionSearchCommand(const std::string& name, const std::string& description);
-        ~JvmOptionSearchCommand();
-        void execute(const std::vector<std::string>& args) override;
+        int getVersion(const std::string& ver) const;
+        std::unique_ptr<std::vector<std::string>> getAvailableVersions() override;
+        void download(const std::string& version) override;
+        void download(const std::string& version, const std::string& path) override;
+        void download(const std::string& version, const std::string& path, const std::string& name) override;
+        bool hasVersion(const std::string& version) override;
     };
 }
 
 
-#endif // __MCSM_JVM_OPTION_SEARCH_COMMAND_H__
+#endif // __MCSM_PAPER_SERVER_H__

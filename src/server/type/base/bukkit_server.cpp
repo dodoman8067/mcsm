@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "bukkit_server.h"
+#include <mcsm/server/type/base/bukkit_server.h>
 
 mcsm::BukkitServer::BukkitServer() {}
 

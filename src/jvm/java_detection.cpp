@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "java_detection.h"
+#include <mcsm/jvm/java_detection.h>
 
 
 #ifdef _WIN32

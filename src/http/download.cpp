@@ -21,7 +21,7 @@ SOFTWARE.
 */
 
 
-#include "download.h"
+#include <mcsm/http/download.h>
 
 static size_t writeFunction(void *ptr, size_t size, size_t nmemb, FILE *stream) {
     size_t written;

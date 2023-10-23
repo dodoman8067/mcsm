@@ -1,4 +1,4 @@
-#include "cli_utils.h"
+#include <mcsm/util/cli/cli_utils.h>
 
 int mcsm::runCommandQuietly(const std::string& command){
     if(mcsm::getCurrentOS() == mcsm::OS::WINDOWS){

@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "mc_utils.h"
+#include <mcsm/util/mc/mc_utils.h>
 
 std::vector<std::string> mcsm::getMinecraftVersions(){
     std::vector<std::string> versions = {

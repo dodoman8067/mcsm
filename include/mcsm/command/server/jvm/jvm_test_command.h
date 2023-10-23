@@ -20,38 +20,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __MCSM_GLOBAL_OPTION_H__
-#define __MCSM_GLOBAL_OPTION_H__
+#ifndef __MCSM_JVM_TEST_COMMAND_H__
+#define __MCSM_JVM_TEST_COMMAND_H__
 
-#include <nlohmann/json.hpp>
-#include <string>
-#include <filesystem>
-#include <fstream>
-#include <iostream>
-#include "configurable.h"
-#include "../util/os/os_detection.h"
-#include "../util/string_utils.h"
+#include <mcsm/command/base/command.h>
+#include <mcsm/data/options/jvm_option.h>
+#include <mcsm/util/cli/cli_utils.h>
 
 namespace mcsm {
-    class GlobalOption : public mcsm::Configurable {
+    class JvmTestCommand : public mcsm::Command {
     private:
-        std::string path;
-        std::string name;
-        bool createDirectories(std::string const &dirName, std::error_code &err) const;
-        std::string getDataPathPerOS();
+        mcsm::SearchTarget getSearchTarget(const std::vector<std::string>& args);
+        std::unique_ptr<mcsm::JvmOption> searchOption(const mcsm::SearchTarget& target, const std::string& name);
+        std::string getProfileName(const std::vector<std::string>& args) const;
+        inline void performTest(std::unique_ptr<mcsm::JvmOption> option);
     public:
-        GlobalOption(const std::string& path, const std::string& name);
-        ~GlobalOption();
-        nlohmann::json load() const;
-        std::string getPath();
-        std::string getName();
-        nlohmann::json getValue(const std::string& key) const;
-        bool hasValue(const std::string& key) const;
-        bool exists() const;
-        void setValue(const std::string& key, const nlohmann::json& value) const;
-        void save(const nlohmann::json& jsonData) const;
-        void reset() const;
+        JvmTestCommand(const std::string& name, const std::string& description);
+        ~JvmTestCommand();
+        void execute(const std::vector<std::string>& args) override;
     };
 }
 
-#endif
+#endif // __MCSM_JVM_TEST_COMMAND_H__

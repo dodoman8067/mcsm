@@ -20,29 +20,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __MCSM_COMMAND_H__
-#define __MCSM_COMMAND_H__
+#ifndef __MCSM_JVM_OPTION_SEARCH_COMMAND_H__
+#define __MCSM_JVM_OPTION_SEARCH_COMMAND_H__
 
-#include <string>
-#include <vector>
+#include <mcsm/command/base/command.h>
+#include <mcsm/data/options/jvm_option.h>
 
 namespace mcsm {
-    class Command {
+    class JvmOptionSearchCommand : public mcsm::Command {
     private:
-        std::string name;
-        std::string description;
-        std::vector<std::string>* aliases;
+        std::vector<std::unique_ptr<mcsm::JvmOption>> search(const mcsm::SearchTarget& target, const std::string& name);
+        std::string getProfileName(const std::vector<std::string>& args) const;
+        mcsm::SearchTarget getSearchTarget(const std::vector<std::string>& args);
     public:
-        Command(const std::string& name, const std::string& description);
-        ~Command();
-        std::string getName() const;
-        std::string getDescription() const;
-        void addAliases(const std::string& value);
-        bool hasAliases(const std::string& value) const;
-        const std::vector<std::string>& getAliases() const;
-        virtual void execute(const std::vector<std::string>& args) = 0;
+        JvmOptionSearchCommand(const std::string& name, const std::string& description);
+        ~JvmOptionSearchCommand();
+        void execute(const std::vector<std::string>& args) override;
     };
-};
+}
 
-#include "../command_manager.h"
-#endif
+
+#endif // __MCSM_JVM_OPTION_SEARCH_COMMAND_H__

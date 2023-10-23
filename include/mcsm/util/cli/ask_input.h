@@ -20,21 +20,20 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __MCSM_JAVA_DETECTION_H__
-#define __MCSM_JAVA_DETECTION_H__
+#ifndef __MCSM_ASK_INPUT_H__
+#define __MCSM_ASK_INPUT_H__
 
-#include <cstdlib>
-#include <string>
-#include <filesystem>
 #include <iostream>
-#include "../util/string_utils.h"
-#include "../util/os/os_detection.h"
+#include <vector>
+#include <string>
+#include <mcsm/util/string_utils.h>
 
 namespace mcsm {
-    std::string getJavaFromHome();
-    std::string getJavaFromPath();
-    std::string detectJava();
-    bool isValidJava(const std::string& path);
+    // Asks input.
+    // @param arguments prints given value when asking
+    // @param input stores the input
+    // @param outputWhenNone sets input variable to given value when input is empty; empty this value and it won't be changed
+    void askInput(std::vector<std::string>& arguments, std::string& input, const std::string &outputWhenNone);
 }
 
 #endif

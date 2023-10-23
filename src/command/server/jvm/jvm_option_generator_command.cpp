@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "jvm_option_generator_command.h"
+#include <mcsm/command/server/jvm/jvm_option_generator_command.h>
 
 const std::vector<std::string> availableOptions = {
     "-jvmPath",

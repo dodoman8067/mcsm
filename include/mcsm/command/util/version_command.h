@@ -24,7 +24,7 @@ SOFTWARE.
 #define __MCSM_VERSION_COMMAND_H__
 
 #include <iostream>
-#include "../base/command.h"
+#include <mcsm/command/base/command.h>
 
 namespace mcsm {
     class VersionCommand : public mcsm::Command {

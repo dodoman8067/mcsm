@@ -20,26 +20,36 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __MCSM_BUKKIT_SERVER_H__
-#define __MCSM_BUKKIT_SERVER_H__
+#ifndef __MCSM_OPTION_H__
+#define __MCSM_OPTION_H__
 
-#include "../../server.h"
+#include <nlohmann/json.hpp>
+#include <string>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <mcsm/data/configurable.h>
+#include <mcsm/util/string_utils.h>
 
 namespace mcsm {
-    /**
-     * @brief Represents a server that uses Bukkit API.
-     */
-    class BukkitServer : public mcsm::Server {
+    class Option : public mcsm::Configurable {
+    private:
+        std::string path;
+        std::string name;
+        bool createDirectories(std::string const &dirName, std::error_code &err) const;
     public:
-        BukkitServer();
-        ~BukkitServer();
-        /**
-         * @brief Returns current server type.
-         * 
-         * @return mcsm::ServerType 
-         */
-        mcsm::ServerType getType() const override;
+        Option(const std::string& path, const std::string& name);
+        ~Option();
+        nlohmann::json load() const;
+        std::string getPath();
+        std::string getName();
+        nlohmann::json getValue(const std::string& key) const;
+        bool hasValue(const std::string& key) const;
+        bool exists() const override;
+        void setValue(const std::string& key, const nlohmann::json& value) const;
+        void save(const nlohmann::json& jsonData) const;
+        void reset() const;
     };
 }
 
-#endif // __MCSM_BUKKIT_SERVER_H__
+#endif

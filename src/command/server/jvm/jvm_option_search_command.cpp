@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "jvm_option_search_command.h"
+#include <mcsm/command/server/jvm/jvm_option_search_command.h>
 
 mcsm::JvmOptionSearchCommand::JvmOptionSearchCommand(const std::string& name, const std::string& description) : mcsm::Command(name, description) {}
 

@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "vanilla_server.h"
+#include <mcsm/server/type/base/vanilla_server.h>
 
 mcsm::VanillaServer::VanillaServer(){
     this->versions = std::make_unique<std::map<const std::string, const std::string>>();

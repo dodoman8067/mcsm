@@ -23,10 +23,10 @@ SOFTWARE.
 #ifndef __MCSM_JVM_OPTION_H__
 #define __MCSM_JVM_OPTION_H__
 
-#include "../global_option.h"
-#include "../option.h"
-#include "../../jvm/java_detection.h"
-#include "../../util/string_utils.h"
+#include <mcsm/data/global_option.h>
+#include <mcsm/data/option.h>
+#include <mcsm/jvm/java_detection.h>
+#include <mcsm/util/string_utils.h>
 #include <memory>
 
 namespace mcsm {

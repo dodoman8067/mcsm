@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "paper_server.h"
+#include <mcsm/server/type/bukkit/paper_server.h>
 
 int mcsm::PaperServer::getVersion(const std::string& ver) const {
     std::string res = mcsm::get("https://api.papermc.io/v2/projects/paper/versions/" + ver);

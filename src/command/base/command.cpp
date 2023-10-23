@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "command.h"
+#include <mcsm/command/base/command.h>
 
 mcsm::Command::Command(const std::string& name, const std::string& description){
     this->name = name;

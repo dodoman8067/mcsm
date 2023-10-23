@@ -20,21 +20,30 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __MCSM_HELP_COMMAND_H__
-#define __MCSM_HELP_COMMAND_H__
+#ifndef __MCSM_VANILLA_SERVER_H__
+#define __MCSM_VANILLA_SERVER_H__
 
-#include "../base/command.h"
-#include "../command_manager.h"
-#include <iostream>
+#include <mcsm/server/server.h>
+#include <mcsm/server/type/bukkit/downloadable.h>
+#include <mcsm/data/global_option.h>
+#include <map>
 
 namespace mcsm {
-    class HelpCommand : public mcsm::Command {
-    public:
-        HelpCommand(const std::string& name, const std::string& description);
-        ~HelpCommand();
-        void execute(const std::vector<std::string>& args) override;
+    class VanillaServer : public mcsm::Server, public mcsm::Downloadable {
     private:
+        std::unique_ptr<std::map<const std::string, const std::string>> versions;
+        void init();
+    public:
+        VanillaServer();
+        ~VanillaServer();
+        std::unique_ptr<std::vector<std::string>> getAvailableVersions() override;
+        void download(const std::string& version) override;
+        void download(const std::string& version, const std::string& path) override;
+        void download(const std::string& version, const std::string& path, const std::string& name) override;
+        bool hasVersion(const std::string& version) override;
+        mcsm::ServerType getType() const override;
     };
 }
 
-#endif
+
+#endif // __MCSM_VANILLA_SERVER_H__

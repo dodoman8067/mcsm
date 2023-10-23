@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "help_command.h"
+#include <mcsm/command/util/help_command.h>
 
 mcsm::HelpCommand::HelpCommand(const std::string& name, const std::string& description) : mcsm::Command(name, description) {};
 

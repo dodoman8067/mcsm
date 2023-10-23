@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "server_type.h"
+#include <mcsm/server/server_type.h>
 
 mcsm::ServerType mcsm::getServerType(const std::string& name){
     if(name == "vanilla"){

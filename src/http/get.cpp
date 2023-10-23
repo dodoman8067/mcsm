@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "get.h"
+#include <mcsm/http/get.h>
 
 static size_t writeFunction(void* contents, size_t size, size_t nmemb, std::string* output) {
     size_t totalSize = size * nmemb;

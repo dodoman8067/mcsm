@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "global_option.h"
+#include <mcsm/data/global_option.h>
 
 mcsm::GlobalOption::GlobalOption(const std::string& path, const std::string& name){
     std::string path1 = path;

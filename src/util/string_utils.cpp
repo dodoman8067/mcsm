@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "string_utils.h"
+#include <mcsm/util/string_utils.h>
 
 namespace mcsm {
     bool startsWith(const std::string& str, const std::string& value){

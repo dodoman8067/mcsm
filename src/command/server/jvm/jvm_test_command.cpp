@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "jvm_test_command.h"
+#include <mcsm/command/server/jvm/jvm_test_command.h>
 
 mcsm::JvmTestCommand::JvmTestCommand(const std::string& name, const std::string& description) : mcsm::Command(name, description) {}
 

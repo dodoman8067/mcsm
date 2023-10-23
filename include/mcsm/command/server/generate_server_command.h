@@ -23,8 +23,8 @@ SOFTWARE.
 #ifndef __MCSM_GENERATE_SERVER_COMMAND_H__
 #define __MCSM_GENERATE_SERVER_COMMAND_H__
 
-#include "../base/command.h"
-#include "../../util/ask_input.h"
+#include <mcsm/command/base/command.h>
+#include <mcsm/util/cli/ask_input.h>
 #include <iostream>
 #include <limits>
 

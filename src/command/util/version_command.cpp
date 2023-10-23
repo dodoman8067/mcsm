@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "version_command.h"
+#include <mcsm/command/util/version_command.h>
 
 mcsm::VersionCommand::VersionCommand(const std::string& name, const std::string& description, const std::string& version) : mcsm::Command(name, description) {
     this->version = version;

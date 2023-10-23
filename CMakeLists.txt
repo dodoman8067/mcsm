@@ -1,6 +1,9 @@
 cmake_minimum_required(VERSION 3.24)
 project(mcsm)
 
+# Set include directory
+include_directories(${CMAKE_SOURCE_DIR}/include)
+
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 

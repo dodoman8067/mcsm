@@ -20,7 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include "os_detection.h"
+#include <mcsm/util/os/os_detection.h>
 
 mcsm::OS mcsm::getCurrentOS() {
 #ifdef _WIN32

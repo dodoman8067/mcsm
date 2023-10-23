@@ -23,18 +23,18 @@ SOFTWARE.
 #include <vector>
 #include <memory>
 #include <string>
-#include "command/command_manager.h"
-#include "command/base/command.h"
-#include "command/util/version_command.h"
-#include "command/util/help_command.h"
-#include "command/server/generate_server_command.h"
-#include "command/server/jvm/jvm_option_generator_command.h"
-#include "command/server/jvm/jvm_option_search_command.h"
-#include "command/server/jvm/jvm_test_command.h"
-#include "data/option.h"
-#include "data/options/jvm_option.h"
-#include "util/string_utils.h"
-#include "jvm/java_detection.h"
+#include <mcsm/command/command_manager.h>
+#include <mcsm/command/base/command.h>
+#include <mcsm/command/util/version_command.h>
+#include <mcsm/command/util/help_command.h>
+#include <mcsm/command/server/generate_server_command.h>
+#include <mcsm/command/server/jvm/jvm_option_generator_command.h>
+#include <mcsm/command/server/jvm/jvm_option_search_command.h>
+#include <mcsm/command/server/jvm/jvm_test_command.h>
+#include <mcsm/data/option.h>
+#include <mcsm/data/options/jvm_option.h>
+#include <mcsm/util/string_utils.h>
+#include <mcsm/jvm/java_detection.h>
 
 const std::string version = "0.0.1";
 

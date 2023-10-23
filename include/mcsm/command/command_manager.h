@@ -20,25 +20,31 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __MCSM_JVM_TEST_COMMAND_H__
-#define __MCSM_JVM_TEST_COMMAND_H__
+#ifndef __MCSM_COMMAND_MANAGER_H__
+#define __MCSM_COMMAND_MANAGER_H__
 
-#include "../../base/command.h"
-#include "../../../data/options/jvm_option.h"
-#include "../../../util/cli_utils.h"
+#include <curl/curl.h>
+#include <memory>
+#include <vector>
+#include <mcsm/command/base/command.h>
+#include <iostream>
 
 namespace mcsm {
-    class JvmTestCommand : public mcsm::Command {
+    class CommandManager {
     private:
-        mcsm::SearchTarget getSearchTarget(const std::vector<std::string>& args);
-        std::unique_ptr<mcsm::JvmOption> searchOption(const mcsm::SearchTarget& target, const std::string& name);
-        std::string getProfileName(const std::vector<std::string>& args) const;
-        inline void performTest(std::unique_ptr<mcsm::JvmOption> option);
+        static bool initialized;
+        static std::unique_ptr<std::vector<std::unique_ptr<mcsm::Command>>> commands;
+        CommandManager();
     public:
-        JvmTestCommand(const std::string& name, const std::string& description);
-        ~JvmTestCommand();
-        void execute(const std::vector<std::string>& args) override;
+        ~CommandManager();
+        static void init();
+        static std::vector<std::unique_ptr<mcsm::Command>>& getCommands();
+        static void addCommand(std::unique_ptr<mcsm::Command> command);
+        static bool hasCommand(const std::string& name);
+        static bool hasAliases(const std::string& command, const std::string& value);
+        static bool hasAliasesInGlobal(const std::string& value);
+        static std::unique_ptr<mcsm::Command> getCommand(const std::string& name);
     };
-}
+};
 
-#endif // __MCSM_JVM_TEST_COMMAND_H__
+#endif

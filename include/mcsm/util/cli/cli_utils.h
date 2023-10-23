@@ -4,7 +4,7 @@
 #include <string>
 #include <cstdlib>
 #include <iostream>
-#include "os/os_detection.h"
+#include <mcsm/util/os/os_detection.h>
 
 namespace mcsm {
     int runCommandQuietly(const std::string& command);

@@ -23,7 +23,7 @@ SOFTWARE.
 #ifndef __MCSM_SERVER_H__
 #define __MCSM_SERVER_H__
 
-#include "server_type.h"
+#include <mcsm/server/server_type.h>
 
 namespace mcsm {
     /**

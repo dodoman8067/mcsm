@@ -20,20 +20,25 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __MCSM_ASK_INPUT_H__
-#define __MCSM_ASK_INPUT_H__
+#include <mcsm/util/cli/ask_input.h>
 
-#include <iostream>
-#include <vector>
-#include <string>
-#include "string_utils.h"
-
-namespace mcsm {
-    // Asks input.
-    // @param arguments prints given value when asking
-    // @param input stores the input
-    // @param outputWhenNone sets input variable to given value when input is empty; empty this value and it won't be changed
-    void askInput(std::vector<std::string>& arguments, std::string& input, const std::string &outputWhenNone);
+void mcsm::askInput(std::vector<std::string>& arguments, std::string& input, const std::string &outputWhenNone){
+    for(std::string& s : arguments){
+        std::cout << s << "\n";
+    }
+    std::cout << " " << std::endl;
+    while(true){
+        std::cout << ">> ";
+        std::getline(std::cin, input);
+            
+        if(!mcsm::isWhitespaceOrEmpty(input)){
+            break;
+        }else{
+            if(!outputWhenNone.empty()){
+                input = outputWhenNone;
+                break;
+            }
+            std::cout << "Not a valid input; Please try again." << std::endl;
+        }
+    }
 }
-
-#endif

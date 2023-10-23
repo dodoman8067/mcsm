@@ -20,28 +20,38 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __MCSM_PAPER_SERVER_H__
-#define __MCSM_PAPER_SERVER_H__
+#ifndef __MCSM_GLOBAL_OPTION_H__
+#define __MCSM_GLOBAL_OPTION_H__
 
-#include "../base/bukkit_server.h"
-#include "../downloadable.h"
-#include "../../../http/get.h"
-#include "../../../util/mc/mc_utils.h"
-#include <curl/curl.h>
 #include <nlohmann/json.hpp>
+#include <string>
+#include <filesystem>
+#include <fstream>
+#include <iostream>
+#include <mcsm/data/configurable.h>
+#include <mcsm/util/os/os_detection.h>
+#include <mcsm/util/string_utils.h>
 
 namespace mcsm {
-    class PaperServer : public mcsm::BukkitServer, public mcsm::Downloadable {
+    class GlobalOption : public mcsm::Configurable {
     private:
+        std::string path;
+        std::string name;
+        bool createDirectories(std::string const &dirName, std::error_code &err) const;
+        std::string getDataPathPerOS();
     public:
-        int getVersion(const std::string& ver) const;
-        std::unique_ptr<std::vector<std::string>> getAvailableVersions() override;
-        void download(const std::string& version) override;
-        void download(const std::string& version, const std::string& path) override;
-        void download(const std::string& version, const std::string& path, const std::string& name) override;
-        bool hasVersion(const std::string& version) override;
+        GlobalOption(const std::string& path, const std::string& name);
+        ~GlobalOption();
+        nlohmann::json load() const;
+        std::string getPath();
+        std::string getName();
+        nlohmann::json getValue(const std::string& key) const;
+        bool hasValue(const std::string& key) const;
+        bool exists() const;
+        void setValue(const std::string& key, const nlohmann::json& value) const;
+        void save(const nlohmann::json& jsonData) const;
+        void reset() const;
     };
 }
 
-
-#endif // __MCSM_PAPER_SERVER_H__
+#endif

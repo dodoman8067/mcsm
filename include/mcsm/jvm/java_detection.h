@@ -20,36 +20,21 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __MCSM_OPTION_H__
-#define __MCSM_OPTION_H__
+#ifndef __MCSM_JAVA_DETECTION_H__
+#define __MCSM_JAVA_DETECTION_H__
 
-#include <nlohmann/json.hpp>
+#include <cstdlib>
 #include <string>
 #include <filesystem>
-#include <fstream>
 #include <iostream>
-#include "../util/string_utils.h"
-#include "configurable.h"
+#include <mcsm/util/string_utils.h>
+#include <mcsm/util/os/os_detection.h>
 
 namespace mcsm {
-    class Option : public mcsm::Configurable {
-    private:
-        std::string path;
-        std::string name;
-        bool createDirectories(std::string const &dirName, std::error_code &err) const;
-    public:
-        Option(const std::string& path, const std::string& name);
-        ~Option();
-        nlohmann::json load() const;
-        std::string getPath();
-        std::string getName();
-        nlohmann::json getValue(const std::string& key) const;
-        bool hasValue(const std::string& key) const;
-        bool exists() const override;
-        void setValue(const std::string& key, const nlohmann::json& value) const;
-        void save(const nlohmann::json& jsonData) const;
-        void reset() const;
-    };
+    std::string getJavaFromHome();
+    std::string getJavaFromPath();
+    std::string detectJava();
+    bool isValidJava(const std::string& path);
 }
 
 #endif

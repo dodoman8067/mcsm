@@ -20,31 +20,29 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __MCSM_COMMAND_MANAGER_H__
-#define __MCSM_COMMAND_MANAGER_H__
+#ifndef __MCSM_COMMAND_H__
+#define __MCSM_COMMAND_H__
 
-#include <curl/curl.h>
-#include <memory>
+#include <string>
 #include <vector>
-#include "base/command.h"
-#include <iostream>
 
 namespace mcsm {
-    class CommandManager {
+    class Command {
     private:
-        static bool initialized;
-        static std::unique_ptr<std::vector<std::unique_ptr<mcsm::Command>>> commands;
-        CommandManager();
+        std::string name;
+        std::string description;
+        std::vector<std::string>* aliases;
     public:
-        ~CommandManager();
-        static void init();
-        static std::vector<std::unique_ptr<mcsm::Command>>& getCommands();
-        static void addCommand(std::unique_ptr<mcsm::Command> command);
-        static bool hasCommand(const std::string& name);
-        static bool hasAliases(const std::string& command, const std::string& value);
-        static bool hasAliasesInGlobal(const std::string& value);
-        static std::unique_ptr<mcsm::Command> getCommand(const std::string& name);
+        Command(const std::string& name, const std::string& description);
+        ~Command();
+        std::string getName() const;
+        std::string getDescription() const;
+        void addAliases(const std::string& value);
+        bool hasAliases(const std::string& value) const;
+        const std::vector<std::string>& getAliases() const;
+        virtual void execute(const std::vector<std::string>& args) = 0;
     };
 };
 
+#include <mcsm/command/command_manager.h>
 #endif
