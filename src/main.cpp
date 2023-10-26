@@ -102,7 +102,7 @@ inline void initCommands(){
     jvmProfileSearchCommand->addAliases("searchprofile");
     mcsm::CommandManager::addCommand(std::move(jvmProfileSearchCommand));
 
-    std::unique_ptr<mcsm::JvmTestCommand> jvmTestCommand = std::make_unique<mcsm::JvmTestCommand>("performTest", "Tests Java Virtual Machine is valid.");
+    std::unique_ptr<mcsm::JvmTestCommand> jvmTestCommand = std::make_unique<mcsm::JvmTestCommand>("performTest", "Tests if Java Virtual Machine is valid.");
     jvmTestCommand->addAliases("performtest");
     mcsm::CommandManager::addCommand(std::move(jvmTestCommand));
 }
