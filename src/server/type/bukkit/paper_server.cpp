@@ -38,11 +38,10 @@ int mcsm::PaperServer::getVersion(const std::string& ver) const {
         return -1;
     }
 }
-
-std::unique_ptr<std::vector<std::string>> mcsm::PaperServer::getAvailableVersions() {
-    std::unique_ptr<std::vector<std::string>> versions = std::make_unique<std::vector<std::string>>();
+std::vector<std::string> mcsm::PaperServer::getAvailableVersions() {
+    std::vector<std::string> versions;
     for(const std::string& s : mcsm::getMinecraftVersions()){
-        versions->push_back(s);
+        versions.push_back(s);
     }
     return versions;
 }

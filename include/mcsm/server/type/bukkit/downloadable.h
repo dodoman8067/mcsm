@@ -37,7 +37,7 @@ namespace mcsm {
         * 
         * @return std::unique_ptr<std::vector<std::string>> 
         */
-        virtual std::unique_ptr<std::vector<std::string>> getAvailableVersions() = 0;
+        virtual std::vector<std::string> getAvailableVersions() = 0;
 
         /**
          * @brief Downloads a server in current directory.
