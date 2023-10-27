@@ -26,6 +26,7 @@ SOFTWARE.
 #include <mcsm/server/type/base/bukkit_server.h>
 #include <mcsm/server/type/bukkit/downloadable.h>
 #include <mcsm/http/get.h>
+#include <mcsm/http/download.h>
 #include <mcsm/util/mc/mc_utils.h>
 #include <curl/curl.h>
 #include <nlohmann/json.hpp>

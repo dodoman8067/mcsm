@@ -38,7 +38,8 @@ int mcsm::PaperServer::getVersion(const std::string& ver) const {
         return -1;
     }
 }
-std::vector<std::string> mcsm::PaperServer::getAvailableVersions() {
+
+std::vector<std::string> mcsm::PaperServer::getAvailableVersions(){
     std::vector<std::string> versions;
     for(const std::string& s : mcsm::getMinecraftVersions()){
         versions.push_back(s);
@@ -47,17 +48,25 @@ std::vector<std::string> mcsm::PaperServer::getAvailableVersions() {
 }
 
 void mcsm::PaperServer::download(const std::string& version){
-    
+    download(version, std::filesystem::current_path().string(), "paper.jar");
 }
 
 void mcsm::PaperServer::download(const std::string& version, const std::string& path){
-
+    download(version, path, "paper.jar");
 }
 
 void mcsm::PaperServer::download(const std::string& version, const std::string& path, const std::string& name){
-
+    int ver = getVersion(version);
+    if(ver == -1){
+        std::cerr << "Error : Invalid version\n";
+        std::cerr << "Called method : mcsm::PaperServer::download() with arguments : " << version << "\n";
+        std::exit(1);
+    }
+    std::string strVer = std::to_string(ver);
+    std::string url = "https://api.papermc.io/v2/projects/paper/versions/" + version + "/builds/" + strVer + "/downloads/paper-" + version + "-" + strVer + ".jar";
+    download(version, std::filesystem::current_path().string(), name);
 }
 
 bool mcsm::PaperServer::hasVersion(const std::string& version){
-    
+    return getVersion(version) != -1;
 }
