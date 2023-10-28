@@ -36,7 +36,7 @@ namespace mcsm {
     public:
         VanillaServer();
         ~VanillaServer();
-        std::unique_ptr<std::vector<std::string>> getAvailableVersions() override;
+        std::vector<std::string> getAvailableVersions() override;
         void download(const std::string& version) override;
         void download(const std::string& version, const std::string& path) override;
         void download(const std::string& version, const std::string& path, const std::string& name) override;

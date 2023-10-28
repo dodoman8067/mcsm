@@ -64,9 +64,9 @@ void mcsm::VanillaServer::init(){
     }
 }
 
-std::unique_ptr<std::vector<std::string>> mcsm::VanillaServer::getAvailableVersions(){
-    std::unique_ptr<std::vector<std::string>> vector = std::make_unique<std::vector<std::string>>();
-    vector->reserve(this->versions->size());
+std::vector<std::string> mcsm::VanillaServer::getAvailableVersions(){
+    std::vector<std::string> vector;
+    vector.reserve(this->versions->size());
     return vector;
 }
 
