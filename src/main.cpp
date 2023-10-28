@@ -35,7 +35,6 @@ SOFTWARE.
 #include <mcsm/data/options/jvm_option.h>
 #include <mcsm/util/string_utils.h>
 #include <mcsm/jvm/java_detection.h>
-#include <mcsm/server/type/bukkit/paper_server.h>
 
 const std::string version = "0.0.1";
 
@@ -51,8 +50,6 @@ int main(int argc, char *argv[]) {
     if(argc < 2){
         std::cout << "Welcome to MCSM (Minecraft Server Manager).\n";
         std::cout << "Type \'mcsm help\' for list of commands.\n";
-        mcsm::PaperServer server;
-        server.download("1.20.1");
         return 0;
     }
 
