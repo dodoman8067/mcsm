@@ -89,3 +89,7 @@ bool mcsm::VanillaServer::hasVersion(const std::string& version){
 mcsm::ServerType mcsm::VanillaServer::getType() const {
     return ServerType::VANILLA;
 }
+
+std::string mcsm::VanillaServer::getJarFile(){
+    return "server.jar";
+}

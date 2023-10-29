@@ -47,6 +47,10 @@ std::vector<std::string> mcsm::PaperServer::getAvailableVersions(){
     return versions;
 }
 
+std::string mcsm::PaperServer::getJarFile(){
+    return "paper.jar";
+}
+
 void mcsm::PaperServer::download(const std::string& version){
     download(version, std::filesystem::current_path().string(), "paper.jar");
 }

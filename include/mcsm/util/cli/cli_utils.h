@@ -8,6 +8,7 @@
 
 namespace mcsm {
     int runCommandQuietly(const std::string& command);
+    int runCommand(const std::string& command);
 }
 
 #endif // __MCSM_CLI_UTILS_H__

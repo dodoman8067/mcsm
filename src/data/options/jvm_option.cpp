@@ -57,7 +57,8 @@ void mcsm::JvmOption::create(){
     std::string jvm = mcsm::detectJava();
     std::vector<std::string> jvmArgs = {
         "-Xms2G",
-        "-Xmx2G"
+        "-Xmx2G",
+        "-jar"
     };
     std::vector<std::string> serverArgs = {
         "nogui"
@@ -76,7 +77,8 @@ void mcsm::JvmOption::create(){
 void mcsm::JvmOption::create(const std::string& jvmPath, const mcsm::SearchTarget& target){
     std::vector<std::string> jvmArgs = {
         "-Xms2G",
-        "-Xmx2G"
+        "-Xmx2G",
+        "-jar"
     };
     std::vector<std::string> serverArgs = {
         "nogui"

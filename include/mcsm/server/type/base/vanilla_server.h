@@ -36,6 +36,7 @@ namespace mcsm {
     public:
         VanillaServer();
         ~VanillaServer();
+        std::string getJarFile() override;
         std::vector<std::string> getAvailableVersions() override;
         void download(const std::string& version) override;
         void download(const std::string& version, const std::string& path) override;

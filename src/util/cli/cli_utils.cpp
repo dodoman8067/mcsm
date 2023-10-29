@@ -12,3 +12,12 @@ int mcsm::runCommandQuietly(const std::string& command){
         std::exit(1);
     }
 }
+
+int mcsm::runCommand(const std::string& command){
+    if(mcsm::getCurrentOS() == mcsm::OS::WINDOWS || mcsm::getCurrentOS() == mcsm::OS::LINUX){
+        return std::system(command.c_str());
+    }else{
+        std::cerr << "[mcsm] This platform is not supported. Please use Windows or Linux.\n";
+        std::exit(1);
+    }
+}

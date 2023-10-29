@@ -24,6 +24,8 @@ SOFTWARE.
 #define __MCSM_SERVER_H__
 
 #include <mcsm/server/server_type.h>
+#include <mcsm/data/options/jvm_option.h>
+#include <mcsm/util/cli/cli_utils.h>
 
 namespace mcsm {
     /**
@@ -36,6 +38,8 @@ namespace mcsm {
          * @return mcsm::ServerType enum
          */
         virtual mcsm::ServerType getType() const = 0;
+        virtual std::string getJarFile() = 0;
+        virtual void start(std::unique_ptr<mcsm::JvmOption> option);
     };
 }
 
