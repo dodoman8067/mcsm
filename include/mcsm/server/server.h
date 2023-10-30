@@ -39,7 +39,7 @@ namespace mcsm {
          */
         virtual mcsm::ServerType getType() const = 0;
         virtual std::string getJarFile() = 0;
-        virtual void start(std::unique_ptr<mcsm::JvmOption> option);
+        virtual void start(mcsm::JvmOption& option);
     };
 }
 
