@@ -55,6 +55,7 @@ namespace mcsm {
         std::vector<std::string> getServerArguments();
         std::string getProfileName() const;
         std::string getProfilePath() const;
+        mcsm::SearchTarget getSearchTarget() const;
     };
 }
 

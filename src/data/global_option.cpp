@@ -23,10 +23,7 @@ SOFTWARE.
 #include <mcsm/data/global_option.h>
 
 mcsm::GlobalOption::GlobalOption(const std::string& path, const std::string& name){
-    std::string path1 = path;
-    std::replace(path1.begin(), path1.end(), '.', '/');
-    std::string finalPath = getDataPathPerOS() + path1;
-    this->path = finalPath;
+    this->path = getDataPathPerOS() + path;
 
     std::string name1 = name;
     if(!mcsm::endsWith(name1, ".json")){

@@ -23,10 +23,7 @@ SOFTWARE.
 #include <mcsm/data/option.h>
 
 mcsm::Option::Option(const std::string& path, const std::string& name){
-    std::string path1 = path;
-    std::replace(path1.begin(), path1.end(), '.', '/');
-    std::string finalPath = "./.mcsm" + path1;
-    this->path = finalPath;
+    this->path = path;
 
     std::string name1 = name;
     if(!mcsm::endsWith(name1, ".json")){

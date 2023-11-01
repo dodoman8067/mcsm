@@ -81,7 +81,7 @@ std::string mcsm::JvmOptionSearchCommand::getProfileName(const std::vector<std::
             }
         
     }
-    std::cerr << "[mcsm] Name not provided; Specify a name to continune.\n";
+    std::cerr << "[mcsm] Name not provided; Specify a name to continue.\n";
     std::exit(1);
 }
 

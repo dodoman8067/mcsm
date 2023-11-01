@@ -71,6 +71,13 @@ void mcsm::PaperServer::download(const std::string& version, const std::string& 
     mcsm::download(name, url, path);
 }
 
+void mcsm::PaperServer::start(mcsm::JvmOption& option){
+    if(!std::filesystem::exists("paper.jar")){
+        std::cout << "Downloading paper.jar...\n";
+    }
+    Server::start(option);
+}
+
 bool mcsm::PaperServer::hasVersion(const std::string& version){
     return getVersion(version) != -1;
 }
