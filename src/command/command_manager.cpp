@@ -38,7 +38,7 @@ void mcsm::CommandManager::init(){
         std::cerr << "Error: Program's command manager was initialized more than once.\n";
         std::cerr << "You're not supposed to see this message unless you're using development version.\n";
         std::cerr << "If you see this message, this might be a software issue or the file is corrupted.\n";
-        std::cerr << "If you think this is a software issue, please open a issue to github https://github.com/dodoman8067/mcsm .\n";
+        std::cerr << "If you think this is a software issue, please open an issue to github https://github.com/dodoman8067/mcsm .\n";
         std::cerr << "Otherwise, reinstall the entire program.\n";
         std::exit(1);
     }
