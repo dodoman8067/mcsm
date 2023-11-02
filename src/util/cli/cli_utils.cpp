@@ -12,11 +12,13 @@ int mcsm::runCommandQuietly(const std::string& command){
                 int finalCode = WEXITSTATUS(code);
                 return finalCode;
             }else{
-                std::cerr << "[mcsm] Command " << cmd << " failed.\n";
+                std::cerr << "[mcsm] Command " << command << " failed.\n";
                 std::cerr << "If you believe this is a bug, please report it to GitHub (https://github.com/dodoman8067/mcsm).";
+                std::exit(1);
             }
+        #else
+            return 1;
         #endif
-        return 1;
     }else{
         std::cerr << "[mcsm] This platform is not supported. Please use Windows or Linux.\n";
         std::exit(1);
@@ -35,9 +37,11 @@ int mcsm::runCommand(const std::string& command){
             }else{
                 std::cerr << "[mcsm] Command " << command << " failed.\n";
                 std::cerr << "If you believe this is a bug, please report it to GitHub (https://github.com/dodoman8067/mcsm).";
+                std::exit(1);
             }
+        #else
+            return 1;
         #endif
-        return 1;
     }else{
         std::cerr << "[mcsm] This platform is not supported. Please use Windows or Linux.\n";
         std::exit(1);
