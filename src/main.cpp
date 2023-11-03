@@ -33,6 +33,8 @@ SOFTWARE.
 #include <mcsm/command/server/jvm/jvm_test_command.h>
 #include <mcsm/data/option.h>
 #include <mcsm/data/options/jvm_option.h>
+#include <mcsm/data/options/server_option.h>
+#include <mcsm/server/type/bukkit/paper_server.h>
 #include <mcsm/util/string_utils.h>
 #include <mcsm/jvm/java_detection.h>
 
@@ -50,6 +52,16 @@ int main(int argc, char *argv[]) {
     if(argc < 2){
         std::cout << "Welcome to MCSM (Minecraft Server Manager).\n";
         std::cout << "Type \'mcsm help\' for list of commands.\n";
+        std::shared_ptr<mcsm::PaperServer> server = std::make_shared<mcsm::PaperServer>();
+        mcsm::JvmOption jvmOpt("111", mcsm::SearchTarget::CURRENT);
+        mcsm::ServerOption option("1.19.4", server);
+        if(!option.exists()){
+            option.create("example", jvmOpt);
+        }
+        if(!std::filesystem::exists("paper.jar")){
+            server->download(option.getServerVersion());
+        }
+        option.start();
         return 0;
     }
 

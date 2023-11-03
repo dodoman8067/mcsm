@@ -168,10 +168,22 @@ std::vector<std::string> mcsm::JvmOption::getJvmArguments(){
             std::exit(1);
         }
         // I debugged here for more then 2 hours because returning "path" instead of "args"
-        if(opt2->getValue("args") == nullptr) return empty;
+        if(opt2->getValue("args") == nullptr){
+            std::cerr << "Error: No \"args\" value specified in file " << opt2->getName() << "\n";
+            std::cerr << "Manually editing the launch profile might have caused this issue.\n";
+            std::cerr << "If you know what you're doing, I believe you that you know how to handle this issue.\n";
+            std::cerr << "If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).\n";
+            std::exit(1);
+        }
         return opt2->getValue("args");
     }
-    if(opt->getValue("args") == nullptr) return empty;
+    if(opt->getValue("args") == nullptr){
+        std::cerr << "Error: No \"args\" value specified in file " << opt->getName() << "\n";
+        std::cerr << "Manually editing the launch profile might have caused this issue.\n";
+        std::cerr << "If you know what you're doing, I believe you that you know how to handle this issue.\n";
+        std::cerr << "If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).\n";
+        std::exit(1);
+    }
     return opt->getValue("args");
 }
 
@@ -190,10 +202,22 @@ std::string mcsm::JvmOption::getJvmPath(){
             std::cerr << "Error called from : mcsm::JvmOption::getJvmPath()\n";
             std::exit(1);
         }
-        if(opt2->getValue("path") == nullptr) return std::move("");
+        if(opt2->getValue("path") == nullptr){
+            std::cerr << "Error: No \"path\" value specified in file " << opt2->getName() << "\n";
+            std::cerr << "Manually editing the launch profile might have caused this issue.\n";
+            std::cerr << "If you know what you're doing, I believe you that you know how to handle this issue.\n";
+            std::cerr << "If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).\n";
+            std::exit(1);
+        }
         return opt2->getValue("path");
     }
-    if(opt->getValue("path") == nullptr) return std::move("");
+    if(opt->getValue("path") == nullptr){
+        std::cerr << "Error: No \"path\" value specified in file " << opt->getName() << "\n";
+        std::cerr << "Manually editing the launch profile might have caused this issue.\n";
+        std::cerr << "If you know what you're doing, I believe you that you know how to handle this issue.\n";
+        std::cerr << "If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).\n";
+        std::exit(1);
+    }
     return opt->getValue("path");
 }
 

@@ -26,23 +26,23 @@ SOFTWARE.
 
 #include <mcsm/data/option.h>
 #include <mcsm/server/server.h>
+#include <mcsm/server/type/bukkit/downloadable.h>
 #include <memory>
 
 namespace mcsm {
     class ServerOption {
     private:
-        std::unique_ptr<mcsm::Server> server;
+        std::shared_ptr<mcsm::Server> server;
         std::string version;
     public:
-        ServerOption(const std::string& version);
+        ServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server);
         ~ServerOption();
-        void create(const std::string& name, mcsm::JvmOption& defaultOption, std::unique_ptr<mcsm::Server> server);
+        void create(const std::string& name, mcsm::JvmOption& defaultOption);
         void start();
         void start(std::unique_ptr<mcsm::JvmOption> option);
-        std::string getFileName() const;
+        bool exists();
         std::string getServerName() const;
         std::string getServerVersion() const;
-        std::unique_ptr<mcsm::Server> getServer() const;
         std::unique_ptr<mcsm::JvmOption> getDefaultOption() const;
     };
 }

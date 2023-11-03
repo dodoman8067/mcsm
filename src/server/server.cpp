@@ -11,7 +11,7 @@ void mcsm::Server::start(mcsm::JvmOption& option){
         svrOpt = svrOpt + s + " ";
     }
 
-    std::string command = option.getJvmPath() + jvmOpt + " " + this->getJarFile() + " " + svrOpt;
+    std::string command = option.getJvmPath() + jvmOpt + this->getJarFile() + svrOpt;
     //mcsm::runCommand(command.c_str());
     std::cout << command << std::endl;
 }
