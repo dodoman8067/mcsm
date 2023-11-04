@@ -58,7 +58,7 @@ int main(int argc, char *argv[]) {
         if(!option.exists()){
             option.create("example", jvmOpt);
         }
-        if(!std::filesystem::exists("paper.jar")){
+        if(!std::filesystem::exists(server->getJarFile())){
             server->download(option.getServerVersion());
         }
         option.start();
@@ -67,12 +67,12 @@ int main(int argc, char *argv[]) {
 
     //If arguments exist, iterates through CommandManager::getCommands()
     for(auto& v : mcsm::CommandManager::getCommands()){
-        if(argv[1] == v.get()->getName() || v.get()->hasAliases(argv[1])){
+        if(argv[1] == v->getName() || v->hasAliases(argv[1])){
             std::vector<std::string> args;
             for(int i = 2; i < argc; i++){
                 args.push_back(std::string(argv[i]));
             }
-            v.get()->execute(std::move(args));
+            v->execute(std::move(args));
             commandFound = true;
             break;
         }
