@@ -86,9 +86,9 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const{
     }
     std::unique_ptr<mcsm::JvmOption> jvmOption = std::make_unique<mcsm::JvmOption>(profileObj["name"], target);
     if(!jvmOption->exists()){
-        std::cerr << "Error: Invalid default launch profile.\n";
-        std::cerr << "File server.json might be corrupted or the profile is removed.\n";
-        std::cerr << "Please change the profile or create a new server.json file.\n";
+        std::cerr << "[mcsm] Error: Invalid default launch profile.\n";
+        std::cerr << "[mcsm] File server.json might be corrupted or the profile is removed.\n";
+        std::cerr << "[mcsm] Please change the profile or create a new server.json file.\n";
         std::exit(1);
     }
     return jvmOption;

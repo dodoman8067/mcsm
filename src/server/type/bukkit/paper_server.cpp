@@ -26,10 +26,10 @@ int mcsm::PaperServer::getVersion(const std::string& ver) const {
     std::string res = mcsm::get("https://api.papermc.io/v2/projects/paper/versions/" + ver);
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
     if(json.is_discarded()){
-        std::cerr << "Error : Parse of json failed.\n";
-        std::cerr << "If you believe that this is an error, please report it to GitHub. (https://github.com/dodoman8067/mcsm)\n\n";
-        std::cerr << "Error informations : \n";
-        std::cerr << "Called method : mcsm::PaperServer::getVersion() with arguments : " << ver << "\n";
+        std::cerr << "[mcsm] Error : Parse of json failed.\n";
+        std::cerr << "[mcsm] If you believe that this is an error, please report it to GitHub. (https://github.com/dodoman8067/mcsm)\n\n";
+        std::cerr << "[mcsm] Error informations : \n";
+        std::cerr << "[mcsm] Called method : mcsm::PaperServer::getVersion() with arguments : " << ver << "\n";
         std::exit(1);
     }
     if(json["builds"].is_array()){

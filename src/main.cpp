@@ -106,6 +106,9 @@ inline void initCommands(){
     jvmOptionGeneratorCommand->addAliases("generateJvmOption");
     jvmOptionGeneratorCommand->addAliases("generateJavaVirtualMachineOption");
     jvmOptionGeneratorCommand->addAliases("genjvmoption");
+    jvmOptionGeneratorCommand->addAliases("generateJvmProfile");
+    jvmOptionGeneratorCommand->addAliases("generateJavaVirtualMachineProfile");
+    jvmOptionGeneratorCommand->addAliases("genjvmprofile");
     mcsm::CommandManager::addCommand(std::move(jvmOptionGeneratorCommand));
 
     std::unique_ptr<mcsm::JvmOptionSearchCommand> jvmProfileSearchCommand = std::make_unique<mcsm::JvmOptionSearchCommand>("searchJvmProfile", "Looks up for Java Virtual Machine profiles.");

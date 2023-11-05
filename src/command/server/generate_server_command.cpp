@@ -22,30 +22,41 @@ SOFTWARE.
 
 #include <mcsm/command/server/generate_server_command.h>
 
+const std::vector<std::string> availableOptions = {
+    "-servertype",
+    "--servertype",
+    "-st",
+    "--st",
+    "--profile"
+    "-profile",
+    "-p",
+    "--p",
+    "--name",
+    "-name",
+    "--current",
+    "-current",
+    "--c",
+    "-c",
+    "--global",
+    "-global",
+    "-g",
+    "--g"
+};
+
 mcsm::GenerateServerCommand::GenerateServerCommand(const std::string& name, const std::string& description) : Command(name, description) {}
 
 mcsm::GenerateServerCommand::~GenerateServerCommand(){}
 
 void mcsm::GenerateServerCommand::execute(const std::vector<std::string>& args){
-    if(args.size() <= 0) {
-        std::string input;
-        std::string output;
-        std::vector<std::string> description = {
-            "Type an input.",
-            "",
-            "1.paper",
-            "2.spigot",
-            "3.bukkit"
-        };
-
-        mcsm::askInput(description, input, output);
-        std::cout << input << std::endl;
-    }else{
-        std::cout << "This command is not quite ready yet! :)" << "\n";
+    if(args.empty()){
+        std::cout << "[mcsm] Invalid arguments.\n";
+        std::cerr << "[mcsm] You must specify a server name by --name option.\n";
+        std::exit(1);
     }
+
 }
 
-void mcsm::GenerateServerCommand::stuff(std::string& value){
+void mcsm::GenerateServerCommand::askServer(std::string& value){
     while(true){
         std::cout << "Type a string: ";
         std::getline(std::cin, value);
@@ -56,4 +67,69 @@ void mcsm::GenerateServerCommand::stuff(std::string& value){
             std::cout << "Wrong input" << std::endl;
         }
     }
+}
+
+std::string mcsm::GenerateServerCommand::getProfileName(const std::vector<std::string>& args) const {
+    std::string name;
+    for(size_t i = 0; i < args.size(); ++i){
+        const std::string& arg = args[i];
+            if(!(arg == "-profile" || arg == "--profile" || arg == "-p" || arg == "--p")) continue;
+            if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
+                name = args[i + 1];
+                if(name.find("\"") == std::string::npos && name.find("\'") == std::string::npos){
+                    return name;
+                }else{
+                    mcsm::replaceAll(name, "\"", "");
+                    mcsm::replaceAll(name, "\'", "");
+                    std::cout << "[mcsm] NOTE : \' and \" are not allowed in profile names; The profile name was modified to " << name << ".\n";
+                }
+                return name;
+            }
+        
+    }
+    std::cerr << "[mcsm] Profile name not provided; Specify a profile name to continue.\n";
+    std::exit(1);
+}
+
+std::string mcsm::GenerateServerCommand::getServerName(const std::vector<std::string>& args) const {
+    std::string name;
+    for(size_t i = 0; i < args.size(); ++i){
+        const std::string& arg = args[i];
+            if(!(arg == "-profile" || arg == "--profile" || arg == "-p" || arg == "--p")) continue;
+            if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
+                name = args[i + 1];
+                if(name.find("\"") == std::string::npos && name.find("\'") == std::string::npos){
+                    return name;
+                }else{
+                    mcsm::replaceAll(name, "\"", "");
+                    mcsm::replaceAll(name, "\'", "");
+                    std::cout << "[mcsm] NOTE : \' and \" are not allowed in profile names; The profile name was modified to " << name << ".\n";
+                }
+                return name;
+            }
+        
+    }
+    std::cerr << "[mcsm] Server name not provided; Specify a name to continue.\n";
+    std::exit(1);
+}
+
+std::unique_ptr<mcsm::JvmOption> mcsm::GenerateServerCommand::searchOption(const mcsm::SearchTarget& target, const std::string& name){
+    if(target == mcsm::SearchTarget::GLOBAL || target == mcsm::SearchTarget::ALL){
+        std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(name, mcsm::SearchTarget::GLOBAL);
+        if(opt->exists()) return opt;
+    }
+    if(target == mcsm::SearchTarget::CURRENT || target == mcsm::SearchTarget::ALL){
+        std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(name, mcsm::SearchTarget::CURRENT);
+        if(opt->exists()) return opt;
+    }
+    return nullptr;
+}
+
+mcsm::SearchTarget mcsm::GenerateServerCommand::getSearchTarget(const std::vector<std::string>& args){
+    if(args.empty()) return mcsm::SearchTarget::ALL;
+    for(const std::string& arg : args) {
+        if(arg == "--global" || arg == "-global" || arg == "--g" || arg == "-g") return mcsm::SearchTarget::GLOBAL;
+        if(arg == "--current" || arg == "-current" || arg == "--c" || arg == "-c") return mcsm::SearchTarget::CURRENT;
+    }
+    return mcsm::SearchTarget::ALL;
 }

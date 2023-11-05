@@ -23,8 +23,8 @@ SOFTWARE.
 #include <mcsm/command/server/jvm/jvm_option_generator_command.h>
 
 const std::vector<std::string> availableOptions = {
-    "-jvmPath",
-    "--jvmPath",
+    "-jvmpath",
+    "--jvmpath",
     "-jp",
     "--jp",
     "--global"
@@ -82,7 +82,7 @@ std::string mcsm::JvmOptionGeneratorCommand::getJvmPath(const std::vector<std::s
     for(size_t i = 0; i < args.size(); ++i){
         const std::string& arg = args[i];
         if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
-            if(!(arg == "-jvmPath" || arg == "--jvmPath" || arg == "-jp" || arg == "--jp")) continue;
+            if(!(arg == "-jvmpath" || arg == "--jvmpath" || arg == "-jp" || arg == "--jp")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
                 jvmPath = args[i + 1];
                 if(!mcsm::startsWith(jvmPath, "\"") && !mcsm::startsWith(jvmPath, "\'")){

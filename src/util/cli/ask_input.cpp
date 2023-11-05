@@ -22,11 +22,11 @@ SOFTWARE.
 
 #include <mcsm/util/cli/ask_input.h>
 
-void mcsm::askInput(std::vector<std::string>& arguments, std::string& input, const std::string &outputWhenNone){
+void mcsm::askInput(std::vector<std::string>& arguments, std::string& input, std::string &outputWhenNone){
     for(std::string& s : arguments){
         std::cout << s << "\n";
     }
-    std::cout << " " << std::endl;
+    std::cout << " " << "\n";
     while(true){
         std::cout << ">> ";
         std::getline(std::cin, input);
@@ -34,11 +34,11 @@ void mcsm::askInput(std::vector<std::string>& arguments, std::string& input, con
         if(!mcsm::isWhitespaceOrEmpty(input)){
             break;
         }else{
-            if(!outputWhenNone.empty()){
+            if(!mcsm::isWhitespaceOrEmpty(outputWhenNone)){
                 input = outputWhenNone;
                 break;
             }
-            std::cout << "Not a valid input; Please try again." << std::endl;
+            std::cout << "Not a valid input; Please try again." << "\n";
         }
     }
 }

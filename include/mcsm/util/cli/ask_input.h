@@ -32,8 +32,8 @@ namespace mcsm {
     // Asks input.
     // @param arguments prints given value when asking
     // @param input stores the input
-    // @param outputWhenNone sets input variable to given value when input is empty; empty this value and it won't be changed
-    void askInput(std::vector<std::string>& arguments, std::string& input, const std::string &outputWhenNone);
+    // @param outputWhenNone sets the input variable's value as given value when the input is empty;
+    void askInput(std::vector<std::string>& arguments, std::string& input, std::string &outputWhenNone);
 }
 
 #endif

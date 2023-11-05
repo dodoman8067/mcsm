@@ -25,17 +25,27 @@ SOFTWARE.
 
 #include <mcsm/command/base/command.h>
 #include <mcsm/util/cli/ask_input.h>
-#include <iostream>
+#include <mcsm/data/options/server_option.h>
 #include <limits>
 
 namespace mcsm {
-    class GenerateServerCommand : public Command {
+    class GenerateServerCommand : public mcsm::Command {
     private:
+        void generateBukkit(const mcsm::BukkitServerType& type);
+        void generateForge();
+        void generateFabric();
+        void generateSponge();
+        void generateVelocity();
+        void generateBungee();
+        std::string getProfileName(const std::vector<std::string>& args) const;
+        std::string getServerName(const std::vector<std::string>& args) const;
+        mcsm::SearchTarget getSearchTarget(const std::vector<std::string>& args);
+        std::unique_ptr<mcsm::JvmOption> searchOption(const mcsm::SearchTarget& target, const std::string& name);
     public:
         GenerateServerCommand(const std::string& name, const std::string& description);
         ~GenerateServerCommand();
         void execute(const std::vector<std::string>& args) override;
-        void stuff(std::string& value);
+        void askServer(std::string& value);
     };
 }
 

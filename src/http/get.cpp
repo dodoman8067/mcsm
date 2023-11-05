@@ -32,9 +32,9 @@ const std::string mcsm::get(const std::string& url){
     CURL *curl = curl_easy_init();
 
     if(!curl){
-        std::cerr << "Error: Unable to initialize curl\n";
-        std::cerr << "Please try re-running the program, reboot the PC or reinstall the program.\n";
-        std::cerr << "If none of it isn't working for you, please open a new issue in GitHub (https://github.com/dodoman8067/mcsm).\n";
+        std::cerr << "[mcsm] Error: Unable to initialize curl\n";
+        std::cerr << "[mcsm] Please try re-running the program, reboot the PC or reinstall the program.\n";
+        std::cerr << "[mcsm] If none of it isn't working for you, please open a new issue in GitHub (https://github.com/dodoman8067/mcsm).\n";
         std::exit(1);
     }
 
@@ -48,7 +48,7 @@ const std::string mcsm::get(const std::string& url){
     CURLcode res = curl_easy_perform(curl);
 
     if (res != CURLE_OK) {
-        std::cerr << "Error: Failed to perform GET request with the following error : " << curl_easy_strerror(res) << "\n";
+        std::cerr << "[mcsm] Error: Failed to perform GET request with the following error : " << curl_easy_strerror(res) << "\n";
         curl_easy_cleanup(curl);
         std::exit(1);
     }
