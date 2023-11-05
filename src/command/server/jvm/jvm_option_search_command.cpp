@@ -67,19 +67,18 @@ std::string mcsm::JvmOptionSearchCommand::getProfileName(const std::vector<std::
     std::string name;
     for(size_t i = 0; i < args.size(); ++i){
         const std::string& arg = args[i];
-            if(!(arg == "-name" || arg == "--name" || arg == "-n" || arg == "--n")) continue;
-            if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
-                name = args[i + 1];
-                if(name.find("\"") == std::string::npos && name.find("\'") == std::string::npos){
-                    return name;
-                }else{
-                    mcsm::replaceAll(name, "\"", "");
-                    mcsm::replaceAll(name, "\'", "");
-                    std::cout << "[mcsm] NOTE : \' and \" are not allowed in names; Name was modified to " << name << ".\n";
-                }
+        if(!(arg == "-name" || arg == "--name" || arg == "-n" || arg == "--n")) continue;
+        if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
+            name = args[i + 1];
+            if(name.find("\"") == std::string::npos && name.find("\'") == std::string::npos){
                 return name;
+            }else{
+                mcsm::replaceAll(name, "\"", "");
+                mcsm::replaceAll(name, "\'", "");
+                std::cout << "[mcsm] NOTE : \' and \" are not allowed in names; Name was modified to " << name << ".\n";
             }
-        
+            return name;
+        }
     }
     std::cerr << "[mcsm] Name not provided; Specify a name to continue.\n";
     std::exit(1);

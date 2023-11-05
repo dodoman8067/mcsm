@@ -40,7 +40,8 @@ const std::vector<std::string> availableOptions = {
     "--global",
     "-global",
     "-g",
-    "--g"
+    "--g",
+    "--jarpath"
 };
 
 mcsm::GenerateServerCommand::GenerateServerCommand(const std::string& name, const std::string& description) : Command(name, description) {}
@@ -73,6 +74,7 @@ std::string mcsm::GenerateServerCommand::getProfileName(const std::vector<std::s
     std::string name;
     for(size_t i = 0; i < args.size(); ++i){
         const std::string& arg = args[i];
+        if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
             if(!(arg == "-profile" || arg == "--profile" || arg == "-p" || arg == "--p")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
                 name = args[i + 1];
@@ -85,7 +87,7 @@ std::string mcsm::GenerateServerCommand::getProfileName(const std::vector<std::s
                 }
                 return name;
             }
-        
+        }
     }
     std::cerr << "[mcsm] Profile name not provided; Specify a profile name to continue.\n";
     std::exit(1);
@@ -95,7 +97,8 @@ std::string mcsm::GenerateServerCommand::getServerName(const std::vector<std::st
     std::string name;
     for(size_t i = 0; i < args.size(); ++i){
         const std::string& arg = args[i];
-            if(!(arg == "-profile" || arg == "--profile" || arg == "-p" || arg == "--p")) continue;
+        if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
+            if(!(arg == "-name" || arg == "--name")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
                 name = args[i + 1];
                 if(name.find("\"") == std::string::npos && name.find("\'") == std::string::npos){
@@ -107,7 +110,7 @@ std::string mcsm::GenerateServerCommand::getServerName(const std::vector<std::st
                 }
                 return name;
             }
-        
+        }
     }
     std::cerr << "[mcsm] Server name not provided; Specify a name to continue.\n";
     std::exit(1);
@@ -132,4 +135,41 @@ mcsm::SearchTarget mcsm::GenerateServerCommand::getSearchTarget(const std::vecto
         if(arg == "--current" || arg == "-current" || arg == "--c" || arg == "-c") return mcsm::SearchTarget::CURRENT;
     }
     return mcsm::SearchTarget::ALL;
+}
+
+void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& args){
+    std::string value;
+    for(size_t i = 0; i < args.size(); ++i){
+        const std::string& arg = args[i];
+        if(!(arg == "-servertype" || arg == "--servertype" || arg == "-st" || arg == "--st")) continue;
+        if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
+            value = args[i + 1];
+            if(value == "bukkit" || value == "craftbukkit"){
+                generateBukkit(mcsm::BukkitServerType::CRAFTBUKKIT);
+                return;
+            }
+            if(value == "spigot"){
+                generateBukkit(mcsm::BukkitServerType::SPIGOT);
+                return;
+            }
+            if(value == "paper" || value == "paperspigot"){
+                generateBukkit(mcsm::BukkitServerType::PAPER);
+                return;
+            }
+            if(value == "purpur"){
+                generateBukkit(mcsm::BukkitServerType::PURPUR);
+                return;
+            }
+            if(value == "bukkit" || value == "craftbukkit"){
+                generateBukkit(mcsm::BukkitServerType::PUFFERFISH);
+                return;
+            }
+        }
+    }
+    std::cerr << "[mcsm] Server type not provided; Specify a name to continue.\n";
+    std::exit(1);
+}
+
+void mcsm::GenerateServerCommand::generateBukkit(const mcsm::BukkitServerType& type){
+    
 }

@@ -35,12 +35,12 @@ namespace mcsm {
         void generateForge();
         void generateFabric();
         void generateSponge();
-        void generateVelocity();
-        void generateBungee();
+        void generateCustom(const std::string& filePath);
         std::string getProfileName(const std::vector<std::string>& args) const;
         std::string getServerName(const std::vector<std::string>& args) const;
         mcsm::SearchTarget getSearchTarget(const std::vector<std::string>& args);
         std::unique_ptr<mcsm::JvmOption> searchOption(const mcsm::SearchTarget& target, const std::string& name);
+        void detectServer(const std::vector<std::string>& args);
     public:
         GenerateServerCommand(const std::string& name, const std::string& description);
         ~GenerateServerCommand();
