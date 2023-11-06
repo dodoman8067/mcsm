@@ -44,6 +44,7 @@ namespace mcsm {
         std::string getServerName() const;
         std::string getServerVersion() const;
         std::unique_ptr<mcsm::JvmOption> getDefaultOption() const;
+        std::string getServerType() const;
     };
 }
 

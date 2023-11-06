@@ -43,6 +43,7 @@ namespace mcsm {
         void download(const std::string& version, const std::string& path) override;
         void download(const std::string& version, const std::string& path, const std::string& name) override;
         bool hasVersion(const std::string& version) override;
+        std::string getTypeAsString() const override;
     };
 }
 

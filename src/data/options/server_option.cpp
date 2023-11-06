@@ -45,6 +45,7 @@ void mcsm::ServerOption::create(const std::string& name, mcsm::JvmOption& defaul
     option.setValue("version", this->version);
     option.setValue("default_launch_profile", profileObj);
     option.setValue("server_jar", this->server->getJarFile());
+    option.setValue("type", this->server->getTypeAsString());
 }
 
 void mcsm::ServerOption::start(){
@@ -102,4 +103,9 @@ std::string mcsm::ServerOption::getServerName() const {
 std::string mcsm::ServerOption::getServerVersion() const {
     mcsm::Option option(".", "server");
     return option.getValue("version");  
+}
+
+std::string mcsm::ServerOption::getServerType() const {
+    mcsm::Option option(".", "server");
+    return option.getValue("type");
 }

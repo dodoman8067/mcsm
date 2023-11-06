@@ -38,6 +38,7 @@ namespace mcsm {
          * @return mcsm::ServerType enum
          */
         virtual mcsm::ServerType getType() const = 0;
+        virtual std::string getTypeAsString() const = 0;
         virtual std::string getJarFile() = 0;
         virtual void start(mcsm::JvmOption& option);
     };

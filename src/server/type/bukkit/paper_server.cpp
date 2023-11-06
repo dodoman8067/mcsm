@@ -81,3 +81,7 @@ void mcsm::PaperServer::start(mcsm::JvmOption& option){
 bool mcsm::PaperServer::hasVersion(const std::string& version){
     return getVersion(version) != -1;
 }
+
+std::string mcsm::PaperServer::getTypeAsString() const {
+    return "paper";
+}

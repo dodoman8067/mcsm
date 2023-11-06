@@ -26,18 +26,21 @@ SOFTWARE.
 #include <mcsm/command/base/command.h>
 #include <mcsm/util/cli/ask_input.h>
 #include <mcsm/data/options/server_option.h>
+#include <mcsm/server/type/bukkit/paper_server.h>
 #include <limits>
 
 namespace mcsm {
     class GenerateServerCommand : public mcsm::Command {
     private:
-        void generateBukkit(const mcsm::BukkitServerType& type);
-        void generateForge();
-        void generateFabric();
-        void generateSponge();
-        void generateCustom(const std::string& filePath);
+        void generateBukkit(const std::string& name, mcsm::JvmOption& option, const std::string& version, const mcsm::BukkitServerType& type);
+        void generateForge(const std::string& name, mcsm::JvmOption& option, const std::string& version);
+        void generateFabric(const std::string& name, mcsm::JvmOption& option, const std::string& version);
+        void generateSponge(const std::string& name, mcsm::JvmOption& option, const std::string& version);
+        void generateCustom(const std::string& name, mcsm::JvmOption& option, const std::string& filePath, const std::string& version);
         std::string getProfileName(const std::vector<std::string>& args) const;
         std::string getServerName(const std::vector<std::string>& args) const;
+        std::string getServerVersion(const std::vector<std::string>& args) const;
+        std::string getServerType(const std::vector<std::string>& args) const;
         mcsm::SearchTarget getSearchTarget(const std::vector<std::string>& args);
         std::unique_ptr<mcsm::JvmOption> searchOption(const mcsm::SearchTarget& target, const std::string& name);
         void detectServer(const std::vector<std::string>& args);

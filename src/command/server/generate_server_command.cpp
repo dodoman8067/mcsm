@@ -41,7 +41,16 @@ const std::vector<std::string> availableOptions = {
     "-global",
     "-g",
     "--g",
-    "--jarpath"
+    "--jarpath",
+    "-jarpath",
+    "--jp",
+    "-jp",
+    "--version",
+    "-version",
+    "--ver",
+    "-ver",
+    "--v",
+    "-v"
 };
 
 mcsm::GenerateServerCommand::GenerateServerCommand(const std::string& name, const std::string& description) : Command(name, description) {}
@@ -54,7 +63,7 @@ void mcsm::GenerateServerCommand::execute(const std::vector<std::string>& args){
         std::cerr << "[mcsm] You must specify a server name by --name option.\n";
         std::exit(1);
     }
-
+    detectServer(args);
 }
 
 void mcsm::GenerateServerCommand::askServer(std::string& value){
@@ -116,6 +125,22 @@ std::string mcsm::GenerateServerCommand::getServerName(const std::vector<std::st
     std::exit(1);
 }
 
+std::string mcsm::GenerateServerCommand::getServerVersion(const std::vector<std::string>& args) const {
+    std::string ver;
+    for(size_t i = 0; i < args.size(); ++i){
+        const std::string& arg = args[i];
+        if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
+            if(!(arg == "-version" || arg == "--version" || arg == "-ver" || arg == "--ver" || arg == "-v" || arg == "--v")) continue;
+            if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
+                ver = args[i + 1];
+                return ver;
+            }
+        }
+    }
+    std::cerr << "[mcsm] Server version not provided; Specify a version to continue.\n";
+    std::exit(1);
+}
+
 std::unique_ptr<mcsm::JvmOption> mcsm::GenerateServerCommand::searchOption(const mcsm::SearchTarget& target, const std::string& name){
     if(target == mcsm::SearchTarget::GLOBAL || target == mcsm::SearchTarget::ALL){
         std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(name, mcsm::SearchTarget::GLOBAL);
@@ -137,39 +162,69 @@ mcsm::SearchTarget mcsm::GenerateServerCommand::getSearchTarget(const std::vecto
     return mcsm::SearchTarget::ALL;
 }
 
-void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& args){
-    std::string value;
+std::string mcsm::GenerateServerCommand::getServerType(const std::vector<std::string>& args) const {
+    std::string type;
     for(size_t i = 0; i < args.size(); ++i){
         const std::string& arg = args[i];
-        if(!(arg == "-servertype" || arg == "--servertype" || arg == "-st" || arg == "--st")) continue;
-        if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
-            value = args[i + 1];
-            if(value == "bukkit" || value == "craftbukkit"){
-                generateBukkit(mcsm::BukkitServerType::CRAFTBUKKIT);
-                return;
-            }
-            if(value == "spigot"){
-                generateBukkit(mcsm::BukkitServerType::SPIGOT);
-                return;
-            }
-            if(value == "paper" || value == "paperspigot"){
-                generateBukkit(mcsm::BukkitServerType::PAPER);
-                return;
-            }
-            if(value == "purpur"){
-                generateBukkit(mcsm::BukkitServerType::PURPUR);
-                return;
-            }
-            if(value == "bukkit" || value == "craftbukkit"){
-                generateBukkit(mcsm::BukkitServerType::PUFFERFISH);
-                return;
+        if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
+            if(!(arg == "-servertype" || arg == "--servertype" || arg == "-st" || arg == "--st")) continue;
+            if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
+                type = args[i + 1];
+                return type;
             }
         }
     }
-    std::cerr << "[mcsm] Server type not provided; Specify a name to continue.\n";
+    std::cerr << "[mcsm] Server type not provided; Specify a type to continue.\n";
     std::exit(1);
 }
 
-void mcsm::GenerateServerCommand::generateBukkit(const mcsm::BukkitServerType& type){
-    
+void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& args){
+    mcsm::SearchTarget target = getSearchTarget(args);
+    std::unique_ptr<mcsm::JvmOption> option = searchOption(target, getProfileName(args));
+    std::string version = getServerVersion(args);
+    std::string name = getServerName(args);
+    std::string type = getServerType(args);
+
+    if(type == "bukkit" || type == "craftbukkit"){
+        generateBukkit(name, *option, version, mcsm::BukkitServerType::CRAFTBUKKIT);
+        return;
+    }
+    if(type == "spigot"){
+        generateBukkit(name, *option, version, mcsm::BukkitServerType::SPIGOT);
+        return;
+    }
+    if(type == "paper" || type == "paperspigot"){
+        generateBukkit(name, *option, version, mcsm::BukkitServerType::PAPER);
+        return;
+    }
+    if(type == "purpur"){
+        generateBukkit(name, *option, version, mcsm::BukkitServerType::PURPUR);
+        return;
+    }
+    if(type == "bukkit" || type == "craftbukkit"){
+        generateBukkit(name, *option, version, mcsm::BukkitServerType::PUFFERFISH);
+        return;
+    }
+    std::cerr << "[mcsm] Server type not supported : " << type << "\n";
+    std::exit(1);
+}
+
+void mcsm::GenerateServerCommand::generateBukkit(const std::string& name, mcsm::JvmOption& option, const std::string& version, const mcsm::BukkitServerType& type){
+    switch(type){
+        case mcsm::BukkitServerType::PAPER: {
+            std::shared_ptr<mcsm::PaperServer> server = std::make_shared<mcsm::PaperServer>();
+            mcsm::ServerOption serverOption(version, server);
+            if(serverOption.exists()){
+                std::cerr << "[mcsm] Error: Server is already configured in this directory.\n";
+                std::cerr << "[mcsm] Try in another directory.\n";
+            }
+            serverOption.create(name, option);
+            break;
+        }
+        default: {
+            std::cerr << "[mcsm] This kind of Bukkit-API based server implementation is not supported right now.\n";
+            std::exit(1);
+            break;
+        }
+    }
 }
