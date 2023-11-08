@@ -220,16 +220,7 @@ void mcsm::GenerateServerCommand::generateBukkit(const std::string& name, mcsm::
         case mcsm::BukkitServerType::PAPER: {
             std::shared_ptr<mcsm::PaperServer> server = std::make_shared<mcsm::PaperServer>();
             mcsm::ServerOption serverOption(version, server);
-            if(serverOption.exists()){
-                std::cerr << "[mcsm] Error: Server is already configured in this directory.\n";
-                std::cerr << "[mcsm] Try in another directory.\n";
-            }
-            serverOption.create(name, option);
-            std::cout << "[mcsm] Configured server information :\n";
-            std::cout << "[mcsm] Server name : " << serverOption.getServerName() << "\n";
-            std::cout << "[mcsm] Server type : " << serverOption.getServerType() << "\n";
-            std::cout << "[mcsm] Server version : " << serverOption.getServerVersion() << "\n";
-            std::cout << "[mcsm] Server JVM launch profile : " << serverOption.getDefaultOption()->getProfileName() << "\n";
+            configure(serverOption, name, option);
             break;
         }
         default: {
@@ -238,4 +229,18 @@ void mcsm::GenerateServerCommand::generateBukkit(const std::string& name, mcsm::
             break;
         }
     }
+}
+
+inline void mcsm::GenerateServerCommand::configure(mcsm::ServerOption& serverOption, const std::string& name, mcsm::JvmOption& option){
+    if(serverOption.exists()){
+        std::cerr << "[mcsm] Error: Server is already configured in this directory.\n";
+        std::cerr << "[mcsm] Try in another directory.\n";\
+        std::exit(1);
+    }
+    serverOption.create(name, option);
+    std::cout << "[mcsm] Configured server information :\n";
+    std::cout << "[mcsm] Server name : " << serverOption.getServerName() << "\n";
+    std::cout << "[mcsm] Server type : " << serverOption.getServerType() << "\n";
+    std::cout << "[mcsm] Server version : " << serverOption.getServerVersion() << "\n";
+    std::cout << "[mcsm] Server JVM launch profile : " << serverOption.getDefaultOption()->getProfileName() << "\n";
 }
