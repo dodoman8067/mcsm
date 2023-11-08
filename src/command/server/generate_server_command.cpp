@@ -225,6 +225,11 @@ void mcsm::GenerateServerCommand::generateBukkit(const std::string& name, mcsm::
                 std::cerr << "[mcsm] Try in another directory.\n";
             }
             serverOption.create(name, option);
+            std::cout << "[mcsm] Configured server information :\n";
+            std::cout << "[mcsm] Server name : " << serverOption.getServerName() << "\n";
+            std::cout << "[mcsm] Server type : " << serverOption.getServerType() << "\n";
+            std::cout << "[mcsm] Server version : " << serverOption.getServerVersion() << "\n";
+            std::cout << "[mcsm] Server JVM launch profile : " << serverOption.getDefaultOption()->getProfileName() << "\n";
             break;
         }
         default: {
