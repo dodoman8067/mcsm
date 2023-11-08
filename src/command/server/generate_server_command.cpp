@@ -27,7 +27,7 @@ const std::vector<std::string> availableOptions = {
     "--servertype",
     "-st",
     "--st",
-    "--profile"
+    "--profile",
     "-profile",
     "-p",
     "--p",
@@ -184,6 +184,12 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& a
     std::string version = getServerVersion(args);
     std::string name = getServerName(args);
     std::string type = getServerType(args);
+
+    if(option == nullptr){
+        std::cerr << "[mcsm] JVM launch profile " << getProfileName(args) << " not found.\n";
+        std::cerr << "[mcsm] Maybe you misspelled --c or --g option.\n";
+        std::exit(1);
+    }
 
     if(type == "bukkit" || type == "craftbukkit"){
         generateBukkit(name, *option, version, mcsm::BukkitServerType::CRAFTBUKKIT);
