@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
         if(argv[1] == v->getName() || v->hasAliases(argv[1])){
             std::vector<std::string> args;
             for(int i = 2; i < argc; i++){
-                args.push_back(std::string(argv[i]));
+                args.push_back(argv[i]);
             }
             v->execute(std::move(args));
             commandFound = true;
