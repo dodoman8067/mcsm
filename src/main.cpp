@@ -52,8 +52,8 @@ int main(int argc, char *argv[]) {
     if(argc < 2){
         std::cout << "Welcome to MCSM (Minecraft Server Manager).\n";
         std::cout << "Type \'mcsm help\' for list of commands.\n";
-        std::shared_ptr<mcsm::PaperServer> server = std::make_shared<mcsm::PaperServer>();
         /*
+        std::shared_ptr<mcsm::PaperServer> server = std::make_shared<mcsm::PaperServer>();
         mcsm::JvmOption jvmOpt("111", mcsm::SearchTarget::CURRENT);
         mcsm::ServerOption option("1.19.4", server);
         if(!option.exists()){
