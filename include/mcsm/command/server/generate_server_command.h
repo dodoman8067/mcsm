@@ -27,7 +27,6 @@ SOFTWARE.
 #include <mcsm/util/cli/ask_input.h>
 #include <mcsm/data/options/server_option.h>
 #include <mcsm/server/type/bukkit/paper_server.h>
-#include <limits>
 
 namespace mcsm {
     class GenerateServerCommand : public mcsm::Command {
