@@ -45,6 +45,6 @@ Currently, you can't contribute to this project because it isn't completed right
 
 ## License
 
-This project is licensed under the [MIT](LICENSE).
+This project is licensed under [MIT](LICENSE).
 
 Binary is statically linked with libcurl. You can view the LICENSE file [here](https://curl.se/docs/copyright.html).
