@@ -28,6 +28,7 @@ SOFTWARE.
 #include <mcsm/command/util/version_command.h>
 #include <mcsm/command/util/help_command.h>
 #include <mcsm/command/server/generate_server_command.h>
+#include <mcsm/command/server/start_server_command.h>
 #include <mcsm/command/server/jvm/jvm_option_generator_command.h>
 #include <mcsm/command/server/jvm/jvm_option_search_command.h>
 #include <mcsm/command/server/jvm/jvm_test_command.h>
@@ -119,7 +120,8 @@ inline void initCommands(){
     jvmProfileSearchCommand->addAliases("searchprofile");
     mcsm::CommandManager::addCommand(std::move(jvmProfileSearchCommand));
 
-    std::unique_ptr<mcsm::JvmTestCommand> jvmTestCommand = std::make_unique<mcsm::JvmTestCommand>("performTest", "Tests if launch profile's Java Virtual Machine is valid.");
-    jvmTestCommand->addAliases("performtest");
-    mcsm::CommandManager::addCommand(std::move(jvmTestCommand));
+    std::unique_ptr<mcsm::StartServerCommand> startServerCommand = std::make_unique<mcsm::StartServerCommand>("start", "Starts a server");
+    startServerCommand->addAliases("startServer");
+    startServerCommand->addAliases("startserver");
+    mcsm::CommandManager::addCommand(std::move(startServerCommand));
 }

@@ -23,6 +23,43 @@ SOFTWARE.
 
 #include <mcsm/data/options/server_option.h>
 
+mcsm::ServerOption::ServerOption(){
+    mcsm::Option option(".", "server");
+
+    if(!option.exists()){
+        std::cerr << "[mcsm] File server.json cannot be found.\n";
+        std::cerr << "[mcsm] Task aborted.\n";
+        std::exit(1);
+    }
+    if(option.getValue("version") == nullptr){
+        std::cerr << "[mcsm] Option \"version\" cannot be found.\n";
+        std::cerr << "[mcsm] Task aborted.\n";
+        std::exit(1);    
+    }
+
+    ServerOption(option.getValue("version"));
+}
+
+mcsm::ServerOption::ServerOption(const std::string& version){
+    mcsm::Option option(".", "server");
+
+    if(!option.exists()){
+        std::cerr << "[mcsm] File server.json cannot be found.\n";
+        std::cerr << "[mcsm] Task aborted.\n";
+        std::exit(1);
+    }
+    if(option.getValue("type") == nullptr){
+        std::cerr << "[mcsm] Option \"type\" cannot be found.\n";
+        std::cerr << "[mcsm] Task aborted.\n";
+        std::exit(1);    
+    }
+
+    std::string server = option.getValue("type");
+    std::shared_ptr<mcsm::Server> sPtr = detectServerType(server);
+    this->version = version;
+    this->server = sPtr;
+}
+
 mcsm::ServerOption::ServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server){
     this->version = version;
     this->server = server;
@@ -76,6 +113,21 @@ bool mcsm::ServerOption::exists(){
     return option.exists();
 }
 
+inline std::shared_ptr<mcsm::Server> mcsm::ServerOption::detectServerType(const std::string& server){
+    std::shared_ptr<mcsm::Server> sPtr;
+
+    if(server == "paper"){
+        sPtr = std::make_shared<mcsm::PaperServer>();
+    }
+    if(sPtr == nullptr){
+        std::cerr << "[mcsm] The following server type (" << server << ") is not supported.\n";
+        std::cerr << "[mcsm] Task aborted.\n";
+        std::exit(1); 
+    }
+
+    return sPtr;
+}
+
 std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const{
     mcsm::Option option(".", "server");
     nlohmann::json profileObj = option.getValue("default_launch_profile");
@@ -86,7 +138,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const{
         target = mcsm::SearchTarget::CURRENT;
     }
     std::unique_ptr<mcsm::JvmOption> jvmOption = std::make_unique<mcsm::JvmOption>(profileObj["name"], target);
-    if(!jvmOption->exists()){
+    if(!jvmOption->exists() || jvmOption == nullptr){
         std::cerr << "[mcsm] Error: Invalid default launch profile.\n";
         std::cerr << "[mcsm] File server.json might be corrupted or the profile is removed.\n";
         std::cerr << "[mcsm] Please change the profile or create a new server.json file.\n";

@@ -26,6 +26,7 @@ SOFTWARE.
 
 #include <mcsm/data/option.h>
 #include <mcsm/server/server.h>
+#include <mcsm/server/type/bukkit/paper_server.h>
 #include <mcsm/server/type/bukkit/downloadable.h>
 #include <memory>
 
@@ -34,7 +35,10 @@ namespace mcsm {
     private:
         std::shared_ptr<mcsm::Server> server;
         std::string version;
+        inline std::shared_ptr<mcsm::Server> detectServerType(const std::string& server);
     public:
+        ServerOption();
+        ServerOption(const std::string& version);
         ServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server);
         ~ServerOption();
         void create(const std::string& name, mcsm::JvmOption& defaultOption);
