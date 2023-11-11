@@ -22,6 +22,10 @@ SOFTWARE.
 
 #include <mcsm/server/type/bukkit/paper_server.h>
 
+mcsm::PaperServer::PaperServer() {}
+
+mcsm::PaperServer::~PaperServer() {}
+
 int mcsm::PaperServer::getVersion(const std::string& ver) const {
     std::string res = mcsm::get("https://api.papermc.io/v2/projects/paper/versions/" + ver);
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
@@ -62,8 +66,8 @@ void mcsm::PaperServer::download(const std::string& version, const std::string& 
 void mcsm::PaperServer::download(const std::string& version, const std::string& path, const std::string& name){
     int ver = getVersion(version);
     if(ver == -1){
-        std::cerr << "Error : Invalid version\n";
-        std::cerr << "Called method : mcsm::PaperServer::download() with arguments : " << version << "\n";
+        std::cerr << "[mcsm] Error : Unsupported version.\n";
+        std::cerr << "[mcsm] Please try again with a different version.\n";
         std::exit(1);
     }
     std::string strVer = std::to_string(ver);
@@ -72,8 +76,10 @@ void mcsm::PaperServer::download(const std::string& version, const std::string& 
 }
 
 void mcsm::PaperServer::start(mcsm::JvmOption& option){
+    mcsm::ServerOption sOpt;
     if(!std::filesystem::exists("paper.jar")){
-        std::cout << "Downloading paper.jar...\n";
+        std::cout << "[mcsm] Downloading paper.jar...\n";
+        download(sOpt.getServerVersion());
     }
     Server::start(option);
 }

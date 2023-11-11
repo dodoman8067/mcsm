@@ -20,7 +20,14 @@ mcsm::StartServerCommand::StartServerCommand(const std::string& name, const std:
 mcsm::StartServerCommand::~StartServerCommand() {}
 
 void mcsm::StartServerCommand::execute(const std::vector<std::string>& args){
-    searchOption(args);
+    if(!isConfigured()){
+        std::cerr << "[mcsm] Server not configured.\n";
+        std::cerr << "[mcsm] Task aborted.\n";
+        std::exit(1);
+    }
+    std::unique_ptr<mcsm::JvmOption> jvmOpt = searchOption(args);
+    mcsm::ServerOption sOpt;
+    sOpt.start(std::move(jvmOpt));
 }
 
 std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const std::vector<std::string>& args){

@@ -71,15 +71,12 @@ int main(int argc, char *argv[]) {
     //If arguments exist, iterates through CommandManager::getCommands()
     for(auto& v : mcsm::CommandManager::getCommands()){
         if(argv[1] == v->getName() || v->hasAliases(argv[1])){
-            std::vector<std::string> args;
-            for(int i = 2; i < argc; i++){
-                args.push_back(argv[i]);
-            }
-            v->execute(std::move(args));
+            std::vector<std::string> args(argv + 2, argv + argc);
+            v->execute(args);
             commandFound = true;
             break;
         }
-    }
+    }   
 
     //If arguments exist but command is not found, prints message and exits
     if(!commandFound){

@@ -65,7 +65,9 @@ mcsm::ServerOption::ServerOption(const std::string& version, std::shared_ptr<mcs
     this->server = server;
 }
 
-mcsm::ServerOption::~ServerOption(){}
+mcsm::ServerOption::~ServerOption(){
+    
+}
 
 void mcsm::ServerOption::create(const std::string& name, mcsm::JvmOption& defaultOption){
     mcsm::Option option(".", "server");
@@ -96,16 +98,16 @@ void mcsm::ServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
         std::cerr << "[mcsm] Task aborted.\n";
         std::exit(1);
     }
-    if(!std::filesystem::exists(this->server->getJarFile())){
-        std::cerr << "[mcsm] Server jarfile cannot be found.\n";
-        std::cerr << "[mcsm] Task aborted.\n";
-        std::exit(1);  
+    if(this->server == nullptr){
+        this->server.reset();
+        this->server = detectServerType(getServerType());
     }
     std::cout << "[mcsm] Starting server..\n";
     std::cout << "[mcsm] Server name : " << getServerName() << "\n";
     std::cout << "[mcsm] Server MC version : " << getServerVersion() << "\n";
     std::cout << "[mcsm] Server JVM launch profile : " << option->getProfileName() << "\n";
     this->server->start(*option);
+    std::cout << "[mcsm] Server stopped.\n";
 }
 
 bool mcsm::ServerOption::exists(){
