@@ -36,9 +36,9 @@ void mcsm::download(const std::string& name, const std::string& url){
 void mcsm::download(const std::string& name, const std::string& url, const std::string& path){
     CURL* curl = curl_easy_init();
     if(!curl){
-        std::cerr << "[mcsm] Error: Unable to initialize curl\n";
-        std::cerr << "[mcsm] Please try re-running the program, reboot the PC or reinstall the program.\n";
-        std::cerr << "[mcsm] If none of it isn't working for you, please open a new issue in GitHub (https://github.com/dodoman8067/mcsm).\n";
+        mcsm::error("Unable to initialize curl");
+        mcsm::error("Please try re-running the program, reboot the PC or reinstall the program.");
+        mcsm::error("If none of it isn't working for you, please open a new issue in GitHub (https://github.com/dodoman8067/mcsm).");
         curl_easy_cleanup(curl);
         std::exit(1);
     }
@@ -55,7 +55,7 @@ void mcsm::download(const std::string& name, const std::string& url, const std::
     res = curl_easy_perform(curl);
 
     if(res != CURLE_OK){
-        std::cerr << "[mcsm] Error : Failed to download a file from specified url : " << url << " with the following reason : " << curl_easy_strerror(res) << "\n";
+        mcsm::error("Failed to download a file in the following url : " + url + " with the following reason : " + curl_easy_strerror(res));
         std::fclose(file);
         curl_easy_cleanup(curl);
         std::exit(1);

@@ -24,10 +24,9 @@ SOFTWARE.
 #define __MCSM_GLOBAL_OPTION_H__
 
 #include <nlohmann/json.hpp>
-#include <string>
 #include <filesystem>
 #include <fstream>
-#include <iostream>
+#include <mcsm/util/cli/logging.h>
 #include <mcsm/data/configurable.h>
 #include <mcsm/util/os/os_detection.h>
 #include <mcsm/util/string_utils.h>

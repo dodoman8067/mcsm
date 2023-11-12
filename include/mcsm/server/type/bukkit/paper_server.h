@@ -29,7 +29,6 @@ SOFTWARE.
 #include <mcsm/http/download.h>
 #include <mcsm/data/options/server_option.h>
 #include <mcsm/util/mc/mc_utils.h>
-#include <nlohmann/json.hpp>
 
 namespace mcsm {
     class PaperServer : public mcsm::BukkitServer, public mcsm::Downloadable {
