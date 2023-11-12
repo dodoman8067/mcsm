@@ -127,7 +127,13 @@ bool mcsm::isValidJava(const std::string& path){
     if (!mcsm::endsWith(command, "\"")) {
         command += "\"";
     }
-    command = "\""+ path + "\"";
+    if(mcsm::getCurrentOS() == mcsm::OS::WINDOWS){
+        command = "\""+ path + "\"" + " -version > NUL 2>&1";
+    }else if(mcsm::getCurrentOS() == mcsm::OS::LINUX){
+        command = path + " -version > /dev/null 2>&1";
+    }
     
-    return mcsm::runCommandQuietly(command) == 0;
+    int code = std::system(command.c_str());
+    
+    return code == 0;
 }
