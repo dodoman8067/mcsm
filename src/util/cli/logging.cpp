@@ -13,5 +13,5 @@ void mcsm::warning(const std::string& message){
 }
 
 void mcsm::error(const std::string& message){
-    std::cerr << termcolor::red << "[mcsm/ERROR] " << message << termcolor::reset << "\n";
+    std::cerr << termcolor::bright_red << "[mcsm/ERROR] " << message << termcolor::reset << "\n";
 }
