@@ -34,6 +34,7 @@ namespace mcsm {
         void generateSponge(const std::string& name, mcsm::JvmOption& option, const std::string& version);
         void generateCustom(const std::string& name, mcsm::JvmOption& option, const std::string& filePath, const std::string& version);
         void configure(mcsm::ServerOption& serverOption, const std::string& name, mcsm::JvmOption& option);
+        std::shared_ptr<mcsm::Server> detectServerType(const std::string& server);
     };
 }
 

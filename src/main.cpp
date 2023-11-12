@@ -45,6 +45,8 @@ inline void initCommands();
 
 int main(int argc, char *argv[]) {
 
+    //TODO : Add purpur support, default op in server config, spiget.org
+
     bool commandFound = false;
 
     initCommands();

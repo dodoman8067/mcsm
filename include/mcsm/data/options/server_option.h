@@ -35,7 +35,6 @@ namespace mcsm {
     private:
         std::shared_ptr<mcsm::Server> server;
         std::string version;
-        inline std::shared_ptr<mcsm::Server> detectServerType(const std::string& server);
     public:
         ServerOption();
         ServerOption(const std::string& version);
@@ -51,5 +50,7 @@ namespace mcsm {
         std::string getServerType() const;
     };
 }
+
+#include <mcsm/server/server_generator.h>
 
 #endif // __MCSM_SERVER_OPTION_H__

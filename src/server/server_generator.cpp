@@ -66,3 +66,18 @@ void mcsm::server::configure(mcsm::ServerOption& serverOption, const std::string
     mcsm::info("Server version : " + serverOption.getServerVersion());
     mcsm::info("Server JVM launch profile : " + serverOption.getDefaultOption()->getProfileName());
 }
+
+std::shared_ptr<mcsm::Server> mcsm::server::detectServerType(const std::string& server){
+    std::shared_ptr<mcsm::Server> sPtr;
+
+    if(server == "paper"){
+        sPtr = std::make_shared<mcsm::PaperServer>();
+    }
+    if(sPtr == nullptr){
+        mcsm::error("The following server type (" + server + ") is not supported.");
+        mcsm::error("Task aborted.");
+        std::exit(1); 
+    }
+
+    return sPtr;
+}

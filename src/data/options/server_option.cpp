@@ -55,7 +55,7 @@ mcsm::ServerOption::ServerOption(const std::string& version){
     }
 
     std::string server = option.getValue("type");
-    std::shared_ptr<mcsm::Server> sPtr = detectServerType(server);
+    std::shared_ptr<mcsm::Server> sPtr = mcsm::server::detectServerType(server);
     this->version = version;
     this->server = sPtr;
 }
@@ -100,7 +100,7 @@ void mcsm::ServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
     }
     if(this->server == nullptr){
         this->server.reset();
-        this->server = detectServerType(getServerType());
+        this->server = mcsm::server::detectServerType(getServerType());
     }
     mcsm::success("Starting server..");
     mcsm::info("Server name : " + getServerName());
@@ -113,21 +113,6 @@ void mcsm::ServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
 bool mcsm::ServerOption::exists(){
     mcsm::Option option(".", "server");
     return option.exists();
-}
-
-inline std::shared_ptr<mcsm::Server> mcsm::ServerOption::detectServerType(const std::string& server){
-    std::shared_ptr<mcsm::Server> sPtr;
-
-    if(server == "paper"){
-        sPtr = std::make_shared<mcsm::PaperServer>();
-    }
-    if(sPtr == nullptr){
-        mcsm::error("The following server type (" + server + ") is not supported.");
-        mcsm::error("Task aborted.");
-        std::exit(1); 
-    }
-
-    return sPtr;
 }
 
 std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const{
