@@ -27,7 +27,7 @@ SOFTWARE.
 #include <memory>
 #include <vector>
 #include <mcsm/command/base/command.h>
-#include <mcsm/util/cli/logging.h>
+#include <iostream>
 
 namespace mcsm {
     class CommandManager {

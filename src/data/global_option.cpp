@@ -54,8 +54,8 @@ std::string mcsm::GlobalOption::getDataPathPerOS(){
         }
 
         default: {
-            mcsm::error("This platform isn't supported.");
-            mcsm::error("This program only supports Linux and Windows.");
+            std::cerr << "Error: This platform isn't supported.\n";
+            std::cerr << "This program only supports Linux and Windows.\n";
             std::exit(1);
             break;
         }
@@ -83,9 +83,9 @@ nlohmann::json mcsm::GlobalOption::load() const {
         createDirectories(this->path, ec);
         std::ofstream ofs(fullPath);
         if(!ofs.is_open()){
-            mcsm::error("Cannot create directory/file " + fullPath);
-            mcsm::error("This might have caused because of permissions or file name problems.");
-            mcsm::error("If you believe that this is from name problems, try regenerating the file again with only English characters.");
+            std::cerr << "[mcsm] Error: Cannot create directory/file " << fullPath << "\n";
+            std::cerr << "[mcsm] This might have caused because of permissions or file name problems.\n";
+            std::cerr << "[mcsm] If you believe that this is from name problems, try regenerating the file again with only English characters.\n";
             std::exit(1);
         }
         
@@ -95,7 +95,7 @@ nlohmann::json mcsm::GlobalOption::load() const {
 
     std::ifstream fileStream(fullPath);
     if (!fileStream.is_open()) {
-        mcsm::error("Cannot load file " + fullPath);
+        std::cerr << "[mcsm] Error: Cannot load file " << fullPath << "\n";
         std::exit(1);
     }
 
@@ -105,14 +105,14 @@ nlohmann::json mcsm::GlobalOption::load() const {
 
     nlohmann::json finalValue = nlohmann::json::parse(content, nullptr, false);
     if(finalValue.is_discarded()) {
-        mcsm::error("Failed to parse json " + fullPath);
-        mcsm::error("There might be many reasons why you see this error.");
-        mcsm::error("1. Comments: Comments are not allowed in JSON. If you used the comment syntax like other programming languages, you must remove them and try again.");
-        mcsm::error("2. Unclosed Brackets: Check if all curly braces '{}' and square brackets '[]' are properly closed.");
-        mcsm::error("3. Trailing Commas: Trailing Commas are not allowed in JSON. Make sure that end of the element doesn't end with comma.");
-        mcsm::error("4. Incorrect Escape Sequences: Check if all escaped are used properly.");
-        mcsm::error("5. Data types: Double check each element is storing the correct data types.");
-        mcsm::error("6. File Access Permissions: Check if your OS or security software is blocking the access to the file. Creating the file in system directories may cause this problem.");
+        std::cerr << "[mcsm] Error: Failed to parse json " << fullPath << "\n";
+        std::cerr << "[mcsm] There might be many reasons why you see this error.\n";
+        std::cerr << "[mcsm] 1. Comments: Comments are not allowed in JSON. If you used the comment syntax like other programming languages, you must remove them and try again.\n";
+        std::cerr << "[mcsm] 2. Unclosed Brackets: Check if all curly braces '{}' and square brackets '[]' are properly closed.\n";
+        std::cerr << "[mcsm] 3. Trailing Commas: Trailing Commas are not allowed in JSON. Make sure that end of the element doesn't end with comma.\n";
+        std::cerr << "[mcsm] 4. Incorrect Escape Sequences: Check if all escaped are used properly.\n";
+        std::cerr << "[mcsm] 5. Data types: Double check each element is storing the correct data types.\n";
+        std::cerr << "[mcsm] 6. File Access Permissions: Check if your OS or security software is blocking the access to the file. Creating the file in system directories may cause this problem.\n";
         std::exit(1);
     }
     return finalValue;
@@ -143,7 +143,7 @@ void mcsm::GlobalOption::setValue(const std::string& key, const nlohmann::json& 
 
     std::ofstream fileStream(fullPath);
     if (!fileStream.is_open()) {
-        mcsm::error("Cannot open file " + fullPath);
+        std::cerr << "[mcsm] Error: Cannot open file " << fullPath << "\n";
         std::exit(1);
     }
 
@@ -158,7 +158,7 @@ void mcsm::GlobalOption::save(const nlohmann::json& jsonData) const {
         outFile << jsonData.dump(4); 
         outFile.close();
     }else{
-        mcsm::error("Cannot save file " + fullPath);
+        std::cerr << "[mcsm] Error: Cannot save file " << fullPath << "\n";
         std::exit(1);
     }
 }
@@ -171,7 +171,7 @@ void mcsm::GlobalOption::reset() const {
         outFile << "{}";
         outFile.close();
     }else{
-        mcsm::error("Cannot save file " + fullPath);
+        std::cerr << "[mcsm] Error: Cannot save file " << fullPath << "\n";
         std::exit(1);
     }    
 }

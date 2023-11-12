@@ -24,14 +24,11 @@ SOFTWARE.
 #ifndef __MCSM_DOWNLOAD_H__
 #define __MCSM_DOWNLOAD_H__
 
-#ifdef _WIN32
-    #include <winsock2.h>
-#endif
-
-#include <curl/curl.h>
-#include <mcsm/util/cli/logging.h>
+#include <string>
+#include <iostream>
 #include <cstdio>
 #include <filesystem>
+#include <curl/curl.h>
 
 namespace mcsm {
     void download(const std::string& name, const std::string& url);

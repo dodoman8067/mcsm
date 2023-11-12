@@ -64,9 +64,9 @@ void mcsm::JvmOption::create(){
         "nogui"
     };
     if(mcsm::isWhitespaceOrEmpty(jvm)){
-        mcsm::error("JVM detection failed.");
-        mcsm::error("This error can be fixed by setting JAVA_HOME enviroment variable.");
-        mcsm::error("Or if you believe this is a software issue, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
+        std::cerr << "[mcsm] Error: JVM detection failed.\n";
+        std::cerr << "[mcsm] This error can be fixed by setting JAVA_HOME enviroment variable.\n";
+        std::cerr << "[mcsm] Or if you believe this is a software issue, please report it to GitHub. (https://github.com/dodoman8067/mcsm)\n";
         std::exit(1);
     }
     create(std::move(jvm), std::move(jvmArgs), std::move(serverArgs), mcsm::SearchTarget::GLOBAL);
@@ -130,13 +130,13 @@ void mcsm::JvmOption::reset(){
     if(!opt){
         mcsm::Option* opt2 = dynamic_cast<mcsm::Option*>(this->option.get());
         if(!opt2){
-            mcsm::error("Both dynamic_cast calls from mcsm::Configurable to mcsm::GlobalOption and mcsm::Option have failed.");
-            mcsm::error("Normally, one of these casts should be successful as both classes extend mcsm::Configurable.");
-            mcsm::error("If you see this error, this might be a operating system issue or software's issue.");
-            mcsm::error("If you believe that this is a software issue, try downloading a new copy of program in GitHub. If that isn't solving the issue, please report to GitHub. (https://github.com/dodoman8067/mcsm)");
-            mcsm::error("Or if you believe that this is operating system's issue, try updating the operating system. If it's not working, try reinstalling the operating system.");
+            std::cerr << "[mcsm] Error: Both dynamic_cast calls from mcsm::Configurable to mcsm::GlobalOption and mcsm::Option have failed.\n";
+            std::cerr << "[mcsm] Normally, one of these casts should be successful as both classes extend mcsm::Configurable.\n";
+            std::cerr << "[mcsm] If you see this error, this might be a operating system issue or software's issue.\n";
+            std::cerr << "[mcsm] If you believe that this is a software issue, try downloading a new copy of program in GitHub. If that isn't solving the issue, please report to GitHub. (https://github.com/dodoman8067/mcsm)\n";
+            std::cerr << "[mcsm] Or if you believe that this is operating system's issue, try updating the operating system. If it's not working, try reinstalling the operating system.\n";
             std::cerr << "\n";
-            mcsm::error("Error called from : mcsm::JvmOption::reset()");
+            std::cerr << "[mcsm] Error called from : mcsm::JvmOption::reset()\n";
             std::exit(1);
         }
         opt2->reset();
@@ -156,30 +156,30 @@ std::vector<std::string> mcsm::JvmOption::getJvmArguments(){
     if(!opt){
         mcsm::Option* opt2 = dynamic_cast<mcsm::Option*>(this->option.get());
         if(!opt2){
-            mcsm::error("Both dynamic_cast calls from mcsm::Configurable to mcsm::GlobalOption and mcsm::Option have failed.");
-            mcsm::error("Normally, one of these casts should be successful as both classes extend mcsm::Configurable.");
-            mcsm::error("If you see this error, this might be a operating system issue or software's issue.");
-            mcsm::error("If you believe that this is a software issue, try downloading a new copy of program in GitHub. If that isn't solving the issue, please report to GitHub. (https://github.com/dodoman8067/mcsm)");
-            mcsm::error("Or if you believe that this is operating system's issue, try updating the operating system. If it's not working, try reinstalling the operating system.");
+            std::cerr << "[mcsm] Error: Both dynamic_cast calls from mcsm::Configurable to mcsm::GlobalOption and mcsm::Option have failed.\n";
+            std::cerr << "[mcsm] Normally, one of these casts should be successful as both classes extend mcsm::Configurable.\n";
+            std::cerr << "[mcsm] If you see this error, this might be a operating system issue or software's issue.\n";
+            std::cerr << "[mcsm] If you believe that this is a software issue, try downloading a new copy of program in GitHub. If that isn't solving the issue, please report to GitHub. (https://github.com/dodoman8067/mcsm)\n";
+            std::cerr << "[mcsm] Or if you believe that this is operating system's issue, try updating the operating system. If it's not working, try reinstalling the operating system.\n";
             std::cerr << "\n";
-            mcsm::error("Error called from : mcsm::JvmOption::getJvmArguments()");
+            std::cerr << "[mcsm] Error called from : mcsm::JvmOption::getJvmArguments()\n";
             std::exit(1);
         }
         // I debugged here for more then 2 hours because returning "path" instead of "args"
         if(opt2->getValue("args") == nullptr){
-            mcsm::error("No \"args\" value specified in file " + opt2->getName());
-            mcsm::error("Manually editing the launch profile might have caused this issue.");
-            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+            std::cerr << "[mcsm] Error: No \"args\" value specified in file " << opt2->getName() << "\n";
+            std::cerr << "[mcsm] Manually editing the launch profile might have caused this issue.\n";
+            std::cerr << "[mcsm] If you know what you're doing, I believe you that you know how to handle this issue.\n";
+            std::cerr << "[mcsm] If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).\n";
             std::exit(1);
         }
         return opt2->getValue("args");
     }
     if(opt->getValue("args") == nullptr){
-        mcsm::error("No \"args\" value specified in file " + opt->getName());
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::cerr << "[mcsm] Error: No \"args\" value specified in file " << opt->getName() << "\n";
+        std::cerr << "[mcsm] Manually editing the launch profile might have caused this issue.\n";
+        std::cerr << "[mcsm] If you know what you're doing, I believe you that you know how to handle this issue.\n";
+        std::cerr << "[mcsm] If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).\n";
         std::exit(1);
     }
     return opt->getValue("args");
@@ -191,29 +191,29 @@ std::string mcsm::JvmOption::getJvmPath(){
     if(!opt){
         mcsm::Option* opt2 = dynamic_cast<mcsm::Option*>(this->option.get());
         if(!opt2){
-            mcsm::error("Both dynamic_cast calls from mcsm::Configurable to mcsm::GlobalOption and mcsm::Option have failed.");
-            mcsm::error("Normally, one of these casts should be successful as both classes extend mcsm::Configurable.");
-            mcsm::error("If you see this error, this might be a operating system issue or software's issue.");
-            mcsm::error("If you believe that this is a software issue, try downloading a new copy of program in GitHub. If that isn't solving the issue, please report to GitHub. (https://github.com/dodoman8067/mcsm)");
-            mcsm::error("Or if you believe that this is operating system's issue, try updating the operating system. If it's not working, try reinstalling the operating system.");
+            std::cerr << "[mcsm] Error: Both dynamic_cast calls from mcsm::Configurable to mcsm::GlobalOption and mcsm::Option have failed.\n";
+            std::cerr << "[mcsm] Normally, one of these casts should be successful as both classes extend mcsm::Configurable.\n";
+            std::cerr << "[mcsm] If you see this error, this might be a operating system issue or software's issue.\n";
+            std::cerr << "[mcsm] If you believe that this is a software issue, try downloading a new copy of program in GitHub. If that isn't solving the issue, please report to GitHub. (https://github.com/dodoman8067/mcsm)\n";
+            std::cerr << "[mcsm] Or if you believe that this is operating system's issue, try updating the operating system. If it's not working, try reinstalling the operating system.\n";
             std::cerr << "\n";
-            mcsm::error("Error called from : mcsm::JvmOption::getJvmPath()");
+            std::cerr << "[mcsm] Error called from : mcsm::JvmOption::getJvmPath()\n";
             std::exit(1);
         }
         if(opt2->getValue("path") == nullptr){
-            mcsm::error("No \"path\" value specified in file " + opt2->getName());
-            mcsm::error("Manually editing the launch profile might have caused this issue.");
-            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+            std::cerr << "[mcsm] Error: No \"path\" value specified in file " << opt2->getName() << "\n";
+            std::cerr << "[mcsm] Manually editing the launch profile might have caused this issue.\n";
+            std::cerr << "[mcsm] If you know what you're doing, I believe you that you know how to handle this issue.\n";
+            std::cerr << "[mcsm] If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).\n";
             std::exit(1);
         }
         return opt2->getValue("path");
     }
     if(opt->getValue("path") == nullptr){
-        mcsm::error("No \"path\" value specified in file " + opt->getName());
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::cerr << "[mcsm] Error: No \"path\" value specified in file " << opt->getName() << "\n";
+        std::cerr << "[mcsm] Manually editing the launch profile might have caused this issue.\n";
+        std::cerr << "[mcsm] If you know what you're doing, I believe you that you know how to handle this issue.\n";
+        std::cerr << "[mcsm] If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).\n";
         std::exit(1);
     }
     return opt->getValue("path");
@@ -226,13 +226,13 @@ std::vector<std::string> mcsm::JvmOption::getServerArguments(){
     if(!opt){
         mcsm::Option* opt2 = dynamic_cast<mcsm::Option*>(this->option.get());
         if(!opt2){
-            mcsm::error("Both dynamic_cast calls from mcsm::Configurable to mcsm::GlobalOption and mcsm::Option have failed.");
-            mcsm::error("Normally, one of these casts should be successful as both classes extend mcsm::Configurable.");
-            mcsm::error("If you see this error, this might be a operating system issue or software's issue.");
-            mcsm::error("If you believe that this is a software issue, try downloading a new copy of program in GitHub. If that isn't solving the issue, please report to GitHub. (https://github.com/dodoman8067/mcsm)");
-            mcsm::error("Or if you believe that this is operating system's issue, try updating the operating system. If it's not working, try reinstalling the operating system.");
+            std::cerr << "[mcsm] Error: Both dynamic_cast calls from mcsm::Configurable to mcsm::GlobalOption and mcsm::Option have failed.\n";
+            std::cerr << "[mcsm] Normally, one of these casts should be successful as both classes extend mcsm::Configurable.\n";
+            std::cerr << "[mcsm] If you see this error, this might be a operating system issue or software's issue.\n";
+            std::cerr << "[mcsm] If you believe that this is a software issue, try downloading a new copy of program in GitHub. If that isn't solving the issue, please report to GitHub. (https://github.com/dodoman8067/mcsm)\n";
+            std::cerr << "[mcsm] Or if you believe that this is operating system's issue, try updating the operating system. If it's not working, try reinstalling the operating system.\n";
             std::cerr << "\n";
-            mcsm::error("Error called from : mcsm::JvmOption::getServerArguments()");
+            std::cerr << "[mcsm] Error called from : mcsm::JvmOption::getServerArguments()\n";
             std::exit(1);
         }
         if(opt2->getValue("server_args") == nullptr) return empty;
@@ -251,13 +251,13 @@ std::string mcsm::JvmOption::getProfilePath() const {
     if(!opt){
         mcsm::Option* opt2 = dynamic_cast<mcsm::Option*>(this->option.get());
         if(!opt2){
-            mcsm::error("Both dynamic_cast calls from mcsm::Configurable to mcsm::GlobalOption and mcsm::Option have failed.");
-            mcsm::error("Normally, one of these casts should be successful as both classes extend mcsm::Configurable.");
-            mcsm::error("If you see this error, this might be a operating system issue or software's issue.");
-            mcsm::error("If you believe that this is a software issue, try downloading a new copy of program in GitHub. If that isn't solving the issue, please report to GitHub. (https://github.com/dodoman8067/mcsm)");
-            mcsm::error("Or if you believe that this is operating system's issue, try updating the operating system. If it's not working, try reinstalling the operating system.");
+            std::cerr << "[mcsm] Error: Both dynamic_cast calls from mcsm::Configurable to mcsm::GlobalOption and mcsm::Option have failed.\n";
+            std::cerr << "[mcsm] Normally, one of these casts should be successful as both classes extend mcsm::Configurable.\n";
+            std::cerr << "[mcsm] If you see this error, this might be a operating system issue or software's issue.\n";
+            std::cerr << "[mcsm] If you believe that this is a software issue, try downloading a new copy of program in GitHub. If that isn't solving the issue, please report to GitHub. (https://github.com/dodoman8067/mcsm)\n";
+            std::cerr << "[mcsm] Or if you believe that this is operating system's issue, try updating the operating system. If it's not working, try reinstalling the operating system.\n";
             std::cerr << "\n";
-            mcsm::error("Error called from : mcsm::JvmOption::getProfilePath()");
+            std::cerr << "[mcsm] Error called from : mcsm::JvmOption::getProfilePath()\n";
             std::exit(1);
         }
         return opt2->getPath();
@@ -270,13 +270,13 @@ mcsm::SearchTarget mcsm::JvmOption::getSearchTarget() const {
     if(!opt){
         mcsm::Option* opt2 = dynamic_cast<mcsm::Option*>(this->option.get());
         if(!opt2){
-            mcsm::error("Both dynamic_cast calls from mcsm::Configurable to mcsm::GlobalOption and mcsm::Option have failed.");
-            mcsm::error("Normally, one of these casts should be successful as both classes extend mcsm::Configurable.");
-            mcsm::error("If you see this error, this might be a operating system issue or software's issue.");
-            mcsm::error("If you believe that this is a software issue, try downloading a new copy of program in GitHub. If that isn't solving the issue, please report to GitHub. (https://github.com/dodoman8067/mcsm)");
-            mcsm::error("Or if you believe that this is operating system's issue, try updating the operating system. If it's not working, try reinstalling the operating system.");
+            std::cerr << "[mcsm] Error: Both dynamic_cast calls from mcsm::Configurable to mcsm::GlobalOption and mcsm::Option have failed.\n";
+            std::cerr << "[mcsm] Normally, one of these casts should be successful as both classes extend mcsm::Configurable.\n";
+            std::cerr << "[mcsm] If you see this error, this might be a operating system issue or software's issue.\n";
+            std::cerr << "[mcsm] If you believe that this is a software issue, try downloading a new copy of program in GitHub. If that isn't solving the issue, please report to GitHub. (https://github.com/dodoman8067/mcsm)\n";
+            std::cerr << "[mcsm] Or if you believe that this is operating system's issue, try updating the operating system. If it's not working, try reinstalling the operating system completely.\n";
             std::cerr << "\n";
-            mcsm::error("Error called from : mcsm::JvmOption::reset()");
+            std::cerr << "[mcsm] Error called from : mcsm::JvmOption::reset()\n";
             std::exit(1);
         }
         return mcsm::SearchTarget::CURRENT;

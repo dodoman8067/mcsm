@@ -59,8 +59,8 @@ mcsm::GenerateServerCommand::~GenerateServerCommand(){}
 
 void mcsm::GenerateServerCommand::execute(const std::vector<std::string>& args){
     if(args.empty()){
-        mcsm::warning("Invalid arguments.");
-        mcsm::warning("You must specify a server name by --name option.");
+        std::cout << "[mcsm] Invalid arguments.\n";
+        std::cerr << "[mcsm] You must specify a server name by --name option.\n";
         std::exit(1);
     }
     detectServer(args);
@@ -92,13 +92,13 @@ std::string mcsm::GenerateServerCommand::getProfileName(const std::vector<std::s
                 }else{
                     mcsm::replaceAll(name, "\"", "");
                     mcsm::replaceAll(name, "\'", "");
-                    mcsm::warning("NOTE : \' and \" are not allowed in profile names; The profile name was modified to " + name + ".");
+                    std::cout << "[mcsm] NOTE : \' and \" are not allowed in profile names; The profile name was modified to " << name << ".\n";
                 }
                 return name;
             }
         }
     }
-    mcsm::warning("Profile name not provided; Specify a profile name with --profile option to continue.");
+    std::cerr << "[mcsm] Profile name not provided; Specify a profile name to continue.\n";
     std::exit(1);
 }
 
@@ -121,7 +121,7 @@ std::string mcsm::GenerateServerCommand::getServerName(const std::vector<std::st
             }
         }
     }
-    mcsm::warning("Server name not provided; Specify a name with --name option to continue.");
+    std::cerr << "[mcsm] Server name not provided; Specify a name to continue.\n";
     std::exit(1);
 }
 
@@ -137,7 +137,7 @@ std::string mcsm::GenerateServerCommand::getServerVersion(const std::vector<std:
             }
         }
     }
-    mcsm::warning("Server version not provided; Specify a version with --version option to continue.");
+    std::cerr << "[mcsm] Server version not provided; Specify a version to continue.\n";
     std::exit(1);
 }
 
@@ -174,7 +174,7 @@ std::string mcsm::GenerateServerCommand::getServerType(const std::vector<std::st
             }
         }
     }
-    mcsm::warning("Server type not provided; Specify a type with --servertype option to continue.");
+    std::cerr << "[mcsm] Server type not provided; Specify a type to continue.\n";
     std::exit(1);
 }
 
@@ -186,8 +186,8 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& a
     std::string type = getServerType(args);
 
     if(option == nullptr){
-        mcsm::warning("JVM launch profile " + getProfileName(args) + " not found.");
-        mcsm::warning("Maybe you have misspelled --c or --g option.");
+        std::cerr << "[mcsm] JVM launch profile " << getProfileName(args) << " not found.\n";
+        std::cerr << "[mcsm] Maybe you have misspelled --c or --g option.\n";
         std::exit(1);
     }
 
@@ -211,6 +211,6 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& a
         mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::PUFFERFISH);
         return;
     }
-    mcsm::error("Server type not supported : " + type);
+    std::cerr << "[mcsm] Server type not supported : " << type << "\n";
     std::exit(1);
 }

@@ -43,8 +43,8 @@ mcsm::StartServerCommand::~StartServerCommand() {}
 
 void mcsm::StartServerCommand::execute(const std::vector<std::string>& args){
     if(!isConfigured()){
-        mcsm::error("Server not configured.");
-        mcsm::error("Task aborted.");
+        std::cerr << "[mcsm] Server not configured.\n";
+        std::cerr << "[mcsm] Task aborted.\n";
         std::exit(1);
     }
     std::unique_ptr<mcsm::JvmOption> jvmOpt = searchOption(args);
@@ -54,8 +54,8 @@ void mcsm::StartServerCommand::execute(const std::vector<std::string>& args){
 
 std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const std::vector<std::string>& args){
     if(!isConfigured()){
-        mcsm::error("Server not configured.");
-        mcsm::error("Task aborted.");
+        std::cerr << "[mcsm] Server not configured.\n";
+        std::cerr << "[mcsm] Task aborted.\n";
         std::exit(1);
     }
     for(size_t i = 0; i < args.size(); ++i){
@@ -67,16 +67,16 @@ std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const st
                 mcsm::SearchTarget target = getSearchTarget(args);
                 std::unique_ptr<mcsm::JvmOption> profile = searchOption(target, pName);
                 if(profile == nullptr){
-                    mcsm::error("The specified JVM launch profile " + pName + " does not exist.");
+                    std::cerr << "[mcsm] The specified JVM launch profile " << pName << " does not exist.\n";
                     std::exit(1);
                 }
-                mcsm::info("Found specified JVM launch profile " + pName + ".");
-                mcsm::info("Location : " + profile->getProfilePath());
+                std::cout << "[mcsm] Found specified JVM launch profile " << pName << ".\n";
+                std::cout << "[mcsm] Location : " << profile->getProfilePath() << "\n";
                 return profile;
             }
         }
     }
-    mcsm::info("No JVM launch profile specified; Using default JVM launch profile.");
+    std::cout << "[mcsm] No JVM launch profile specified; Using default JVM launch profile.\n";
     mcsm::ServerOption option;
     std::unique_ptr<mcsm::JvmOption> jvmOpt = option.getDefaultOption();
     return jvmOpt;
@@ -84,8 +84,8 @@ std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const st
 
 std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const mcsm::SearchTarget& target, const std::string& name){
     if(!isConfigured()){
-        mcsm::error("Server not configured.");
-        mcsm::error("Task aborted.");
+        std::cerr << "[mcsm] Server not configured.\n";
+        std::cerr << "[mcsm] Task aborted.\n";
         std::exit(1);
     }
     if(target == mcsm::SearchTarget::GLOBAL || target == mcsm::SearchTarget::ALL){

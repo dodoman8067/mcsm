@@ -27,13 +27,13 @@ mcsm::ServerOption::ServerOption(){
     mcsm::Option option(".", "server");
 
     if(!option.exists()){
-        mcsm::error("File server.json cannot be found.");
-        mcsm::error("Task aborted.");
+        std::cerr << "[mcsm] File server.json cannot be found.\n";
+        std::cerr << "[mcsm] Task aborted.\n";
         std::exit(1);
     }
     if(option.getValue("version") == nullptr){
-        mcsm::error("Option \"version\" cannot be found.");
-        mcsm::error("Task aborted.");
+        std::cerr << "[mcsm] Option \"version\" cannot be found.\n";
+        std::cerr << "[mcsm] Task aborted.\n";
         std::exit(1);    
     }
 
@@ -44,13 +44,13 @@ mcsm::ServerOption::ServerOption(const std::string& version){
     mcsm::Option option(".", "server");
 
     if(!option.exists()){
-        mcsm::error("File server.json cannot be found.");
-        mcsm::error("Task aborted.");
+        std::cerr << "[mcsm] File server.json cannot be found.\n";
+        std::cerr << "[mcsm] Task aborted.\n";
         std::exit(1);
     }
     if(option.getValue("type") == nullptr){
-        mcsm::error("Option \"type\" cannot be found.");
-        mcsm::error("Task aborted.");
+        std::cerr << "[mcsm] Option \"type\" cannot be found.\n";
+        std::cerr << "[mcsm] Task aborted.\n";
         std::exit(1);    
     }
 
@@ -94,20 +94,20 @@ void mcsm::ServerOption::start(){
 
 void mcsm::ServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
     if(!std::filesystem::exists("server.json")){
-        mcsm::error("File server.json cannot be found.");
-        mcsm::error("Task aborted.");
+        std::cerr << "[mcsm] File server.json cannot be found.\n";
+        std::cerr << "[mcsm] Task aborted.\n";
         std::exit(1);
     }
     if(this->server == nullptr){
         this->server.reset();
         this->server = detectServerType(getServerType());
     }
-    mcsm::success("Starting server..");
-    mcsm::info("Server name : " + getServerName());
-    mcsm::info("Server MC version : " + getServerVersion());
-    mcsm::info("Server JVM launch profile : " + option->getProfileName());
+    std::cout << "[mcsm] Starting server..\n";
+    std::cout << "[mcsm] Server name : " << getServerName() << "\n";
+    std::cout << "[mcsm] Server MC version : " << getServerVersion() << "\n";
+    std::cout << "[mcsm] Server JVM launch profile : " << option->getProfileName() << "\n";
     this->server->start(*option);
-    mcsm::info("Server stopped.\n");
+    std::cout << "[mcsm] Server stopped.\n";
 }
 
 bool mcsm::ServerOption::exists(){
@@ -122,8 +122,8 @@ inline std::shared_ptr<mcsm::Server> mcsm::ServerOption::detectServerType(const 
         sPtr = std::make_shared<mcsm::PaperServer>();
     }
     if(sPtr == nullptr){
-        mcsm::error("The following server type (" + server + ") is not supported.");
-        mcsm::error("Task aborted.");
+        std::cerr << "[mcsm] The following server type (" << server << ") is not supported.\n";
+        std::cerr << "[mcsm] Task aborted.\n";
         std::exit(1); 
     }
 
@@ -141,9 +141,9 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const{
     }
     std::unique_ptr<mcsm::JvmOption> jvmOption = std::make_unique<mcsm::JvmOption>(profileObj["name"], target);
     if(!jvmOption->exists() || jvmOption == nullptr){
-        mcsm::error("Invalid default launch profile.");
-        mcsm::error("File server.json might be corrupted or the profile is removed.");
-        mcsm::error("Please change the profile or create a new server.json file.");
+        std::cerr << "[mcsm] Error: Invalid default launch profile.\n";
+        std::cerr << "[mcsm] File server.json might be corrupted or the profile is removed.\n";
+        std::cerr << "[mcsm] Please change the profile or create a new server.json file.\n";
         std::exit(1);
     }
     return jvmOption;

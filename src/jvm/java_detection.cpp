@@ -80,15 +80,15 @@ std::string mcsm::getJavaFromPath(){
 }
 
 std::string mcsm::detectJava(){
-    mcsm::info("Detecting java..");
+    std::cout << "[mcsm] Detecting java..\n";
     std::string str = getJavaFromHome();
     if(!mcsm::isWhitespaceOrEmpty(str)){
         mcsm::replaceAll(str, "\\", "/");
         if(!isValidJava(str)){
-            mcsm::info("Detected java was not valid java.");
+            std::cout << "[mcsm] Detected java was not valid java.\n";
             std::exit(1);
         }
-        mcsm::info("Detected java from JAVA_HOME : " + str);
+        std::cout << "[mcsm] Detected java from JAVA_HOME : " << str << ".\n";
         if(!mcsm::startsWith(str, "\"")){
             str = "\"" + str;
         }
@@ -97,15 +97,15 @@ std::string mcsm::detectJava(){
         }
         return str;
     }
-    mcsm::info("Failed to detect java from JAVA_HOME; Looking from PATH.");
+    std::cout << "[mcsm] Failed to detect java from JAVA_HOME; Looking from PATH.\n";
     std::string pathStr = getJavaFromPath();
     if(!mcsm::isWhitespaceOrEmpty(pathStr)){
         mcsm::replaceAll(pathStr, "\\", "/");
         if(!isValidJava(pathStr)){
-            mcsm::info("Detected java was not valid java.");
+            std::cout << "[mcsm] Detected java was not valid java.\n";
             std::exit(1);
         }
-        mcsm::info("Detected java from PATH : " + pathStr + ".");
+        std::cout << "[mcsm] Detected java from PATH : " << pathStr << ".\n";
         if(!mcsm::startsWith(pathStr, "\"")){
             pathStr = "\"" + pathStr;
         }
@@ -114,8 +114,8 @@ std::string mcsm::detectJava(){
         }
         return pathStr;
     }
-    mcsm::error("Failed to detect java from PATH.");
-    mcsm::error("But you may specify jvm path manually.");
+    std::cerr << "[mcsm] Failed to detect java from PATH.\n";
+    std::cerr << "[mcsm] But you may specify jvm path manually.\n";
     std::exit(1);
 }
 
@@ -127,7 +127,13 @@ bool mcsm::isValidJava(const std::string& path){
     if (!mcsm::endsWith(command, "\"")) {
         command += "\"";
     }
-    command = "\""+ path + "\"";
+    if(mcsm::getCurrentOS() == mcsm::OS::WINDOWS){
+        command = "\""+ path + "\"" + " -version > NUL 2>&1";
+    }else if(mcsm::getCurrentOS() == mcsm::OS::LINUX){
+        command = path + " -version > /dev/null 2>&1";
+    }
     
-    return mcsm::runCommandQuietly(command) == 0;
+    int code = std::system(command.c_str());
+    
+    return code == 0;
 }

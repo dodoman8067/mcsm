@@ -24,10 +24,10 @@ SOFTWARE.
 #define __MCSM_JAVA_DETECTION_H__
 
 #include <cstdlib>
+#include <string>
 #include <filesystem>
-#include <mcsm/util/cli/logging.h>
+#include <iostream>
 #include <mcsm/util/string_utils.h>
-#include <mcsm/util/cli/cli_utils.h>
 #include <mcsm/util/os/os_detection.h>
 
 namespace mcsm {

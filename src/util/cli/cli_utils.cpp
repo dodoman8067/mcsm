@@ -18,7 +18,7 @@ int mcsm::runCommandQuietly(const std::string& command){
             return 1;
         #endif
     }else{
-        mcsm::error("This platform is not supported. Please use Windows or Linux.");
+        std::cerr << "[mcsm] This platform is not supported. Please use Windows or Linux.\n";
         std::exit(1);
     }
 }
@@ -39,7 +39,7 @@ int mcsm::runCommand(const std::string& command){
             return 1;
         #endif
     }else{
-        mcsm::error("This platform is not supported. Please use Windows or Linux.");
+        std::cerr << "[mcsm] This platform is not supported. Please use Windows or Linux.\n";
         std::exit(1);
     }
 }

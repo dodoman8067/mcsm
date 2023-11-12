@@ -57,8 +57,8 @@ mcsm::JvmOptionGeneratorCommand::~JvmOptionGeneratorCommand() {}
 
 void mcsm::JvmOptionGeneratorCommand::execute(const std::vector<std::string>& args) {
     if(args.empty()){
-        mcsm::warning("Invalid arguments.");
-        mcsm::warning("You must specify a name by --name option.");
+        std::cout << "[mcsm] Invalid arguments.\n";
+        std::cerr << "[mcsm] You must specify a name by --name option.\n";
         std::exit(1);
     }
     if(getSaveTarget(args) == mcsm::SearchTarget::GLOBAL){
@@ -92,12 +92,12 @@ std::string mcsm::JvmOptionGeneratorCommand::getJvmPath(const std::vector<std::s
                     jvmPath += "\"";
                 }
                 if (!mcsm::isValidJava(jvmPath)) continue;
-                mcsm::success("Detected java from specified path : " + jvmPath);
+                std::cout << "[mcsm] Detected java from specified path : " << jvmPath << "\n";
                 return jvmPath;
             }
         }
     }
-    mcsm::info("Java detection from -jp command arguments failed; Automatically detecting java..");
+    std::cout << "[mcsm] Java detection from -jp command arguments failed; Automatically detecting java..\n";
     return mcsm::detectJava();
 }
 
@@ -112,16 +112,16 @@ std::string mcsm::JvmOptionGeneratorCommand::getProfileName(const std::vector<st
                 if(name.find("\"") == std::string::npos && name.find("\'") == std::string::npos){
                     mcsm::JvmOption option(name, target);
                     if(option.exists()){
-                        mcsm::warning("JVM launch profile " + name + " already exists. Command failed.");
+                        std::cerr << "[mcsm] JVM launch profile " << name << " already exists. Command failed.\n";
                         std::exit(1); 
                     }
                 }else{
                     mcsm::replaceAll(name, "\"", "");
                     mcsm::replaceAll(name, "\'", "");
-                    mcsm::warning("NOTE : \' and \" are not allowed in names; Name was modified to " + name + ".");
+                    std::cout << "[mcsm] NOTE : \' and \" are not allowed in names; Name was modified to " << name << ".\n";
                     mcsm::JvmOption option(name, target);
                     if(option.exists()){
-                        mcsm::warning("JVM launch profile " + name + " already exists. Command failed.");
+                        std::cerr << "[mcsm] JVM launch profile " << name << " already exists. Command failed.\n";
                         std::exit(1); 
                     }
                 }
@@ -129,7 +129,7 @@ std::string mcsm::JvmOptionGeneratorCommand::getProfileName(const std::vector<st
             }
         }
     }
-    mcsm::warning("Name not provided; Specify a name with --name option to continue.");
+    std::cerr << "[mcsm] Name not provided; Specify a name to continue.\n";
     std::exit(1);
 }
 
@@ -184,28 +184,28 @@ inline void mcsm::JvmOptionGeneratorCommand::createProfile(const std::vector<std
         jvmArgs.push_back("-Xms2G");
         jvmArgs.push_back("-Xmx2G");
         jvmArgs.push_back("-jar");
-        mcsm::info("No JVM arguments specified; Defaulting to -Xms2G, -Xmx2G and -jar.");
+        std::cout << "[mcsm] No JVM arguments specified; Defaulting to -Xms2G, -Xmx2G and -jar.\n";
     }
     std::vector<std::string> sargs = getServerArguments(args);
     if(sargs.empty()) {
-        mcsm::info("No server arguments specified; Defaulting to nogui.");
+        std::cout << "[mcsm] No server arguments specified; Defaulting to nogui.\n";
         sargs.push_back("nogui");
     }
     std::string jvm = getJvmPath(args);
     option.create(std::move(jvm), std::move(jvmArgs), std::move(sargs), target);
-    mcsm::info("Java Virtual Machine launch profile generated : ");
-    mcsm::info("Profile name : " + option.getProfileName());
-    mcsm::info("JVM path : " + jvm);
+    std::cout << "[mcsm] Java Virtual Machine launch profile generated : \n";
+    std::cout << "[mcsm] Profile name : " << option.getProfileName() << "\n";
+    std::cout << "[mcsm] JVM path : " << jvm << "\n";
     
     if(!option.getJvmArguments().empty()){
-        mcsm::info("JVM arguments : ");
+        std::cout << "[mcsm] JVM arguments : ";
         for(const std::string& args : option.getJvmArguments()){
             std::cout << args << " ";
         }
         std::cout << "\n";
     }
     if(!option.getServerArguments().empty()){
-        mcsm::info("Server arguments : ");
+        std::cout << "[mcsm] Server arguments : ";
         for(const std::string& sArgs : option.getServerArguments()){
             std::cout << sArgs << " ";
         }

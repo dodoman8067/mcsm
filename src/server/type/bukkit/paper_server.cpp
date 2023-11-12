@@ -30,10 +30,10 @@ int mcsm::PaperServer::getVersion(const std::string& ver) const {
     std::string res = mcsm::get("https://api.papermc.io/v2/projects/paper/versions/" + ver);
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
     if(json.is_discarded()){
-        mcsm::error("Parse of json failed.");
-        mcsm::error("If you believe that this is an error, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
-        mcsm::error("Error informations : ");
-        mcsm::error("Called method : mcsm::PaperServer::getVersion() with arguments : " + ver);
+        std::cerr << "[mcsm] Error : Parse of json failed.\n";
+        std::cerr << "[mcsm] If you believe that this is an error, please report it to GitHub. (https://github.com/dodoman8067/mcsm)\n\n";
+        std::cerr << "[mcsm] Error informations : \n";
+        std::cerr << "[mcsm] Called method : mcsm::PaperServer::getVersion() with arguments : " << ver << "\n";
         std::exit(1);
     }
     if(json["builds"].is_array()){
@@ -66,8 +66,8 @@ void mcsm::PaperServer::download(const std::string& version, const std::string& 
 void mcsm::PaperServer::download(const std::string& version, const std::string& path, const std::string& name){
     int ver = getVersion(version);
     if(ver == -1){
-        mcsm::error("Unsupported version.");
-        mcsm::error("Please try again with a different version.");
+        std::cerr << "[mcsm] Error : Unsupported version.\n";
+        std::cerr << "[mcsm] Please try again with a different version.\n";
         std::exit(1);
     }
     std::string strVer = std::to_string(ver);
@@ -78,7 +78,7 @@ void mcsm::PaperServer::download(const std::string& version, const std::string& 
 void mcsm::PaperServer::start(mcsm::JvmOption& option){
     mcsm::ServerOption sOpt;
     if(!std::filesystem::exists("paper.jar")){
-        mcsm::info("[mcsm] Downloading paper.jar...");
+        std::cout << "[mcsm] Downloading paper.jar...\n";
         download(sOpt.getServerVersion());
     }
     Server::start(option);
