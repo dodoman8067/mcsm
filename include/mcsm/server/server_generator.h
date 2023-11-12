@@ -19,3 +19,22 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
+
+#ifndef __MCSM_SERVER_GENERATOR_H__
+#define __MCSM_SERVER_GENERATOR_H__
+
+#include <mcsm/data/options/server_option.h>
+#include <mcsm/server/server_type.h>
+
+namespace mcsm {
+    namespace server {
+        void generateBukkit(const std::string& name, mcsm::JvmOption& option, const std::string& version, const mcsm::BukkitServerType& type);
+        void generateForge(const std::string& name, mcsm::JvmOption& option, const std::string& version);
+        void generateFabric(const std::string& name, mcsm::JvmOption& option, const std::string& version);
+        void generateSponge(const std::string& name, mcsm::JvmOption& option, const std::string& version);
+        void generateCustom(const std::string& name, mcsm::JvmOption& option, const std::string& filePath, const std::string& version);
+        void configure(mcsm::ServerOption& serverOption, const std::string& name, mcsm::JvmOption& option);
+    };
+}
+
+#endif // __MCSM_SERVER_GENERATOR_H__

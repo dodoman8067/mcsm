@@ -70,19 +70,19 @@ std::vector<std::string> mcsm::VanillaServer::getAvailableVersions(){
     return vector;
 }
 
-void mcsm::VanillaServer::download(const std::string& version){
+void mcsm::VanillaServer::download(const std::string& /* version */){
     
 }
 
-void mcsm::VanillaServer::download(const std::string& version, const std::string& path){
+void mcsm::VanillaServer::download(const std::string& /* version */, const std::string& /* path */){
 
 }
 
-void mcsm::VanillaServer::download(const std::string& version, const std::string& path, const std::string& name){
+void mcsm::VanillaServer::download(const std::string& /* version */, const std::string& /* path */, const std::string& /* name */){
 
 }
 
-bool mcsm::VanillaServer::hasVersion(const std::string& version){
+bool mcsm::VanillaServer::hasVersion(const std::string& /* version */){
     return false;
 }
 

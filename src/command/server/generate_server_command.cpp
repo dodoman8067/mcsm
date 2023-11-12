@@ -187,60 +187,30 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& a
 
     if(option == nullptr){
         std::cerr << "[mcsm] JVM launch profile " << getProfileName(args) << " not found.\n";
-        std::cerr << "[mcsm] Maybe you misspelled --c or --g option.\n";
+        std::cerr << "[mcsm] Maybe you have misspelled --c or --g option.\n";
         std::exit(1);
     }
 
     if(type == "bukkit" || type == "craftbukkit"){
-        generateBukkit(name, *option, version, mcsm::BukkitServerType::CRAFTBUKKIT);
+        mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::CRAFTBUKKIT);
         return;
     }
     if(type == "spigot"){
-        generateBukkit(name, *option, version, mcsm::BukkitServerType::SPIGOT);
+        mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::SPIGOT);
         return;
     }
     if(type == "paper" || type == "paperspigot"){
-        generateBukkit(name, *option, version, mcsm::BukkitServerType::PAPER);
+        mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::PAPER);
         return;
     }
     if(type == "purpur"){
-        generateBukkit(name, *option, version, mcsm::BukkitServerType::PURPUR);
+        mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::PURPUR);
         return;
     }
     if(type == "bukkit" || type == "craftbukkit"){
-        generateBukkit(name, *option, version, mcsm::BukkitServerType::PUFFERFISH);
+        mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::PUFFERFISH);
         return;
     }
     std::cerr << "[mcsm] Server type not supported : " << type << "\n";
     std::exit(1);
-}
-
-void mcsm::GenerateServerCommand::generateBukkit(const std::string& name, mcsm::JvmOption& option, const std::string& version, const mcsm::BukkitServerType& type){
-    switch(type){
-        case mcsm::BukkitServerType::PAPER: {
-            std::shared_ptr<mcsm::PaperServer> server = std::make_shared<mcsm::PaperServer>();
-            mcsm::ServerOption serverOption(version, server);
-            configure(serverOption, name, option);
-            break;
-        }
-        default: {
-            std::cerr << "[mcsm] This kind of Bukkit-API based server implementation is not supported right now.\n";
-            std::exit(1);
-            break;
-        }
-    }
-}
-
-inline void mcsm::GenerateServerCommand::configure(mcsm::ServerOption& serverOption, const std::string& name, mcsm::JvmOption& option){
-    if(serverOption.exists()){
-        std::cerr << "[mcsm] Error: Server is already configured in this directory.\n";
-        std::cerr << "[mcsm] Try in another directory.\n";\
-        std::exit(1);
-    }
-    serverOption.create(name, option);
-    std::cout << "[mcsm] Configured server information :\n";
-    std::cout << "[mcsm] Server name : " << serverOption.getServerName() << "\n";
-    std::cout << "[mcsm] Server type : " << serverOption.getServerType() << "\n";
-    std::cout << "[mcsm] Server version : " << serverOption.getServerVersion() << "\n";
-    std::cout << "[mcsm] Server JVM launch profile : " << serverOption.getDefaultOption()->getProfileName() << "\n";
 }
