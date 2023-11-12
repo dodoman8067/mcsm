@@ -30,7 +30,7 @@ void mcsm::server::generateBukkit(const std::string& name, mcsm::JvmOption& opti
             break;
         }
         default: {
-            std::cerr << "[mcsm] This kind of Bukkit-API based server implementation is not supported right now.\n";
+            mcsm::error("This kind of Bukkit-API based server implementation is not supported right now.");
             std::exit(1);
             break;
         }
@@ -55,14 +55,14 @@ void mcsm::server::generateCustom(const std::string& /* name */, mcsm::JvmOption
 
 void mcsm::server::configure(mcsm::ServerOption& serverOption, const std::string& name, mcsm::JvmOption& option){
     if(serverOption.exists()){
-        std::cerr << "[mcsm] Error: Server is already configured in this directory.\n";
-        std::cerr << "[mcsm] Try in another directory.\n";\
+        mcsm::error("Server is already configured in this directory.");
+        mcsm::error("Try in another directory.");
         std::exit(1);
     }
     serverOption.create(name, option);
-    std::cout << "[mcsm] Configured server information :\n";
-    std::cout << "[mcsm] Server name : " << serverOption.getServerName() << "\n";
-    std::cout << "[mcsm] Server type : " << serverOption.getServerType() << "\n";
-    std::cout << "[mcsm] Server version : " << serverOption.getServerVersion() << "\n";
-    std::cout << "[mcsm] Server JVM launch profile : " << serverOption.getDefaultOption()->getProfileName() << "\n";
+    mcsm::success("Configured server information : ");
+    mcsm::info("Server name : " + serverOption.getServerName());
+    mcsm::info("Server type : " + serverOption.getServerType());
+    mcsm::info("Server version : " + serverOption.getServerVersion());
+    mcsm::info("Server JVM launch profile : " + serverOption.getDefaultOption()->getProfileName());
 }

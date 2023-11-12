@@ -39,6 +39,7 @@ if(CMAKE_BUILD_TYPE MATCHES Release)
 endif()
 
 # Find dependencies 
+find_package(termcolor REQUIRED)
 find_package(CURL REQUIRED CONFIG)
 find_package(nlohmann_json 3.2.0 REQUIRED)
 
@@ -48,4 +49,4 @@ add_executable(mcsm ${SRC_FILES} ${RESOURCE_FILE})
 # Link dependencies
 target_link_libraries(mcsm PRIVATE CURL::libcurl)
 target_link_libraries(mcsm PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(mcsm PRIVATE termcolor)
+target_link_libraries(mcsm PRIVATE termcolor::termcolor)

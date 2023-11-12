@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <mcsm/util/os/os_detection.h>
+#include <mcsm/util/cli/logging.h>
 #ifdef __linux__
     #include <sys/wait.h>
 #endif

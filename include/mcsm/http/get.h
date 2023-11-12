@@ -23,8 +23,11 @@ SOFTWARE.
 #ifndef __MCSM_GET_H__
 #define __MCSM_GET_H__
 
-#include <string>
-#include <iostream>
+#ifdef _WIN32
+    #include <winsock2.h>
+#endif
+
+#include <mcsm/util/cli/logging.h>
 #include <curl/curl.h>
 
 namespace mcsm {

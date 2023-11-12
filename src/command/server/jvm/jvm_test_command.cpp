@@ -28,14 +28,14 @@ mcsm::JvmTestCommand::~JvmTestCommand(){}
 
 void mcsm::JvmTestCommand::execute(const std::vector<std::string>& args){
     if(args.empty()){
-        std::cerr << "[mcsm] Invalid arguments.\n";
-        std::cerr << "[mcsm] You must specify a name by --name option.\n";
+        mcsm::warning("Invalid arguments.");
+        mcsm::warning("You must specify a name by --name option.");
         std::exit(1);
     }
     std::string name = getProfileName(args);
     std::unique_ptr<mcsm::JvmOption> option = searchOption(getSearchTarget(args), std::move(name));
     if(option == nullptr){
-        std::cerr << "[mcsm] No JVM launch profile found in the given search target.\n";
+        mcsm::warning("No JVM launch profile found in the given search target.");
         std::exit(1);
     }
     performTest(std::move(option));
@@ -74,23 +74,23 @@ std::string mcsm::JvmTestCommand::getProfileName(const std::vector<std::string>&
             }else{
                 mcsm::replaceAll(name, "\"", "");
                 mcsm::replaceAll(name, "\'", "");
-                std::cout << "[mcsm] NOTE : \' and \" are not allowed in names; Name was modified to " << name << ".\n";
+                mcsm::warning("NOTE : \' and \" are not allowed in names; Name was modified to " + name + ".");
             }
             return name;
         }
     }
-    std::cerr << "[mcsm] Name not provided; Specify a name to continue.\n";
+    mcsm::warning("Name not provided; Specify a name to continue.");
     std::exit(1);
 }
 
 inline void mcsm::JvmTestCommand::performTest(std::unique_ptr<mcsm::JvmOption> option){
     std::string jvm = option->getJvmPath();
-    std::cout << "[mcsm] Profile name : " << option->getProfileName() << "\n";
-    std::cout << "[mcsm] Profile path : " << option->getProfilePath() << "\n";
-    std::cout << "[mcsm] Performing test with the following command : " << jvm << " -version"<< "\n";
+    mcsm::info("Profile name : " + option->getProfileName());
+    mcsm::info("Profile path : " + option->getProfilePath());
+    mcsm::info("Performing test with the following command : " + jvm + " -version");
     if(mcsm::runCommandQuietly(jvm + " --version") != 0){
-        std::cerr << "[mcsm] Test failed : " << jvm << "\n";
+        mcsm::warning("Test failed : " + jvm);
         std::exit(1);
     }
-    std::cout << "[mcsm] Test success : " << jvm << "\n";
+    mcsm::success("Test success : " + jvm);
 }

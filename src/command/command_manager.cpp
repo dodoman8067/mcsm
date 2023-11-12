@@ -35,10 +35,10 @@ mcsm::CommandManager::~CommandManager(){
 
 void mcsm::CommandManager::init(){
     if(initialized){
-        std::cerr << "[mcsm] Error: Program's command manager was initialized more than once.\n";
-        std::cerr << "[mcsm] You're not supposed to see this message unless you're using development version.\n";
-        std::cerr << "[mcsm] If you see this message, this might be a software issue or the file is corrupted.\n";
-        std::cerr << "[mcsm] If you think this is a software issue, please open an issue to github https://github.com/dodoman8067/mcsm .\n";
+        mcsm::error("Program's command manager was initialized more than once.");
+        mcsm::error("You're not supposed to see this message unless you're using development version.");
+        mcsm::error("If you see this message, this might be a software issue or the file is corrupted.");
+        mcsm::error("If you think this is a software issue, please open an issue to github https://github.com/dodoman8067/mcsm.");
         std::exit(1);
     }
     commands = std::make_unique<std::vector<std::unique_ptr<mcsm::Command>>>();

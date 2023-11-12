@@ -28,17 +28,17 @@ mcsm::JvmOptionSearchCommand::~JvmOptionSearchCommand() {}
 
 void mcsm::JvmOptionSearchCommand::execute(const std::vector<std::string>& args){
     if(args.empty()){
-        std::cerr << "[mcsm] Invalid arguments.\n";
-        std::cerr << "[mcsm] You must specify a name by --name option.\n";
+        mcsm::warning("Invalid arguments.");
+        mcsm::warning("You must specify a name by --name option.");
         std::exit(1);
     }
     std::string name = getProfileName(args);
     std::vector<std::unique_ptr<mcsm::JvmOption>> options = search(getSearchTarget(args), std::move(name));
     if(options.empty()){
-        std::cerr << "[mcsm] No JVM launch profile found in the given search target.\n";
+        mcsm::info("No JVM launch profile found in the given search target.");
         std::exit(1);
     }
-    std::cout << "[mcsm] Search result : \n";
+    mcsm::info("Search result : ");
     std::cout << "\n";
     int i = 1;
     for(std::unique_ptr<mcsm::JvmOption>& option : options){
@@ -75,12 +75,12 @@ std::string mcsm::JvmOptionSearchCommand::getProfileName(const std::vector<std::
             }else{
                 mcsm::replaceAll(name, "\"", "");
                 mcsm::replaceAll(name, "\'", "");
-                std::cout << "[mcsm] NOTE : \' and \" are not allowed in names; Name was modified to " << name << ".\n";
+                mcsm::warning("NOTE : \' and \" are not allowed in names; Name was modified to " + name + ".");
             }
             return name;
         }
     }
-    std::cerr << "[mcsm] Name not provided; Specify a name to continue.\n";
+    mcsm::warning("Name not provided; Specify a name with --name option to continue.");
     std::exit(1);
 }
 
