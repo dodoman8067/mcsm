@@ -198,14 +198,14 @@ inline void mcsm::JvmOptionGeneratorCommand::createProfile(const std::vector<std
     mcsm::info("JVM path : " + jvm);
     
     if(!option.getJvmArguments().empty()){
-        mcsm::info("JVM arguments : ");
+        std::cout << "[mcsm/INFO] JVM arguments : ";
         for(const std::string& args : option.getJvmArguments()){
             std::cout << args << " ";
         }
         std::cout << "\n";
     }
     if(!option.getServerArguments().empty()){
-        mcsm::info("Server arguments : ");
+        std::cout << "[mcsm/INFO] Server arguments : ";
         for(const std::string& sArgs : option.getServerArguments()){
             std::cout << sArgs << " ";
         }
