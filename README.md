@@ -23,6 +23,7 @@ This project requires the following dependencies :
 
 * [cURL](https://github.com/curl/curl)
 * [nlohmann/json](https://github.com/nlohmann/json)
+* [termcolor](https://github.com/ikalnytskyi/termcolor)
 
 Before building, you must build them(static if libcurl) and install it with CMake.
 
@@ -47,4 +48,8 @@ Currently, you can't contribute to this project because it isn't completed right
 
 This project is licensed under [MIT](LICENSE).
 
-Binary is statically linked with libcurl. You can view the LICENSE file [here](https://curl.se/docs/copyright.html).
+* [cURL](https://curl.se/docs/copyright.html)
+* [nlohmann/json](https://github.com/nlohmann/json/blob/develop/LICENSE.MIT)
+* [termcolor](https://github.com/ikalnytskyi/termcolor/LICENSE)
+
+Special thanks to the creators of these libraries.

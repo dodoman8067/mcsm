@@ -48,3 +48,4 @@ add_executable(mcsm ${SRC_FILES} ${RESOURCE_FILE})
 # Link dependencies
 target_link_libraries(mcsm PRIVATE CURL::libcurl)
 target_link_libraries(mcsm PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(mcsm PRIVATE termcolor)
