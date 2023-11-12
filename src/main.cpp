@@ -39,7 +39,7 @@ SOFTWARE.
 #include <mcsm/util/string_utils.h>
 #include <mcsm/jvm/java_detection.h>
 
-const std::string version = "0.0.1";
+const std::string version = "0.0.2.0";
 
 inline void initCommands();
 

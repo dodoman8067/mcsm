@@ -5,22 +5,24 @@
 #define PRODUCT_NAME "Mcsm"
 
 1 VERSIONINFO
-FILEVERSION 0,0,1,0
-PRODUCTVERSION 0,0,1,0
+FILEVERSION 0,0,2,0
+PRODUCTVERSION 0,0,2,0
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
         BLOCK "040904E4"
         BEGIN
             VALUE "FileDescription", STRING_FILE_DESCRIPTION
-            VALUE "FileVersion", "0,0,1,0"
-            VALUE "ProductVersion", "0.0.1.0"
+            VALUE "FileVersion", "0,0,2,0"
+            VALUE "ProductVersion", "0.0.2.0"
             VALUE "ProductName", PRODUCT_NAME
+            VALUE "CompanyName", "dodoman8067\0"
+            VALUE "LegalCopyright", "MIT license\0" 
         END
     END
     BLOCK "VarFileInfo"
     BEGIN
-        VALUE "Translation", 0x409, 1252
+        VALUE "Translation", 0, 1252
     END
 END
 
