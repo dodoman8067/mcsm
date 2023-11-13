@@ -51,8 +51,11 @@ namespace mcsm {
         void reset();
         bool exists();
         std::string getJvmPath();
+        void setJvmPath(const std::string& jvmPath);
         std::vector<std::string> getJvmArguments();
+        void setJvmArguments(const std::vector<std::string>& jvmArgs);
         std::vector<std::string> getServerArguments();
+        void setServerArguments(const std::vector<std::string>& serverArgs);
         std::string getProfileName() const;
         std::string getProfilePath() const;
         mcsm::SearchTarget getSearchTarget() const;

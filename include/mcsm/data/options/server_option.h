@@ -45,8 +45,11 @@ namespace mcsm {
         void start(std::unique_ptr<mcsm::JvmOption> option);
         bool exists();
         std::string getServerName() const;
+        void setServerName(const std::string& name);
         std::string getServerVersion() const;
+        void setServerVersion(const std::string& version);
         std::unique_ptr<mcsm::JvmOption> getDefaultOption() const;
+        void setDefaultOption(std::unique_ptr<mcsm::JvmOption> jvmOption);
         std::string getServerType() const;
     };
 }
