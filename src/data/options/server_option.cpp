@@ -118,6 +118,13 @@ bool mcsm::ServerOption::exists(){
 std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const{
     mcsm::Option option(".", "server");
     nlohmann::json profileObj = option.getValue("default_launch_profile");
+    if(profileObj == nullptr){
+        mcsm::error("No default launch profile specified in file " + option.getName());
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);       
+    }
     mcsm::SearchTarget target;
     if(profileObj["location"] == "global"){
         target = mcsm::SearchTarget::GLOBAL;
@@ -134,17 +141,60 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const{
     return jvmOption;
 }
 
+void mcsm::ServerOption::setDefaultOption(std::unique_ptr<mcsm::JvmOption> jvmOption){
+    mcsm::Option option(".", "server");
+    nlohmann::json profileObj;
+    profileObj["name"] = jvmOption->getProfileName();
+    if(jvmOption->getSearchTarget() == mcsm::SearchTarget::GLOBAL){
+        profileObj["location"] = "global";
+    }else{
+        profileObj["location"] = "current";
+    }
+    option.setValue("default_launch_profile", profileObj);
+}
+
 std::string mcsm::ServerOption::getServerName() const {
     mcsm::Option option(".", "server");
+    if(option.getValue("name") == nullptr){
+        mcsm::error("No \"name\" value specified in file " + option.getName());
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);
+    }
     return option.getValue("name");
+}
+
+void mcsm::ServerOption::setServerName(const std::string& name){
+    mcsm::Option option(".", "server");
+    option.setValue("name", name);
 }
 
 std::string mcsm::ServerOption::getServerVersion() const {
     mcsm::Option option(".", "server");
-    return option.getValue("version");  
+    if(option.getValue("version") == nullptr){
+        mcsm::error("No \"version\" value specified in file " + option.getName());
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);
+    }
+    return option.getValue("version");
+}
+
+void mcsm::ServerOption::setServerVersion(const std::string& version){
+    mcsm::Option option(".", "version");
+    option.setValue("version", version);    
 }
 
 std::string mcsm::ServerOption::getServerType() const {
     mcsm::Option option(".", "server");
+    if(option.getValue("type") == nullptr){
+        mcsm::error("No \"type\" value specified in file " + option.getName());
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);
+    }
     return option.getValue("type");
 }
