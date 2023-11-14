@@ -283,10 +283,22 @@ std::vector<std::string> mcsm::JvmOption::getServerArguments(){
             mcsm::error("Error called from : mcsm::JvmOption::getServerArguments()");
             std::exit(1);
         }
-        if(opt2->getValue("server_args") == nullptr) return empty;
+        if(opt2->getValue("server_args") == nullptr){
+            mcsm::error("No \"server_args\" value specified in file " + opt2->getName());
+            mcsm::error("Manually editing the launch profile might have caused this issue.");
+            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+            std::exit(1);
+        }
         return opt2->getValue("server_args");
     }
-    if(opt->getValue("server_args") == nullptr) return empty;
+    if(opt->getValue("server_args") == nullptr){
+        mcsm::error("No \"server_args\" value specified in file " + opt->getName());
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);
+    }
     return opt->getValue("server_args");  
 }
 
