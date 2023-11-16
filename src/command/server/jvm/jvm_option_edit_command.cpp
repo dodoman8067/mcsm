@@ -34,16 +34,17 @@ mcsm::JvmOptionEditCommand::JvmOptionEditCommand(const std::string& name, const 
 mcsm::JvmOptionEditCommand::~JvmOptionEditCommand() {}
 
 void mcsm::JvmOptionEditCommand::execute(const std::vector<std::string>& args){
-
+    editProfile(std::move(args));
 }
 
 
-mcsm::SearchTarget mcsm::JvmOptionEditCommand::getSaveTarget(const std::vector<std::string>& args){
+mcsm::SearchTarget mcsm::JvmOptionEditCommand::getSearchTarget(const std::vector<std::string>& args){
     if(args.empty()) return mcsm::SearchTarget::ALL;
     for(const std::string& arg : args) {
         if(arg == "--global" || arg == "-global" || arg == "--g" || arg == "-g") return mcsm::SearchTarget::GLOBAL;
+        if(arg == "--current" || arg == "-current" || arg == "--c" || arg == "-c") return mcsm::SearchTarget::CURRENT;
     }
-    return mcsm::SearchTarget::CURRENT;
+    return mcsm::SearchTarget::ALL;
 }
 
 std::string mcsm::JvmOptionEditCommand::getJvmPath(const std::vector<std::string>& args) const {
@@ -66,9 +67,7 @@ std::string mcsm::JvmOptionEditCommand::getJvmPath(const std::vector<std::string
             }
         }
     }
-    mcsm::warning("Java detection from -jp command arguments failed.");
-    mcsm::warning("Please specify a valid JVM path.");
-    std::exit(1);
+    mcsm::info("JVM not detected or not a valid JVM. Ignoring..");
 }
 
 std::string mcsm::JvmOptionEditCommand::getProfileName(const std::vector<std::string>& args, const mcsm::SearchTarget& target) const {
@@ -145,4 +144,57 @@ std::vector<std::string> mcsm::JvmOptionEditCommand::getJvmArguments(const std::
     }
 
     return result;
+}
+
+
+inline void mcsm::JvmOptionEditCommand::editProfile(const std::vector<std::string>& args){
+    mcsm::SearchTarget target = getSearchTarget(args);
+    mcsm::JvmOption option(getProfileName(args, target), target);
+    if(!option.exists()){
+        mcsm::error("Profile does not exist; Task aborted.");
+        std::exit(1);
+    }
+    std::vector<std::string> jvmArgs = getJvmArguments(args);
+    std::vector<std::string> sArgs = getServerArguments(args);
+    std::vector<std::string> optJvmArgs = option.getJvmArguments();
+    std::vector<std::string> optServerArgs = option.getServerArguments();
+    std::string jvm = getJvmPath(args);
+    
+    mcsm::info("Java Virtual Machine launch profile edited : ");
+    
+    mcsm::info("Profile name : " + option.getProfileName());
+    
+    if(option.getJvmPath() != jvm){
+        mcsm::info("JVM path : " + option.getJvmPath() + " -> " + jvm);
+        option.setJvmPath(jvm);
+    }
+
+    if(!mcsm::compare(optJvmArgs, jvmArgs)){
+        if(!option.getJvmArguments().empty()){
+            std::cout << "[mcsm/INFO] JVM arguments : ";
+            std::cout << "[mcsm/INFO] From : ";
+            for(const std::string& args : optJvmArgs){
+                std::cout << args << " ";
+            }
+            std::cout << "\n[mcsm/INFO] To : ";
+            for(const std::string& arg : jvmArgs){
+                std::cout << arg << " ";
+            }
+            option.setJvmArguments(jvmArgs);
+        }
+    }
+    if(!mcsm::compare(optServerArgs, sArgs)){
+        if(!option.getServerArguments().empty()){
+            std::cout << "[mcsm/INFO] Server arguments : ";
+            std::cout << "[mcsm/INFO] From : ";
+            for(const std::string& args : optServerArgs){
+                std::cout << args << " ";
+            }
+            std::cout << "\n[mcsm/INFO] To : ";
+            for(const std::string& arg : sArgs){
+                std::cout << arg << " ";
+            }
+            option.setServerArguments(sArgs);
+        }
+    }
 }
