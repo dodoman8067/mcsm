@@ -111,6 +111,7 @@ inline void initCommands(){
     std::unique_ptr<mcsm::JvmOptionEditCommand> jvmOptionEditCommand = std::make_unique<mcsm::JvmOptionEditCommand>("editJvmProfile", "Edits the specified Java Virtual Machine launch profile.");
     jvmOptionEditCommand->addAliases("editJavaVirtualMachineProfile");
     jvmOptionEditCommand->addAliases("editprofile");
+    jvmOptionEditCommand->addAliases("editProfile");
     jvmOptionEditCommand->addAliases("editjvmprofile");
     mcsm::CommandManager::addCommand(std::move(jvmOptionEditCommand));
 
