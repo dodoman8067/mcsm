@@ -167,7 +167,6 @@ std::vector<std::string> mcsm::JvmOption::getJvmArguments(){
 }
 
 void mcsm::JvmOption::setJvmArguments(const std::vector<std::string>& jvmArgs){
-    std::cout << "1\n";
     if(!exists()){
         mcsm::error("This jvm option does not exist.");
         mcsm::error("Please edit the launch profile after creating.");
@@ -208,7 +207,6 @@ std::string mcsm::JvmOption::getJvmPath(){
 }
 
 void mcsm::JvmOption::setJvmPath(const std::string& jvmPath){
-    std::cout << "1\n";
     if(!exists()){
         mcsm::error("This jvm option does not exist.");
         mcsm::error("Please edit the launch profile after creating.");
