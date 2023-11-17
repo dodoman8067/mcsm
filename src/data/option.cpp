@@ -106,15 +106,13 @@ bool mcsm::Option::exists() const {
     return std::filesystem::exists(fullPath);
 }
 
+bool mcsm::Option::isGlobal() const {
+    return false;
+}
+
 void mcsm::Option::setValue(const std::string& key, const nlohmann::json& value) const {
     std::string fullPath = this->path + "/" + this->name;
     nlohmann::json jsonData = load();
-
-    std::ofstream fileStream(fullPath);
-    if (!fileStream.is_open()) {
-        mcsm::error("Cannot open file " + fullPath);
-        std::exit(1);
-    }
 
     jsonData[key] = value;
     save(jsonData);

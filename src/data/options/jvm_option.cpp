@@ -126,22 +126,13 @@ void mcsm::JvmOption::create(const std::string& jvmPath, const std::vector<std::
 }
 
 void mcsm::JvmOption::reset(){
-    mcsm::GlobalOption* opt = dynamic_cast<mcsm::GlobalOption*>(this->option.get());
-    if(!opt){
-        mcsm::Option* opt2 = dynamic_cast<mcsm::Option*>(this->option.get());
-        if(!opt2){
-            mcsm::error("Both dynamic_cast calls from mcsm::Configurable to mcsm::GlobalOption and mcsm::Option have failed.");
-            mcsm::error("Normally, one of these casts should be successful as both classes extend mcsm::Configurable.");
-            mcsm::error("If you see this error, this might be a operating system issue or software's issue.");
-            mcsm::error("If you believe that this is a software issue, try downloading a new copy of program in GitHub. If that isn't solving the issue, please report to GitHub. (https://github.com/dodoman8067/mcsm)");
-            mcsm::error("Or if you believe that this is operating system's issue, try updating the operating system. If it's not working, try reinstalling the operating system.");
-            std::cerr << "\n";
-            mcsm::error("Error called from : mcsm::JvmOption::reset()");
-            std::exit(1);
-        }
+    if(this->option->isGlobal()){
+        mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
+        opt->reset();
+    }else{
+        mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
         opt2->reset();
     }
-    opt->reset();
 }
 
 bool mcsm::JvmOption::exists(){
@@ -152,20 +143,18 @@ bool mcsm::JvmOption::exists(){
 std::vector<std::string> mcsm::JvmOption::getJvmArguments(){
     std::vector<std::string> empty;
     if(!exists()) return empty;
-    mcsm::GlobalOption* opt = dynamic_cast<mcsm::GlobalOption*>(this->option.get());
-    if(!opt){
-        mcsm::Option* opt2 = dynamic_cast<mcsm::Option*>(this->option.get());
-        if(!opt2){
-            mcsm::error("Both dynamic_cast calls from mcsm::Configurable to mcsm::GlobalOption and mcsm::Option have failed.");
-            mcsm::error("Normally, one of these casts should be successful as both classes extend mcsm::Configurable.");
-            mcsm::error("If you see this error, this might be a operating system issue or software's issue.");
-            mcsm::error("If you believe that this is a software issue, try downloading a new copy of program in GitHub. If that isn't solving the issue, please report to GitHub. (https://github.com/dodoman8067/mcsm)");
-            mcsm::error("Or if you believe that this is operating system's issue, try updating the operating system. If it's not working, try reinstalling the operating system.");
-            std::cerr << "\n";
-            mcsm::error("Error called from : mcsm::JvmOption::getJvmArguments()");
+    if(this->option->isGlobal()){
+        mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
+        if(opt->getValue("args") == nullptr){
+            mcsm::error("No \"args\" value specified in file " + opt->getName());
+            mcsm::error("Manually editing the launch profile might have caused this issue.");
+            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
             std::exit(1);
         }
-        // I debugged here for more then 2 hours because returning "path" instead of "args"
+        return opt->getValue("args");
+    }else{
+        mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
         if(opt2->getValue("args") == nullptr){
             mcsm::error("No \"args\" value specified in file " + opt2->getName());
             mcsm::error("Manually editing the launch profile might have caused this issue.");
@@ -175,55 +164,38 @@ std::vector<std::string> mcsm::JvmOption::getJvmArguments(){
         }
         return opt2->getValue("args");
     }
-    if(opt->getValue("args") == nullptr){
-        mcsm::error("No \"args\" value specified in file " + opt->getName());
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
-    }
-    return opt->getValue("args");
 }
 
 void mcsm::JvmOption::setJvmArguments(const std::vector<std::string>& jvmArgs){
+    std::cout << "1\n";
     if(!exists()){
         mcsm::error("This jvm option does not exist.");
         mcsm::error("Please edit the launch profile after creating.");
         std::exit(1);
     }
-    mcsm::GlobalOption* opt = dynamic_cast<mcsm::GlobalOption*>(this->option.get());
-    if(!opt){
-        mcsm::Option* opt2 = dynamic_cast<mcsm::Option*>(this->option.get());
-        if(!opt2){
-            mcsm::error("Both dynamic_cast calls from mcsm::Configurable to mcsm::GlobalOption and mcsm::Option have failed.");
-            mcsm::error("Normally, one of these casts should be successful as both classes extend mcsm::Configurable.");
-            mcsm::error("If you see this error, this might be a operating system issue or software's issue.");
-            mcsm::error("If you believe that this is a software issue, try downloading a new copy of program in GitHub. If that isn't solving the issue, please report to GitHub. (https://github.com/dodoman8067/mcsm)");
-            mcsm::error("Or if you believe that this is operating system's issue, try updating the operating system. If it's not working, try reinstalling the operating system.");
-            std::cerr << "\n";
-            mcsm::error("Error called from : mcsm::JvmOption::setJvmArguments()");
-            std::exit(1);
-        }
+    if(this->option->isGlobal()){
+        mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
+        opt->setValue("args", jvmArgs);
+    }else{
+        mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
         opt2->setValue("args", jvmArgs);
     }
-    opt->setValue("args", jvmArgs);    
 }
 
 std::string mcsm::JvmOption::getJvmPath(){
     if(!exists()) return std::move("");
-    mcsm::GlobalOption* opt = dynamic_cast<mcsm::GlobalOption*>(this->option.get());
-    if(!opt){
-        mcsm::Option* opt2 = dynamic_cast<mcsm::Option*>(this->option.get());
-        if(!opt2){
-            mcsm::error("Both dynamic_cast calls from mcsm::Configurable to mcsm::GlobalOption and mcsm::Option have failed.");
-            mcsm::error("Normally, one of these casts should be successful as both classes extend mcsm::Configurable.");
-            mcsm::error("If you see this error, this might be a operating system issue or software's issue.");
-            mcsm::error("If you believe that this is a software issue, try downloading a new copy of program in GitHub. If that isn't solving the issue, please report to GitHub. (https://github.com/dodoman8067/mcsm)");
-            mcsm::error("Or if you believe that this is operating system's issue, try updating the operating system. If it's not working, try reinstalling the operating system.");
-            std::cerr << "\n";
-            mcsm::error("Error called from : mcsm::JvmOption::getJvmPath()");
+    if(this->option->isGlobal()){
+        mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
+        if(opt->getValue("path") == nullptr){
+            mcsm::error("No \"path\" value specified in file " + opt->getName());
+            mcsm::error("Manually editing the launch profile might have caused this issue.");
+            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
             std::exit(1);
         }
+        return opt->getValue("path");
+    }else{
+        mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
         if(opt2->getValue("path") == nullptr){
             mcsm::error("No \"path\" value specified in file " + opt2->getName());
             mcsm::error("Manually editing the launch profile might have caused this issue.");
@@ -233,56 +205,39 @@ std::string mcsm::JvmOption::getJvmPath(){
         }
         return opt2->getValue("path");
     }
-    if(opt->getValue("path") == nullptr){
-        mcsm::error("No \"path\" value specified in file " + opt->getName());
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
-    }
-    return opt->getValue("path");
 }
 
 void mcsm::JvmOption::setJvmPath(const std::string& jvmPath){
+    std::cout << "1\n";
     if(!exists()){
         mcsm::error("This jvm option does not exist.");
         mcsm::error("Please edit the launch profile after creating.");
         std::exit(1);
     }
-    mcsm::GlobalOption* opt = dynamic_cast<mcsm::GlobalOption*>(this->option.get());
-    if(!opt){
-        mcsm::Option* opt2 = dynamic_cast<mcsm::Option*>(this->option.get());
-        if(!opt2){
-            mcsm::error("Both dynamic_cast calls from mcsm::Configurable to mcsm::GlobalOption and mcsm::Option have failed.");
-            mcsm::error("Normally, one of these casts should be successful as both classes extend mcsm::Configurable.");
-            mcsm::error("If you see this error, this might be a operating system issue or software's issue.");
-            mcsm::error("If you believe that this is a software issue, try downloading a new copy of program in GitHub. If that isn't solving the issue, please report to GitHub. (https://github.com/dodoman8067/mcsm)");
-            mcsm::error("Or if you believe that this is operating system's issue, try updating the operating system. If it's not working, try reinstalling the operating system.");
-            std::cerr << "\n";
-            mcsm::error("Error called from : mcsm::JvmOption::setJvmPath()");
-            std::exit(1);
-        }
+    if(this->option->isGlobal()){
+        mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
+        opt->setValue("path", jvmPath);
+    }else{
+        mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
         opt2->setValue("path", jvmPath);
     }
-    opt->setValue("path", jvmPath);
 }
 
 std::vector<std::string> mcsm::JvmOption::getServerArguments(){
     std::vector<std::string> empty;
     if(!exists()) return empty;
-    mcsm::GlobalOption* opt = dynamic_cast<mcsm::GlobalOption*>(this->option.get());
-    if(!opt){
-        mcsm::Option* opt2 = dynamic_cast<mcsm::Option*>(this->option.get());
-        if(!opt2){
-            mcsm::error("Both dynamic_cast calls from mcsm::Configurable to mcsm::GlobalOption and mcsm::Option have failed.");
-            mcsm::error("Normally, one of these casts should be successful as both classes extend mcsm::Configurable.");
-            mcsm::error("If you see this error, this might be a operating system issue or software's issue.");
-            mcsm::error("If you believe that this is a software issue, try downloading a new copy of program in GitHub. If that isn't solving the issue, please report to GitHub. (https://github.com/dodoman8067/mcsm)");
-            mcsm::error("Or if you believe that this is operating system's issue, try updating the operating system. If it's not working, try reinstalling the operating system.");
-            std::cerr << "\n";
-            mcsm::error("Error called from : mcsm::JvmOption::getServerArguments()");
+    if(this->option->isGlobal()){
+        mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
+        if(opt->getValue("server_args") == nullptr){
+            mcsm::error("No \"server_args\" value specified in file " + opt->getName());
+            mcsm::error("Manually editing the launch profile might have caused this issue.");
+            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
             std::exit(1);
         }
+        return opt->getValue("server_args");
+    }else{
+        mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
         if(opt2->getValue("server_args") == nullptr){
             mcsm::error("No \"server_args\" value specified in file " + opt2->getName());
             mcsm::error("Manually editing the launch profile might have caused this issue.");
@@ -292,14 +247,6 @@ std::vector<std::string> mcsm::JvmOption::getServerArguments(){
         }
         return opt2->getValue("server_args");
     }
-    if(opt->getValue("server_args") == nullptr){
-        mcsm::error("No \"server_args\" value specified in file " + opt->getName());
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
-    }
-    return opt->getValue("server_args");  
 }
 
 void mcsm::JvmOption::setServerArguments(const std::vector<std::string>& serverArgs){
@@ -308,22 +255,13 @@ void mcsm::JvmOption::setServerArguments(const std::vector<std::string>& serverA
         mcsm::error("Please edit the launch profile after creating.");
         std::exit(1);
     }
-    mcsm::GlobalOption* opt = dynamic_cast<mcsm::GlobalOption*>(this->option.get());
-    if(!opt){
-        mcsm::Option* opt2 = dynamic_cast<mcsm::Option*>(this->option.get());
-        if(!opt2){
-            mcsm::error("Both dynamic_cast calls from mcsm::Configurable to mcsm::GlobalOption and mcsm::Option have failed.");
-            mcsm::error("Normally, one of these casts should be successful as both classes extend mcsm::Configurable.");
-            mcsm::error("If you see this error, this might be a operating system issue or software's issue.");
-            mcsm::error("If you believe that this is a software issue, try downloading a new copy of program in GitHub. If that isn't solving the issue, please report to GitHub. (https://github.com/dodoman8067/mcsm)");
-            mcsm::error("Or if you believe that this is operating system's issue, try updating the operating system. If it's not working, try reinstalling the operating system.");
-            std::cerr << "\n";
-            mcsm::error("Error called from : mcsm::JvmOption::setServerArguments()");
-            std::exit(1);
-        }
+    if(this->option->isGlobal()){
+        mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
+        opt->setValue("server_args", serverArgs);
+    }else{
+        mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
         opt2->setValue("server_args", serverArgs);
     }
-    opt->setValue("server_args", serverArgs);
 }
 
 std::string mcsm::JvmOption::getProfileName() const {
@@ -331,41 +269,21 @@ std::string mcsm::JvmOption::getProfileName() const {
 }
 
 std::string mcsm::JvmOption::getProfilePath() const {
-    mcsm::GlobalOption* opt = dynamic_cast<mcsm::GlobalOption*>(this->option.get());
-    if(!opt){
-        mcsm::Option* opt2 = dynamic_cast<mcsm::Option*>(this->option.get());
-        if(!opt2){
-            mcsm::error("Both dynamic_cast calls from mcsm::Configurable to mcsm::GlobalOption and mcsm::Option have failed.");
-            mcsm::error("Normally, one of these casts should be successful as both classes extend mcsm::Configurable.");
-            mcsm::error("If you see this error, this might be a operating system issue or software's issue.");
-            mcsm::error("If you believe that this is a software issue, try downloading a new copy of program in GitHub. If that isn't solving the issue, please report to GitHub. (https://github.com/dodoman8067/mcsm)");
-            mcsm::error("Or if you believe that this is operating system's issue, try updating the operating system. If it's not working, try reinstalling the operating system.");
-            std::cerr << "\n";
-            mcsm::error("Error called from : mcsm::JvmOption::getProfilePath()");
-            std::exit(1);
-        }
+    if(this->option->isGlobal()){
+        mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
+        return opt->getPath();
+    }else{
+        mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
         return opt2->getPath();
     }
-    return opt->getPath();  
 }
 
 mcsm::SearchTarget mcsm::JvmOption::getSearchTarget() const {
-    mcsm::GlobalOption* opt = dynamic_cast<mcsm::GlobalOption*>(this->option.get());
-    if(!opt){
-        mcsm::Option* opt2 = dynamic_cast<mcsm::Option*>(this->option.get());
-        if(!opt2){
-            mcsm::error("Both dynamic_cast calls from mcsm::Configurable to mcsm::GlobalOption and mcsm::Option have failed.");
-            mcsm::error("Normally, one of these casts should be successful as both classes extend mcsm::Configurable.");
-            mcsm::error("If you see this error, this might be a operating system issue or software's issue.");
-            mcsm::error("If you believe that this is a software issue, try downloading a new copy of program in GitHub. If that isn't solving the issue, please report to GitHub. (https://github.com/dodoman8067/mcsm)");
-            mcsm::error("Or if you believe that this is operating system's issue, try updating the operating system. If it's not working, try reinstalling the operating system.");
-            std::cerr << "\n";
-            mcsm::error("Error called from : mcsm::JvmOption::reset()");
-            std::exit(1);
-        }
+    if(this->option->isGlobal()){
+        return mcsm::SearchTarget::GLOBAL;
+    }else{
         return mcsm::SearchTarget::CURRENT;
     }
-    return mcsm::SearchTarget::GLOBAL;
 }
 
 mcsm::JvmOption::~JvmOption(){

@@ -68,6 +68,7 @@ std::string mcsm::JvmOptionEditCommand::getJvmPath(const std::vector<std::string
         }
     }
     mcsm::info("JVM not detected or not a valid JVM. Ignoring..");
+    return "";
 }
 
 std::string mcsm::JvmOptionEditCommand::getProfileName(const std::vector<std::string>& args, const mcsm::SearchTarget& target) const {
@@ -147,54 +148,56 @@ std::vector<std::string> mcsm::JvmOptionEditCommand::getJvmArguments(const std::
 }
 
 
-inline void mcsm::JvmOptionEditCommand::editProfile(const std::vector<std::string>& args){
+inline void mcsm::JvmOptionEditCommand::editProfile(const std::vector<std::string>& args) {
     mcsm::SearchTarget target = getSearchTarget(args);
     mcsm::JvmOption option(getProfileName(args, target), target);
+
     if(!option.exists()){
         mcsm::error("Profile does not exist; Task aborted.");
         std::exit(1);
     }
+
     std::vector<std::string> jvmArgs = getJvmArguments(args);
     std::vector<std::string> sArgs = getServerArguments(args);
+
     std::vector<std::string> optJvmArgs = option.getJvmArguments();
     std::vector<std::string> optServerArgs = option.getServerArguments();
     std::string jvm = getJvmPath(args);
-    
+
     mcsm::info("Java Virtual Machine launch profile edited : ");
-    
     mcsm::info("Profile name : " + option.getProfileName());
-    
-    if(option.getJvmPath() != jvm){
+
+    if (option.getJvmPath() != jvm && !mcsm::isWhitespaceOrEmpty(jvm)) {
         mcsm::info("JVM path : " + option.getJvmPath() + " -> " + jvm);
         option.setJvmPath(jvm);
     }
 
-    if(!mcsm::compare(optJvmArgs, jvmArgs)){
-        if(!option.getJvmArguments().empty()){
-            std::cout << "[mcsm/INFO] JVM arguments : ";
-            std::cout << "[mcsm/INFO] From : ";
-            for(const std::string& args : optJvmArgs){
-                std::cout << args << " ";
-            }
-            std::cout << "\n[mcsm/INFO] To : ";
-            for(const std::string& arg : jvmArgs){
-                std::cout << arg << " ";
-            }
-            option.setJvmArguments(jvmArgs);
-        }
+    printDifference("JVM arguments", optJvmArgs, jvmArgs);
+    if(!jvmArgs.empty() && optJvmArgs != jvmArgs){
+        option.setJvmArguments(jvmArgs);
     }
-    if(!mcsm::compare(optServerArgs, sArgs)){
-        if(!option.getServerArguments().empty()){
-            std::cout << "[mcsm/INFO] Server arguments : ";
+    printDifference("Server arguments", optServerArgs, sArgs);
+    if(!sArgs.empty()){
+        option.setServerArguments(sArgs);
+    }
+}
+
+inline void mcsm::JvmOptionEditCommand::printDifference(const std::string& category, const std::vector<std::string>& from, const std::vector<std::string>& to) const {
+    if(from != to){
+        std::cout << "[mcsm/INFO] " << category << " : \n";
+        if(!from.empty()){
             std::cout << "[mcsm/INFO] From : ";
-            for(const std::string& args : optServerArgs){
-                std::cout << args << " ";
-            }
-            std::cout << "\n[mcsm/INFO] To : ";
-            for(const std::string& arg : sArgs){
+            for (const std::string& arg : from) {
                 std::cout << arg << " ";
             }
-            option.setServerArguments(sArgs);
         }
+
+        if(!to.empty()){
+            std::cout << "\n[mcsm/INFO] To : ";
+            for(const std::string& arg : to){
+                std::cout << arg << " ";
+            }
+        }
+        std::cout << "\n";
     }
 }

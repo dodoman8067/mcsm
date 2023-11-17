@@ -26,7 +26,8 @@ SOFTWARE.
 namespace mcsm {
     class Configurable {
     public:
-        virtual bool exists() const = 0; 
+        virtual bool exists() const = 0;
+        virtual bool isGlobal() const = 0;
     };
 }
 
