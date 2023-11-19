@@ -47,7 +47,11 @@ if(LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
 endif()
 
 # Add executable
-add_executable(mcsm ${SRC_FILES} ${RESOURCE_FILE})
+if(LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
+    add_executable(mcsm ${SRC_FILES} ${RESOURCE_FILE} backward/backward.cpp)
+else()
+    add_executable(mcsm ${SRC_FILES} ${RESOURCE_FILE})
+endif()
 
 # Link dependencies
 target_link_libraries(mcsm PRIVATE CURL::libcurl)

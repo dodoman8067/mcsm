@@ -38,6 +38,7 @@
 build/
 bin/
 lib/
+backward/
 
 # Visual Studio files
 .vscode/
