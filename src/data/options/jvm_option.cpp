@@ -69,7 +69,7 @@ void mcsm::JvmOption::create(){
         mcsm::error("Or if you believe this is a software issue, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
         std::exit(1);
     }
-    create(std::move(jvm), std::move(jvmArgs), std::move(serverArgs), mcsm::SearchTarget::GLOBAL);
+    create(jvm, jvmArgs, serverArgs, mcsm::SearchTarget::GLOBAL);
 }
 
 void mcsm::JvmOption::create(const std::string& jvmPath, const mcsm::SearchTarget& target){
@@ -81,14 +81,14 @@ void mcsm::JvmOption::create(const std::string& jvmPath, const mcsm::SearchTarge
     std::vector<std::string> serverArgs = {
         "nogui"
     };
-    create(std::move(jvmPath), std::move(jvmArgs), std::move(serverArgs), std::move(target));
+    create(jvmPath, jvmArgs, serverArgs, target);
 }
 
 void mcsm::JvmOption::create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions, const mcsm::SearchTarget& target){
     std::vector<std::string> serverArgs = {
         "nogui"
     };
-    create(std::move(jvmPath), std::move(jvmOptions), std::move(serverArgs), std::move(target));
+    create(jvmPath, jvmOptions, serverArgs, target);
 }
 
 void mcsm::JvmOption::create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions, const std::vector<std::string>& serverOptions, const mcsm::SearchTarget& target){
@@ -182,7 +182,7 @@ void mcsm::JvmOption::setJvmArguments(const std::vector<std::string>& jvmArgs){
 }
 
 std::string mcsm::JvmOption::getJvmPath(){
-    if(!exists()) return std::move("");
+    if(!exists()) return "";
     if(this->option->isGlobal()){
         mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
         if(opt->getValue("path") == nullptr){
