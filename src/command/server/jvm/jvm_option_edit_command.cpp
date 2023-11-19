@@ -172,13 +172,13 @@ inline void mcsm::JvmOptionEditCommand::editProfile(const std::vector<std::strin
         option.setJvmPath(jvm);
     }
 
-    printDifference("JVM arguments", optJvmArgs, jvmArgs);
     if(!jvmArgs.empty() && optJvmArgs != jvmArgs){
         option.setJvmArguments(jvmArgs);
+        printDifference("JVM arguments", optJvmArgs, jvmArgs);
     }
-    printDifference("Server arguments", optServerArgs, sArgs);
     if(!sArgs.empty()){
         option.setServerArguments(sArgs);
+        printDifference("Server arguments", optServerArgs, sArgs);
     }
 }
 
