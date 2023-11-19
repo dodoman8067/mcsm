@@ -44,6 +44,21 @@ void mcsm::JvmOptionSearchCommand::execute(const std::vector<std::string>& args)
         std::cout << "Result " << i << " : "<< "\n";
         std::cout << "Name : " << option->getProfileName() << "\n";
         std::cout << "Path : " << option->getProfilePath() << "\n";
+        std::cout << "JVM : " << option->getJvmPath() << "\n";
+        if(!option->getJvmArguments().empty()){
+            std::cout << "JVM arguments : ";
+            for(const std::string& args : option->getJvmArguments()){
+                std::cout << args << " ";
+            }
+            std::cout << "\n";
+        }
+        if(!option->getServerArguments().empty()){
+            std::cout << "Server arguments : ";
+            for(const std::string& sArgs : option->getServerArguments()){
+                std::cout << sArgs << " ";
+            }
+            std::cout << "\n";
+        }
         std::cout << "\n";
         i++;
     }
