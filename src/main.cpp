@@ -49,8 +49,6 @@ int main(int argc, char *argv[]) {
     //TODO : Add purpur support, default op in server config, spiget.org
 
     bool commandFound = false;
-    mcsm::JvmOption* opt = nullptr;
-    opt->exists();
 
     initCommands();
 
