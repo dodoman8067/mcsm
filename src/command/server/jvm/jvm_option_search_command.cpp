@@ -28,8 +28,7 @@ mcsm::JvmOptionSearchCommand::~JvmOptionSearchCommand() {}
 
 void mcsm::JvmOptionSearchCommand::execute(const std::vector<std::string>& args){
     if(args.empty()){
-        mcsm::warning("Invalid arguments.");
-        mcsm::warning("You must specify a name by --name option.");
+        mcsm::warning("Name not provided; Specify a name with --name option to continue.");
         std::exit(1);
     }
     std::string name = getProfileName(args);

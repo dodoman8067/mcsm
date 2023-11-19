@@ -57,8 +57,7 @@ mcsm::JvmOptionGeneratorCommand::~JvmOptionGeneratorCommand() {}
 
 void mcsm::JvmOptionGeneratorCommand::execute(const std::vector<std::string>& args) {
     if(args.empty()){
-        mcsm::warning("Invalid arguments.");
-        mcsm::warning("You must specify a name by --name option.");
+        mcsm::warning("Name not provided; Specify a name with --name option to continue.");
         std::exit(1);
     }
     if(getSaveTarget(args) == mcsm::SearchTarget::GLOBAL){

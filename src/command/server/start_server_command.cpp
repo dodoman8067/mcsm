@@ -43,8 +43,8 @@ mcsm::StartServerCommand::~StartServerCommand() {}
 
 void mcsm::StartServerCommand::execute(const std::vector<std::string>& args){
     if(!isConfigured()){
-        mcsm::error("Server not configured.");
-        mcsm::error("Task aborted.");
+        mcsm::warning("Server not configured.");
+        mcsm::warning("Task aborted.");
         std::exit(1);
     }
     std::unique_ptr<mcsm::JvmOption> jvmOpt = searchOption(args);
