@@ -24,7 +24,7 @@ SOFTWARE.
 #define __MCSM_PAPER_SERVER_H__
 
 #include <mcsm/server/type/base/bukkit_server.h>
-#include <mcsm/server/type/bukkit/downloadable.h>
+#include <mcsm/server/type/downloadable.h>
 #include <mcsm/http/get.h>
 #include <mcsm/http/download.h>
 #include <mcsm/data/options/server_option.h>

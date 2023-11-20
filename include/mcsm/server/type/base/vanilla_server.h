@@ -24,7 +24,7 @@ SOFTWARE.
 #define __MCSM_VANILLA_SERVER_H__
 
 #include <mcsm/server/server.h>
-#include <mcsm/server/type/bukkit/downloadable.h>
+#include <mcsm/server/type/downloadable.h>
 #include <mcsm/data/global_option.h>
 #include <map>
 

@@ -27,7 +27,7 @@ SOFTWARE.
 #include <mcsm/data/option.h>
 #include <mcsm/server/server.h>
 #include <mcsm/server/type/bukkit/paper_server.h>
-#include <mcsm/server/type/bukkit/downloadable.h>
+#include <mcsm/server/type/downloadable.h>
 #include <memory>
 
 namespace mcsm {
