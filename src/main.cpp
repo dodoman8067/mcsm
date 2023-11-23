@@ -39,6 +39,7 @@ SOFTWARE.
 #include <mcsm/server/type/bukkit/paper_server.h>
 #include <mcsm/util/string_utils.h>
 #include <mcsm/jvm/java_detection.h>
+#include <mcsm/command/server/view_server_command.h>
 
 const std::string version = "0.0.2.0";
 
@@ -115,8 +116,13 @@ inline void initCommands(){
     jvmOptionEditCommand->addAliases("editjvmprofile");
     mcsm::CommandManager::addCommand(std::move(jvmOptionEditCommand));
 
-    std::unique_ptr<mcsm::StartServerCommand> startServerCommand = std::make_unique<mcsm::StartServerCommand>("start", "Starts a server");
+    std::unique_ptr<mcsm::StartServerCommand> startServerCommand = std::make_unique<mcsm::StartServerCommand>("start", "Starts a server.");
     startServerCommand->addAliases("startServer");
     startServerCommand->addAliases("startserver");
     mcsm::CommandManager::addCommand(std::move(startServerCommand));
+
+    std::unique_ptr<mcsm::ViewServerCommand> viewServerCommmand = std::make_unique<mcsm::ViewServerCommand>("view", "Prints configured server's basic information.");
+    viewServerCommmand->addAliases("viewServer");
+    viewServerCommmand->addAliases("viewserver");
+    mcsm::CommandManager::addCommand(std::move(viewServerCommmand));
 }

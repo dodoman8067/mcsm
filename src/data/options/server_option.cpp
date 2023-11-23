@@ -117,6 +117,10 @@ bool mcsm::ServerOption::exists(){
 
 std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const{
     mcsm::Option option(".", "server");
+    if(!option.exists()){
+        mcsm::error("Option does not exist; Task aborted.");
+        std::exit(1);
+    }
     nlohmann::json profileObj = option.getValue("default_launch_profile");
     if(profileObj == nullptr){
         mcsm::error("No default launch profile specified in file " + option.getName());
@@ -155,6 +159,10 @@ void mcsm::ServerOption::setDefaultOption(std::unique_ptr<mcsm::JvmOption> jvmOp
 
 std::string mcsm::ServerOption::getServerName() const {
     mcsm::Option option(".", "server");
+    if(!option.exists()){
+        mcsm::error("Option does not exist; Task aborted.");
+        std::exit(1);
+    }
     if(option.getValue("name") == nullptr){
         mcsm::error("No \"name\" value specified in file " + option.getName());
         mcsm::error("Manually editing the launch profile might have caused this issue.");
@@ -172,6 +180,10 @@ void mcsm::ServerOption::setServerName(const std::string& name){
 
 std::string mcsm::ServerOption::getServerVersion() const {
     mcsm::Option option(".", "server");
+    if(!option.exists()){
+        mcsm::error("Option does not exist; Task aborted.");
+        std::exit(1);
+    }
     if(option.getValue("version") == nullptr){
         mcsm::error("No \"version\" value specified in file " + option.getName());
         mcsm::error("Manually editing the launch profile might have caused this issue.");
@@ -189,6 +201,10 @@ void mcsm::ServerOption::setServerVersion(const std::string& version){
 
 std::string mcsm::ServerOption::getServerType() const {
     mcsm::Option option(".", "server");
+    if(!option.exists()){
+        mcsm::error("Option does not exist; Task aborted.");
+        std::exit(1);
+    }
     if(option.getValue("type") == nullptr){
         mcsm::error("No \"type\" value specified in file " + option.getName());
         mcsm::error("Manually editing the launch profile might have caused this issue.");
