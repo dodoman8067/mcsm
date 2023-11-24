@@ -52,15 +52,19 @@ std::vector<std::string> mcsm::PaperServer::getAvailableVersions(){
 }
 
 std::string mcsm::PaperServer::getJarFile(){
+    mcsm::Option opt(".", "server");
+    if(opt.exists() && opt.getValue("server_jar") != nullptr){
+        return opt.getValue("server_jar");
+    }
     return "paper.jar";
 }
 
 void mcsm::PaperServer::download(const std::string& version){
-    download(version, std::filesystem::current_path().string(), "paper.jar");
+    download(version, std::filesystem::current_path().string(), getJarFile());
 }
 
 void mcsm::PaperServer::download(const std::string& version, const std::string& path){
-    download(version, path, "paper.jar");
+    download(version, path, getJarFile());
 }
 
 void mcsm::PaperServer::download(const std::string& version, const std::string& path, const std::string& name){
@@ -77,8 +81,8 @@ void mcsm::PaperServer::download(const std::string& version, const std::string& 
 
 void mcsm::PaperServer::start(mcsm::JvmOption& option){
     mcsm::ServerOption sOpt;
-    if(!std::filesystem::exists("paper.jar")){
-        mcsm::info("Downloading paper.jar...");
+    if(!std::filesystem::exists(getJarFile())){
+        mcsm::info("Downloading " + getJarFile() + "...");
         download(sOpt.getServerVersion());
     }
     Server::start(option);
