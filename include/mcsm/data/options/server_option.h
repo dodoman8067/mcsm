@@ -51,6 +51,8 @@ namespace mcsm {
         std::unique_ptr<mcsm::JvmOption> getDefaultOption() const;
         void setDefaultOption(std::unique_ptr<mcsm::JvmOption> jvmOption);
         std::string getServerType() const;
+        std::string getServerJarFile() const;
+        void setServerJarFile(const std::string& name);
     };
 }
 

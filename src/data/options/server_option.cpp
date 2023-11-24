@@ -195,7 +195,7 @@ std::string mcsm::ServerOption::getServerVersion() const {
 }
 
 void mcsm::ServerOption::setServerVersion(const std::string& version){
-    mcsm::Option option(".", "version");
+    mcsm::Option option(".", "server");
     option.setValue("version", version);    
 }
 
@@ -213,4 +213,25 @@ std::string mcsm::ServerOption::getServerType() const {
         std::exit(1);
     }
     return option.getValue("type");
+}
+
+std::string mcsm::ServerOption::getServerJarFile() const{
+    mcsm::Option option(".", "server");
+    if(!option.exists()){
+        mcsm::error("Option does not exist; Task aborted.");
+        std::exit(1);
+    }
+    if(option.getValue("server_jar") == nullptr){
+        mcsm::error("No \"server_jar\" value specified in file " + option.getName());
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);
+    }
+    return option.getValue("server_jar");
+}
+
+void mcsm::ServerOption::setServerJarFile(const std::string& name){
+    mcsm::Option option(".", "server");
+    option.setValue("server_jar", name);
 }
