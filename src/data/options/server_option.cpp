@@ -83,7 +83,7 @@ void mcsm::ServerOption::create(const std::string& name, mcsm::JvmOption& defaul
     option.setValue("name", name);
     option.setValue("version", this->version);
     option.setValue("default_launch_profile", profileObj);
-    option.setValue("server_jar", this->server->getJarFile());
+    option.setValue("server_jar", this->server->getDefaultJarFileName());
     option.setValue("type", this->server->getTypeAsString());
 }
 
@@ -92,7 +92,7 @@ void mcsm::ServerOption::start(){
     start(std::move(jvmOpt));
 }
 
-void mcsm::ServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
+void mcsm::ServerOption::start(std::shared_ptr<mcsm::JvmOption> option){
     if(!std::filesystem::exists("server.json")){
         mcsm::error("File server.json cannot be found.");
         mcsm::error("Task aborted.");
@@ -145,7 +145,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const{
     return jvmOption;
 }
 
-void mcsm::ServerOption::setDefaultOption(std::unique_ptr<mcsm::JvmOption> jvmOption){
+void mcsm::ServerOption::setDefaultOption(std::shared_ptr<mcsm::JvmOption> jvmOption){
     mcsm::Option option(".", "server");
     nlohmann::json profileObj;
     profileObj["name"] = jvmOption->getProfileName();
@@ -213,4 +213,25 @@ std::string mcsm::ServerOption::getServerType() const {
         std::exit(1);
     }
     return option.getValue("type");
+}
+
+std::string mcsm::ServerOption::getServerJarName() const {
+    mcsm::Option option(".", "server");
+    if(!option.exists()){
+        mcsm::error("Option does not exist; Task aborted.");
+        std::exit(1);
+    }
+    if(option.getValue("server_jar") == nullptr){
+        mcsm::error("No \"server_jar\" value specified in file " + option.getName());
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);
+    }
+    return option.getValue("server_jar");
+}
+
+void mcsm::ServerOption::setServerJarName(const std::string& name){
+    mcsm::Option option(".", "server_jar");
+    option.setValue("server_jar", name);    
 }

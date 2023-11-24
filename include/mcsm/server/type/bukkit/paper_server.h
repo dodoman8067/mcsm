@@ -27,7 +27,6 @@ SOFTWARE.
 #include <mcsm/server/type/downloadable.h>
 #include <mcsm/http/get.h>
 #include <mcsm/http/download.h>
-#include <mcsm/data/options/server_option.h>
 #include <mcsm/util/mc/mc_utils.h>
 
 namespace mcsm {
@@ -38,7 +37,7 @@ namespace mcsm {
         ~PaperServer();
         int getVersion(const std::string& ver) const;
         std::vector<std::string> getAvailableVersions() override;
-        std::string getJarFile() override;
+        std::string getDefaultJarFileName() override;
         void start(mcsm::JvmOption& option) override;
         void download(const std::string& version) override;
         void download(const std::string& version, const std::string& path) override;

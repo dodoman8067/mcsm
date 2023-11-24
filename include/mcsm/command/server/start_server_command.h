@@ -36,8 +36,8 @@ namespace mcsm {
         std::string getServerVersion(const std::vector<std::string>& args) const;
         std::string getServerType(const std::vector<std::string>& args) const;
         mcsm::SearchTarget getSearchTarget(const std::vector<std::string>& args);
-        std::unique_ptr<mcsm::JvmOption> searchOption(const std::vector<std::string>& args);
-        std::unique_ptr<mcsm::JvmOption> searchOption(const mcsm::SearchTarget& target, const std::string& name);
+        std::shared_ptr<mcsm::JvmOption> searchOption(const std::vector<std::string>& args);
+        std::shared_ptr<mcsm::JvmOption> searchOption(const mcsm::SearchTarget& target, const std::string& name);
         void detectServer(const std::vector<std::string>& args);
         inline bool isConfigured();
     public:

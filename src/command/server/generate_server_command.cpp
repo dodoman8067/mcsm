@@ -62,20 +62,12 @@ void mcsm::GenerateServerCommand::execute(const std::vector<std::string>& args){
         mcsm::warning("Name not provided; Specify a name with --name option to continue.");
         std::exit(1);
     }
-    detectServer(args);
-}
-
-void mcsm::GenerateServerCommand::askServer(std::string& value){
-    while(true){
-        std::cout << "Type a string: ";
-        std::getline(std::cin, value);
-            
-        if(!value.empty()){
-            break;
-        }else{
-            std::cout << "Wrong input" << std::endl;
-        }
+    if(std::filesystem::exists("server.json")){
+        mcsm::warning("Server is already configured in this directory.");
+        mcsm::warning("Try in another directory.");
+        std::exit(1);
     }
+    detectServer(args);
 }
 
 std::string mcsm::GenerateServerCommand::getProfileName(const std::vector<std::string>& args) const {
