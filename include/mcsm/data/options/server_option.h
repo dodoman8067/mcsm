@@ -25,9 +25,9 @@ SOFTWARE.
 #define __MCSM_SERVER_OPTION_H__
 
 #include <mcsm/data/option.h>
-#include <mcsm/data/options/jvm_option.h>
-#include <mcsm/server/type/downloadable.h>
 #include <mcsm/server/server.h>
+#include <mcsm/server/type/bukkit/paper_server.h>
+#include <mcsm/server/type/downloadable.h>
 #include <memory>
 
 namespace mcsm {
@@ -42,17 +42,15 @@ namespace mcsm {
         ~ServerOption();
         void create(const std::string& name, mcsm::JvmOption& defaultOption);
         void start();
-        void start(std::shared_ptr<mcsm::JvmOption> option);
+        void start(std::unique_ptr<mcsm::JvmOption> option);
         bool exists();
         std::string getServerName() const;
         void setServerName(const std::string& name);
         std::string getServerVersion() const;
         void setServerVersion(const std::string& version);
         std::unique_ptr<mcsm::JvmOption> getDefaultOption() const;
-        void setDefaultOption(std::shared_ptr<mcsm::JvmOption> jvmOption);
+        void setDefaultOption(std::unique_ptr<mcsm::JvmOption> jvmOption);
         std::string getServerType() const;
-        std::string getServerJarName() const;
-        void setServerJarName(const std::string& name);
     };
 }
 

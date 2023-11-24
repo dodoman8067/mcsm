@@ -90,7 +90,7 @@ mcsm::ServerType mcsm::VanillaServer::getType() const {
     return ServerType::VANILLA;
 }
 
-std::string mcsm::VanillaServer::getDefaultJarFileName(){
+std::string mcsm::VanillaServer::getJarFile(){
     return "server.jar";
 }
 

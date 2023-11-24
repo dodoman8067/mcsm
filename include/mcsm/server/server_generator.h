@@ -25,7 +25,6 @@ SOFTWARE.
 
 #include <mcsm/data/options/server_option.h>
 #include <mcsm/server/server_type.h>
-#include <mcsm/server/type/bukkit/paper_server.h>
 
 namespace mcsm {
     namespace server {

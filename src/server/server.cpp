@@ -2,7 +2,6 @@
 
 void mcsm::Server::start(mcsm::JvmOption& option){
     std::string jvmOpt = " ";
-    mcsm::ServerOption sOpt;
     for(auto& s : option.getJvmArguments()){
         jvmOpt = jvmOpt + s + " ";
     }
@@ -12,12 +11,7 @@ void mcsm::Server::start(mcsm::JvmOption& option){
         svrOpt = svrOpt + s + " ";
     }
 
-    std::string command;
-    if(sOpt.exists()){
-        command = option.getJvmPath() + jvmOpt + sOpt.getServerJarName() + svrOpt;
-    }else{
-        command = option.getJvmPath() + jvmOpt + this->getDefaultJarFileName() + svrOpt;
-    }
+    std::string command = option.getJvmPath() + jvmOpt + this->getJarFile() + svrOpt;
     mcsm::info("Running command : " + command);
     mcsm::runCommand(command.c_str());
 }

@@ -47,12 +47,12 @@ void mcsm::StartServerCommand::execute(const std::vector<std::string>& args){
         mcsm::warning("Task aborted.");
         std::exit(1);
     }
-    std::shared_ptr<mcsm::JvmOption> jvmOpt = searchOption(args);
+    std::unique_ptr<mcsm::JvmOption> jvmOpt = searchOption(args);
     mcsm::ServerOption sOpt;
-    sOpt.start(jvmOpt);
+    sOpt.start(std::move(jvmOpt));
 }
 
-std::shared_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const std::vector<std::string>& args){
+std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const std::vector<std::string>& args){
     if(!isConfigured()){
         mcsm::error("Server not configured.");
         mcsm::error("Task aborted.");
@@ -65,7 +65,7 @@ std::shared_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const st
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-'){
                 std::string pName = args[i + 1];
                 mcsm::SearchTarget target = getSearchTarget(args);
-                std::shared_ptr<mcsm::JvmOption> profile = searchOption(target, pName);
+                std::unique_ptr<mcsm::JvmOption> profile = searchOption(target, pName);
                 if(profile == nullptr){
                     mcsm::error("The specified JVM launch profile " + pName + " does not exist.");
                     std::exit(1);
@@ -82,18 +82,18 @@ std::shared_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const st
     return jvmOpt;
 }
 
-std::shared_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const mcsm::SearchTarget& target, const std::string& name){
+std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const mcsm::SearchTarget& target, const std::string& name){
     if(!isConfigured()){
         mcsm::error("Server not configured.");
         mcsm::error("Task aborted.");
         std::exit(1);
     }
     if(target == mcsm::SearchTarget::GLOBAL || target == mcsm::SearchTarget::ALL){
-        std::shared_ptr<mcsm::JvmOption> opt = std::make_shared<mcsm::JvmOption>(name, mcsm::SearchTarget::GLOBAL);
+        std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(name, mcsm::SearchTarget::GLOBAL);
         if(opt->exists()) return opt;
     }
     if(target == mcsm::SearchTarget::CURRENT || target == mcsm::SearchTarget::ALL){
-        std::shared_ptr<mcsm::JvmOption> opt = std::make_shared<mcsm::JvmOption>(name, mcsm::SearchTarget::CURRENT);
+        std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(name, mcsm::SearchTarget::CURRENT);
         if(opt->exists()) return opt;
     }
     return nullptr;
