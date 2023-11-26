@@ -142,7 +142,11 @@ bool mcsm::JvmOption::exists(){
 
 std::vector<std::string> mcsm::JvmOption::getJvmArguments(){
     std::vector<std::string> empty;
-    if(!exists()) return empty;
+    if(!exists()){
+        mcsm::error("This jvm option does not exist.");
+        mcsm::error("Please edit the launch profile after creating.");
+        std::exit(1);
+    }
     if(this->option->isGlobal()){
         mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
         if(opt->getValue("args") == nullptr){
@@ -182,7 +186,11 @@ void mcsm::JvmOption::setJvmArguments(const std::vector<std::string>& jvmArgs){
 }
 
 std::string mcsm::JvmOption::getJvmPath(){
-    if(!exists()) return "";
+    if(!exists()){
+        mcsm::error("This jvm option does not exist.");
+        mcsm::error("Please edit the launch profile after creating.");
+        std::exit(1);
+    }
     if(this->option->isGlobal()){
         mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
         if(opt->getValue("path") == nullptr){
@@ -223,7 +231,11 @@ void mcsm::JvmOption::setJvmPath(const std::string& jvmPath){
 
 std::vector<std::string> mcsm::JvmOption::getServerArguments(){
     std::vector<std::string> empty;
-    if(!exists()) return empty;
+    if(!exists()){
+        mcsm::error("This jvm option does not exist.");
+        mcsm::error("Please edit the launch profile after creating.");
+        std::exit(1);
+    }
     if(this->option->isGlobal()){
         mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
         if(opt->getValue("server_args") == nullptr){
