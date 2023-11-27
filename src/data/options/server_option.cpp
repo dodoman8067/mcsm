@@ -71,7 +71,16 @@ mcsm::ServerOption::~ServerOption(){
 
 void mcsm::ServerOption::create(const std::string& name, mcsm::JvmOption& defaultOption){
     mcsm::Option option(".", "server");
-    if(option.exists()) return;
+    if(option.exists()){
+        mcsm::error("Server is already configured in this directory.");
+        mcsm::error("Please create a server.json file in other directories.");
+    }
+
+    mcsm::ServerDataOption serverDataOpt;
+    if(serverDataOpt.exists()){
+        serverDataOpt.reset();
+    }
+    serverDataOpt.create("none");
 
     nlohmann::json profileObj;
     profileObj["name"] = defaultOption.getProfileName();
@@ -93,19 +102,29 @@ void mcsm::ServerOption::start(){
 }
 
 void mcsm::ServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
+    mcsm::ServerDataOption serverDataOpt;
+    if(!serverDataOpt.exists()){
+        mcsm::error("File ./.mcsm/server_datas.json cannot be found.");
+        mcsm::error("Task aborted.");
+        std::exit(1);
+    }
+
     if(!std::filesystem::exists("server.json")){
         mcsm::error("File server.json cannot be found.");
         mcsm::error("Task aborted.");
         std::exit(1);
     }
+
     if(this->server == nullptr){
         this->server.reset();
         this->server = mcsm::server::detectServerType(getServerType());
     }
+
     mcsm::success("Starting server..");
     mcsm::info("Server name : " + getServerName());
     mcsm::info("Server MC version : " + getServerVersion());
     mcsm::info("Server JVM launch profile : " + option->getProfileName());
+    serverDataOpt.updateLastTimeLaunched();
     this->server->start(*option);
     mcsm::info("Server stopped.\n");
 }

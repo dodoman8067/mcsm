@@ -11,12 +11,10 @@ namespace mcsm {
     public:
         ServerDataOption();
         ~ServerDataOption();
-        void create(const std::string& lastTimeLaunched, const std::string& build);
+        void create(const std::string& lastTimeLaunched);
         void reset();
         std::string getLastTimeLaunched() const;
         void updateLastTimeLaunched();
-        std::string getCurrentBuild() const;
-        void updateCurrentBuild(const std::string& build);
         bool exists() const;
     };
 }
