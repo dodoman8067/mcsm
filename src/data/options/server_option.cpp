@@ -104,9 +104,7 @@ void mcsm::ServerOption::start(){
 void mcsm::ServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
     mcsm::ServerDataOption serverDataOpt;
     if(!serverDataOpt.exists()){
-        mcsm::error("File ./.mcsm/server_datas.json cannot be found.");
-        mcsm::error("Task aborted.");
-        std::exit(1);
+        serverDataOpt.create("none");
     }
 
     if(!std::filesystem::exists("server.json")){
