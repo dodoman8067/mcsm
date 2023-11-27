@@ -65,19 +65,6 @@ void mcsm::GenerateServerCommand::execute(const std::vector<std::string>& args){
     detectServer(args);
 }
 
-void mcsm::GenerateServerCommand::askServer(std::string& value){
-    while(true){
-        std::cout << "Type a string: ";
-        std::getline(std::cin, value);
-            
-        if(!value.empty()){
-            break;
-        }else{
-            std::cout << "Wrong input" << std::endl;
-        }
-    }
-}
-
 std::string mcsm::GenerateServerCommand::getProfileName(const std::vector<std::string>& args) const {
     std::string name;
     for(size_t i = 0; i < args.size(); ++i){

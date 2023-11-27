@@ -37,7 +37,6 @@ namespace mcsm {
         ViewServerCommand(const std::string& name, const std::string& description);
         ~ViewServerCommand();
         void execute(const std::vector<std::string>& args) override;
-        void askServer(std::string& value);
     };
 }
 

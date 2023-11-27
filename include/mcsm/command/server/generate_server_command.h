@@ -43,7 +43,6 @@ namespace mcsm {
         GenerateServerCommand(const std::string& name, const std::string& description);
         ~GenerateServerCommand();
         void execute(const std::vector<std::string>& args) override;
-        void askServer(std::string& value);
     };
 }
 

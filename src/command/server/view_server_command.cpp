@@ -48,4 +48,9 @@ inline void mcsm::ViewServerCommand::printServerInfo(){
 
     std::unique_ptr<mcsm::JvmOption> jvmOpt = sOpt.getDefaultOption();
     mcsm::info("Server default launch profile : " + jvmOpt->getProfileName());
+
+    mcsm::ServerDataOption sDataOpt;
+    if(sDataOpt.exists()){
+        mcsm::info("Last server launch date : " + sDataOpt.getLastTimeLaunched());
+    }
 }
