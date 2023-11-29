@@ -70,20 +70,34 @@ std::vector<std::string> mcsm::VanillaServer::getAvailableVersions(){
     return vector;
 }
 
-void mcsm::VanillaServer::download(const std::string& /* version */){
-    
+void mcsm::VanillaServer::download(const std::string& version){
+    download(version, std::filesystem::current_path().string(), getJarFile());
 }
 
-void mcsm::VanillaServer::download(const std::string& /* version */, const std::string& /* path */){
-
+void mcsm::VanillaServer::download(const std::string& version, const std::string& path){
+    download(version, path, getJarFile());
 }
 
-void mcsm::VanillaServer::download(const std::string& /* version */, const std::string& /* path */, const std::string& /* name */){
-
+void mcsm::VanillaServer::download(const std::string& version, const std::string& path, const std::string& name){
+    if(!hasVersion(version)){
+        mcsm::error("Unsupported version.");
+        mcsm::error("Please try again with a different version.");
+        std::exit(1);
+    }
+    std::string url;
+    auto it = this->versions->find(version);
+    if(it != this->versions->end()){
+        url = it->second;
+    }else{
+        mcsm::error("Unsupported version.");
+        mcsm::error("Please try again with a different version.");
+        std::exit(1);      
+    }
+    mcsm::download(name, url, path);
 }
 
-bool mcsm::VanillaServer::hasVersion(const std::string& /* version */){
-    return false;
+bool mcsm::VanillaServer::hasVersion(const std::string& version){
+    return this->versions->find(version) != this->versions->end();
 }
 
 mcsm::ServerType mcsm::VanillaServer::getType() const {
