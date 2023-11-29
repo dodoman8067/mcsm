@@ -85,7 +85,7 @@ void mcsm::VanillaServer::download(const std::string& version, const std::string
         std::exit(1);
     }
     std::string url;
-    auto it = this->versions->find(version);
+    std::map<const std::string, const std::string>::iterator it = this->versions->find(version);
     if(it != this->versions->end()){
         url = it->second;
     }else{
