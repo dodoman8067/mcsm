@@ -96,6 +96,15 @@ void mcsm::VanillaServer::download(const std::string& version, const std::string
     mcsm::download(name, url, path);
 }
 
+void mcsm::VanillaServer::start(mcsm::JvmOption& option){
+    mcsm::ServerOption sOpt;
+    if(!std::filesystem::exists(getJarFile())){
+        mcsm::info("Downloading " + getJarFile() + "...");
+        download(sOpt.getServerVersion());
+    }
+    Server::start(option);
+}
+
 bool mcsm::VanillaServer::hasVersion(const std::string& version){
     return this->versions->find(version) != this->versions->end();
 }

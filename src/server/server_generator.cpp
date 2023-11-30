@@ -37,6 +37,12 @@ void mcsm::server::generateBukkit(const std::string& name, mcsm::JvmOption& opti
     }
 }
 
+void mcsm::server::generateVanilla(const std::string& name, mcsm::JvmOption& option, const std::string& version){
+    std::shared_ptr<mcsm::VanillaServer> server = std::make_shared<mcsm::VanillaServer>();
+    mcsm::ServerOption serverOption(version, server);
+    configure(serverOption, name, option);    
+}
+
 void mcsm::server::generateForge(const std::string& /* name */, mcsm::JvmOption& /* option */, const std::string& /* version */){
 
 }
@@ -72,6 +78,9 @@ std::shared_ptr<mcsm::Server> mcsm::server::detectServerType(const std::string& 
 
     if(server == "paper"){
         sPtr = std::make_shared<mcsm::PaperServer>();
+    }
+    if(server == "vanilla"){
+        sPtr = std::make_shared<mcsm::VanillaServer>();
     }
     if(sPtr == nullptr){
         mcsm::error("The following server type (" + server + ") is not supported.");
