@@ -197,6 +197,10 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& a
         mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::PUFFERFISH);
         return;
     }
+    if(type == "vanilla"){
+        mcsm::server::generateVanilla(name, *option, version);
+        return;
+    }
     mcsm::error("Server type not supported : " + type);
     std::exit(1);
 }
