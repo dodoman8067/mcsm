@@ -20,30 +20,32 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <mcsm/server/type/bukkit/paper_server.h>
+#include <mcsm/server/type/bukkit/purpur_server.h>
 
-mcsm::PaperServer::PaperServer() {}
+mcsm::PurpurServer::PurpurServer() {}
 
-mcsm::PaperServer::~PaperServer() {}
+mcsm::PurpurServer::~PurpurServer() {}
 
-int mcsm::PaperServer::getVersion(const std::string& ver) const {
-    std::string res = mcsm::get("https://api.papermc.io/v2/projects/paper/versions/" + ver);
+int mcsm::PurpurServer::getVersion(const std::string& ver) const {
+    std::string res = mcsm::get("https://api.purpurmc.org/v2/purpur/" + ver);
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
     if(json.is_discarded()){
         mcsm::error("Parse of json failed.");
         mcsm::error("If you believe that this is an error, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
         mcsm::error("Error informations : ");
-        mcsm::error("Called method : mcsm::PaperServer::getVersion() with arguments : " + ver);
+        mcsm::error("Called method : mcsm::PurpurServer::getVersion() with arguments : " + ver);
         std::exit(1);
     }
-    if(json["builds"].is_array()){
-        return json["builds"][json["builds"].size() - 1];
+    if(json["builds"] != nullptr){
+        nlohmann::json builds = json["builds"];
+        if(builds["latest"] == nullptr) return -1;
+        return std::stoi(builds["latest"].get<std::string>());
     }else{
         return -1;
     }
 }
 
-std::vector<std::string> mcsm::PaperServer::getAvailableVersions(){
+std::vector<std::string> mcsm::PurpurServer::getAvailableVersions(){
     std::vector<std::string> versions;
     for(const std::string& s : mcsm::getMinecraftVersions()){
         versions.push_back(s);
@@ -51,7 +53,7 @@ std::vector<std::string> mcsm::PaperServer::getAvailableVersions(){
     return versions;
 }
 
-std::string mcsm::PaperServer::getJarFile(){
+std::string mcsm::PurpurServer::getJarFile(){
     mcsm::Option opt(".", "server");
     if(opt.exists() && opt.getValue("server_jar") != nullptr){
         return opt.getValue("server_jar");
@@ -59,15 +61,15 @@ std::string mcsm::PaperServer::getJarFile(){
     return getTypeAsString() + ".jar";
 }
 
-void mcsm::PaperServer::download(const std::string& version){
+void mcsm::PurpurServer::download(const std::string& version){
     download(version, std::filesystem::current_path().string(), getJarFile());
 }
 
-void mcsm::PaperServer::download(const std::string& version, const std::string& path){
+void mcsm::PurpurServer::download(const std::string& version, const std::string& path){
     download(version, path, getJarFile());
 }
 
-void mcsm::PaperServer::download(const std::string& version, const std::string& path, const std::string& name){
+void mcsm::PurpurServer::download(const std::string& version, const std::string& path, const std::string& name){
     int ver = getVersion(version);
     if(ver == -1){
         mcsm::error("Unsupported version.");
@@ -75,11 +77,11 @@ void mcsm::PaperServer::download(const std::string& version, const std::string& 
         std::exit(1);
     }
     std::string strVer = std::to_string(ver);
-    std::string url = "https://api.papermc.io/v2/projects/paper/versions/" + version + "/builds/" + strVer + "/downloads/paper-" + version + "-" + strVer + ".jar";
+    std::string url = "https://api.purpurmc.org/v2/purpur/" + version + "/" + strVer + "/download/";
     mcsm::download(name, url, path);
 }
 
-void mcsm::PaperServer::start(mcsm::JvmOption& option){
+void mcsm::PurpurServer::start(mcsm::JvmOption& option){
     mcsm::ServerOption sOpt;
     if(!std::filesystem::exists(getJarFile())){
         mcsm::info("Downloading " + getJarFile() + "...");
@@ -88,10 +90,10 @@ void mcsm::PaperServer::start(mcsm::JvmOption& option){
     Server::start(option);
 }
 
-bool mcsm::PaperServer::hasVersion(const std::string& version){
+bool mcsm::PurpurServer::hasVersion(const std::string& version){
     return getVersion(version) != -1;
 }
 
-std::string mcsm::PaperServer::getTypeAsString() const {
-    return "paper";
+std::string mcsm::PurpurServer::getTypeAsString() const {
+    return "purpur";
 }

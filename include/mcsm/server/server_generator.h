@@ -25,6 +25,7 @@ SOFTWARE.
 
 #include <mcsm/data/options/server_option.h>
 #include <mcsm/server/type/bukkit/paper_server.h>
+#include <mcsm/server/type/bukkit/purpur_server.h>
 #include <mcsm/server/type/base/vanilla_server.h>
 #include <mcsm/server/server_type.h>
 

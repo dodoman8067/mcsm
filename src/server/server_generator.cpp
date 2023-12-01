@@ -29,6 +29,12 @@ void mcsm::server::generateBukkit(const std::string& name, mcsm::JvmOption& opti
             configure(serverOption, name, option);
             break;
         }
+        case mcsm::BukkitServerType::PURPUR: {
+            std::shared_ptr<mcsm::PurpurServer> server = std::make_shared<mcsm::PurpurServer>();
+            mcsm::ServerOption serverOption(version, server);
+            configure(serverOption, name, option);
+            break;
+        }
         default: {
             mcsm::error("This kind of Bukkit-API based server implementation is not supported right now.");
             std::exit(1);
@@ -78,6 +84,9 @@ std::shared_ptr<mcsm::Server> mcsm::server::detectServerType(const std::string& 
 
     if(server == "paper"){
         sPtr = std::make_shared<mcsm::PaperServer>();
+    }
+    if(server == "purpur"){
+        sPtr = std::make_shared<mcsm::PurpurServer>();
     }
     if(server == "vanilla"){
         sPtr = std::make_shared<mcsm::VanillaServer>();
