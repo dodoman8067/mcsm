@@ -36,7 +36,7 @@ const std::string version = "0.0.2.0";
 
 inline void initCommands();
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]){
 
     //TODO : Add purpur support, default op in server config, spiget.org
 
