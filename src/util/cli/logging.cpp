@@ -31,7 +31,7 @@ void mcsm::success(const std::string& message){
 }
 
 void mcsm::warning(const std::string& message){
-    std::cout << termcolor::bright_yellow << "[mcsm/WARN] " << message << termcolor::reset << "\n";
+    std::cerr << termcolor::bright_yellow << "[mcsm/WARN] " << message << termcolor::reset << "\n";
 }
 
 void mcsm::error(const std::string& message){
