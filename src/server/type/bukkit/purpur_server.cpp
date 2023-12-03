@@ -53,12 +53,20 @@ std::vector<std::string> mcsm::PurpurServer::getAvailableVersions(){
     return versions;
 }
 
-std::string mcsm::PurpurServer::getJarFile(){
+std::string mcsm::PurpurServer::getJarFile() const {
     mcsm::Option opt(".", "server");
     if(opt.exists() && opt.getValue("server_jar") != nullptr){
         return opt.getValue("server_jar");
     }
     return getTypeAsString() + ".jar";
+}
+
+std::string mcsm::PurpurServer::getSupportedVersions() const {
+    return "1.14.1~";
+}
+
+std::string mcsm::PurpurServer::getBasedServer() const {
+    return "pufferfish";
 }
 
 void mcsm::PurpurServer::download(const std::string& version){

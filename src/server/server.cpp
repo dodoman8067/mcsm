@@ -15,3 +15,8 @@ void mcsm::Server::start(mcsm::JvmOption& option){
     mcsm::info("Running command : " + command);
     mcsm::runCommand(command.c_str());
 }
+
+bool mcsm::Server::isBasedAs(const std::string& input) const {
+    if(!mcsm::isWhitespaceOrEmpty(getBasedServer())) return false;
+    return getBasedServer() == input;
+}

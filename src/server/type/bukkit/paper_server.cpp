@@ -51,12 +51,20 @@ std::vector<std::string> mcsm::PaperServer::getAvailableVersions(){
     return versions;
 }
 
-std::string mcsm::PaperServer::getJarFile(){
+std::string mcsm::PaperServer::getJarFile() const {
     mcsm::Option opt(".", "server");
     if(opt.exists() && opt.getValue("server_jar") != nullptr){
         return opt.getValue("server_jar");
     }
     return getTypeAsString() + ".jar";
+}
+
+std::string mcsm::PaperServer::getSupportedVersions() const {
+    return "1.8~";
+}
+
+std::string mcsm::PaperServer::getBasedServer() const {
+    return "spigot";
 }
 
 void mcsm::PaperServer::download(const std::string& version){

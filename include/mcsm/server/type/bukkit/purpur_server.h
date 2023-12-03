@@ -38,7 +38,9 @@ namespace mcsm {
         ~PurpurServer();
         int getVersion(const std::string& ver) const;
         std::vector<std::string> getAvailableVersions() override;
-        std::string getJarFile() override;
+        std::string getJarFile() const override;
+        std::string getSupportedVersions() const override;
+        std::string getBasedServer() const override;
         void start(mcsm::JvmOption& option) override;
         void download(const std::string& version) override;
         void download(const std::string& version, const std::string& path) override;
