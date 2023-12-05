@@ -69,6 +69,58 @@ void mcsm::ServerDataOption::updateLastTimeLaunched(){
     this->option->setValue("last_time_launched", buffer);
 }
 
+std::string mcsm::ServerDataOption::getFirstTimeLaunched() const {
+    if(!this->option->exists()){
+        mcsm::error("Option does not exist; Task aborted.");
+        std::exit(1);
+    }
+    if(this->option->getValue("first_time_launched") == nullptr){
+        mcsm::error("No \"first_time_launched\" value specified in file " + this->option->getName());
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);
+    }
+    return this->option->getValue("first_time_launched");
+}
+
+void mcsm::ServerDataOption::updateFirstTimeLaunched(){
+    char buffer[80];
+
+    auto currentTimePoint = std::chrono::system_clock::now();
+    std::time_t currentTime = std::chrono::system_clock::to_time_t(currentTimePoint);
+
+    std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", std::localtime(&currentTime));
+
+    this->option->setValue("first_time_launched", buffer);
+}
+
+std::string mcsm::ServerDataOption::getServerTimeCreated() const {
+    if(!this->option->exists()){
+        mcsm::error("Option does not exist; Task aborted.");
+        std::exit(1);
+    }
+    if(this->option->getValue("server_time_created") == nullptr){
+        mcsm::error("No \"server_time_created\" value specified in file " + this->option->getName());
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);
+    }
+    return this->option->getValue("server_time_created");
+}
+
+void mcsm::ServerDataOption::updateServerTimeCreated(){
+    char buffer[80];
+
+    auto currentTimePoint = std::chrono::system_clock::now();
+    std::time_t currentTime = std::chrono::system_clock::to_time_t(currentTimePoint);
+
+    std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", std::localtime(&currentTime));
+
+    this->option->setValue("server_time_created", buffer);
+}
+
 bool mcsm::ServerDataOption::exists() const {
     return this->option->exists();
 }
