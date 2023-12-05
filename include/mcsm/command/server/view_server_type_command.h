@@ -20,33 +20,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __MCSM_SERVER_H__
-#define __MCSM_SERVER_H__
+#ifndef __VIEW_SERVER_TYPE_COMMAND_H__
+#define __VIEW_SERVER_TYPE_COMMAND_H__
 
-#include <mcsm/server/server_type.h>
-#include <mcsm/data/options/jvm_option.h>
-#include <mcsm/util/cli/cli_utils.h>
+#include <mcsm/command/base/command.h>
+#include <mcsm/util/cli/ask_input.h>
+#include <mcsm/data/options/server_option.h>
+#include <mcsm/server/type/bukkit/paper_server.h>
 
 namespace mcsm {
-    /**
-     * @brief Represents base of server.
-     */
-    class Server {
+    class ViewServerTypeCommand : public mcsm::Command {
+    private:
+        inline void printServerInfo();
     public:
-        /**
-         * @brief Returns the base type of server.
-         * @return mcsm::ServerType enum
-         */
-        virtual mcsm::ServerType getType() const = 0;
-        virtual std::string getTypeAsString() const = 0;
-        virtual std::string getJarFile() const = 0;
-        virtual std::string getSupportedVersions() const = 0;
-        virtual std::string getBasedServer() const = 0;
-        virtual std::string getWebSite() const = 0;
-        virtual std::string getGitHub() const = 0;
-        virtual bool isBasedAs(const std::string& input) const;
-        virtual void start(mcsm::JvmOption& option);
+        ViewServerTypeCommand(const std::string& name, const std::string& description);
+        ~ViewServerTypeCommand();
+        void execute(const std::vector<std::string>& args) override;
     };
 }
 
-#endif // __MCSM_SERVER_H__
+#endif // __VIEW_SERVER_TYPE_COMMAND_H__

@@ -132,3 +132,11 @@ std::string mcsm::VanillaServer::getBasedServer() const {
 std::string mcsm::VanillaServer::getTypeAsString() const {
     return "vanilla";
 }
+
+std::string mcsm::VanillaServer::getWebSite() const {
+    return "https://minecraft.net";
+}
+
+std::string mcsm::VanillaServer::getGitHub() const {
+    return "";
+}

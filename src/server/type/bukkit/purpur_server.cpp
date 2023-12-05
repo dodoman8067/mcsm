@@ -69,6 +69,14 @@ std::string mcsm::PurpurServer::getBasedServer() const {
     return "pufferfish";
 }
 
+std::string mcsm::PurpurServer::getWebSite() const {
+    return "https://purpurmc.org";
+}
+
+std::string mcsm::PurpurServer::getGitHub() const {
+    return "https://github.com/PurpurMC/Purpur";
+}
+
 void mcsm::PurpurServer::download(const std::string& version){
     download(version, std::filesystem::current_path().string(), getJarFile());
 }

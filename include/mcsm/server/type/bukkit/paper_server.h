@@ -41,6 +41,8 @@ namespace mcsm {
         std::string getJarFile() const override;
         std::string getSupportedVersions() const override;
         std::string getBasedServer() const override;
+        std::string getWebSite() const override;
+        std::string getGitHub() const override;
         void start(mcsm::JvmOption& option) override;
         void download(const std::string& version) override;
         void download(const std::string& version, const std::string& path) override;

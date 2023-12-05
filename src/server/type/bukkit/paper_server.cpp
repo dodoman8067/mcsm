@@ -67,6 +67,14 @@ std::string mcsm::PaperServer::getBasedServer() const {
     return "spigot";
 }
 
+std::string mcsm::PaperServer::getWebSite() const {
+    return "https://papermc.io";
+}
+
+std::string mcsm::PaperServer::getGitHub() const {
+    return "https://github.com/PaperMC/Paper";
+}
+
 void mcsm::PaperServer::download(const std::string& version){
     download(version, std::filesystem::current_path().string(), getJarFile());
 }

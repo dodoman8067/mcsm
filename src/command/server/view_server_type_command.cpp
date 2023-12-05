@@ -20,33 +20,4 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __MCSM_SERVER_H__
-#define __MCSM_SERVER_H__
-
-#include <mcsm/server/server_type.h>
-#include <mcsm/data/options/jvm_option.h>
-#include <mcsm/util/cli/cli_utils.h>
-
-namespace mcsm {
-    /**
-     * @brief Represents base of server.
-     */
-    class Server {
-    public:
-        /**
-         * @brief Returns the base type of server.
-         * @return mcsm::ServerType enum
-         */
-        virtual mcsm::ServerType getType() const = 0;
-        virtual std::string getTypeAsString() const = 0;
-        virtual std::string getJarFile() const = 0;
-        virtual std::string getSupportedVersions() const = 0;
-        virtual std::string getBasedServer() const = 0;
-        virtual std::string getWebSite() const = 0;
-        virtual std::string getGitHub() const = 0;
-        virtual bool isBasedAs(const std::string& input) const;
-        virtual void start(mcsm::JvmOption& option);
-    };
-}
-
-#endif // __MCSM_SERVER_H__
+#include <mcsm/command/server/view_server_type_command.h>
