@@ -28,6 +28,7 @@ This project requires the following dependencies :
 Before building, you must build them(static if libcurl) and install it with CMake.
 
 NOTE: libcurl is built with the following cmake command : cmake -B ./build -G "MinGW Makefiles" -DBUILD_SHARED_LIBS=OFF -DZLIB_USE_STATIC_LIBS=ON -DCURL_USE_SCHANNEL=ON
+
 For Linux builds : cmake -B ./build -G "MinGW Makefiles" -DBUILD_SHARED_LIBS=OFF -DZLIB_USE_STATIC_LIBS=ON
 
 ## Usage
@@ -36,13 +37,13 @@ To use the compiled executable, type:
 
     mcsm help
 
-By doing this, you can get list of commands. If it's not working, try this:
+By doing this, you can get a list of commands. If it's not working, try this:
 
     ./mcsm help
 
 ## Contributing
 
-Currently, you can't contribute to this project because it isn't completed right now.
+Currently you can't contribute to this project because it isn't completed right now.
 
 ## License
 
@@ -52,4 +53,4 @@ This project is licensed under [MIT](LICENSE).
 * [nlohmann/json](https://github.com/nlohmann/json/blob/develop/LICENSE.MIT)
 * [termcolor](https://github.com/ikalnytskyi/termcolor/LICENSE)
 
-Special thanks to the creators of these libraries.
+Special thanks for the creators of program's dependencies.
