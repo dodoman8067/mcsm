@@ -77,9 +77,6 @@ void mcsm::ServerOption::create(const std::string& name, mcsm::JvmOption& defaul
     }
 
     mcsm::ServerDataOption serverDataOpt;
-    if(serverDataOpt.exists()){
-        serverDataOpt.reset();
-    }
     serverDataOpt.create("none");
 
     nlohmann::json profileObj;
@@ -94,6 +91,7 @@ void mcsm::ServerOption::create(const std::string& name, mcsm::JvmOption& defaul
     option.setValue("default_launch_profile", profileObj);
     option.setValue("server_jar", this->server->getJarFile());
     option.setValue("type", this->server->getTypeAsString());
+    serverDataOpt.updateServerTimeCreated();
 }
 
 void mcsm::ServerOption::start(){
@@ -103,9 +101,6 @@ void mcsm::ServerOption::start(){
 
 void mcsm::ServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
     mcsm::ServerDataOption serverDataOpt;
-    if(!serverDataOpt.exists()){
-        serverDataOpt.create("none");
-    }
 
     if(!std::filesystem::exists("server.json")){
         mcsm::error("File server.json cannot be found.");

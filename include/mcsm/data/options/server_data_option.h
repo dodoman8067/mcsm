@@ -37,8 +37,6 @@ namespace mcsm {
         void reset();
         std::string getLastTimeLaunched() const;
         void updateLastTimeLaunched();
-        std::string getFirstTimeLaunched() const;
-        void updateFirstTimeLaunched();
         std::string getServerTimeCreated() const;
         void updateServerTimeCreated();
         bool exists() const;
