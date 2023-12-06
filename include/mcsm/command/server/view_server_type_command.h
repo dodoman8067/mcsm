@@ -20,27 +20,23 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __SERVER_DATA_OPTION_H__
-#define __SERVER_DATA_OPTION_H__
+#ifndef __VIEW_SERVER_TYPE_COMMAND_H__
+#define __VIEW_SERVER_TYPE_COMMAND_H__
 
-#include <mcsm/data/option.h>
-#include <chrono>
+#include <mcsm/command/base/command.h>
+#include <mcsm/util/cli/ask_input.h>
+#include <mcsm/data/options/server_option.h>
+#include <mcsm/server/type/bukkit/paper_server.h>
 
 namespace mcsm {
-    class ServerDataOption {
+    class ViewServerTypeCommand : public mcsm::Command {
     private:
-        std::unique_ptr<mcsm::Option> option;
+        inline void printServerInfo();
     public:
-        ServerDataOption();
-        ~ServerDataOption();
-        void create(const std::string& lastTimeLaunched);
-        void reset();
-        std::string getLastTimeLaunched() const;
-        void updateLastTimeLaunched();
-        std::string getServerTimeCreated() const;
-        void updateServerTimeCreated();
-        bool exists() const;
+        ViewServerTypeCommand(const std::string& name, const std::string& description);
+        ~ViewServerTypeCommand();
+        void execute(const std::vector<std::string>& args) override;
     };
 }
 
-#endif // __SERVER_DATA_OPTION_H__
+#endif // __VIEW_SERVER_TYPE_COMMAND_H__

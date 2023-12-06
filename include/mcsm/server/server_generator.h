@@ -24,6 +24,9 @@ SOFTWARE.
 #define __MCSM_SERVER_GENERATOR_H__
 
 #include <mcsm/data/options/server_option.h>
+#include <mcsm/server/type/bukkit/paper_server.h>
+#include <mcsm/server/type/bukkit/purpur_server.h>
+#include <mcsm/server/type/base/vanilla_server.h>
 #include <mcsm/server/server_type.h>
 
 namespace mcsm {
@@ -33,6 +36,7 @@ namespace mcsm {
         void generateFabric(const std::string& name, mcsm::JvmOption& option, const std::string& version);
         void generateSponge(const std::string& name, mcsm::JvmOption& option, const std::string& version);
         void generateCustom(const std::string& name, mcsm::JvmOption& option, const std::string& filePath, const std::string& version);
+        void generateVanilla(const std::string& name, mcsm::JvmOption& option, const std::string& version);
         void configure(mcsm::ServerOption& serverOption, const std::string& name, mcsm::JvmOption& option);
         std::shared_ptr<mcsm::Server> detectServerType(const std::string& server);
     };

@@ -20,27 +20,4 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __SERVER_DATA_OPTION_H__
-#define __SERVER_DATA_OPTION_H__
-
-#include <mcsm/data/option.h>
-#include <chrono>
-
-namespace mcsm {
-    class ServerDataOption {
-    private:
-        std::unique_ptr<mcsm::Option> option;
-    public:
-        ServerDataOption();
-        ~ServerDataOption();
-        void create(const std::string& lastTimeLaunched);
-        void reset();
-        std::string getLastTimeLaunched() const;
-        void updateLastTimeLaunched();
-        std::string getServerTimeCreated() const;
-        void updateServerTimeCreated();
-        bool exists() const;
-    };
-}
-
-#endif // __SERVER_DATA_OPTION_H__
+#include <mcsm/command/server/view_server_type_command.h>

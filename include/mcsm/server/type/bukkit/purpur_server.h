@@ -20,8 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __MCSM_PAPER_SERVER_H__
-#define __MCSM_PAPER_SERVER_H__
+#ifndef __PURPUR_SERVER_H__
+#define __PURPUR_SERVER_H__
 
 #include <mcsm/server/type/base/bukkit_server.h>
 #include <mcsm/server/type/downloadable.h>
@@ -31,11 +31,11 @@ SOFTWARE.
 #include <mcsm/util/mc/mc_utils.h>
 
 namespace mcsm {
-    class PaperServer : public mcsm::BukkitServer, public mcsm::Downloadable {
+    class PurpurServer : public mcsm::BukkitServer, public mcsm::Downloadable {
     private:
     public:
-        PaperServer();
-        ~PaperServer();
+        PurpurServer();
+        ~PurpurServer();
         int getVersion(const std::string& ver) const;
         std::vector<std::string> getAvailableVersions() override;
         std::string getJarFile() const override;
@@ -52,5 +52,4 @@ namespace mcsm {
     };
 }
 
-
-#endif // __MCSM_PAPER_SERVER_H__
+#endif // __PURPUR_SERVER_H__

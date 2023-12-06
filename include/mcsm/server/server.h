@@ -39,7 +39,12 @@ namespace mcsm {
          */
         virtual mcsm::ServerType getType() const = 0;
         virtual std::string getTypeAsString() const = 0;
-        virtual std::string getJarFile() = 0;
+        virtual std::string getJarFile() const = 0;
+        virtual std::string getSupportedVersions() const = 0;
+        virtual std::string getBasedServer() const = 0;
+        virtual std::string getWebSite() const = 0;
+        virtual std::string getGitHub() const = 0;
+        virtual bool isBasedAs(const std::string& input) const;
         virtual void start(mcsm::JvmOption& option);
     };
 }

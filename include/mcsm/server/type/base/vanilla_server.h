@@ -26,6 +26,7 @@ SOFTWARE.
 #include <mcsm/server/server.h>
 #include <mcsm/server/type/downloadable.h>
 #include <mcsm/data/global_option.h>
+#include <mcsm/data/options/server_option.h>
 #include <mcsm/http/download.h>
 #include <map>
 
@@ -37,11 +38,16 @@ namespace mcsm {
     public:
         VanillaServer();
         ~VanillaServer();
-        std::string getJarFile() override;
+        std::string getJarFile() const override;
+        std::string getSupportedVersions() const override;
+        std::string getBasedServer() const override;
+        std::string getWebSite() const override;
+        std::string getGitHub() const override;
         std::vector<std::string> getAvailableVersions() override;
         void download(const std::string& version) override;
         void download(const std::string& version, const std::string& path) override;
         void download(const std::string& version, const std::string& path, const std::string& name) override;
+        void start(mcsm::JvmOption& option) override;
         bool hasVersion(const std::string& version) override;
         mcsm::ServerType getType() const override;
         std::string getTypeAsString() const override;

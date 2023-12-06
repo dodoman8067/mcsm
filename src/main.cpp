@@ -30,19 +30,13 @@ SOFTWARE.
 #include <mcsm/command/server/jvm/jvm_option_search_command.h>
 #include <mcsm/command/server/jvm/jvm_test_command.h>
 #include <mcsm/command/server/jvm/jvm_option_edit_command.h>
-#include <mcsm/data/option.h>
-#include <mcsm/data/options/jvm_option.h>
-#include <mcsm/data/options/server_option.h>
-#include <mcsm/server/type/bukkit/paper_server.h>
-#include <mcsm/util/string_utils.h>
-#include <mcsm/jvm/java_detection.h>
 #include <mcsm/command/server/view_server_command.h>
 
 const std::string version = "0.0.2.0";
 
 inline void initCommands();
 
-int main(int argc, char *argv[]) {
+int main(int argc, char *argv[]){
 
     //TODO : Add purpur support, default op in server config, spiget.org
 
