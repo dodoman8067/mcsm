@@ -37,6 +37,7 @@ namespace mcsm {
         PaperServer();
         ~PaperServer();
         int getVersion(const std::string& ver) const;
+        int getVersion(const std::string& ver, const std::string& build) const;
         std::vector<std::string> getAvailableVersions() override;
         std::string getJarFile() const override;
         std::string getSupportedVersions() const override;

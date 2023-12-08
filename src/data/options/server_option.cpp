@@ -90,6 +90,7 @@ void mcsm::ServerOption::create(const std::string& name, mcsm::JvmOption& defaul
     option.setValue("version", this->version);
     option.setValue("default_launch_profile", profileObj);
     option.setValue("server_jar", this->server->getJarFile());
+    option.setValue("server_build", "latest");
     option.setValue("type", this->server->getTypeAsString());
     serverDataOpt.updateServerTimeCreated();
 }
@@ -246,4 +247,25 @@ std::string mcsm::ServerOption::getServerJarFile() const{
 void mcsm::ServerOption::setServerJarFile(const std::string& name){
     mcsm::Option option(".", "server");
     option.setValue("server_jar", name);
+}
+
+std::string mcsm::ServerOption::getServerJarBuild() const {
+    mcsm::Option option(".", "server");
+    if(!option.exists()){
+        mcsm::error("Option does not exist; Task aborted.");
+        std::exit(1);
+    }
+    if(option.getValue("server_build") == nullptr){
+        mcsm::error("No \"server_build\" value specified in file " + option.getName());
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);
+    }
+    return option.getValue("server_build");
+}
+
+void mcsm::ServerOption::setServerJarBuild(const std::string& build){
+    mcsm::Option option(".", "server");
+    option.setValue("server_build", build);
 }

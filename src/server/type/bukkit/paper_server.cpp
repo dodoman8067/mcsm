@@ -43,6 +43,24 @@ int mcsm::PaperServer::getVersion(const std::string& ver) const {
     }
 }
 
+int mcsm::PaperServer::getVersion(const std::string& ver, const std::string& build) const {
+    std::string res = mcsm::get("https://api.papermc.io/v2/projects/paper/versions/" + ver + "/builds/" + build);
+    nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
+    if(json.is_discarded()){
+        mcsm::error("Parse of json failed.");
+        mcsm::error("If you believe that this is an error, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
+        mcsm::error("Error informations : ");
+        mcsm::error("Called method : mcsm::PaperServer::getVersion() with arguments : " + ver + ", " + build);
+        std::exit(1);
+    }
+
+    if(json["build"] == nullptr){
+        return -1;
+    }else{
+        return json["build"];
+    }
+}
+
 std::vector<std::string> mcsm::PaperServer::getAvailableVersions(){
     std::vector<std::string> versions;
     for(const std::string& s : mcsm::getMinecraftVersions()){
@@ -84,15 +102,35 @@ void mcsm::PaperServer::download(const std::string& version, const std::string& 
 }
 
 void mcsm::PaperServer::download(const std::string& version, const std::string& path, const std::string& name){
-    int ver = getVersion(version);
-    if(ver == -1){
-        mcsm::error("Unsupported version.");
-        mcsm::error("Please try again with a different version.");
-        std::exit(1);
+    mcsm::Option opt(".", "server");
+    if(opt.hasValue("server_build") && opt.getValue("server_build") != "latest"){
+        std::string build = opt.getValue("server_build").get<std::string>();
+        int ver = getVersion(version, build);
+        if(ver == -1){
+            mcsm::error("Unsupported version : " + build);
+            mcsm::error("Please try again with a different version.");
+            std::exit(1);
+        }
+        std::string strVer = std::to_string(ver);
+        std::string url = "https://api.papermc.io/v2/projects/paper/versions/" + version + "/builds/" + strVer + "/downloads/paper-" + version + "-" + strVer + ".jar";
+        mcsm::download(name, url, path);
+    }else{
+        if(!opt.hasValue("server_build")){
+            mcsm::error("No \"server_build\" option specified in server.json");
+            mcsm::error("It's not recommended to directly modify server config file without knowing what you're doing.");
+            mcsm::error("Please re-add \"server_build\": \"latest\" in the file to make program download latest buid.");
+            std::exit(1);
+        }
+        int ver = getVersion(version);
+        if(ver == -1){
+            mcsm::error("Unsupported version.");
+            mcsm::error("Please try again with a different version.");
+            std::exit(1);
+        }
+        std::string strVer = std::to_string(ver);
+        std::string url = "https://api.papermc.io/v2/projects/paper/versions/" + version + "/builds/" + strVer + "/downloads/paper-" + version + "-" + strVer + ".jar";
+        mcsm::download(name, url, path);
     }
-    std::string strVer = std::to_string(ver);
-    std::string url = "https://api.papermc.io/v2/projects/paper/versions/" + version + "/builds/" + strVer + "/downloads/paper-" + version + "-" + strVer + ".jar";
-    mcsm::download(name, url, path);
 }
 
 void mcsm::PaperServer::start(mcsm::JvmOption& option){
