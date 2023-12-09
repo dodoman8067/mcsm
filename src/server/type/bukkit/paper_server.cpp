@@ -104,11 +104,16 @@ void mcsm::PaperServer::download(const std::string& version, const std::string& 
 void mcsm::PaperServer::download(const std::string& version, const std::string& path, const std::string& name){
     mcsm::Option opt(".", "server");
     if(opt.hasValue("server_build") && opt.getValue("server_build") != "latest"){
+        if(!opt.getValue("server_build").is_string()){
+            mcsm::error("Value \"server_build\" option in server.json must be a string type.");
+            mcsm::error("To fix, change it into \"server_build\": \"latest\" .");
+            std::exit(1);            
+        }
         std::string build = opt.getValue("server_build").get<std::string>();
         if(mcsm::isWhitespaceOrEmpty(build)){
             mcsm::error("Missing \"server_build\" option in server.json");
             mcsm::error("To fix, add \"server_build\": \"latest\" to server.json for automatic download.");
-            std::exit(1);            
+            std::exit(1);
         }
         int ver = getVersion(version, build);
         if(ver == -1){
