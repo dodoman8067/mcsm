@@ -36,6 +36,13 @@ mcsm::ServerOption::ServerOption(){
         mcsm::error("Task aborted.");
         std::exit(1);    
     }
+    if(!option.getValue("version").is_string()){
+        mcsm::error("Value \"version\" has to be a string, but it's not.");
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);      
+    }
 
     ServerOption(option.getValue("version"));
 }
@@ -52,6 +59,13 @@ mcsm::ServerOption::ServerOption(const std::string& version){
         mcsm::error("Option \"type\" cannot be found.");
         mcsm::error("Task aborted.");
         std::exit(1);    
+    }
+    if(!option.getValue("type").is_string()){
+        mcsm::error("Value \"type\" has to be a string, but it's not.");
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);      
     }
 
     std::string server = option.getValue("type");
@@ -183,6 +197,13 @@ std::string mcsm::ServerOption::getServerName() const {
         mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
+    if(!option.getValue("name").is_string()){
+        mcsm::error("Value \"name\" has to be a string, but it's not.");
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);
+    }
     return option.getValue("name");
 }
 
@@ -199,6 +220,13 @@ std::string mcsm::ServerOption::getServerVersion() const {
     }
     if(option.getValue("version") == nullptr){
         mcsm::error("No \"version\" value specified in file " + option.getName());
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);
+    }
+    if(!option.getValue("version").is_string()){
+        mcsm::error("Value \"version\" has to be a string, but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
         mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
@@ -225,6 +253,13 @@ std::string mcsm::ServerOption::getServerType() const {
         mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
+    if(!option.getValue("type").is_string()){
+        mcsm::error("Value \"type\" has to be a string, but it's not.");
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);
+    }
     return option.getValue("type");
 }
 
@@ -236,6 +271,13 @@ std::string mcsm::ServerOption::getServerJarFile() const{
     }
     if(option.getValue("server_jar") == nullptr){
         mcsm::error("No \"server_jar\" value specified in file " + option.getName());
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);
+    }
+    if(!option.getValue("server_jar").is_string()){
+        mcsm::error("Value \"server_jar\" has to be a string, but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
         mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
@@ -257,6 +299,13 @@ std::string mcsm::ServerOption::getServerJarBuild() const {
     }
     if(option.getValue("server_build") == nullptr){
         mcsm::error("No \"server_build\" value specified in file " + option.getName());
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);
+    }
+    if(!option.getValue("server_build").is_string()){
+        mcsm::error("Value \"server_build\" has to be a string, but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
         mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
