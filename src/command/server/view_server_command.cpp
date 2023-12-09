@@ -51,6 +51,7 @@ inline void mcsm::ViewServerCommand::printServerInfo(){
 
     mcsm::ServerDataOption sDataOpt;
     if(sDataOpt.exists()){
+        mcsm::info("Server creation date : " + sDataOpt.getServerTimeCreated());
         mcsm::info("Last server launch date : " + sDataOpt.getLastTimeLaunched());
     }
 }
