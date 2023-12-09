@@ -45,6 +45,24 @@ int mcsm::PurpurServer::getVersion(const std::string& ver) const {
     }
 }
 
+int mcsm::PurpurServer::getVersion(const std::string& ver, const std::string& build) const {
+    std::string res = mcsm::get("https://api.purpurmc.org/v2/purpur/" + ver + "/" +  build);
+    nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
+    if(json.is_discarded()){
+        mcsm::error("Parse of json failed.");
+        mcsm::error("If you believe that this is an error, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
+        mcsm::error("Error informations : ");
+        mcsm::error("Called method : mcsm::PurpurServer::getVersion() with arguments : " + ver + ", " + build);
+        std::exit(1);
+    }
+
+    if(json["build"] == nullptr){
+        return -1;
+    }else{
+        return std::stoi(json["build"].get<std::string>());
+    }
+}
+
 std::vector<std::string> mcsm::PurpurServer::getAvailableVersions(){
     std::vector<std::string> versions;
     for(const std::string& s : mcsm::getMinecraftVersions()){
@@ -86,15 +104,39 @@ void mcsm::PurpurServer::download(const std::string& version, const std::string&
 }
 
 void mcsm::PurpurServer::download(const std::string& version, const std::string& path, const std::string& name){
-    int ver = getVersion(version);
-    if(ver == -1){
-        mcsm::error("Unsupported version.");
-        mcsm::error("Please try again with a different version.");
-        std::exit(1);
+    mcsm::Option opt(".", "server");
+    if(opt.hasValue("server_build") && opt.getValue("server_build") != "latest"){
+        std::string build = opt.getValue("server_build").get<std::string>();
+        if(mcsm::isWhitespaceOrEmpty(build)){
+            mcsm::error("Missing \"server_build\" option in server.json");
+            mcsm::error("To fix, add \"server_build\": \"latest\" to server.json for automatic download.");
+            std::exit(1);            
+        }
+        int ver = getVersion(version, build);
+        if(ver == -1){
+            mcsm::error("Unsupported version : " + build);
+            mcsm::error("Please try again with a different version.");
+            std::exit(1);
+        }
+        std::string strVer = std::to_string(ver);
+        std::string url = "https://api.purpurmc.org/v2/purpur/" + version + "/" + strVer + "/download/";
+        mcsm::download(name, url, path);
+    }else{
+        if(!opt.hasValue("server_build")){
+            mcsm::error("Missing \"server_build\" option in server.json");
+            mcsm::error("To fix, add \"server_build\": \"latest\" to server.json for automatic download.");
+            std::exit(1);
+        }
+        int ver = getVersion(version);
+        if(ver == -1){
+            mcsm::error("Unsupported version.");
+            mcsm::error("Please try again with a different version.");
+            std::exit(1);
+        }
+        std::string strVer = std::to_string(ver);
+        std::string url = "https://api.purpurmc.org/v2/purpur/" + version + "/" + strVer + "/download/";
+        mcsm::download(name, url, path);
     }
-    std::string strVer = std::to_string(ver);
-    std::string url = "https://api.purpurmc.org/v2/purpur/" + version + "/" + strVer + "/download/";
-    mcsm::download(name, url, path);
 }
 
 void mcsm::PurpurServer::start(mcsm::JvmOption& option){

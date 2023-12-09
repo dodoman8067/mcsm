@@ -105,6 +105,11 @@ void mcsm::PaperServer::download(const std::string& version, const std::string& 
     mcsm::Option opt(".", "server");
     if(opt.hasValue("server_build") && opt.getValue("server_build") != "latest"){
         std::string build = opt.getValue("server_build").get<std::string>();
+        if(mcsm::isWhitespaceOrEmpty(build)){
+            mcsm::error("Missing \"server_build\" option in server.json");
+            mcsm::error("To fix, add \"server_build\": \"latest\" to server.json for automatic download.");
+            std::exit(1);            
+        }
         int ver = getVersion(version, build);
         if(ver == -1){
             mcsm::error("Unsupported version : " + build);
@@ -116,9 +121,8 @@ void mcsm::PaperServer::download(const std::string& version, const std::string& 
         mcsm::download(name, url, path);
     }else{
         if(!opt.hasValue("server_build")){
-            mcsm::error("No \"server_build\" option specified in server.json");
-            mcsm::error("It's not recommended to directly modify server config file without knowing what you're doing.");
-            mcsm::error("Please re-add \"server_build\": \"latest\" in the file to make program download latest buid.");
+            mcsm::error("Missing \"server_build\" option in server.json");
+            mcsm::error("To fix, add \"server_build\": \"latest\" to server.json for automatic download.");
             std::exit(1);
         }
         int ver = getVersion(version);
