@@ -35,10 +35,30 @@ SOFTWARE.
 #endif
 
 namespace mcsm {
+    /**
+     * Prints normal information message to the console.
+     * @param message string to print
+     */
     void info(const std::string& message);
+
+    /**
+     * Prints successful (green) message to the console.
+     * @param message string to print
+     */
     void success(const std::string& message);
+
+    /**
+     * Prints warning (yellow) message to the console.
+     * @param message string to print
+    */
     void warning(const std::string& message);
+
+    /**
+     * Prints error (red) message to the console.
+     * @param message string to print
+    */
     void error(const std::string& message);
+
 }
 
 #endif // __MCSM_LOGGING_H__

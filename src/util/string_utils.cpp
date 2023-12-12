@@ -23,22 +23,10 @@ SOFTWARE.
 #include <mcsm/util/string_utils.h>
 
 namespace mcsm {
-    /**
-     * Checks if the string `str` starts with the specified `value`.
-     * @param str the string to check
-     * @param value the prefix to check for at the beginning of `str`
-     * @return true if `str` starts with `value`, otherwise false
-     */
     bool startsWith(const std::string& str, const std::string& value){
         return str.rfind(value, 0) == 0;
     }
 
-    /**
-     * Checks if the string `str` ends with the specified `value`.
-     * @param str the string to check
-     * @param value the suffix to check for at the end of `str`
-     * @return true if `str` ends with `value`, otherwise false
-     */
     bool endsWith(const std::string& str, const std::string& value){
         // Ensure that `value` is not longer than `str` to avoid out-of-bounds comparisons
         if (str.length() < value.length()) {
@@ -47,11 +35,6 @@ namespace mcsm {
         return str.compare(str.length() - value.length(), value.length(), value) == 0;
     }
 
-    /**
-     * Checks if the string `str` is either whitespace or empty.
-     * @param str the string to check
-     * @return true if `str` is whitespace or empty, otherwise false
-     */
     bool isWhitespaceOrEmpty(const std::string& str){
         // If the string is empty, consider it whitespace
         if (str.empty()) {
@@ -61,12 +44,6 @@ namespace mcsm {
         return str.find_first_not_of(" \t\n\v\f\r") == std::string::npos;
     }
 
-    /**
-     * Replaces all occurrences of a specified `value` with a `replacement` in the string `str`.
-     * @param str the string to modify
-     * @param value the substring to replace
-     * @param replacement the string to replace `value` with
-     */
     void replaceAll(std::string& str, const std::string& value, const std::string& replacement){
         std::string::size_type pos = 0;
         // Iterate through the string and replace all occurrences of `value`
