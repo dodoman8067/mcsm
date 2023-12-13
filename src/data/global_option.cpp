@@ -152,7 +152,7 @@ void mcsm::GlobalOption::save(const nlohmann::json& jsonData) const {
     std::string fullPath = this->path + "/" + this->name;
     std::ofstream outFile(fullPath);
     if (outFile.is_open()) {
-        outFile << jsonData.dump(4); 
+        outFile << jsonData.dump(2); 
         outFile.close();
     }else{
         mcsm::error("Cannot save file " + fullPath);
