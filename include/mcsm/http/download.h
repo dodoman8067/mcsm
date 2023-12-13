@@ -30,7 +30,19 @@ SOFTWARE.
 #include <filesystem>
 
 namespace mcsm {
+    /**
+     * Downloads a file in `url` named as `name`.
+     * @param name file's name
+     * @param url link to perform GET request
+    */
     void download(const std::string& name, const std::string& url);
+
+    /**
+     * Downloads a file in `url` named as `name`.
+     * @param name file's name
+     * @param url link to perform GET request
+     * @param path file's stored location
+    */
     void download(const std::string& name, const std::string& url, const std::string& path);
 }
 

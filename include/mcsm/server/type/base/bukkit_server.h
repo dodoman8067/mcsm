@@ -27,14 +27,14 @@ SOFTWARE.
 
 namespace mcsm {
     /**
-     * @brief Represents a server that uses Bukkit API.
+     * Represents a server that uses Bukkit API.
      */
     class BukkitServer : public mcsm::Server {
     public:
         BukkitServer();
         ~BukkitServer();
         /**
-         * @brief Returns current server type.
+         * Returns current server type.
          * 
          * @return mcsm::ServerType 
          */

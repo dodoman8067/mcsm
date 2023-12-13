@@ -133,7 +133,7 @@ bool mcsm::isValidJava(const std::string& path){
         command = path + " -version > /dev/null 2>&1";
     }
     
-    int code = std::system(command.c_str());
+    int code = mcsm::runCommand(command.c_str());
     
     return code == 0;
 }

@@ -26,7 +26,7 @@ SOFTWARE.
 #include <string>
 
 namespace mcsm {
-    // Represents Minecraft server types.
+    // Represents enum of Minecraft server type.
     enum ServerType {
         // Represents vanilla server
         VANILLA,
@@ -46,7 +46,7 @@ namespace mcsm {
         UNKNOWN
     };
 
-    // Represents server type that implements bukkit api.
+    // Represents enum of server type that implements bukkit api.
     enum BukkitServerType {
         // Represents craftbukkit
         CRAFTBUKKIT,
@@ -64,18 +64,18 @@ namespace mcsm {
         OTHER
     };
 
-    /*
+    /**
      * Returns enum representing server type in string.
      * @param name string to convert to enum
      * @return enum representing server type
-     */
+    */
     mcsm::ServerType getServerType(const std::string& name);
 
-    /*
+    /**
      * Returns string representing server type in enum.
      * @param type enum value to convert it to string
      * @return string version of server type
-     */
+    */
     std::string getServerType(const mcsm::ServerType& type);
 }
 

@@ -30,14 +30,73 @@ SOFTWARE.
 #include <mcsm/server/server_type.h>
 
 namespace mcsm {
+    /**
+     * Namespace for server generation-related methods.
+    */
     namespace server {
+        /**
+         * Generates a Bukkit-API based Minecraft server.
+         * @param name server's name
+         * @param option server's default JVM launch profile
+         * @param version Minecraft version for the server
+         * @param type Bukkit-API server implementation (e.g., CRAFTBUKKIT, SPIGOT, PAPER, PURPUR, PUFFERFISH, FOLIA)
+        */
         void generateBukkit(const std::string& name, mcsm::JvmOption& option, const std::string& version, const mcsm::BukkitServerType& type);
+
+        /**
+         * Generates a Forge server.
+         * @param name server's name
+         * @param option server's default JVM launch profile
+         * @param version Minecraft version for the server
+        */
         void generateForge(const std::string& name, mcsm::JvmOption& option, const std::string& version);
+
+        /**
+         * Generates a Fabric server.
+         * @param name server's name
+         * @param option server's default JVM launch profile
+         * @param version Minecraft version for the server
+        */
         void generateFabric(const std::string& name, mcsm::JvmOption& option, const std::string& version);
+
+        /**
+         * Generates a SpongeVanilla server.
+         * @param name server's name
+         * @param option server's default JVM launch profile
+         * @param version Minecraft version for the server
+        */
         void generateSponge(const std::string& name, mcsm::JvmOption& option, const std::string& version);
+
+        /**
+         * Generates a custom server.
+         * @param name server's name
+         * @param option server's default JVM launch profile
+         * @param filePath jarfile's location (path)
+         * @param version Minecraft version for the server
+        */
         void generateCustom(const std::string& name, mcsm::JvmOption& option, const std::string& filePath, const std::string& version);
+
+        /**
+         * Generates a Vanilla server.
+         * @param name server's name
+         * @param option server's default JVM launch profile
+         * @param version Minecraft version for the server
+        */
         void generateVanilla(const std::string& name, mcsm::JvmOption& option, const std::string& version);
+
+        /**
+         * Configures a server.
+         * @param serverOption mcsm::ServerOption instance
+         * @param name server's name
+         * @param option server's default JVM launch profile
+        */
         void configure(mcsm::ServerOption& serverOption, const std::string& name, mcsm::JvmOption& option);
+
+        /**
+         * Returns a pointer of server instance.
+         * @param server server's type
+         * @return pointer of server instance based on `server`
+        */
         std::shared_ptr<mcsm::Server> detectServerType(const std::string& server);
     };
 }
