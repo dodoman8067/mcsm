@@ -27,6 +27,10 @@ const std::vector<std::string> availableOptions = {
     "-profile",
     "-p",
     "--p",
+    "--jvmprofile",
+    "-jvmprofile",
+    "--jp",
+    "-jp"
     "--current",
     "-current",
     "--c",
@@ -61,7 +65,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const st
     for(size_t i = 0; i < args.size(); ++i){
         const std::string& arg = args[i];
         if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
-            if(!(arg == "-profile" || arg == "--profile" || arg == "-p" || arg == "--p")) continue;
+            if(!(arg == "-profile" || arg == "--profile" || arg == "-p" || arg == "--p" || arg == "-jvmprofile" || arg == "--jvmprofile" || arg == "-jp" || "--jp")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-'){
                 std::string pName = args[i + 1];
                 mcsm::SearchTarget target = getSearchTarget(args);
