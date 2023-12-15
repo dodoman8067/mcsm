@@ -25,12 +25,22 @@ void mcsm::server::generateBukkit(const std::string& name, mcsm::JvmOption& opti
     switch(type){
         case mcsm::BukkitServerType::PAPER: {
             std::shared_ptr<mcsm::PaperServer> server = std::make_shared<mcsm::PaperServer>();
+            if(!server->hasVersion(version)){
+                mcsm::error("Unsupported version.");
+                mcsm::error("Please try again with a different version.");
+                std::exit(1);
+            }
             mcsm::ServerOption serverOption(version, server);
             configure(serverOption, name, option);
             break;
         }
         case mcsm::BukkitServerType::PURPUR: {
             std::shared_ptr<mcsm::PurpurServer> server = std::make_shared<mcsm::PurpurServer>();
+            if(!server->hasVersion(version)){
+                mcsm::error("Unsupported version.");
+                mcsm::error("Please try again with a different version.");
+                std::exit(1);
+            }
             mcsm::ServerOption serverOption(version, server);
             configure(serverOption, name, option);
             break;
@@ -45,6 +55,11 @@ void mcsm::server::generateBukkit(const std::string& name, mcsm::JvmOption& opti
 
 void mcsm::server::generateVanilla(const std::string& name, mcsm::JvmOption& option, const std::string& version){
     std::shared_ptr<mcsm::VanillaServer> server = std::make_shared<mcsm::VanillaServer>();
+    if(!server->hasVersion(version)){
+        mcsm::error("Unsupported version.");
+        mcsm::error("Please try again with a different version.");
+        std::exit(1);
+    }
     mcsm::ServerOption serverOption(version, server);
     configure(serverOption, name, option);    
 }

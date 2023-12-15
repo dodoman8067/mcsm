@@ -31,7 +31,7 @@ SOFTWARE.
 namespace mcsm {
     class ViewServerTypeCommand : public mcsm::Command {
     private:
-        inline void printServerInfo();
+        inline void printServerTypeInfo();
     public:
         ViewServerTypeCommand(const std::string& name, const std::string& description);
         ~ViewServerTypeCommand();
