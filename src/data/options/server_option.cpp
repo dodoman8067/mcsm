@@ -352,3 +352,10 @@ void mcsm::ServerOption::setServerJarBuild(const std::string& build){
     mcsm::Option option(".", "server");
     option.setValue("server_build", build);
 }
+
+std::shared_ptr<mcsm::Server> mcsm::ServerOption::getServer() const {
+    if(this->server != nullptr) return this->server;
+    mcsm::error("Server instance null.");
+    mcsm::error("There's a high chance that this is a software issue. Please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+    std::exit(1);
+}
