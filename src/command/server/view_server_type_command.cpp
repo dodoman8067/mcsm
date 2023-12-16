@@ -21,3 +21,30 @@ SOFTWARE.
 */
 
 #include <mcsm/command/server/view_server_type_command.h>
+
+const std::vector<std::string> availableOptions = {
+    "--all",
+    "-all",
+    "--a",
+    "-a",
+    "--type",
+    "-type",
+    "--t",
+    "-t"
+};
+
+mcsm::ViewServerTypeCommand::ViewServerTypeCommand(const std::string& name, const std::string& description) : Command(name, description) {}
+
+mcsm::ViewServerTypeCommand::~ViewServerTypeCommand(){}
+
+void mcsm::ViewServerTypeCommand::execute(const std::vector<std::string>& args){
+
+}
+
+inline void mcsm::ViewServerTypeCommand::printServerTypeInfo(){
+
+}
+
+std::shared_ptr<mcsm::Server> mcsm::ViewServerTypeCommand::getServer(const std::vector<std::string>& args) const {
+
+}

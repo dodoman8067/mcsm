@@ -32,6 +32,7 @@ namespace mcsm {
     class ViewServerTypeCommand : public mcsm::Command {
     private:
         inline void printServerTypeInfo();
+        std::shared_ptr<mcsm::Server> getServer(const std::vector<std::string>& args) const;
     public:
         ViewServerTypeCommand(const std::string& name, const std::string& description);
         ~ViewServerTypeCommand();

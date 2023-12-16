@@ -93,7 +93,7 @@ namespace mcsm {
         void configure(mcsm::ServerOption& serverOption, const std::string& name, mcsm::JvmOption& option);
 
         /**
-         * Returns a pointer of server instance.
+         * Returns a pointer of server instance based on `server`.
          * @param server server's type
          * @return pointer of server instance based on `server`
         */
