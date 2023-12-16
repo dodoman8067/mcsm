@@ -107,8 +107,8 @@ std::shared_ptr<mcsm::Server> mcsm::server::detectServerType(const std::string& 
         sPtr = std::make_shared<mcsm::VanillaServer>();
     }
     if(sPtr == nullptr){
-        mcsm::error("The following server type (" + server + ") is not supported.");
-        mcsm::error("Task aborted.");
+        mcsm::warning("The following server type (" + server + ") is not supported.");
+        mcsm::warning("Task aborted.");
         std::exit(1); 
     }
 

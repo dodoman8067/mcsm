@@ -138,5 +138,5 @@ std::string mcsm::VanillaServer::getWebSite() const {
 }
 
 std::string mcsm::VanillaServer::getGitHub() const {
-    return "";
+    return "none";
 }

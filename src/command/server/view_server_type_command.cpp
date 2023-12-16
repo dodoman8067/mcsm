@@ -23,10 +23,10 @@ SOFTWARE.
 #include <mcsm/command/server/view_server_type_command.h>
 
 const std::vector<std::string> availableOptions = {
-    "--all",
-    "-all",
-    "--a",
-    "-a",
+    "-servertype",
+    "--servertype",
+    "-st",
+    "--st",
     "--type",
     "-type",
     "--t",
@@ -38,13 +38,30 @@ mcsm::ViewServerTypeCommand::ViewServerTypeCommand(const std::string& name, cons
 mcsm::ViewServerTypeCommand::~ViewServerTypeCommand(){}
 
 void mcsm::ViewServerTypeCommand::execute(const std::vector<std::string>& args){
-
+    printServerTypeInfo(args);
 }
 
-inline void mcsm::ViewServerTypeCommand::printServerTypeInfo(){
-
+inline void mcsm::ViewServerTypeCommand::printServerTypeInfo(const std::vector<std::string>& args){
+    std::shared_ptr<mcsm::Server> server = getServer(args);
+    mcsm::info("Server implementation info : ");
+    mcsm::info("Implementation's name : " + server->getTypeAsString());
+    mcsm::info("Implementation is based on : " + server->getBasedServer());
+    mcsm::info("Implementation's supported versions : " + server->getSupportedVersions());
+    mcsm::info("Implementation's website : " + server->getWebSite());
+    mcsm::info("Implementation's GitHub repository : " + server->getGitHub());
 }
 
-std::shared_ptr<mcsm::Server> mcsm::ViewServerTypeCommand::getServer(const std::vector<std::string>& args) const {
-
+inline std::shared_ptr<mcsm::Server> mcsm::ViewServerTypeCommand::getServer(const std::vector<std::string>& args) const {
+    for(size_t i = 0; i < args.size(); ++i){
+        const std::string& arg = args[i];
+        if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
+            if(!(arg == "-type" || arg == "--type" || arg == "-t" || arg == "--t" || arg == "-servertype" || arg == "--servertype" || arg == "-st" || "--st")) continue;
+            if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-'){
+                std::string server = args[i + 1];
+                return mcsm::server::detectServerType(server);
+            }
+        }
+    }
+    mcsm::warning("Server type not provided; Specify a type with --type option to continue.");
+    std::exit(1);
 }

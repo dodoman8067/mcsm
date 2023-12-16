@@ -31,6 +31,7 @@ SOFTWARE.
 #include <mcsm/command/server/jvm/jvm_test_command.h>
 #include <mcsm/command/server/jvm/jvm_option_edit_command.h>
 #include <mcsm/command/server/view_server_command.h>
+#include <mcsm/command/server/view_server_type_command.h>
 
 const std::string version = "0.0.2.0";
 
@@ -112,8 +113,15 @@ inline void initCommands(){
     startServerCommand->addAliases("startserver");
     mcsm::CommandManager::addCommand(std::move(startServerCommand));
 
+
+    // TODO: Consider a better name for these two commands.
     std::unique_ptr<mcsm::ViewServerCommand> viewServerCommmand = std::make_unique<mcsm::ViewServerCommand>("view", "Prints configured server's basic information.");
     viewServerCommmand->addAliases("viewServer");
     viewServerCommmand->addAliases("viewserver");
     mcsm::CommandManager::addCommand(std::move(viewServerCommmand));
+
+    std::unique_ptr<mcsm::ViewServerTypeCommand> viewServerTypeCommmand = std::make_unique<mcsm::ViewServerTypeCommand>("info", "Prints specified server implementation's basic information.");
+    viewServerTypeCommmand->addAliases("infoserver");
+    viewServerTypeCommmand->addAliases("infoServer");
+    mcsm::CommandManager::addCommand(std::move(viewServerTypeCommmand));
 }
