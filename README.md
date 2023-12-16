@@ -53,4 +53,4 @@ This project is licensed under [MIT](LICENSE).
 * [nlohmann/json](https://github.com/nlohmann/json/blob/develop/LICENSE.MIT)
 * [termcolor](https://github.com/ikalnytskyi/termcolor/LICENSE)
 
-Special thanks to creators of the program's dependencies.
+Special thanks to the creators of the program's dependencies.
