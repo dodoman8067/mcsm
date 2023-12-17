@@ -113,7 +113,6 @@ inline void initCommands(){
     startServerCommand->addAliases("startserver");
     mcsm::CommandManager::addCommand(std::move(startServerCommand));
 
-
     // TODO: Consider a better name for these two commands.
     std::unique_ptr<mcsm::ViewServerCommand> viewServerCommmand = std::make_unique<mcsm::ViewServerCommand>("view", "Prints configured server's basic information.");
     viewServerCommmand->addAliases("viewServer");
