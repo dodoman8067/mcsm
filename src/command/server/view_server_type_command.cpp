@@ -62,6 +62,6 @@ inline std::shared_ptr<mcsm::Server> mcsm::ViewServerTypeCommand::getServer(cons
             }
         }
     }
-    mcsm::warning("Server type not provided; Specify a type with --type option to continue.");
+    mcsm::warning("Server type not provided; To continue, specify a type with --type option.");
     std::exit(1);
 }

@@ -50,8 +50,6 @@ inline void mcsm::ViewServerCommand::printServerInfo(){
     mcsm::info("Server default launch profile : " + jvmOpt->getProfileName());
 
     mcsm::ServerDataOption sDataOpt;
-    if(sDataOpt.exists()){
-        mcsm::info("Server creation date : " + sDataOpt.getServerTimeCreated());
-        mcsm::info("Last server launch date : " + sDataOpt.getLastTimeLaunched());
-    }
+    mcsm::info("Server creation date : " + sDataOpt.getServerTimeCreated());
+    mcsm::info("Last server launch date : " + sDataOpt.getLastTimeLaunched());
 }

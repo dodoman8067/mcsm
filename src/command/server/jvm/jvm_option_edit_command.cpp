@@ -104,7 +104,7 @@ std::string mcsm::JvmOptionEditCommand::getProfileName(const std::vector<std::st
                 if(name.find("\"") == std::string::npos && name.find("\'") == std::string::npos){
                     mcsm::JvmOption option(name, target);
                     if(!option.exists()){
-                        mcsm::warning("JVM launch profile " + name + " does not exist. run mcsm genJvmOption command to generate it first.");
+                        mcsm::warning("JVM launch profile " + name + " does not exist. run \"mcsm genJvmProfile --name " + name + "\" command to generate it first.");
                         std::exit(1); 
                     }
                 }else{
@@ -113,7 +113,7 @@ std::string mcsm::JvmOptionEditCommand::getProfileName(const std::vector<std::st
                     mcsm::warning("NOTE : \' and \" are not allowed in names; Name was modified to " + name + ".");
                     mcsm::JvmOption option(name, target);
                     if(!option.exists()){
-                        mcsm::warning("JVM launch profile " + name + " does not exist. run mcsm genJvmOption command to generate it first.");
+                        mcsm::warning("JVM launch profile " + name + " does not exist. run \"mcsm genJvmProfile --name " + name + "\" command to generate it first.");
                         std::exit(1); 
                     }
                 }
@@ -121,7 +121,7 @@ std::string mcsm::JvmOptionEditCommand::getProfileName(const std::vector<std::st
             }
         }
     }
-    mcsm::warning("Name not provided; Specify a name with --name option to continue.");
+    mcsm::warning("Name not provided; To continue, specify a name with --name option.");
     std::exit(1);
 }
 

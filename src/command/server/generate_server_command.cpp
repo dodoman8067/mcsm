@@ -59,7 +59,7 @@ mcsm::GenerateServerCommand::~GenerateServerCommand(){}
 
 void mcsm::GenerateServerCommand::execute(const std::vector<std::string>& args){
     if(args.empty()){
-        mcsm::warning("Name not provided; Specify a name with --name option to continue.");
+        mcsm::warning("Name not provided; To continue, specify a name with --name option.");
         std::exit(1);
     }
     detectServer(args);
@@ -84,7 +84,7 @@ std::string mcsm::GenerateServerCommand::getProfileName(const std::vector<std::s
             }
         }
     }
-    mcsm::warning("Profile name not provided; Specify a profile name with --profile option to continue.");
+    mcsm::warning("Profile name not provided; To continue, specify a profile name with --profile option.");
     std::exit(1);
 }
 
@@ -107,7 +107,7 @@ std::string mcsm::GenerateServerCommand::getServerName(const std::vector<std::st
             }
         }
     }
-    mcsm::warning("Server name not provided; Specify a name with --name option to continue.");
+    mcsm::warning("Server name not provided; To continue, specify a name with --name option.");
     std::exit(1);
 }
 
@@ -123,7 +123,7 @@ std::string mcsm::GenerateServerCommand::getServerVersion(const std::vector<std:
             }
         }
     }
-    mcsm::warning("Server version not provided; Specify a version with --version option to continue.");
+    mcsm::warning("Server version not provided; To continue, specify a version with --version option.");
     std::exit(1);
 }
 
@@ -160,7 +160,7 @@ std::string mcsm::GenerateServerCommand::getServerType(const std::vector<std::st
             }
         }
     }
-    mcsm::warning("Server type not provided; Specify a type with --servertype option to continue.");
+    mcsm::warning("Server type not provided; To continue, specify a type with --servertype option.");
     std::exit(1);
 }
 
