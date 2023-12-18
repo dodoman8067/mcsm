@@ -56,12 +56,8 @@ namespace mcsm {
         PAPER,
         // Represents purpur
         PURPUR,
-        // Represents pufferfish
-        PUFFERFISH,
         // Represents folia
-        FOLIA,
-        // Represents other types of bukkit server
-        OTHER
+        FOLIA
     };
 
     /**
