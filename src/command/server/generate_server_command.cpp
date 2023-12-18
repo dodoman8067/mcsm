@@ -193,10 +193,6 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& a
         mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::PURPUR);
         return;
     }
-    if(type == "bukkit" || type == "craftbukkit"){
-        mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::PUFFERFISH);
-        return;
-    }
     if(type == "vanilla"){
         mcsm::server::generateVanilla(name, *option, version);
         return;

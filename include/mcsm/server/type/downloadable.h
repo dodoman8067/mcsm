@@ -64,7 +64,7 @@ namespace mcsm {
         virtual void download(const std::string& version, const std::string& path, const std::string& name) = 0;
 
         /**
-         * Returns the following server has this version
+         * Returns the following server has this version.
          * 
          * @param version version of the server
          * @return true when version exists, otherwise false

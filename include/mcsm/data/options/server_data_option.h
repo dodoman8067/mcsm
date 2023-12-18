@@ -39,6 +39,8 @@ namespace mcsm {
         void updateLastTimeLaunched();
         std::string getServerTimeCreated() const;
         void updateServerTimeCreated();
+        std::string getLastDownloadedBuild() const;
+        void updateLastDownloadedBuild(const std::string& build);
         bool exists() const;
     };
 }

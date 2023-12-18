@@ -74,6 +74,13 @@ std::vector<std::string> mcsm::PurpurServer::getAvailableVersions(){
 std::string mcsm::PurpurServer::getJarFile() const {
     mcsm::Option opt(".", "server");
     if(opt.exists() && opt.getValue("server_jar") != nullptr){
+        if(!opt.getValue("server_jar").is_string()){
+            mcsm::error("Value \"server_jar\" has to be a string, but it's not.");
+            mcsm::error("Manually editing the launch profile might have caused this issue.");
+            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+            std::exit(1);
+        }
         return opt.getValue("server_jar");
     }
     return getTypeAsString() + ".jar";
@@ -105,6 +112,7 @@ void mcsm::PurpurServer::download(const std::string& version, const std::string&
 
 void mcsm::PurpurServer::download(const std::string& version, const std::string& path, const std::string& name){
     mcsm::Option opt(".", "server");
+    mcsm::ServerDataOption sDataOpt;
     if(opt.hasValue("server_build") && opt.getValue("server_build") != "latest"){
         if(!opt.getValue("server_build").is_string()){
             mcsm::error("Value \"server_build\" option in server.json must be a string type.");
@@ -126,6 +134,7 @@ void mcsm::PurpurServer::download(const std::string& version, const std::string&
         std::string strVer = std::to_string(ver);
         std::string url = "https://api.purpurmc.org/v2/purpur/" + version + "/" + strVer + "/download/";
         mcsm::download(name, url, path);
+        sDataOpt.updateLastDownloadedBuild(strVer);
     }else{
         if(!opt.hasValue("server_build")){
             mcsm::error("Missing \"server_build\" option in server.json");
@@ -141,6 +150,7 @@ void mcsm::PurpurServer::download(const std::string& version, const std::string&
         std::string strVer = std::to_string(ver);
         std::string url = "https://api.purpurmc.org/v2/purpur/" + version + "/" + strVer + "/download/";
         mcsm::download(name, url, path);
+        sDataOpt.updateLastDownloadedBuild(strVer);
     }
 }
 
@@ -149,8 +159,59 @@ void mcsm::PurpurServer::start(mcsm::JvmOption& option){
     if(!std::filesystem::exists(getJarFile())){
         mcsm::info("Downloading " + getJarFile() + "...");
         download(sOpt.getServerVersion());
+    }else{
+        update();
     }
     Server::start(option);
+}
+
+void mcsm::PurpurServer::update(){
+    // If you change the default build to specific build from latest build, it won't downgrade automatically. (You'll have to manually delete the server jarfile) This is an intented feature.
+    mcsm::info("Checking updates...");
+    mcsm::ServerDataOption sDataOpt;
+    mcsm::Option opt(".", "server");
+    if(!opt.getValue("server_build").is_string()){
+        mcsm::error("Value \"server_build\" option in server.json must be a string type.");
+        mcsm::error("To fix, change it into \"server_build\": \"latest\" .");
+        std::exit(1);            
+    }
+    std::string build = opt.getValue("server_build").get<std::string>();
+    if(build != "latest"){
+        mcsm::warning("This server won't update to latest build.");
+        mcsm::warning("Change server.json into \"server_build\": \"latest\" for automatic download.");
+        return;
+    }
+    if(opt.getValue("version") == nullptr){
+        mcsm::error("No \"version\" value specified in file " + opt.getName());
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);
+    }
+    if(!opt.getValue("version").is_string()){
+        mcsm::error("Value \"version\" has to be a string, but it's not.");
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);            
+    }
+    std::string version = opt.getValue("version").get<std::string>();
+    int ver = getVersion(version);
+    if(ver == -1){
+        mcsm::error("Unsupported version.");
+        mcsm::error("Please try again with a different version.");
+        std::exit(1);
+    }
+    std::string strVer = std::to_string(ver);
+    if(sDataOpt.getLastDownloadedBuild() == strVer){
+        mcsm::success("Server is up to date.");
+        return;
+    }
+    mcsm::success("Update found : "  + strVer + ". Current build : " + sDataOpt.getLastDownloadedBuild());
+    if(std::filesystem::exists(getJarFile())){
+        std::filesystem::remove(getJarFile());
+    }
+    download(version);
 }
 
 bool mcsm::PurpurServer::hasVersion(const std::string& version){
