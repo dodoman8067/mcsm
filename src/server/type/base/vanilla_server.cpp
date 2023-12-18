@@ -114,11 +114,7 @@ mcsm::ServerType mcsm::VanillaServer::getType() const {
 }
 
 std::string mcsm::VanillaServer::getJarFile() const {
-    mcsm::Option opt(".", "server");
-    if(opt.exists() && opt.getValue("server_jar") != nullptr){
-        return opt.getValue("server_jar");
-    }
-    return "server.jar";
+    return Server::getJarFile();
 }
 
 std::string mcsm::VanillaServer::getSupportedVersions() const {
