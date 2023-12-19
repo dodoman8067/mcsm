@@ -4,12 +4,17 @@ project(mcsm)
 # Set include directory
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
+# Add options
+option(BUILD_STATIC_EXE "Build static executable" ON)
+
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 
 # Set dependency options
-set(ZLIB_USE_STATIC_LIBS TRUE)
-set(OPENSSL_USE_STATIC_LIBS TRUE)
+if(BUILD_STATIC_EXE)
+    set(ZLIB_USE_STATIC_LIBS TRUE)
+    set(OPENSSL_USE_STATIC_LIBS TRUE)
+endif()
 
 # Source files
 file(GLOB_RECURSE SRC_FILES ${CMAKE_SOURCE_DIR}/src/*.cpp)
@@ -31,11 +36,15 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -flto")
 endif()
 
-if(CMAKE_BUILD_TYPE MATCHES Release)
+if(CMAKE_BUILD_TYPE MATCHES Release AND BUILD_STATIC_EXE)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         message("-- Detected compiler " ${CMAKE_CXX_COMPILER_ID} ". Using -static flags")
-        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -flto")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
     endif()
+endif()
+
+if(CMAKE_BUILD_TYPE MATCHES Release)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -flto")
 endif()
 
 # Find dependencies 
