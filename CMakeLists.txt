@@ -5,7 +5,7 @@ project(mcsm)
 include_directories(${CMAKE_SOURCE_DIR}/include)
 
 # Add options
-option(BUILD_STATIC_EXE "Build static executable" ON)
+option(BUILD_STATIC_EXE "Build static executable" OFF)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
