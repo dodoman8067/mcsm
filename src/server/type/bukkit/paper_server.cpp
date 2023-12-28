@@ -120,7 +120,7 @@ void mcsm::PaperServer::download(const std::string& version, const std::string& 
         }
         std::string strVer = std::to_string(ver);
         std::string url = "https://api.papermc.io/v2/projects/paper/versions/" + version + "/builds/" + strVer + "/downloads/paper-" + version + "-" + strVer + ".jar";
-        mcsm::download(name, url, path);
+        mcsm::download(name, url, path, true);
         sDataOpt.updateLastDownloadedBuild(strVer);
     }else{
         if(!opt.hasValue("server_build")){
@@ -136,7 +136,7 @@ void mcsm::PaperServer::download(const std::string& version, const std::string& 
         }
         std::string strVer = std::to_string(ver);
         std::string url = "https://api.papermc.io/v2/projects/paper/versions/" + version + "/builds/" + strVer + "/downloads/paper-" + version + "-" + strVer + ".jar";
-        mcsm::download(name, url, path);
+        mcsm::download(name, url, path, true);
         sDataOpt.updateLastDownloadedBuild(strVer);
     }
 }

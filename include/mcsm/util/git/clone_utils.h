@@ -20,39 +20,15 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#ifndef __MCSM_CLONE_UTILS_H__
+#define __MCSM_CLONE_UTILS_H__
 
-#ifndef __MCSM_DOWNLOAD_H__
-#define __MCSM_DOWNLOAD_H__
-
-#include <curl/curl.h>
 #include <mcsm/util/cli/logging.h>
-#include <cstdio>
-#include <filesystem>
+#include <git2/clone.h>
 
 namespace mcsm {
-    /**
-     * Downloads a file in `url` named as `name`.
-     * @param name file's name
-     * @param url link to perform GET request
-    */
-    void download(const std::string& name, const std::string& url);
-
-    /**
-     * Downloads a file in `url` named as `name`.
-     * @param name file's name
-     * @param url link to perform GET request
-     * @param path file's stored location
-    */
-    void download(const std::string& name, const std::string& url, const std::string& path);
-
-    /**
-     * Downloads a file in `url` named as `name` while printing percentages.
-     * @param name file's name
-     * @param url link to perform GET request
-     * @param path file's stored location
-     * @param percentages progress of downloading the file
-    */
-    void download(const std::string& name, const std::string& url, const std::string& path, const bool& percentages);
+    void cloneRepo(const std::string& url);
+    void cloneRepo(const std::string& url, const std::string& path);
 }
 
-#endif // __MCSM_DOWNLOAD_H__
+#endif // __MCSM_CLONE_UTILS_H__
