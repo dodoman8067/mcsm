@@ -1,9 +1,6 @@
 cmake_minimum_required(VERSION 3.24)
 project(mcsm)
 
-# Set include directory
-include_directories(${CMAKE_SOURCE_DIR}/include)
-
 # Add options
 option(BUILD_STATIC_EXE "Build static executable" OFF)
 
@@ -16,6 +13,18 @@ if(BUILD_STATIC_EXE)
     set(OPENSSL_USE_STATIC_LIBS TRUE)
 endif()
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
+
+# Find dependencies 
+find_package(termcolor REQUIRED)
+find_package(CURL REQUIRED CONFIG)
+find_package(nlohmann_json 3.2.0 REQUIRED)
+include(Findlibgit2)
+if(LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
+    find_package(Backward REQUIRED)
+endif()
+
+# Set include directory
+include_directories(${CMAKE_SOURCE_DIR}/include ${LIBGIT2_INCLUDE_DIR})
 
 # Source files
 file(GLOB_RECURSE SRC_FILES ${CMAKE_SOURCE_DIR}/src/*.cpp)
@@ -46,15 +55,6 @@ endif()
 
 if(CMAKE_BUILD_TYPE MATCHES Release)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -flto")
-endif()
-
-# Find dependencies 
-find_package(termcolor REQUIRED)
-find_package(CURL REQUIRED CONFIG)
-find_package(nlohmann_json 3.2.0 REQUIRED)
-find_package(libgit2 REQUIRED)
-if(LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
-    find_package(Backward REQUIRED)
 endif()
 
 # Add executable
