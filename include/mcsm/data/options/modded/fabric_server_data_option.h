@@ -9,9 +9,9 @@ namespace mcsm {
         FabricServerDataOption();
         ~FabricServerDataOption();
         std::string getLoaderVersion() const;
-        void setLoaderVersion(const std::string& version);
+        void updateLoaderVersion(const std::string& version);
         std::string getAPIVersion() const;
-        void setAPIVersion(const std::string& version);
+        void updateAPIVersion(const std::string& version);
     };
 }
 

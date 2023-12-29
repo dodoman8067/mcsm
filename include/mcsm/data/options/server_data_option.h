@@ -28,7 +28,7 @@ SOFTWARE.
 
 namespace mcsm {
     class ServerDataOption {
-    private:
+    protected:
         std::unique_ptr<mcsm::Option> option;
     public:
         ServerDataOption();
