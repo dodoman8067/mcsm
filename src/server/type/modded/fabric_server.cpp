@@ -80,10 +80,6 @@ std::vector<std::string> mcsm::FabricServer::getAvailableVersions(){
     return versions;
 }
 
-std::string mcsm::FabricServer::getJarFile() const {
-    return Server::getJarFile();
-}
-
 std::string mcsm::FabricServer::getSupportedVersions() const {
     return "1.14~";
 }

@@ -38,7 +38,6 @@ namespace mcsm {
     public:
         VanillaServer();
         ~VanillaServer();
-        std::string getJarFile() const override;
         std::string getSupportedVersions() const override;
         std::string getBasedServer() const override;
         std::string getWebSite() const override;

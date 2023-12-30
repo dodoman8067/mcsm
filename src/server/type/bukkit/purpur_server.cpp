@@ -71,10 +71,6 @@ std::vector<std::string> mcsm::PurpurServer::getAvailableVersions(){
     return versions;
 }
 
-std::string mcsm::PurpurServer::getJarFile() const {
-    return Server::getJarFile();
-}
-
 std::string mcsm::PurpurServer::getSupportedVersions() const {
     return "1.14.1~";
 }

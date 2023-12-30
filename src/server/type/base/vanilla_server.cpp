@@ -113,10 +113,6 @@ mcsm::ServerType mcsm::VanillaServer::getType() const {
     return ServerType::VANILLA;
 }
 
-std::string mcsm::VanillaServer::getJarFile() const {
-    return Server::getJarFile();
-}
-
 std::string mcsm::VanillaServer::getSupportedVersions() const {
     return "1.14~";
 }

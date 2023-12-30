@@ -71,10 +71,6 @@ std::vector<std::string> mcsm::PaperServer::getAvailableVersions(){
     return versions;
 }
 
-std::string mcsm::PaperServer::getJarFile() const {
-    return Server::getJarFile();
-}
-
 std::string mcsm::PaperServer::getSupportedVersions() const {
     return "1.8~";
 }
