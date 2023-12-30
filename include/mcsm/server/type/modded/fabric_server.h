@@ -35,8 +35,8 @@ namespace mcsm {
     public:
         FabricServer();
         ~FabricServer();
-        int getVersion(const std::string& ver) const;
-        int getVersion(const std::string& ver, const std::string& build) const;
+        std::string getVersion(const std::string& ver) const;
+        std::string getVersion() const;
         std::vector<std::string> getAvailableVersions() override;
         std::string getJarFile() const override;
         std::string getSupportedVersions() const override;
@@ -49,6 +49,7 @@ namespace mcsm {
         void download(const std::string& version, const std::string& path, const std::string& name) override;
         bool hasVersion(const std::string& version) override;
         std::string getTypeAsString() const override;
+        mcsm::ServerType getType() const override;
         void update();
     };
 }

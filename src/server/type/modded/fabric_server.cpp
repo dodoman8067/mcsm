@@ -26,8 +26,11 @@ mcsm::FabricServer::FabricServer() {}
 
 mcsm::FabricServer::~FabricServer() {}
 
-int mcsm::FabricServer::getVersion(const std::string& ver) const {
-    std::string res = mcsm::get("https://api.purpurmc.org/v2/purpur/" + ver);
+/**
+ * Returns fabric loader version.
+ */
+std::string mcsm::FabricServer::getVersion(const std::string& ver) const {
+    std::string res = mcsm::get("https://meta.fabricmc.net/v2/versions/loader/" + ver);
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
     if(json.is_discarded()){
         mcsm::error("Parse of json failed.");
@@ -36,30 +39,36 @@ int mcsm::FabricServer::getVersion(const std::string& ver) const {
         mcsm::error("Called method : mcsm::FabricServer::getVersion() with arguments : " + ver);
         std::exit(1);
     }
-    if(json["builds"] != nullptr){
-        nlohmann::json builds = json["builds"];
-        if(builds["latest"] == nullptr) return -1;
-        return std::stoi(builds["latest"].get<std::string>());
+    if(json.is_array() && !json.empty()){
+        nlohmann::json firstLoader = json[0]["loader"];
+        if(firstLoader == nullptr || firstLoader["version"] == nullptr || !firstLoader["version"].is_string()) return "";
+        std::string version = firstLoader["version"];
+        return version;
     }else{
-        return -1;
+        return "";
     }
 }
 
-int mcsm::FabricServer::getVersion(const std::string& ver, const std::string& build) const {
-    std::string res = mcsm::get("https://api.purpurmc.org/v2/purpur/" + ver + "/" +  build);
+/**
+ * Returns fabric installer version.
+ */
+std::string mcsm::FabricServer::getVersion() const {
+    std::string res = mcsm::get("https://meta.fabricmc.net/v2/versions/installer");
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
     if(json.is_discarded()){
         mcsm::error("Parse of json failed.");
         mcsm::error("If you believe that this is an error, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
         mcsm::error("Error informations : ");
-        mcsm::error("Called method : mcsm::FabricServer::getVersion() with arguments : " + ver + ", " + build);
+        mcsm::error("Called method : mcsm::FabricServer::getVersion()");
         std::exit(1);
     }
-
-    if(json["build"] == nullptr){
-        return -1;
+    if(json.is_array() && !json.empty()){
+        nlohmann::json first = json[0];
+        if(first == nullptr || first["version"] == nullptr || !first["version"].is_string()) return "";
+        std::string version = first["version"];
+        return version;
     }else{
-        return std::stoi(json["build"].get<std::string>());
+        return "";
     }
 }
 
@@ -76,19 +85,19 @@ std::string mcsm::FabricServer::getJarFile() const {
 }
 
 std::string mcsm::FabricServer::getSupportedVersions() const {
-    return "1.14.1~";
+    return "1.14";
 }
 
 std::string mcsm::FabricServer::getBasedServer() const {
-    return "pufferfish";
+    return "vanilla";
 }
 
 std::string mcsm::FabricServer::getWebSite() const {
-    return "https://purpurmc.org";
+    return "https://fabricmc.net";
 }
 
 std::string mcsm::FabricServer::getGitHub() const {
-    return "https://github.com/PurpurMC/Purpur";
+    return "https://github.com/FabricMC/fabric";
 }
 
 void mcsm::FabricServer::download(const std::string& version){
@@ -100,6 +109,7 @@ void mcsm::FabricServer::download(const std::string& version, const std::string&
 }
 
 void mcsm::FabricServer::download(const std::string& version, const std::string& path, const std::string& name){
+    /*
     mcsm::Option opt(".", "server");
     mcsm::ServerDataOption sDataOpt;
     if(opt.hasValue("server_build") && opt.getValue("server_build") != "latest"){
@@ -141,6 +151,7 @@ void mcsm::FabricServer::download(const std::string& version, const std::string&
         mcsm::download(name, url, path, true);
         sDataOpt.updateLastDownloadedBuild(strVer);
     }
+    */
 }
 
 void mcsm::FabricServer::start(mcsm::JvmOption& option){
@@ -155,6 +166,7 @@ void mcsm::FabricServer::start(mcsm::JvmOption& option){
 }
 
 void mcsm::FabricServer::update(){
+    /*
     // If you change the default build to specific build from latest build, it won't downgrade automatically. (You'll have to manually delete the server jarfile) This is an intented feature.
     mcsm::info("Checking updates...");
     mcsm::ServerDataOption sDataOpt;
@@ -201,12 +213,17 @@ void mcsm::FabricServer::update(){
         std::filesystem::remove(getJarFile());
     }
     download(version);
+    */
 }
 
 bool mcsm::FabricServer::hasVersion(const std::string& version){
-    return getVersion(version) != -1;
+    return !mcsm::isWhitespaceOrEmpty(getVersion(version));
 }
 
 std::string mcsm::FabricServer::getTypeAsString() const {
     return "fabric";
+}
+
+mcsm::ServerType mcsm::FabricServer::getType() const {
+    return mcsm::ServerType::FABRIC;
 }

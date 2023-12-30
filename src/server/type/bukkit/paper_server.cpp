@@ -37,7 +37,9 @@ int mcsm::PaperServer::getVersion(const std::string& ver) const {
         std::exit(1);
     }
     if(json["builds"].is_array()){
-        return json["builds"][json["builds"].size() - 1];
+        nlohmann::json builds = json["builds"];
+        if(builds[json["builds"].size() - 1] == nullptr || !builds[json["builds"].size() - 1].is_number_integer()) return -1;
+        return builds[json["builds"].size() - 1];
     }else{
         return -1;
     }
@@ -54,7 +56,7 @@ int mcsm::PaperServer::getVersion(const std::string& ver, const std::string& bui
         std::exit(1);
     }
 
-    if(json["build"] == nullptr){
+    if(json["build"] == nullptr || !json["build"].is_number_integer()){
         return -1;
     }else{
         return json["build"];
