@@ -85,7 +85,7 @@ std::string mcsm::FabricServer::getJarFile() const {
 }
 
 std::string mcsm::FabricServer::getSupportedVersions() const {
-    return "1.14";
+    return "1.14~";
 }
 
 std::string mcsm::FabricServer::getBasedServer() const {
