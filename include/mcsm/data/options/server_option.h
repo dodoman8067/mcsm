@@ -32,7 +32,7 @@ SOFTWARE.
 
 namespace mcsm {
     class ServerOption {
-    private:
+    protected:
         std::shared_ptr<mcsm::Server> server;
         std::string version;
     public:

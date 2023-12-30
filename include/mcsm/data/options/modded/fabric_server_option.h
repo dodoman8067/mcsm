@@ -2,6 +2,7 @@
 #define __MCSM_FABRIC_SERVER_OPTION_H__
 
 #include <mcsm/data/options/server_option.h>
+#include <mcsm/server/type/modded/fabric_server.h>
 
 namespace mcsm {
     class FabricServerOption : public mcsm::ServerOption {
