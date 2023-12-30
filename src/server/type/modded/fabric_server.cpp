@@ -104,7 +104,7 @@ void mcsm::FabricServer::download(const std::string& version, const std::string&
     download(version, path, getJarFile());
 }
 
-void mcsm::FabricServer::download(const std::string& version, const std::string& path, const std::string& name){
+void mcsm::FabricServer::download(const std::string& /* version */, const std::string& /* path */, const std::string& /* name */){
     /*
     mcsm::Option opt(".", "server");
     mcsm::ServerDataOption sDataOpt;
