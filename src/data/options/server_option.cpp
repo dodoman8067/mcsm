@@ -41,7 +41,7 @@ mcsm::ServerOption::ServerOption(){
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
         mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);      
+        std::exit(1);
     }
 
     ServerOption(option.getValue("version"));
@@ -65,7 +65,7 @@ mcsm::ServerOption::ServerOption(const std::string& version){
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
         mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);      
+        std::exit(1);
     }
 
     std::string server = option.getValue("type");
