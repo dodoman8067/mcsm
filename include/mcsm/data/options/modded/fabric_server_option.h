@@ -15,6 +15,10 @@ namespace mcsm {
         void start(std::unique_ptr<mcsm::JvmOption> option) override;
         std::string getServerJarBuild() const override;
         void setServerJarBuild(const std::string& build) override;
+        std::string getLoaderVersion() const;
+        void setLoaderVersion(const std::string& version);
+        std::string getInstallerVersion() const;
+        void setInstallerVersion(const std::string& version);
     };
 }
 
