@@ -73,6 +73,7 @@ void mcsm::FabricServerOption::create(const std::string& name, mcsm::JvmOption& 
     if(option.exists()){
         mcsm::error("Server is already configured in this directory.");
         mcsm::error("Please create a server.json file in other directories.");
+        std::exit(1);
     }
 
     mcsm::ServerDataOption serverDataOpt;
