@@ -125,7 +125,7 @@ void mcsm::FabricServer::download(const std::string& version, const std::string&
             mcsm::error("To fix, change it into \"loader_version\": \"latest\" .");
             std::exit(1);
         }
-        //TODO : Add checks if specified version exists
+        //TODO : Add checks if specified version exists (not tested)
         std::string loaderVer = opt.getValue("loader_version").get<std::string>();
         if(mcsm::isWhitespaceOrEmpty(loaderVer)){
             mcsm::error("Missing \"loader_version\" option in server.json");
