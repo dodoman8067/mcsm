@@ -37,6 +37,8 @@ namespace mcsm {
         ~FabricServer();
         std::string getVersion(const std::string& ver) const;
         std::string getVersion() const;
+        bool loaderExists(const std::string& version, const std::string& loader) const;
+        bool installerExists(const std::string& version, const std::string& installer) const;
         std::vector<std::string> getAvailableVersions() override;
         std::string getSupportedVersions() const override;
         std::string getBasedServer() const override;
