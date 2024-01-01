@@ -168,16 +168,23 @@ void mcsm::FabricServer::download(const std::string& version, const std::string&
 
     std::string url = "https://meta.fabricmc.net/v2/versions/loader/" + version + "/" + loaderVer + "/" + installerVer + "/server/jar";
     mcsm::info("URL : " + url);
-    std::string res = mcsm::get(url);
+
+    if(mcsm::isText(url)){
+        std::string res = mcsm::get(url);
     
-    if(res == "Unable to find valid version for loader_version" || res == "Fabric loader 0.12 or higher is required for unattended server installs. Please use a newer fabric loader version, or the full installer."){
-        mcsm::error("Unsupported loader version : " + loaderVer);
-        mcsm::error("Please try again with a different version.");
-        std::exit(1);
-    }else if(res == "Unable to find valid version for installer_version" || res == "Fabric loader 0.12 or higher is required for unattended server installs. Please use a newer fabric loader version, or the full installer."){
-        mcsm::error("Unsupported installer version : " + installerVer);
-        mcsm::error("Please try again with a different version.");
-        std::exit(1);
+        if(res == "Unable to find valid version for loader_version" || res == "Fabric loader 0.12 or higher is required for unattended server installs. Please use a newer fabric loader version, or the full installer."){
+            mcsm::error("Unsupported loader version : " + loaderVer);
+            mcsm::error("Please try again with a different version.");
+            std::exit(1);
+        }else if(res == "Unable to find valid version for installer_version" || res == "Fabric loader 0.12 or higher is required for unattended server installs. Please use a newer fabric loader version, or the full installer."){
+            mcsm::error("Unsupported installer version : " + installerVer);
+            mcsm::error("Please try again with a different version.");
+            std::exit(1);
+        }else{
+            mcsm::error("Cannot download the file due to the following reason : " + res);
+            mcsm::error("Please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+            std::exit(1);
+        }
     }
     
     mcsm::download(name, url, path, true);
