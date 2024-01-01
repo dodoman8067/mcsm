@@ -32,7 +32,7 @@ SOFTWARE.
 
 namespace mcsm {
     class ServerOption {
-    protected:
+    private:
         std::shared_ptr<mcsm::Server> server;
         std::string version;
     public:
@@ -40,9 +40,9 @@ namespace mcsm {
         ServerOption(const std::string& version);
         ServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server);
         ~ServerOption();
-        virtual void create(const std::string& name, mcsm::JvmOption& defaultOption);
-        virtual void start();
-        virtual void start(std::unique_ptr<mcsm::JvmOption> option);
+        void create(const std::string& name, mcsm::JvmOption& defaultOption);
+        void start();
+        void start(std::unique_ptr<mcsm::JvmOption> option);
         bool exists();
         std::string getServerName() const;
         void setServerName(const std::string& name);
@@ -53,8 +53,8 @@ namespace mcsm {
         std::string getServerType() const;
         std::string getServerJarFile() const;
         void setServerJarFile(const std::string& name);
-        virtual std::string getServerJarBuild() const;
-        virtual void setServerJarBuild(const std::string& build);
+        std::string getServerJarBuild() const;
+        void setServerJarBuild(const std::string& build);
         std::shared_ptr<mcsm::Server> getServer() const;
     };
 }

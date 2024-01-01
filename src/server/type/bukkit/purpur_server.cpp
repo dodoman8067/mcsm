@@ -118,6 +118,7 @@ void mcsm::PurpurServer::download(const std::string& version, const std::string&
         }
         std::string strVer = std::to_string(ver);
         std::string url = "https://api.purpurmc.org/v2/purpur/" + version + "/" + strVer + "/download/";
+        mcsm::info("URL : " + url);
         mcsm::download(name, url, path, true);
         sDataOpt.updateLastDownloadedBuild(strVer);
     }else{
@@ -134,6 +135,7 @@ void mcsm::PurpurServer::download(const std::string& version, const std::string&
         }
         std::string strVer = std::to_string(ver);
         std::string url = "https://api.purpurmc.org/v2/purpur/" + version + "/" + strVer + "/download/";
+        mcsm::info("URL : " + url);
         mcsm::download(name, url, path, true);
         sDataOpt.updateLastDownloadedBuild(strVer);
     }

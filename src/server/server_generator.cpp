@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 #include <mcsm/server/server_generator.h>
+#include <backward.hpp>
 
 void mcsm::server::generateBukkit(const std::string& name, mcsm::JvmOption& option, const std::string& version, const mcsm::BukkitServerType& type){
     switch(type){
@@ -76,7 +77,17 @@ void mcsm::server::generateFabric(const std::string& name, mcsm::JvmOption& opti
         std::exit(1);
     }
     std::unique_ptr<mcsm::FabricServerOption> serverOption = std::make_unique<mcsm::FabricServerOption>(version, server);
-    configure(std::move(serverOption), name, option);   
+    if(serverOption->exists()){
+        mcsm::error("Server is already configured in this directory.");
+        mcsm::error("Try in another directory.");
+        std::exit(1);
+    }
+    serverOption->create(name, option);
+    mcsm::success("Configured server information : ");
+    mcsm::info("Server name : " + serverOption->getServerName());
+    mcsm::info("Server type : " + serverOption->getServerType());
+    mcsm::info("Server version : " + serverOption->getServerVersion());
+    mcsm::info("Server JVM launch profile : " + serverOption->getDefaultOption()->getProfileName());
 }
 
 void mcsm::server::generateSponge(const std::string& /* name */, mcsm::JvmOption& /* option */, const std::string& /* version */){
