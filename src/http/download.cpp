@@ -129,7 +129,7 @@ bool mcsm::isText(const std::string& url){
     res = curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &contentType);
     if(res == CURLE_OK && contentType){
         std::string contentTypeStr(contentType);
-        isText = contentTypeStr.find("text") == 0 || contentTypeStr.find("json") == 0;
+        isText = contentTypeStr.find("text") == 0 || contentTypeStr.find("json") != std::string::npos;
     }else{
         mcsm::error("Failed to check if the following url : " + url + " returns a text with the following reason : " + curl_easy_strerror(res));
         curl_easy_cleanup(curl);
