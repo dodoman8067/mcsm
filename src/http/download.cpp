@@ -99,3 +99,43 @@ void mcsm::download(const std::string& name, const std::string& url, const std::
     std::fclose(file);
     curl_easy_cleanup(curl);
 }
+
+bool mcsm::isText(const std::string& url){
+    CURL* curl = curl_easy_init();
+    char *contentType = nullptr;
+    bool isText = true;
+
+    if(!curl){
+        mcsm::error("Unable to initialize curl");
+        mcsm::error("Please try re-running the program, reboot the PC or reinstall the program.");
+        mcsm::error("If none of it isn't working for you, please open a new issue in GitHub (https://github.com/dodoman8067/mcsm).");
+        curl_easy_cleanup(curl);
+        std::exit(1);
+    }
+    CURLcode res;
+
+    curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
+    curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
+    curl_easy_setopt(curl, CURLOPT_NOBODY, 1L);
+
+    res = curl_easy_perform(curl);
+
+    if(res != CURLE_OK){
+        mcsm::error("Failed to check if the following url : " + url + " returns a text with the following reason : " + curl_easy_strerror(res));
+        curl_easy_cleanup(curl);
+        std::exit(1);
+    }
+
+    res = curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &contentType);
+    if(res == CURLE_OK && contentType){
+        std::string contentTypeStr(contentType);
+        isText = contentTypeStr.find("text") == 0;
+    }else{
+        mcsm::error("Failed to check if the following url : " + url + " returns a text with the following reason : " + curl_easy_strerror(res));
+        curl_easy_cleanup(curl);
+        std::exit(1);
+    }
+
+    curl_easy_cleanup(curl);
+    return isText;
+}

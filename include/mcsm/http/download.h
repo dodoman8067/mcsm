@@ -53,6 +53,13 @@ namespace mcsm {
      * @param percentages progress of downloading the file
     */
     void download(const std::string& name, const std::string& url, const std::string& path, const bool& percentages);
+
+    /**
+     * Checks if the following `url` returns a text.
+     * @param url link to check with
+     * @return true if the following `url` returns a text, otherwise false
+     */
+    bool isText(const std::string& url);
 }
 
 #endif // __MCSM_DOWNLOAD_H__
