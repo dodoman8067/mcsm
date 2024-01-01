@@ -27,6 +27,8 @@ SOFTWARE.
 #include <mcsm/server/type/bukkit/paper_server.h>
 #include <mcsm/server/type/bukkit/purpur_server.h>
 #include <mcsm/server/type/base/vanilla_server.h>
+#include <mcsm/server/type/modded/fabric_server.h>
+#include <mcsm/data/options/modded/fabric_server_option.h>
 #include <mcsm/server/server_type.h>
 
 namespace mcsm {
@@ -86,11 +88,11 @@ namespace mcsm {
 
         /**
          * Configures a server.
-         * @param serverOption mcsm::ServerOption instance
+         * @param serverOption pointer of mcsm::ServerOption
          * @param name server's name
          * @param option server's default JVM launch profile
         */
-        void configure(mcsm::ServerOption& serverOption, const std::string& name, mcsm::JvmOption& option);
+        void configure(std::unique_ptr<mcsm::ServerOption> serverOption, const std::string& name, mcsm::JvmOption& option);
 
         /**
          * Returns a pointer of server instance based on `server`.
