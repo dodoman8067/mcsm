@@ -107,33 +107,7 @@ void mcsm::FabricServer::download(const std::string& version, const std::string&
 
 void mcsm::FabricServer::download(const std::string& version, const std::string& path, const std::string& name){
     mcsm::Option opt(".", "server");
-    mcsm::FabricServerDataOption sDataOpt;
-
-    if(!opt.hasValue("loader_version")){
-        mcsm::error("Missing \"loader_version\" option in server.json");
-        mcsm::error("To fix, add \"loader_version\": \"latest\" to server.json for automatic download.");
-        std::exit(1);
-    }
-    if(!opt.getValue("loader_version").is_string()){
-        mcsm::error("Value \"loader_version\" option in server.json must be a string type.");
-        mcsm::error("To fix, change it into \"loader_version\": \"latest\" .");
-        std::exit(1);
-    }
-
-    if(!opt.hasValue("installer_version")){
-        mcsm::error("Missing \"installer_version\" option in server.json");
-        mcsm::error("To fix, add \"installer_version\": \"latest\" to server.json for automatic download.");
-        std::exit(1);
-    }
-    if(!opt.getValue("installer_version").is_string()){
-        mcsm::error("Value \"installer_version\" option in server.json must be a string type.");
-        mcsm::error("To fix, change it into \"linstaller_version\": \"latest\" .");
-        std::exit(1);
-    }
-
-    std::string loaderVer;
-    std::string installerVer;
-
+    std::string loaderVer, installerVer;
     if(opt.hasValue("loader_version") && opt.getValue("loader_version") != "latest"){
         loaderVer = opt.getValue("loader_version").get<std::string>();
         if(mcsm::isWhitespaceOrEmpty(loaderVer)){
@@ -166,18 +140,81 @@ void mcsm::FabricServer::download(const std::string& version, const std::string&
         }
     }
 
-    std::string url = "https://meta.fabricmc.net/v2/versions/loader/" + version + "/" + loaderVer + "/" + installerVer + "/server/jar";
+    download(version, loaderVer, installerVer, path, name);
+}
+
+void mcsm::FabricServer::download(const std::string& version, const std::string& loaderVersion, const std::string& installerVersion, const std::string& path, const std::string& name){
+    mcsm::Option opt(".", "server");
+    mcsm::FabricServerDataOption sDataOpt;
+
+    if(!opt.hasValue("loader_version")){
+        mcsm::error("Missing \"loader_version\" option in server.json");
+        mcsm::error("To fix, add \"loader_version\": \"latest\" to server.json for automatic download.");
+        std::exit(1);
+    }
+    if(!opt.getValue("loader_version").is_string()){
+        mcsm::error("Value \"loader_version\" option in server.json must be a string type.");
+        mcsm::error("To fix, change it into \"loader_version\": \"latest\" .");
+        std::exit(1);
+    }
+
+    if(!opt.hasValue("installer_version")){
+        mcsm::error("Missing \"installer_version\" option in server.json");
+        mcsm::error("To fix, add \"installer_version\": \"latest\" to server.json for automatic download.");
+        std::exit(1);
+    }
+    if(!opt.getValue("installer_version").is_string()){
+        mcsm::error("Value \"installer_version\" option in server.json must be a string type.");
+        mcsm::error("To fix, change it into \"installer_version\": \"latest\" .");
+        std::exit(1);
+    }
+
+    /*
+    if(opt.hasValue("loader_version") && opt.getValue("loader_version") != "latest"){
+        loaderVer = opt.getValue("loader_version").get<std::string>();
+        if(mcsm::isWhitespaceOrEmpty(loaderVer)){
+            mcsm::error("Missing \"loader_version\" option in server.json");
+            mcsm::error("To fix, add \"loader_version\": \"latest\" to server.json for automatic download.");
+            std::exit(1);
+        }
+    }else if(opt.hasValue("loader_version") && opt.getValue("loader_version") == "latest"){
+        loaderVer = getVersion(version);
+        if(mcsm::isWhitespaceOrEmpty(loaderVer)){
+            mcsm::error("Unsupported loader version.");
+            mcsm::error("Please try again with a different version.");
+            std::exit(1);
+        }
+    }
+
+    if(opt.hasValue("installer_version") && opt.getValue("installer_version") != "latest"){
+        installerVer = opt.getValue("installer_version").get<std::string>();
+        if(mcsm::isWhitespaceOrEmpty(installerVer)){
+            mcsm::error("Missing \"installer_version\" option in server.json");
+            mcsm::error("To fix, add \"installer_version\": \"latest\" to server.json for automatic download.");
+            std::exit(1);
+        }
+    }else if(opt.hasValue("installer_version") && opt.getValue("installer_version") == "latest"){
+        installerVer = getVersion();
+        if(mcsm::isWhitespaceOrEmpty(installerVer)){
+            mcsm::error("Unsupported installer version.");
+            mcsm::error("Please try again with a different version.");
+            std::exit(1);
+        }
+    }
+    */
+
+    std::string url = "https://meta.fabricmc.net/v2/versions/loader/" + version + "/" + loaderVersion + "/" + installerVersion + "/server/jar";
     mcsm::info("URL : " + url);
 
     if(mcsm::isText(url)){
         std::string res = mcsm::get(url);
     
         if(res == "Unable to find valid version for loader_version" || res == "Fabric loader 0.12 or higher is required for unattended server installs. Please use a newer fabric loader version, or the full installer."){
-            mcsm::error("Unsupported loader version : " + loaderVer);
+            mcsm::error("Unsupported loader version : " + loaderVersion);
             mcsm::error("Please try again with a different version.");
             std::exit(1);
         }else if(res == "Unable to find valid version for installer_version" || res == "Fabric loader 0.12 or higher is required for unattended server installs. Please use a newer fabric loader version, or the full installer."){
-            mcsm::error("Unsupported installer version : " + installerVer);
+            mcsm::error("Unsupported installer version : " + installerVersion);
             mcsm::error("Please try again with a different version.");
             std::exit(1);
         }else{
@@ -188,8 +225,8 @@ void mcsm::FabricServer::download(const std::string& version, const std::string&
     }
     
     mcsm::download(name, url, path, true);
-    sDataOpt.updateLoaderVersion(loaderVer);
-    sDataOpt.updateInstallerVersion(installerVer);
+    sDataOpt.updateLoaderVersion(loaderVersion);
+    sDataOpt.updateInstallerVersion(installerVersion);
 }
 
 void mcsm::FabricServer::start(mcsm::JvmOption& option){
@@ -204,22 +241,32 @@ void mcsm::FabricServer::start(mcsm::JvmOption& option){
 }
 
 void mcsm::FabricServer::update(){
-    /*
     // If you change the default build to specific build from latest build, it won't downgrade automatically. (You'll have to manually delete the server jarfile) This is an intented feature.
     mcsm::info("Checking updates...");
-    mcsm::ServerDataOption sDataOpt;
+    mcsm::FabricServerDataOption sDataOpt;
     mcsm::Option opt(".", "server");
-    if(!opt.getValue("server_build").is_string()){
-        mcsm::error("Value \"server_build\" option in server.json must be a string type.");
-        mcsm::error("To fix, change it into \"server_build\": \"latest\" .");
-        std::exit(1);            
+    if(!opt.hasValue("loader_version")){
+        mcsm::error("Missing \"loader_version\" option in server.json");
+        mcsm::error("To fix, add \"loader_version\": \"latest\" to server.json for automatic download.");
+        std::exit(1);
     }
-    std::string build = opt.getValue("server_build").get<std::string>();
-    if(build != "latest"){
-        mcsm::warning("This server won't update to latest build.");
-        mcsm::warning("Change server.json into \"server_build\": \"latest\" for automatic download.");
-        return;
+    if(!opt.getValue("loader_version").is_string()){
+        mcsm::error("Value \"loader_version\" option in server.json must be a string type.");
+        mcsm::error("To fix, change it into \"loader_version\": \"latest\" .");
+        std::exit(1);
     }
+
+    if(!opt.hasValue("installer_version")){
+        mcsm::error("Missing \"installer_version\" option in server.json");
+        mcsm::error("To fix, add \"installer_version\": \"latest\" to server.json for automatic download.");
+        std::exit(1);
+    }
+    if(!opt.getValue("installer_version").is_string()){
+        mcsm::error("Value \"installer_version\" option in server.json must be a string type.");
+        mcsm::error("To fix, change it into \"installer_version\": \"latest\" .");
+        std::exit(1);
+    }
+
     if(opt.getValue("version") == nullptr){
         mcsm::error("No \"version\" value specified in file " + opt.getName());
         mcsm::error("Manually editing the launch profile might have caused this issue.");
@@ -234,24 +281,7 @@ void mcsm::FabricServer::update(){
         mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);            
     }
-    std::string version = opt.getValue("version").get<std::string>();
-    int ver = getVersion(version);
-    if(ver == -1){
-        mcsm::error("Unsupported version.");
-        mcsm::error("Please try again with a different version.");
-        std::exit(1);
-    }
-    std::string strVer = std::to_string(ver);
-    if(sDataOpt.getLastDownloadedBuild() == strVer){
-        mcsm::success("Server is up to date.");
-        return;
-    }
-    mcsm::success("Update found : "  + strVer + ". Current build : " + sDataOpt.getLastDownloadedBuild());
-    if(std::filesystem::exists(getJarFile())){
-        std::filesystem::remove(getJarFile());
-    }
-    download(version);
-    */
+    //TODO : implement
 }
 
 bool mcsm::FabricServer::hasVersion(const std::string& version){
