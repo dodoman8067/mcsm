@@ -53,7 +53,12 @@ void mcsm::StartServerCommand::execute(const std::vector<std::string>& args){
     }
     std::unique_ptr<mcsm::JvmOption> jvmOpt = searchOption(args);
     mcsm::ServerOption sOpt;
-    sOpt.start(std::move(jvmOpt));
+    if(sOpt.getServerType() == "fabric"){
+        mcsm::FabricServerOption fsOpt;
+        fsOpt.start(std::move(jvmOpt));
+    }else{
+        sOpt.start(std::move(jvmOpt));
+    }
 }
 
 std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const std::vector<std::string>& args){
