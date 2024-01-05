@@ -28,7 +28,7 @@ mcsm::JvmTestCommand::~JvmTestCommand(){}
 
 void mcsm::JvmTestCommand::execute(const std::vector<std::string>& args){
     if(args.empty()){
-        mcsm::warning("Name not provided; Specify a name with --name option to continue.");
+        mcsm::warning("Name not provided; To continue, specify a name with --name option.");
         std::exit(1);
     }
     std::string name = getProfileName(args);
@@ -78,7 +78,7 @@ std::string mcsm::JvmTestCommand::getProfileName(const std::vector<std::string>&
             return name;
         }
     }
-    mcsm::warning("Name not provided; Specify a name to continue.");
+    mcsm::warning("Name not provided; To continue, specify a name.");
     std::exit(1);
 }
 

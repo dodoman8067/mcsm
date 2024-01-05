@@ -29,6 +29,10 @@ SOFTWARE.
 #include <mcsm/util/cli/logging.h>
 
 namespace mcsm {
+    /**
+     * Performs a GET request in specified `url`.
+     * @param url link to perform GET request
+    */
     const std::string get(const std::string& url);
 }
 

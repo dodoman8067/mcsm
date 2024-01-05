@@ -55,6 +55,13 @@ std::string mcsm::ServerDataOption::getLastTimeLaunched() const {
         mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
+    if(!this->option->getValue("last_time_launched").is_string()){
+        mcsm::error("Value \"last_time_launched\" has to be a string, but it's not.");
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);
+    }
     return this->option->getValue("last_time_launched");
 }
 
@@ -81,6 +88,13 @@ std::string mcsm::ServerDataOption::getServerTimeCreated() const {
         mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
+    if(!this->option->getValue("server_time_created").is_string()){
+        mcsm::error("Value \"server_time_created\" has to be a string, but it's not.");
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);
+    }
     return this->option->getValue("server_time_created");
 }
 
@@ -93,6 +107,32 @@ void mcsm::ServerDataOption::updateServerTimeCreated(){
     std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", std::localtime(&currentTime));
 
     this->option->setValue("server_time_created", buffer);
+}
+
+std::string mcsm::ServerDataOption::getLastDownloadedBuild() const {
+    if(!this->option->exists()){
+        mcsm::error("Option does not exist; Task aborted.");
+        std::exit(1);
+    }
+    if(this->option->getValue("last_downloaded_build") == nullptr){
+        mcsm::error("No \"last_downloaded_build\" value specified in file " + this->option->getName());
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);
+    }
+    if(!this->option->getValue("last_downloaded_build").is_string()){
+        mcsm::error("Value \"last_downloaded_build\" has to be a string, but it's not.");
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);
+    }
+    return this->option->getValue("last_downloaded_build");
+}
+
+void mcsm::ServerDataOption::updateLastDownloadedBuild(const std::string& build){
+    this->option->setValue("last_downloaded_build", build);
 }
 
 bool mcsm::ServerDataOption::exists() const {

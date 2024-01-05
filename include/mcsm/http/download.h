@@ -30,8 +30,36 @@ SOFTWARE.
 #include <filesystem>
 
 namespace mcsm {
+    /**
+     * Downloads a file in `url` named as `name`.
+     * @param name file's name
+     * @param url link to perform GET request
+    */
     void download(const std::string& name, const std::string& url);
+
+    /**
+     * Downloads a file in `url` named as `name`.
+     * @param name file's name
+     * @param url link to perform GET request
+     * @param path file's stored location
+    */
     void download(const std::string& name, const std::string& url, const std::string& path);
+
+    /**
+     * Downloads a file in `url` named as `name` while printing percentages.
+     * @param name file's name
+     * @param url link to perform GET request
+     * @param path file's stored location
+     * @param percentages progress of downloading the file
+    */
+    void download(const std::string& name, const std::string& url, const std::string& path, const bool& percentages);
+
+    /**
+     * Checks if the following `url` returns a text.
+     * @param url link to check with
+     * @return true if the following `url` returns a text, otherwise false
+     */
+    bool isText(const std::string& url);
 }
 
 #endif // __MCSM_DOWNLOAD_H__

@@ -49,8 +49,14 @@ inline void mcsm::ViewServerCommand::printServerInfo(){
     std::unique_ptr<mcsm::JvmOption> jvmOpt = sOpt.getDefaultOption();
     mcsm::info("Server default launch profile : " + jvmOpt->getProfileName());
 
-    mcsm::ServerDataOption sDataOpt;
-    if(sDataOpt.exists()){
-        mcsm::info("Last server launch date : " + sDataOpt.getLastTimeLaunched());
+    mcsm::ServerDataOption* sDataOpt;
+    if(sOpt.getServerType() == "fabric"){
+        sDataOpt = new mcsm::FabricServerDataOption();
+    }else{
+        sDataOpt = new mcsm::ServerDataOption();
     }
+    mcsm::info("Server creation date : " + sDataOpt->getServerTimeCreated());
+    mcsm::info("Last server launch date : " + sDataOpt->getLastTimeLaunched());
+    delete sDataOpt;
+    sDataOpt = nullptr;
 }

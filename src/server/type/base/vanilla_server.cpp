@@ -93,6 +93,7 @@ void mcsm::VanillaServer::download(const std::string& version, const std::string
         mcsm::error("Please try again with a different version.");
         std::exit(1);      
     }
+    mcsm::info("URL : " + url);
     mcsm::download(name, url, path);
 }
 
@@ -113,14 +114,6 @@ mcsm::ServerType mcsm::VanillaServer::getType() const {
     return ServerType::VANILLA;
 }
 
-std::string mcsm::VanillaServer::getJarFile() const {
-    mcsm::Option opt(".", "server");
-    if(opt.exists() && opt.getValue("server_jar") != nullptr){
-        return opt.getValue("server_jar");
-    }
-    return "server.jar";
-}
-
 std::string mcsm::VanillaServer::getSupportedVersions() const {
     return "1.14~";
 }
@@ -138,5 +131,5 @@ std::string mcsm::VanillaServer::getWebSite() const {
 }
 
 std::string mcsm::VanillaServer::getGitHub() const {
-    return "";
+    return "none";
 }

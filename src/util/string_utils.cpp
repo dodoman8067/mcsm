@@ -28,6 +28,7 @@ namespace mcsm {
     }
 
     bool endsWith(const std::string& str, const std::string& value){
+        // Ensure that `value` is not longer than `str` to avoid out-of-bounds comparisons
         if (str.length() < value.length()) {
             return false;
         }
@@ -35,12 +36,17 @@ namespace mcsm {
     }
 
     bool isWhitespaceOrEmpty(const std::string& str){
-        if(str.empty()) return true;
+        // If the string is empty, consider it whitespace
+        if (str.empty()) {
+            return true;
+        }
+        // Check if the string has only whitespace characters
         return str.find_first_not_of(" \t\n\v\f\r") == std::string::npos;
     }
 
     void replaceAll(std::string& str, const std::string& value, const std::string& replacement){
         std::string::size_type pos = 0;
+        // Iterate through the string and replace all occurrences of `value`
         while ((pos = str.find(value, pos)) != std::string::npos) {
             str.replace(pos, value.length(), replacement);
             pos += replacement.length();

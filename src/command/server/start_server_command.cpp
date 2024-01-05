@@ -27,6 +27,10 @@ const std::vector<std::string> availableOptions = {
     "-profile",
     "-p",
     "--p",
+    "--jvmprofile",
+    "-jvmprofile",
+    "--jp",
+    "-jp"
     "--current",
     "-current",
     "--c",
@@ -49,25 +53,31 @@ void mcsm::StartServerCommand::execute(const std::vector<std::string>& args){
     }
     std::unique_ptr<mcsm::JvmOption> jvmOpt = searchOption(args);
     mcsm::ServerOption sOpt;
-    sOpt.start(std::move(jvmOpt));
+    if(sOpt.getServerType() == "fabric"){
+        mcsm::FabricServerOption fsOpt;
+        fsOpt.start(std::move(jvmOpt));
+    }else{
+        sOpt.start(std::move(jvmOpt));
+    }
 }
 
 std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const std::vector<std::string>& args){
     if(!isConfigured()){
-        mcsm::error("Server not configured.");
-        mcsm::error("Task aborted.");
+        mcsm::warning("Server not configured.");
+        mcsm::warning("Task aborted.");
         std::exit(1);
     }
     for(size_t i = 0; i < args.size(); ++i){
         const std::string& arg = args[i];
         if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
-            if(!(arg == "-profile" || arg == "--profile" || arg == "-p" || arg == "--p")) continue;
+            if(!(arg == "-profile" || arg == "--profile" || arg == "-p" || arg == "--p" || arg == "-jvmprofile" || arg == "--jvmprofile" || arg == "-jp" || "--jp")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-'){
                 std::string pName = args[i + 1];
                 mcsm::SearchTarget target = getSearchTarget(args);
                 std::unique_ptr<mcsm::JvmOption> profile = searchOption(target, pName);
                 if(profile == nullptr){
-                    mcsm::error("The specified JVM launch profile " + pName + " does not exist.");
+                    mcsm::warning("The specified JVM launch profile " + pName + " does not exist.");
+                    mcsm::warning("Task aborted.");
                     std::exit(1);
                 }
                 mcsm::info("Found specified JVM launch profile " + pName + ".");
@@ -84,8 +94,8 @@ std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const st
 
 std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const mcsm::SearchTarget& target, const std::string& name){
     if(!isConfigured()){
-        mcsm::error("Server not configured.");
-        mcsm::error("Task aborted.");
+        mcsm::warning("Server not configured.");
+        mcsm::warning("Task aborted.");
         std::exit(1);
     }
     if(target == mcsm::SearchTarget::GLOBAL || target == mcsm::SearchTarget::ALL){

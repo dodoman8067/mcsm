@@ -33,7 +33,16 @@ SOFTWARE.
 #endif
 
 namespace mcsm {
+    /**
+     * Runs a console command without printing the output.
+     * @param command string to run as a command
+    */
     int runCommandQuietly(const std::string& command);
+
+    /**
+     * Runs a console command.
+     * @param command string to run as a command
+    */
     int runCommand(const std::string& command);
 }
 

@@ -20,44 +20,57 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __MCSM_DOWNLOADABLE_H__
-#define __MCSM_DOWNLOADABLE_H__
+#ifndef __MCSM_COMPILED_H__
+#define __MCSM_COMPILED_H__
 
 #include <vector>
 #include <memory>
 
 namespace mcsm {
     /**
-     * Represents a downloadable server interface.
+     * Represents a compiled (binary not available) server interface.
      */
-    class Downloadable {
+    class Compiled {
     public:
         /**
-         * Returns vector of downloadable versions.
-         * @return vector of available versions
-         */
+        * Returns vector of available versions.
+        * @return vector of available versions
+        */
         virtual std::vector<std::string> getAvailableVersions() = 0;
 
         /**
-         * Downloads the server jarfile in the current directory.
+         * Clones the source code of server for specified version.
          * @param version version of the server
          */
-        virtual void download(const std::string& version) = 0;
+        virtual void cloneSource(const std::string& version) = 0;
 
         /**
-         * Downloads the server jarfile in the specified directory.
+         * Clones the source code of server for specified version in the specified directory.
          * @param version version of the server
          * @param path file's path
          */
-        virtual void download(const std::string& version, const std::string& path) = 0;
+        virtual void cloneSource(const std::string& version, const std::string& path) = 0;
 
         /**
-         * Downloads the server jarfile in the specified directory with the following name.
+         * Compiles the source code of the server.
          * @param version version of the server
-         * @param path file's path
-         * @param name file's name
          */
-        virtual void download(const std::string& version, const std::string& path, const std::string& name) = 0;
+        virtual void compile(const std::string version);
+
+        /**
+         * Compiles the source code of the server.
+         * @param version version of the server
+         * @param workingPath where to perform the compilation
+         */
+        virtual void compile(const std::string version, const std::string workingPath);
+
+        /**
+         * Compiles the source code of the server.
+         * @param version version of the server
+         * @param workingPath where to perform the compilation
+         * @param outputPath where to copy the output jar
+         */
+        virtual void compile(const std::string version, const std::string workingPath, const std::string outputPath);
 
         /**
          * Returns if the following server has this version.

@@ -29,22 +29,63 @@ SOFTWARE.
 
 namespace mcsm {
     /**
-     * @brief Represents base of server.
+     * Represents base of server.
      */
     class Server {
     public:
         /**
-         * @brief Returns the base type of server.
+         * Returns the base type of server.
          * @return mcsm::ServerType enum
          */
         virtual mcsm::ServerType getType() const = 0;
+
+        /**
+         * Returns server type as a string
+         * @return server type as a string
+        */
         virtual std::string getTypeAsString() const = 0;
-        virtual std::string getJarFile() const = 0;
+
+        /**
+         * Returns server jarfile name.
+         * @return jarfile name
+        */
+        virtual std::string getJarFile() const;
+
+        /**
+         * Returns the earliest Minecraft version supported by this server.
+         * @return earliest Minecraft version supported by this server
+        */
         virtual std::string getSupportedVersions() const = 0;
+
+        /**
+         * Returns a server name this server is based on.
+         * @return based server (Paper -> Spigot for example)
+        */
         virtual std::string getBasedServer() const = 0;
+
+        /**
+         * Returns the official website link for this server.
+         * @return link for official website
+        */
         virtual std::string getWebSite() const = 0;
+
+        /**
+         * Returns the official GitHub repostiory link.
+         * @return GitHub repostiory link
+        */
         virtual std::string getGitHub() const = 0;
+
+        /**
+         * Returns if this server is based as server `input`.
+         * @param input string to check against
+         * @return true if this server is based as `input`, otherwise false
+        */
         virtual bool isBasedAs(const std::string& input) const;
+
+        /**
+         * Starts a Minecraft server with following launch profile `option`
+         * @param option JVM launch profile
+        */
         virtual void start(mcsm::JvmOption& option);
     };
 }

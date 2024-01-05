@@ -1,15 +1,31 @@
 cmake_minimum_required(VERSION 3.24)
 project(mcsm)
 
-# Set include directory
-include_directories(${CMAKE_SOURCE_DIR}/include)
+# Add options
+option(BUILD_STATIC_EXE "Build static executable" OFF)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
 
 # Set dependency options
-set(ZLIB_USE_STATIC_LIBS TRUE)
-set(OPENSSL_USE_STATIC_LIBS TRUE)
+if(BUILD_STATIC_EXE)
+    set(ZLIB_USE_STATIC_LIBS TRUE)
+    set(OPENSSL_USE_STATIC_LIBS TRUE)
+    set(LIBGIT2_USE_STATIC_LIBS TRUE)
+endif()
+SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
+
+# Find dependencies 
+find_package(termcolor REQUIRED)
+find_package(CURL REQUIRED CONFIG)
+find_package(nlohmann_json 3.2.0 REQUIRED)
+include(Findlibgit2)
+if(LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
+    find_package(Backward REQUIRED)
+endif()
+
+# Set include directory
+include_directories(${CMAKE_SOURCE_DIR}/include ${LIBGIT2_INCLUDE_DIR})
 
 # Source files
 file(GLOB_RECURSE SRC_FILES ${CMAKE_SOURCE_DIR}/src/*.cpp)
@@ -31,19 +47,15 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -flto")
 endif()
 
-if(CMAKE_BUILD_TYPE MATCHES Release)
+if(CMAKE_BUILD_TYPE MATCHES Release AND BUILD_STATIC_EXE)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         message("-- Detected compiler " ${CMAKE_CXX_COMPILER_ID} ". Using -static flags")
-        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static -flto")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
     endif()
 endif()
 
-# Find dependencies 
-find_package(termcolor REQUIRED)
-find_package(CURL REQUIRED CONFIG)
-find_package(nlohmann_json 3.2.0 REQUIRED)
-if(LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
-    find_package(Backward REQUIRED)
+if(CMAKE_BUILD_TYPE MATCHES Release)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -flto")
 endif()
 
 # Add executable
@@ -57,6 +69,7 @@ endif()
 target_link_libraries(mcsm PRIVATE CURL::libcurl)
 target_link_libraries(mcsm PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(mcsm PRIVATE termcolor::termcolor)
+target_link_libraries(mcsm PRIVATE ${LIBGIT2_LIBRARIES})
 if(LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
     target_link_libraries(mcsm PRIVATE Backward::Backward)
 endif()

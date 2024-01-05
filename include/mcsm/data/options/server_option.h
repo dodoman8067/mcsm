@@ -53,6 +53,9 @@ namespace mcsm {
         std::string getServerType() const;
         std::string getServerJarFile() const;
         void setServerJarFile(const std::string& name);
+        std::string getServerJarBuild() const;
+        void setServerJarBuild(const std::string& build);
+        std::shared_ptr<mcsm::Server> getServer() const;
     };
 }
 

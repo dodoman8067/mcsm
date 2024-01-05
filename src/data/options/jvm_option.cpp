@@ -156,6 +156,22 @@ std::vector<std::string> mcsm::JvmOption::getJvmArguments(){
             mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
             std::exit(1);
         }
+        if(!opt->getValue("args").is_array()){
+            mcsm::error("Value \"args\" has to be a array, but it's not.");
+            mcsm::error("Manually editing the launch profile might have caused this issue.");
+            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+            std::exit(1);
+        }
+        for(auto& v : opt->getValue("args")){
+            if(!v.is_string()){
+                mcsm::error("Value \"args\" has to be a array of string, but it's not.");
+                mcsm::error("Manually editing the launch profile might have caused this issue.");
+                mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+                mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+                std::exit(1);             
+            }
+        }
         return opt->getValue("args");
     }else{
         mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
@@ -165,6 +181,22 @@ std::vector<std::string> mcsm::JvmOption::getJvmArguments(){
             mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
             mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
             std::exit(1);
+        }
+        if(!opt2->getValue("args").is_array()){
+            mcsm::error("Value \"args\" has to be a array, but it's not.");
+            mcsm::error("Manually editing the launch profile might have caused this issue.");
+            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+            std::exit(1);
+        }
+        for(auto& v : opt2->getValue("args")){
+            if(!v.is_string()){
+                mcsm::error("Value \"args\" has to be a array of string, but it's not.");
+                mcsm::error("Manually editing the launch profile might have caused this issue.");
+                mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+                mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+                std::exit(1);             
+            }
         }
         return opt2->getValue("args");
     }
@@ -200,11 +232,25 @@ std::string mcsm::JvmOption::getJvmPath(){
             mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
             std::exit(1);
         }
+        if(!opt->getValue("path").is_string()){
+            mcsm::error("Value \"path\" has to be a string, but it's not.");
+            mcsm::error("Manually editing the launch profile might have caused this issue.");
+            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+            std::exit(1);
+        }
         return opt->getValue("path");
     }else{
         mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
         if(opt2->getValue("path") == nullptr){
             mcsm::error("No \"path\" value specified in file " + opt2->getName());
+            mcsm::error("Manually editing the launch profile might have caused this issue.");
+            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+            std::exit(1);
+        }
+        if(!opt2->getValue("path").is_string()){
+            mcsm::error("Value \"path\" has to be a string, but it's not.");
             mcsm::error("Manually editing the launch profile might have caused this issue.");
             mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
             mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
@@ -245,6 +291,22 @@ std::vector<std::string> mcsm::JvmOption::getServerArguments(){
             mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
             std::exit(1);
         }
+        if(!opt->getValue("server_args").is_array()){
+            mcsm::error("Value \"server_args\" has to be a array, but it's not.");
+            mcsm::error("Manually editing the launch profile might have caused this issue.");
+            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+            std::exit(1);
+        }
+        for(auto& v : opt->getValue("server_args")){
+            if(!v.is_string()){
+                mcsm::error("Value \"server_args\" has to be a array of string, but it's not.");
+                mcsm::error("Manually editing the launch profile might have caused this issue.");
+                mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+                mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+                std::exit(1);             
+            }
+        }
         return opt->getValue("server_args");
     }else{
         mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
@@ -254,6 +316,22 @@ std::vector<std::string> mcsm::JvmOption::getServerArguments(){
             mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
             mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
             std::exit(1);
+        }
+        if(!opt2->getValue("server_args").is_array()){
+            mcsm::error("Value \"server_args\" has to be a array, but it's not.");
+            mcsm::error("Manually editing the launch profile might have caused this issue.");
+            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+            std::exit(1);
+        }
+        for(auto& v : opt2->getValue("server_args")){
+            if(!v.is_string()){
+                mcsm::error("Value \"server_args\" has to be a array of string, but it's not.");
+                mcsm::error("Manually editing the launch profile might have caused this issue.");
+                mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+                mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+                std::exit(1);             
+            }
         }
         return opt2->getValue("server_args");
     }

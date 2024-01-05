@@ -24,12 +24,25 @@ SOFTWARE.
 #define __MCSM_OS_DETECTION_H__
 
 namespace mcsm {
+    /**
+     * Enum of supported operating systems.
+    */
     enum OS {
+        /**
+         * Represents Microsoft Windows operating system.
+        */
         WINDOWS,
+
+        /**
+         * Represents Linux kernel based operating systems.
+        */
         LINUX
     };
-    // Returns current operating system this program is running on.
-    // @return current operating system
+     
+    /**
+     * Returns current operating system this program is running on.
+     * @return current operating system
+    */
     OS getCurrentOS();
 }
 

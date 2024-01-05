@@ -25,14 +25,24 @@ void mcsm::server::generateBukkit(const std::string& name, mcsm::JvmOption& opti
     switch(type){
         case mcsm::BukkitServerType::PAPER: {
             std::shared_ptr<mcsm::PaperServer> server = std::make_shared<mcsm::PaperServer>();
-            mcsm::ServerOption serverOption(version, server);
-            configure(serverOption, name, option);
+            if(!server->hasVersion(version)){
+                mcsm::error("Unsupported version.");
+                mcsm::error("Please try again with a different version.");
+                std::exit(1);
+            }
+            std::unique_ptr<mcsm::ServerOption> serverOption = std::make_unique<mcsm::ServerOption>(version, server);
+            configure(std::move(serverOption), name, option);
             break;
         }
         case mcsm::BukkitServerType::PURPUR: {
             std::shared_ptr<mcsm::PurpurServer> server = std::make_shared<mcsm::PurpurServer>();
-            mcsm::ServerOption serverOption(version, server);
-            configure(serverOption, name, option);
+            if(!server->hasVersion(version)){
+                mcsm::error("Unsupported version.");
+                mcsm::error("Please try again with a different version.");
+                std::exit(1);
+            }
+            std::unique_ptr<mcsm::ServerOption> serverOption = std::make_unique<mcsm::ServerOption>(version, server);
+            configure(std::move(serverOption), name, option);
             break;
         }
         default: {
@@ -45,16 +55,38 @@ void mcsm::server::generateBukkit(const std::string& name, mcsm::JvmOption& opti
 
 void mcsm::server::generateVanilla(const std::string& name, mcsm::JvmOption& option, const std::string& version){
     std::shared_ptr<mcsm::VanillaServer> server = std::make_shared<mcsm::VanillaServer>();
-    mcsm::ServerOption serverOption(version, server);
-    configure(serverOption, name, option);    
+    if(!server->hasVersion(version)){
+        mcsm::error("Unsupported version.");
+        mcsm::error("Please try again with a different version.");
+        std::exit(1);
+    }
+    std::unique_ptr<mcsm::ServerOption> serverOption = std::make_unique<mcsm::ServerOption>(version, server);
+    configure(std::move(serverOption), name, option);    
 }
 
 void mcsm::server::generateForge(const std::string& /* name */, mcsm::JvmOption& /* option */, const std::string& /* version */){
 
 }
 
-void mcsm::server::generateFabric(const std::string& /* name */, mcsm::JvmOption& /* option */, const std::string& /* version */){
-
+void mcsm::server::generateFabric(const std::string& name, mcsm::JvmOption& option, const std::string& version){
+    std::shared_ptr<mcsm::FabricServer> server = std::make_shared<mcsm::FabricServer>();
+    if(!server->hasVersion(version)){
+        mcsm::error("Unsupported version.");
+        mcsm::error("Please try again with a different version.");
+        std::exit(1);
+    }
+    std::unique_ptr<mcsm::FabricServerOption> serverOption = std::make_unique<mcsm::FabricServerOption>(version, server);
+    if(serverOption->exists()){
+        mcsm::error("Server is already configured in this directory.");
+        mcsm::error("Try in another directory.");
+        std::exit(1);
+    }
+    serverOption->create(name, option);
+    mcsm::success("Configured server information : ");
+    mcsm::info("Server name : " + serverOption->getServerName());
+    mcsm::info("Server type : " + serverOption->getServerType());
+    mcsm::info("Server version : " + serverOption->getServerVersion());
+    mcsm::info("Server JVM launch profile : " + serverOption->getDefaultOption()->getProfileName());
 }
 
 void mcsm::server::generateSponge(const std::string& /* name */, mcsm::JvmOption& /* option */, const std::string& /* version */){
@@ -65,18 +97,18 @@ void mcsm::server::generateCustom(const std::string& /* name */, mcsm::JvmOption
 
 }
 
-void mcsm::server::configure(mcsm::ServerOption& serverOption, const std::string& name, mcsm::JvmOption& option){
-    if(serverOption.exists()){
+void mcsm::server::configure(std::unique_ptr<mcsm::ServerOption> serverOption, const std::string& name, mcsm::JvmOption& option){
+    if(serverOption->exists()){
         mcsm::error("Server is already configured in this directory.");
         mcsm::error("Try in another directory.");
         std::exit(1);
     }
-    serverOption.create(name, option);
+    serverOption->create(name, option);
     mcsm::success("Configured server information : ");
-    mcsm::info("Server name : " + serverOption.getServerName());
-    mcsm::info("Server type : " + serverOption.getServerType());
-    mcsm::info("Server version : " + serverOption.getServerVersion());
-    mcsm::info("Server JVM launch profile : " + serverOption.getDefaultOption()->getProfileName());
+    mcsm::info("Server name : " + serverOption->getServerName());
+    mcsm::info("Server type : " + serverOption->getServerType());
+    mcsm::info("Server version : " + serverOption->getServerVersion());
+    mcsm::info("Server JVM launch profile : " + serverOption->getDefaultOption()->getProfileName());
 }
 
 std::shared_ptr<mcsm::Server> mcsm::server::detectServerType(const std::string& server){
@@ -91,9 +123,12 @@ std::shared_ptr<mcsm::Server> mcsm::server::detectServerType(const std::string& 
     if(server == "vanilla"){
         sPtr = std::make_shared<mcsm::VanillaServer>();
     }
+    if(server == "fabric"){
+        sPtr = std::make_shared<mcsm::FabricServer>();
+    }
     if(sPtr == nullptr){
-        mcsm::error("The following server type (" + server + ") is not supported.");
-        mcsm::error("Task aborted.");
+        mcsm::warning("The following server type (" + server + ") is not supported.");
+        mcsm::warning("Task aborted.");
         std::exit(1); 
     }
 

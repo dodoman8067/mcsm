@@ -27,6 +27,10 @@ SOFTWARE.
 #include <string>
 
 namespace mcsm {
+    /**
+     * Returns vector of Minecraft versions starting from 1.8.
+     * @return vector of versions starting from 1.8
+    */
     std::vector<std::string> getMinecraftVersions();
 }
 
