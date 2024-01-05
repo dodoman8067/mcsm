@@ -164,7 +164,7 @@ void mcsm::PurpurServer::update(){
     }
     std::string build = opt.getValue("server_build").get<std::string>();
     if(build != "latest"){
-        mcsm::warning("This server won't update to latest build.");
+        mcsm::warning("This server won't update to the latest build.");
         mcsm::warning("Change server.json into \"server_build\": \"latest\" for automatic download.");
         return;
     }
