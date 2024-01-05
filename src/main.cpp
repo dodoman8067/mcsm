@@ -20,22 +20,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <mcsm/command/command_manager.h>
-#include <mcsm/command/base/command.h>
-#include <mcsm/command/util/version_command.h>
-#include <mcsm/command/util/help_command.h>
-#include <mcsm/command/server/generate_server_command.h>
-#include <mcsm/command/server/start_server_command.h>
-#include <mcsm/command/server/jvm/jvm_option_generator_command.h>
-#include <mcsm/command/server/jvm/jvm_option_search_command.h>
-#include <mcsm/command/server/jvm/jvm_test_command.h>
-#include <mcsm/command/server/jvm/jvm_option_edit_command.h>
-#include <mcsm/command/server/view_server_command.h>
-#include <mcsm/command/server/view_server_type_command.h>
+#include <mcsm/init.h>
 
 const std::string version = "0.0.2.0";
-
-inline void initCommands();
 
 int main(int argc, char *argv[]){
     //libssh2 : cmake -B ./build -DBUILD_SHARED_LIBS=OFF -DOPENSSL_USE_STATIC_LIBS=ON -DZLIB_USE_STATIC_LIBS=ON -DENABLE_ZLIB_COMPRESSION=ON -DCRYPTO_BACKEND=OpenSSL
@@ -47,7 +34,8 @@ int main(int argc, char *argv[]){
 
     bool commandFound = false;
 
-    initCommands();
+    mcsm::init init;
+    init.initMCSM(version);
 
     //Prints default message when no arguments
     if(argc < 2){
@@ -76,55 +64,4 @@ int main(int argc, char *argv[]){
     }
     
     return 0;
-}
-
-inline void initCommands(){
-    //Initializes CommandManager class
-    mcsm::CommandManager::init();
-
-    //Adds command to CommandManager
-    std::unique_ptr<mcsm::VersionCommand> versionCommand = std::make_unique<mcsm::VersionCommand>("version", "Returns version information about this program.", version);
-    versionCommand->addAliases("ver");
-    mcsm::CommandManager::addCommand(std::move(versionCommand));
-
-    std::unique_ptr<mcsm::HelpCommand> helpCommand = std::make_unique<mcsm::HelpCommand>("help", "Shows full list of commands.");
-    mcsm::CommandManager::addCommand(std::move(helpCommand));
-
-    std::unique_ptr<mcsm::GenerateServerCommand> generateServerCommand = std::make_unique<mcsm::GenerateServerCommand>("init", "Configures a server.");
-    mcsm::CommandManager::addCommand(std::move(generateServerCommand));
-
-    std::unique_ptr<mcsm::JvmOptionGeneratorCommand> jvmOptionGeneratorCommand = std::make_unique<mcsm::JvmOptionGeneratorCommand>("genJvmProfile", "Generates Java Virtual Machine launch profile.");
-    jvmOptionGeneratorCommand->addAliases("generateJvmProfile");
-    jvmOptionGeneratorCommand->addAliases("generateJavaVirtualMachineProfile");
-    jvmOptionGeneratorCommand->addAliases("genjvmprofile");
-    mcsm::CommandManager::addCommand(std::move(jvmOptionGeneratorCommand));
-
-    std::unique_ptr<mcsm::JvmOptionSearchCommand> jvmProfileSearchCommand = std::make_unique<mcsm::JvmOptionSearchCommand>("searchJvmProfile", "Looks up for Java Virtual Machine profiles.");
-    jvmProfileSearchCommand->addAliases("searchProfile");
-    jvmProfileSearchCommand->addAliases("searchJavaVirtualMachineProfile");
-    jvmProfileSearchCommand->addAliases("searchprofile");
-    mcsm::CommandManager::addCommand(std::move(jvmProfileSearchCommand));
-
-    std::unique_ptr<mcsm::JvmOptionEditCommand> jvmOptionEditCommand = std::make_unique<mcsm::JvmOptionEditCommand>("editJvmProfile", "Edits the specified Java Virtual Machine launch profile.");
-    jvmOptionEditCommand->addAliases("editJavaVirtualMachineProfile");
-    jvmOptionEditCommand->addAliases("editprofile");
-    jvmOptionEditCommand->addAliases("editProfile");
-    jvmOptionEditCommand->addAliases("editjvmprofile");
-    mcsm::CommandManager::addCommand(std::move(jvmOptionEditCommand));
-
-    std::unique_ptr<mcsm::StartServerCommand> startServerCommand = std::make_unique<mcsm::StartServerCommand>("start", "Starts a server.");
-    startServerCommand->addAliases("startServer");
-    startServerCommand->addAliases("startserver");
-    mcsm::CommandManager::addCommand(std::move(startServerCommand));
-
-    // TODO: Consider a better name for these two commands.
-    std::unique_ptr<mcsm::ViewServerCommand> viewServerCommand = std::make_unique<mcsm::ViewServerCommand>("view", "Prints configured server's basic information.");
-    viewServerCommand->addAliases("viewServer");
-    viewServerCommand->addAliases("viewserver");
-    mcsm::CommandManager::addCommand(std::move(viewServerCommand));
-
-    std::unique_ptr<mcsm::ViewServerTypeCommand> viewServerTypeCommmand = std::make_unique<mcsm::ViewServerTypeCommand>("info", "Prints specified server implementation's basic information.");
-    viewServerTypeCommmand->addAliases("infoserver");
-    viewServerTypeCommmand->addAliases("infoServer");
-    mcsm::CommandManager::addCommand(std::move(viewServerTypeCommmand));
 }
