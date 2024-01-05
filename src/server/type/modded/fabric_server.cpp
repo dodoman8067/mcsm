@@ -241,9 +241,11 @@ void mcsm::FabricServer::start(mcsm::JvmOption& option){
 }
 
 void mcsm::FabricServer::update(){
-    mcsm::info("Checking updates...");
     mcsm::FabricServerDataOption sDataOpt;
     mcsm::Option opt(".", "server");
+
+    mcsm::info("Checking updates...");
+
     if(!opt.hasValue("loader_version")){
         mcsm::error("Missing \"loader_version\" option in server.json");
         mcsm::error("To fix, add \"loader_version\": \"latest\" to server.json for automatic download.");
