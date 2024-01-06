@@ -58,7 +58,7 @@ void mcsm::VanillaServer::init(){
     map->insert({"1.14.2", "https://piston-data.mojang.com/v1/objects/808be3869e2ca6b62378f9f4b33c946621620019/server.jar"});
     map->insert({"1.14.1", "https://piston-data.mojang.com/v1/objects/ed76d597a44c5266be2a7fcd77a8270f1f0bc118/server.jar"});
     map->insert({"1.14", "https://piston-data.mojang.com/v1/objects/f1a0073671057f01aa843443fef34330281333ce/server.jar"});
-    mcsm::GlobalOption option(".server.url", "vanilla_server");
+    mcsm::GlobalOption option("/server/url", "vanilla_server");
     if(!option.hasValue("versions")){
         option.setValue("versions", *map);
     }
