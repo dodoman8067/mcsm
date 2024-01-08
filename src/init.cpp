@@ -1,12 +1,19 @@
 #include <mcsm/init.h>
 
-mcsm::init::init(){}
+mcsm::init::init(){
+    this->initialized = new bool(false);
+}
 
-mcsm::init::~init(){}
+mcsm::init::~init(){
+    delete this->initialized;
+    this->initialized = nullptr;
+}
 
 void mcsm::init::initMCSM(const std::string& version){
     // Some other init tasks will be added
     initCommands(version);
+
+    *this->initialized = true;
 }
 
 void mcsm::init::initCommands(const std::string& version){
@@ -58,4 +65,8 @@ void mcsm::init::initCommands(const std::string& version){
     viewServerTypeCommmand->addAliases("infoserver");
     viewServerTypeCommmand->addAliases("infoServer");
     mcsm::CommandManager::addCommand(std::move(viewServerTypeCommmand));
+}
+
+bool mcsm::init::isInitialized() const {
+    return *this->initialized;
 }

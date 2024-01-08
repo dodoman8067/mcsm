@@ -32,10 +32,16 @@ int main(int argc, char *argv[]){
 
     //TODO : Default op in server config, spiget.org
 
-    bool commandFound = false;
-
     mcsm::init init;
     init.initMCSM(version);
+
+    if(!init.isInitialized()){
+        std::cerr << "Program initialization failed.\n";
+        std::cerr << "High chance to be a software issue. Please report it to GitHub (https://github.com/dodoman8067/mcsm).\n";
+        std::exit(1);
+    }
+
+    bool commandFound = false;
 
     //Prints default message when no arguments
     if(argc < 2){
