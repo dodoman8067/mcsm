@@ -114,16 +114,16 @@ void mcsm::server::configure(std::unique_ptr<mcsm::ServerOption> serverOption, c
 std::shared_ptr<mcsm::Server> mcsm::server::detectServerType(const std::string& server){
     std::shared_ptr<mcsm::Server> sPtr;
 
-    if(server == "paper"){
+    if(server == "paper" || server == "papermc"){
         sPtr = std::make_shared<mcsm::PaperServer>();
     }
-    if(server == "purpur"){
+    if(server == "purpur" || server == "purpurmc"){
         sPtr = std::make_shared<mcsm::PurpurServer>();
     }
     if(server == "vanilla"){
         sPtr = std::make_shared<mcsm::VanillaServer>();
     }
-    if(server == "fabric"){
+    if(server == "fabric" || server == "fabricmc"){
         sPtr = std::make_shared<mcsm::FabricServer>();
     }
     if(sPtr == nullptr){
