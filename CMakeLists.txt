@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.24)
 project(mcsm)
 
+# Detect OS
+if(NOT LINUX AND NOT WIN32)
+    message(FATAL_ERROR "This platform is not supported")
+endif()
+
 # Add options
 option(BUILD_STATIC_EXE "Build static executable" OFF)
 
@@ -47,7 +52,7 @@ if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -flto")
 endif()
 
-if(CMAKE_BUILD_TYPE MATCHES Release AND BUILD_STATIC_EXE)
+if(BUILD_STATIC_EXE)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         message("-- Detected compiler " ${CMAKE_CXX_COMPILER_ID} ". Using -static flags")
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
