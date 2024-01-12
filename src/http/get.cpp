@@ -45,6 +45,7 @@ const std::string mcsm::get(const std::string& url){
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl/8.5.0");
 
     CURLcode res = curl_easy_perform(curl);
 
