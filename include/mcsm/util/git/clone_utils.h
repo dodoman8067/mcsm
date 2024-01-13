@@ -24,6 +24,9 @@ SOFTWARE.
 #define __MCSM_CLONE_UTILS_H__
 
 #include <mcsm/util/cli/logging.h>
+#include <filesystem>
+#include <git2/global.h>
+#include <git2/errors.h>
 #include <git2/clone.h>
 
 namespace mcsm {
