@@ -35,7 +35,7 @@ std::string mcsm::FabricServer::getVersion(const std::string& ver) const {
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
     if(json.is_discarded()){
         mcsm::error("Parse of json failed.");
-        mcsm::error("If you believe that this is an error, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
         mcsm::error("Error informations : ");
         mcsm::error("Called method : mcsm::FabricServer::getVersion() with arguments : " + ver);
         std::exit(1);
@@ -58,7 +58,7 @@ std::string mcsm::FabricServer::getVersion() const {
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
     if(json.is_discarded()){
         mcsm::error("Parse of json failed.");
-        mcsm::error("If you believe that this is an error, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
         mcsm::error("Error informations : ");
         mcsm::error("Called method : mcsm::FabricServer::getVersion()");
         std::exit(1);

@@ -31,7 +31,7 @@ int mcsm::PaperServer::getVersion(const std::string& ver) const {
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
     if(json.is_discarded()){
         mcsm::error("Parse of json failed.");
-        mcsm::error("If you believe that this is an error, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
         mcsm::error("Error informations : ");
         mcsm::error("Called method : mcsm::PaperServer::getVersion() with arguments : " + ver);
         std::exit(1);
@@ -50,7 +50,7 @@ int mcsm::PaperServer::getVersion(const std::string& ver, const std::string& bui
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
     if(json.is_discarded()){
         mcsm::error("Parse of json failed.");
-        mcsm::error("If you believe that this is an error, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
         mcsm::error("Error informations : ");
         mcsm::error("Called method : mcsm::PaperServer::getVersion() with arguments : " + ver + ", " + build);
         std::exit(1);

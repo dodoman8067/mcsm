@@ -65,3 +65,10 @@ int mcsm::runCommand(const std::string& command){
         std::exit(1);
     }
 }
+
+bool mcsm::isDebug(){
+    #ifdef DEBUG
+        return true;
+    #endif
+    return false;
+}

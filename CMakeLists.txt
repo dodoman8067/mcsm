@@ -48,7 +48,7 @@ endif()
 # Set compiler options
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
-    set(CMAKE_CXX_FLAGS_DEBUG "-g")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -DDEBUG")
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -flto")
 endif()
 
@@ -57,6 +57,10 @@ if(BUILD_STATIC_EXE)
         message("-- Detected compiler " ${CMAKE_CXX_COMPILER_ID} ". Using -static flags")
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
     endif()
+endif()
+
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -DDEBUG")
 endif()
 
 if(CMAKE_BUILD_TYPE MATCHES Release)

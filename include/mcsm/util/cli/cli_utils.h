@@ -44,6 +44,8 @@ namespace mcsm {
      * @param command string to run as a command
     */
     int runCommand(const std::string& command);
+
+    bool isDebug();
 }
 
 #endif // __MCSM_CLI_UTILS_H__
