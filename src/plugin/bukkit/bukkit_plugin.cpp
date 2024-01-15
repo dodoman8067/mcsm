@@ -29,13 +29,13 @@ void mcsm::BukkitPlugin::init(){
     }
 }
 
-std::string mcsm::BukkitPlugin::spigetGetCreatedAt(){}
+//std::string mcsm::BukkitPlugin::spigetGetCreatedAt(){}
 
-std::string mcsm::BukkitPlugin::spigetGetDownloads(){}
+//std::string mcsm::BukkitPlugin::spigetGetDownloads(){}
 
-std::string mcsm::BukkitPlugin::spigetGetNativeVersion(){}
+//std::string mcsm::BukkitPlugin::spigetGetNativeVersion(){}
 
-std::vector<std::string> mcsm::BukkitPlugin::spigetGetSupportedVersions(){}
+//std::vector<std::string> mcsm::BukkitPlugin::spigetGetSupportedVersions(){}
 
 std::string mcsm::BukkitPlugin::spigetGetAuthor(){
     std::string spigetres = mcsm::get("https://api.spiget.org/v2/search/resources/" + this->name + "?field=name&size=" + std::to_string(this->result));
