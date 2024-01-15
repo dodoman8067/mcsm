@@ -78,7 +78,15 @@ endif()
 target_link_libraries(mcsm PRIVATE CURL::libcurl)
 target_link_libraries(mcsm PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(mcsm PRIVATE termcolor::termcolor)
+
+# Some dependencies for libgit2 in Windows
+if(MINGW OR WIN32)
+    target_link_libraries(mcsm PRIVATE Winhttp)
+    target_link_libraries(mcsm PRIVATE Rpcrt4)
+endif()
+
 target_link_libraries(mcsm PRIVATE ${LIBGIT2_LIBRARIES})
+
 if(LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
     target_link_libraries(mcsm PRIVATE Backward::Backward)
 endif()
