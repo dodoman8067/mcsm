@@ -31,6 +31,8 @@ mcsm::VanillaServer::~VanillaServer(){}
 
 void mcsm::VanillaServer::init(){
     std::unique_ptr<std::map<const std::string, const std::string>>& map = this->versions;
+    map->insert({"1.20.4", "https://piston-data.mojang.com/v1/objects/8dd1a28015f51b1803213892b50b7b4fc76e594d/server.jar"});
+    map->insert({"1.20.3", "https://piston-data.mojang.com/v1/objects/4fb536bfd4a83d61cdbaf684b8d311e66e7d4c49/server.jar"});
     map->insert({"1.20.2", "https://piston-data.mojang.com/v1/objects/5b868151bd02b41319f54c8d4061b8cae84e665c/server.jar"});
     map->insert({"1.20.1", "https://piston-data.mojang.com/v1/objects/84194a2f286ef7c14ed7ce0090dba59902951553/server.jar"});
     map->insert({"1.20", "https://piston-data.mojang.com/v1/objects/15c777e2cfe0556eef19aab534b186c0c6f277e1/server.jar"});
