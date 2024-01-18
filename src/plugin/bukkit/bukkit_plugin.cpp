@@ -46,7 +46,7 @@ void mcsm::BukkitPlugin::init(){
             mcsm::error("If you believe that this is a software issue, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
             this->found = false;
         }
-        this->author = spigetGetAuthor();
+        this->author = spigetGetAuthor(json);
 
     }
 }
@@ -59,17 +59,7 @@ void mcsm::BukkitPlugin::init(){
 
 //std::vector<std::string> mcsm::BukkitPlugin::spigetGetSupportedVersions(){}
 
-std::string mcsm::BukkitPlugin::spigetGetAuthor(){
-    std::string spigetres = mcsm::get("https://api.spiget.org/v2/search/resources/" + this->name + "?field=name&size=" + std::to_string(this->result));
-    nlohmann::json json = nlohmann::json::parse(spigetres, nullptr, false);
-    if(json.is_discarded()){
-        if(!mcsm::isDebug()){ this->found = false; return ""; }
-        mcsm::error("Parse of json or API request failed.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
-        this->found = false;
-        return "";
-    }
-
+std::string mcsm::BukkitPlugin::spigetGetAuthor(const nlohmann::json& json){
     int i = 0;
 
     if((this->result - 1) < 0){

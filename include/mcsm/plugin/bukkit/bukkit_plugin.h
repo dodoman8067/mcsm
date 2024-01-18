@@ -54,7 +54,7 @@ namespace mcsm {
         std::string spigetGetDownloads();
         std::string spigetGetNativeVersion();
         std::vector<std::string> spigetGetSupportedVersions();
-        std::string spigetGetAuthor();
+        std::string spigetGetAuthor(const nlohmann::json& json);
     public:
         BukkitPlugin(const std::string& name, const mcsm::PluginRepo& repo);
         BukkitPlugin(const std::string& name, const mcsm::PluginRepo& repo, const int& result);
