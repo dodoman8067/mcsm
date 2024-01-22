@@ -67,8 +67,9 @@ int mcsm::runCommand(const std::string& command){
 }
 
 bool mcsm::isDebug(){
-    #ifdef DEBUG
+    #ifdef MCSM_DEBUG
         return true;
+    #else
+        return false;
     #endif
-    return false;
 }
