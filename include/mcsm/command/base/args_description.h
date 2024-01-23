@@ -20,35 +20,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __SERVER_DATA_OPTION_H__
-#define __SERVER_DATA_OPTION_H__
+#ifndef __MCSM_ARGS_DESCRIPTION_H__
+#define __MCSM_ARGS_DESCRIPTION_H__
 
-#include <mcsm/data/option.h>
-#include <chrono>
+#include <mcsm/command/base/command.h>
+#include <map>
+#include <memory>
 
 namespace mcsm {
-    class ServerDataOption {
-    protected:
-        std::unique_ptr<mcsm::Option> option;
+    class ArgumentsDescription {
+    private:
+        std::unique_ptr<std::map<const std::string, const std::string>> argsMap;
     public:
-        ServerDataOption();
-        ~ServerDataOption();
-
-        void create(const std::string& lastTimeLaunched);
-
-        void reset();
-
-        std::string getLastTimeLaunched() const;
-        void updateLastTimeLaunched();
-
-        std::string getServerTimeCreated() const;
-        void updateServerTimeCreated();
-
-        std::string getLastDownloadedBuild() const;
-        void updateLastDownloadedBuild(const std::string& build);
-        
-        bool exists() const;
+        ArgumentsDescription(std::unique_ptr<std::map<const std::string, const std::string>> argsMap);
+        ~ArgumentsDescription();
+        void printAll() const;
+        std::string getDescription(const std::string& arg) const;
+        bool argExists(const std::string& arg) const;
     };
 }
 
-#endif // __SERVER_DATA_OPTION_H__
+#endif // __MCSM_ARGS_DESCRIPTION_H__

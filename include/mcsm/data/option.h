@@ -35,19 +35,28 @@ namespace mcsm {
     private:
         std::string path;
         std::string name;
+
         bool createDirectories(std::string const &dirName, std::error_code &err) const;
     public:
         Option(const std::string& path, const std::string& name);
         ~Option();
+
         nlohmann::json load() const;
+
         std::string getPath();
+
         std::string getName();
+
         nlohmann::json getValue(const std::string& key) const;
-        bool hasValue(const std::string& key) const;
-        bool exists() const override;
-        bool isGlobal() const override;
         void setValue(const std::string& key, const nlohmann::json& value) const;
+        bool hasValue(const std::string& key) const;
+
+        bool exists() const override;
+
+        bool isGlobal() const override;
+
         void save(const nlohmann::json& jsonData) const;
+        
         void reset() const;
     };
 }

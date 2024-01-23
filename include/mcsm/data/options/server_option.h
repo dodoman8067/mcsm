@@ -40,21 +40,31 @@ namespace mcsm {
         ServerOption(const std::string& version);
         ServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server);
         ~ServerOption();
+
         void create(const std::string& name, mcsm::JvmOption& defaultOption);
+        
         void start();
         void start(std::unique_ptr<mcsm::JvmOption> option);
+
         bool exists();
+
         std::string getServerName() const;
         void setServerName(const std::string& name);
+
         std::string getServerVersion() const;
         void setServerVersion(const std::string& version);
+
         std::unique_ptr<mcsm::JvmOption> getDefaultOption() const;
         void setDefaultOption(std::unique_ptr<mcsm::JvmOption> jvmOption);
+
         std::string getServerType() const;
+
         std::string getServerJarFile() const;
         void setServerJarFile(const std::string& name);
+
         std::string getServerJarBuild() const;
         void setServerJarBuild(const std::string& build);
+
         std::shared_ptr<mcsm::Server> getServer() const;
     };
 }
