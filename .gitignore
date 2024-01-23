@@ -4,9 +4,6 @@
 *.out
 *.app
 *.exe
-*.so
-*.dll
-*.dylib
 
 # Compiled source
 *.suo
