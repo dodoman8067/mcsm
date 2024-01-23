@@ -26,9 +26,15 @@ void mcsm::init::initCommands(const std::string& version){
     mcsm::CommandManager::addCommand(std::move(versionCommand));
 
     std::unique_ptr<mcsm::HelpCommand> helpCommand = std::make_unique<mcsm::HelpCommand>("help", "Shows full list of commands.");
+    helpCommand->addAlias("?");
     mcsm::CommandManager::addCommand(std::move(helpCommand));
 
     std::unique_ptr<mcsm::GenerateServerCommand> generateServerCommand = std::make_unique<mcsm::GenerateServerCommand>("init", "Configures a server.");
+    generateServerCommand->addAlias("initServer");
+    generateServerCommand->addAlias("initserver");
+    generateServerCommand->addAlias("initialize");
+    generateServerCommand->addAlias("initializeServer");
+    generateServerCommand->addAlias("initializeserver");
     mcsm::CommandManager::addCommand(std::move(generateServerCommand));
 
     std::unique_ptr<mcsm::JvmOptionGeneratorCommand> jvmOptionGeneratorCommand = std::make_unique<mcsm::JvmOptionGeneratorCommand>("genJvmProfile", "Generates Java Virtual Machine launch profile.");
@@ -62,8 +68,11 @@ void mcsm::init::initCommands(const std::string& version){
     mcsm::CommandManager::addCommand(std::move(viewServerCommand));
 
     std::unique_ptr<mcsm::ViewServerTypeCommand> viewServerTypeCommmand = std::make_unique<mcsm::ViewServerTypeCommand>("info", "Prints specified server implementation's basic information.");
-    viewServerTypeCommmand->addAlias("infoserver");
+    viewServerTypeCommmand->addAlias("information");
+    viewServerTypeCommmand->addAlias("informationServer");
+    viewServerTypeCommmand->addAlias("informationserver");
     viewServerTypeCommmand->addAlias("infoServer");
+    viewServerTypeCommmand->addAlias("infoserver");
     mcsm::CommandManager::addCommand(std::move(viewServerTypeCommmand));
 }
 
