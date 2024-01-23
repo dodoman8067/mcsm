@@ -52,7 +52,7 @@ int main(int argc, char *argv[]){
 
     //If arguments exist, iterates through CommandManager::getCommands()
     for(auto& v : mcsm::CommandManager::getCommands()){
-        if(argv[1] == v->getName() || v->hasAliases(argv[1])){
+        if(argv[1] == v->getName() || v->hasAlias(argv[1])){
             std::vector<std::string> args;
             for(int i = 2; i < argc; i++){
                 args.push_back(argv[i]);

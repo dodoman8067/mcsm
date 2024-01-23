@@ -22,7 +22,7 @@ void mcsm::init::initCommands(const std::string& version){
 
     // Adds command to CommandManager
     std::unique_ptr<mcsm::VersionCommand> versionCommand = std::make_unique<mcsm::VersionCommand>("version", "Returns version information about this program.", version);
-    versionCommand->addAliases("ver");
+    versionCommand->addAlias("ver");
     mcsm::CommandManager::addCommand(std::move(versionCommand));
 
     std::unique_ptr<mcsm::HelpCommand> helpCommand = std::make_unique<mcsm::HelpCommand>("help", "Shows full list of commands.");
@@ -32,38 +32,38 @@ void mcsm::init::initCommands(const std::string& version){
     mcsm::CommandManager::addCommand(std::move(generateServerCommand));
 
     std::unique_ptr<mcsm::JvmOptionGeneratorCommand> jvmOptionGeneratorCommand = std::make_unique<mcsm::JvmOptionGeneratorCommand>("genJvmProfile", "Generates Java Virtual Machine launch profile.");
-    jvmOptionGeneratorCommand->addAliases("generateJvmProfile");
-    jvmOptionGeneratorCommand->addAliases("generateJavaVirtualMachineProfile");
-    jvmOptionGeneratorCommand->addAliases("genjvmprofile");
+    jvmOptionGeneratorCommand->addAlias("generateJvmProfile");
+    jvmOptionGeneratorCommand->addAlias("generateJavaVirtualMachineProfile");
+    jvmOptionGeneratorCommand->addAlias("genjvmprofile");
     mcsm::CommandManager::addCommand(std::move(jvmOptionGeneratorCommand));
 
     std::unique_ptr<mcsm::JvmOptionSearchCommand> jvmProfileSearchCommand = std::make_unique<mcsm::JvmOptionSearchCommand>("searchJvmProfile", "Looks up for Java Virtual Machine profiles.");
-    jvmProfileSearchCommand->addAliases("searchProfile");
-    jvmProfileSearchCommand->addAliases("searchJavaVirtualMachineProfile");
-    jvmProfileSearchCommand->addAliases("searchprofile");
+    jvmProfileSearchCommand->addAlias("searchProfile");
+    jvmProfileSearchCommand->addAlias("searchJavaVirtualMachineProfile");
+    jvmProfileSearchCommand->addAlias("searchprofile");
     mcsm::CommandManager::addCommand(std::move(jvmProfileSearchCommand));
 
     std::unique_ptr<mcsm::JvmOptionEditCommand> jvmOptionEditCommand = std::make_unique<mcsm::JvmOptionEditCommand>("editJvmProfile", "Edits the specified Java Virtual Machine launch profile.");
-    jvmOptionEditCommand->addAliases("editJavaVirtualMachineProfile");
-    jvmOptionEditCommand->addAliases("editprofile");
-    jvmOptionEditCommand->addAliases("editProfile");
-    jvmOptionEditCommand->addAliases("editjvmprofile");
+    jvmOptionEditCommand->addAlias("editJavaVirtualMachineProfile");
+    jvmOptionEditCommand->addAlias("editprofile");
+    jvmOptionEditCommand->addAlias("editProfile");
+    jvmOptionEditCommand->addAlias("editjvmprofile");
     mcsm::CommandManager::addCommand(std::move(jvmOptionEditCommand));
 
     std::unique_ptr<mcsm::StartServerCommand> startServerCommand = std::make_unique<mcsm::StartServerCommand>("start", "Starts a server.");
-    startServerCommand->addAliases("startServer");
-    startServerCommand->addAliases("startserver");
+    startServerCommand->addAlias("startServer");
+    startServerCommand->addAlias("startserver");
     mcsm::CommandManager::addCommand(std::move(startServerCommand));
 
     // TODO: Consider a better name for these two commands.
     std::unique_ptr<mcsm::ViewServerCommand> viewServerCommand = std::make_unique<mcsm::ViewServerCommand>("view", "Prints configured server's basic information.");
-    viewServerCommand->addAliases("viewServer");
-    viewServerCommand->addAliases("viewserver");
+    viewServerCommand->addAlias("viewServer");
+    viewServerCommand->addAlias("viewserver");
     mcsm::CommandManager::addCommand(std::move(viewServerCommand));
 
     std::unique_ptr<mcsm::ViewServerTypeCommand> viewServerTypeCommmand = std::make_unique<mcsm::ViewServerTypeCommand>("info", "Prints specified server implementation's basic information.");
-    viewServerTypeCommmand->addAliases("infoserver");
-    viewServerTypeCommmand->addAliases("infoServer");
+    viewServerTypeCommmand->addAlias("infoserver");
+    viewServerTypeCommmand->addAlias("infoServer");
     mcsm::CommandManager::addCommand(std::move(viewServerTypeCommmand));
 }
 
