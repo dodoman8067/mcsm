@@ -62,12 +62,14 @@ void mcsm::download(const std::string& name, const std::string& url, const std::
 }
 
 void mcsm::download(const std::string& name, const std::string& url, const std::string& path, const bool& percentages){
+    curl_global_init(CURL_GLOBAL_DEFAULT);
     CURL* curl = curl_easy_init();
     if(!curl){
         mcsm::error("Unable to initialize curl");
         mcsm::error("Please try re-running the program, reboot the PC or reinstall the program.");
         mcsm::error("If none of it isn't working for you, please open a new issue in GitHub (https://github.com/dodoman8067/mcsm).");
         curl_easy_cleanup(curl);
+        curl_global_cleanup();
         std::exit(1);
     }
     CURLcode res;
@@ -94,11 +96,13 @@ void mcsm::download(const std::string& name, const std::string& url, const std::
         mcsm::error("Failed to download a file in the following url : " + url + " with the following reason : " + curl_easy_strerror(res));
         std::fclose(file);
         curl_easy_cleanup(curl);
+        curl_global_cleanup();
         std::exit(1);
     }
 
     std::fclose(file);
     curl_easy_cleanup(curl);
+    curl_global_cleanup();
 }
 
 bool mcsm::isText(const std::string& url){

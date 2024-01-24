@@ -29,6 +29,7 @@ static size_t writeFunction(void* contents, size_t size, size_t nmemb, std::stri
 }
 
 const std::string mcsm::get(const std::string& url){
+    curl_global_init(CURL_GLOBAL_DEFAULT);
     CURL *curl = curl_easy_init();
 
     if(!curl){
@@ -36,6 +37,7 @@ const std::string mcsm::get(const std::string& url){
         mcsm::error("Please try re-running the program, reboot the PC or reinstall the program.");
         mcsm::error("If none of it isn't working for you, please open a new issue in GitHub (https://github.com/dodoman8067/mcsm).");
         curl_easy_cleanup(curl);
+        curl_global_cleanup();
         std::exit(1);
     }
 
@@ -52,9 +54,11 @@ const std::string mcsm::get(const std::string& url){
     if (res != CURLE_OK) {
         mcsm::error("Failed to perform GET request in the following url : " + url + " with the following reason : " + curl_easy_strerror(res));
         curl_easy_cleanup(curl);
+        curl_global_cleanup();
         std::exit(1);
     }
 
     curl_easy_cleanup(curl);
+    curl_global_cleanup();
     return response;
 }
