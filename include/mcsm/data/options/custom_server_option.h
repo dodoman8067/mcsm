@@ -51,9 +51,6 @@ namespace mcsm {
         std::string getServerName() const;
         void setServerName(const std::string& name);
 
-        std::string getServerVersion() const;
-        void setServerVersion(const std::string& version);
-
         std::unique_ptr<mcsm::JvmOption> getDefaultOption() const;
         void setDefaultOption(std::unique_ptr<mcsm::JvmOption> jvmOption);
 
@@ -64,9 +61,6 @@ namespace mcsm {
 
         std::string getServerJarFile() const;
         void setServerJarFile(const std::string& name);
-
-        std::string getServerJarBuild() const;
-        void setServerJarBuild(const std::string& build);
 
         std::shared_ptr<mcsm::Server> getServer() const;
     };
