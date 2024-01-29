@@ -64,6 +64,13 @@ namespace mcsm {
         virtual std::string getBasedServer() const = 0;
 
         /**
+         * Returns if this server is based as server `input`.
+         * @param input string to check against
+         * @return true if this server is based as `input`, otherwise false
+        */
+        virtual bool isBasedAs(const std::string& input) const;
+
+        /**
          * Returns the official website link for this server.
          * @return link for official website
         */
@@ -74,13 +81,6 @@ namespace mcsm {
          * @return GitHub repostiory link
         */
         virtual std::string getGitHub() const = 0;
-
-        /**
-         * Returns if this server is based as server `input`.
-         * @param input string to check against
-         * @return true if this server is based as `input`, otherwise false
-        */
-        virtual bool isBasedAs(const std::string& input) const;
 
         /**
          * Starts a Minecraft server with following launch profile `option`

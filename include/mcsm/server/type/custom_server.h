@@ -23,5 +23,27 @@ SOFTWARE.
 #ifndef __MCSM_CUSTOM_SERVER_H__
 #define __MCSM_CUSTOM_SERVER_H__
 
+#include <mcsm/server/server.h>
+
+namespace mcsm {
+    class CustomServer : public mcsm::Server {
+    public:
+        CustomServer();
+        ~CustomServer();
+
+        mcsm::ServerType getType() const override;
+        std::string getTypeAsString() const override;
+
+        std::string getJarFile() const;
+
+        std::string getSupportedVersions() const override;
+
+        std::string getBasedServer() const override;
+        bool isBasedAs(const std::string& input) const override;
+
+        std::string getWebSite() const override;
+        std::string getGitHub() const override;
+    };
+}
 
 #endif // __MCSM_CUSTOM_SERVER_H__
