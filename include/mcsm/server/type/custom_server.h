@@ -27,6 +27,9 @@ SOFTWARE.
 
 namespace mcsm {
     class CustomServer : public mcsm::Server {
+    private:
+        bool isFile(const std::string& location) const;
+        bool isURL(const std::string& location) const;
     public:
         CustomServer();
         ~CustomServer();
@@ -34,7 +37,9 @@ namespace mcsm {
         mcsm::ServerType getType() const override;
         std::string getTypeAsString() const override;
 
-        
+        std::string getFileLocation() const;
+        void setFileLocation(const std::string& location);
+        void getFileFromLocation();
 
         std::string getSupportedVersions() const override;
 

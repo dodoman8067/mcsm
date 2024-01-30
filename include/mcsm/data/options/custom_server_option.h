@@ -56,13 +56,6 @@ namespace mcsm {
 
         std::string getServerType() const;
 
-        std::string getFileLocation() const;
-        void setFileLocation(const std::string& location);
-        void getFileFromLocation();
-
-        bool isFile(const std::string& location) const;
-        bool isURL(const std::string& location) const;
-
         std::string getServerJarFile() const;
         void setServerJarFile(const std::string& name);
 

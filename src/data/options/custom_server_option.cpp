@@ -245,27 +245,6 @@ std::string mcsm::CustomServerOption::getServerName() const {
     return option.getValue("name");
 }
 
-
-std::string mcsm::CustomServerOption::getFileLocation() const {
-
-}
-
-void mcsm::CustomServerOption::setFileLocation(const std::string& location) {
-
-}
-
-void mcsm::CustomServerOption::getFileFromLocation() {
-
-}
-
-bool mcsm::CustomServerOption::isFile(const std::string& location) const {
-
-}
-
-bool mcsm::CustomServerOption::isURL(const std::string& location) const {
-
-}
-
 void mcsm::CustomServerOption::setServerName(const std::string& name){
     mcsm::Option option(".", "server");
     option.setValue("name", name);

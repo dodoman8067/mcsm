@@ -20,6 +20,26 @@ std::string mcsm::CustomServer::getSupportedVersions() const {
     return "unknown";
 }
 
+std::string mcsm::CustomServer::getFileLocation() const {
+
+}
+
+void mcsm::CustomServer::setFileLocation(const std::string& location) {
+
+}
+
+void mcsm::CustomServer::getFileFromLocation() {
+
+}
+
+bool mcsm::CustomServer::isFile(const std::string& location) const {
+
+}
+
+bool mcsm::CustomServer::isURL(const std::string& location) const {
+
+}
+
 std::string mcsm::CustomServer::getBasedServer() const {
     return "unknown";
 }
