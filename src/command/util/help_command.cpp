@@ -35,7 +35,7 @@ void mcsm::HelpCommand::execute(const std::vector<std::string>& args){
     }else{
         if(!mcsm::CommandManager::hasCommand(args[0])){
             std::cout << "Unknown command \"" << args[0] << "\". Type 'mcsm help' for list of commands." << "\n";
-            return;
+            std::exit(1);
         }
         std::unique_ptr<mcsm::Command> command = mcsm::CommandManager::getCommand(args[0]);
         std::cout << command->getName() << " - " << command->getDescription() << "\n";
