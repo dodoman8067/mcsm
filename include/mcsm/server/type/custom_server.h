@@ -34,7 +34,7 @@ namespace mcsm {
         mcsm::ServerType getType() const override;
         std::string getTypeAsString() const override;
 
-        std::string getJarFile() const;
+        
 
         std::string getSupportedVersions() const override;
 

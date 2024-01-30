@@ -56,8 +56,12 @@ namespace mcsm {
 
         std::string getServerType() const;
 
-        void downloadServerJarFile(const std::string& url);
-        void copyServerJarFileFromPath(const std::string& path);
+        std::string getFileLocation() const;
+        void setFileLocation(const std::string& location);
+        void getFileFromLocation();
+
+        bool isFile(const std::string& location) const;
+        bool isURL(const std::string& location) const;
 
         std::string getServerJarFile() const;
         void setServerJarFile(const std::string& name);

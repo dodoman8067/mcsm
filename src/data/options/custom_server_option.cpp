@@ -246,18 +246,24 @@ std::string mcsm::CustomServerOption::getServerName() const {
 }
 
 
-void mcsm::CustomServerOption::downloadServerJarFile(const std::string& url){
-    //TODO : Check url regex
-    mcsm::warning("MCSM doesn't know if it's downloading a malicious file.");
-    mcsm::warning("Use it at your own risk; we aren't responsible for any kinds of damage caused by this.");
-    mcsm::download(getServerJarFile(), url);
+std::string mcsm::CustomServerOption::getFileLocation() const {
+
 }
 
-void mcsm::CustomServerOption::copyServerJarFileFromPath(const std::string& path){
-    //TODO : Check file regex
-    mcsm::warning("MCSM doesn't know if it's copying a malicious file.");
-    mcsm::warning("Use it at your own risk; we aren't responsible for any kinds of damage caused by this.");
-    //TODO : Copy file
+void mcsm::CustomServerOption::setFileLocation(const std::string& location) {
+
+}
+
+void mcsm::CustomServerOption::getFileFromLocation() {
+
+}
+
+bool mcsm::CustomServerOption::isFile(const std::string& location) const {
+
+}
+
+bool mcsm::CustomServerOption::isURL(const std::string& location) const {
+
 }
 
 void mcsm::CustomServerOption::setServerName(const std::string& name){
