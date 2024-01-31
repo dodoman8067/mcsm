@@ -109,6 +109,7 @@ void mcsm::CustomServerOption::create(const std::string& name, mcsm::JvmOption& 
     }
     option.setValue("name", name);
     option.setValue("default_launch_profile", profileObj);
+    option.setValue("jar_location", "current");
     option.setValue("server_jar", this->server->getJarFile());
     option.setValue("type", this->server->getTypeAsString());
     serverDataOpt.updateServerTimeCreated();
@@ -278,6 +279,38 @@ std::string mcsm::CustomServerOption::getServerType() const {
         std::exit(1);
     }
     return "custom";
+}
+
+std::string mcsm::CustomServerOption::getServerJarLocation() const {
+    mcsm::Option option(".", "server");
+    if(!option.exists()){
+        mcsm::error("Option does not exist; Task aborted.");
+        std::exit(1);
+    }
+    if(option.getValue("jar_location") == nullptr){
+        mcsm::error("No \"jar_location\" value specified in file " + option.getName());
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);
+    }
+    if(!option.getValue("jar_location").is_string()){
+        mcsm::error("Value \"jar_location\" has to be a string, but it's not.");
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);
+    }
+    std::string value = option.getValue("jar_location");
+    if(mcsm::startsWith(value, "current") && mcsm::endsWith(value, "current")){
+        return std::filesystem::current_path();
+    }
+    return option.getValue("jar_location");
+}
+
+void mcsm::CustomServerOption::setServerJarLocation(const std::string& location){
+    mcsm::Option option(".", "server");
+    option.setValue("jar_location", location);
 }
 
 std::string mcsm::CustomServerOption::getServerJarFile() const{

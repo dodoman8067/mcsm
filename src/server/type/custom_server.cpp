@@ -33,7 +33,7 @@ void mcsm::CustomServer::getFileFromLocation() {
 }
 
 bool mcsm::CustomServer::isFile(const std::string& location) const {
-
+    return std::filesystem::exists(location);
 }
 
 bool mcsm::CustomServer::isURL(const std::string& location) const {

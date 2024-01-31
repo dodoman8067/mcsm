@@ -56,6 +56,9 @@ namespace mcsm {
 
         std::string getServerType() const;
 
+        std::string getServerJarLocation() const;
+        void setServerJarLocation(const std::string& location);
+
         std::string getServerJarFile() const;
         void setServerJarFile(const std::string& name);
 
