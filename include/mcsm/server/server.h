@@ -40,13 +40,13 @@ namespace mcsm {
         virtual mcsm::ServerType getType() const = 0;
 
         /**
-         * Returns server type as a string
+         * Returns server's type as a string
          * @return server type as a string
         */
         virtual std::string getTypeAsString() const = 0;
 
         /**
-         * Returns server jarfile name.
+         * Returns the name of the server's jarfile.
          * @return jarfile name
         */
         virtual std::string getJarFile() const;

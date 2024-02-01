@@ -24,6 +24,8 @@ SOFTWARE.
 #define __MCSM_CUSTOM_SERVER_H__
 
 #include <mcsm/server/server.h>
+#include <mcsm/http/download.h>
+#include <regex>
 
 namespace mcsm {
     class CustomServer : public mcsm::Server {

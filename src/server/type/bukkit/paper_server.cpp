@@ -88,7 +88,7 @@ std::string mcsm::PaperServer::getGitHub() const {
 }
 
 void mcsm::PaperServer::download(const std::string& version){
-    download(version, std::filesystem::current_path().string(), getJarFile());
+    download(version, mcsm::getCurrentPath(), getJarFile());
 }
 
 void mcsm::PaperServer::download(const std::string& version, const std::string& path){

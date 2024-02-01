@@ -98,7 +98,7 @@ std::string mcsm::FabricServer::getGitHub() const {
 }
 
 void mcsm::FabricServer::download(const std::string& version){
-    download(version, std::filesystem::current_path().string(), getJarFile());
+    download(version, mcsm::getCurrentPath(), getJarFile());
 }
 
 void mcsm::FabricServer::download(const std::string& version, const std::string& path){

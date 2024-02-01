@@ -54,7 +54,7 @@ static int xferinfoCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow,
 }
 
 void mcsm::download(const std::string& name, const std::string& url){
-    download(name, url, std::filesystem::current_path().string());
+    download(name, url, mcsm::getCurrentPath());
 }
 
 void mcsm::download(const std::string& name, const std::string& url, const std::string& path){

@@ -24,6 +24,7 @@ SOFTWARE.
 #define __MCSM_CLI_UTILS_H__
 
 #include <string>
+#include <filesystem>
 #include <cstdlib>
 #include <iostream>
 #include <mcsm/util/os/os_detection.h>
@@ -44,6 +45,8 @@ namespace mcsm {
      * @param command string to run as a command
     */
     int runCommand(const std::string& command);
+
+    std::string getCurrentPath();
 
     bool isDebug();
 }

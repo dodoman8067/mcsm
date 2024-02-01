@@ -47,6 +47,7 @@ int main(int argc, char *argv[]){
     if(argc < 2){
         std::cout << "Welcome to MCSM (Minecraft Server Manager).\n";
         std::cout << "Type \'mcsm help\' for list of commands.\n";
+        std::cout << mcsm::getCurrentPath() << "\n";
         return 0;
     }
 

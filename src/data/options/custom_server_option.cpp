@@ -303,7 +303,7 @@ std::string mcsm::CustomServerOption::getServerJarLocation() const {
     }
     std::string value = option.getValue("jar_location");
     if(mcsm::startsWith(value, "current") && mcsm::endsWith(value, "current")){
-        return std::filesystem::current_path();
+        return mcsm::getCurrentPath();
     }
     return option.getValue("jar_location");
 }

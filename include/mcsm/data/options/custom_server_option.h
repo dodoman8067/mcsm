@@ -28,7 +28,6 @@ SOFTWARE.
 #include <mcsm/server/server.h>
 #include <mcsm/server/type/downloadable.h>
 #include <mcsm/data/options/server_data_option.h>
-#include <memory>
 
 namespace mcsm {
     class CustomServerOption {
