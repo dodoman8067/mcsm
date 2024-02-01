@@ -47,6 +47,8 @@ namespace mcsm {
     int runCommand(const std::string& command);
 
     std::string getCurrentPath();
+    bool fileExists(const std::string& path);
+    bool removeFile(const std::string& path);
 
     bool isDebug();
 }
