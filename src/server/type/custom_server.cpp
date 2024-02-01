@@ -80,7 +80,7 @@ std::string mcsm::CustomServer::getBasedServer() const {
     return "unknown";
 }
 
-bool mcsm::CustomServer::isBasedAs(const std::string& input) const {
+bool mcsm::CustomServer::isBasedAs(const std::string& /* input */) const {
     return false;
 }
 
