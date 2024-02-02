@@ -52,6 +52,13 @@ namespace mcsm {
         virtual std::string getJarFile() const;
 
         /**
+         * Returns the name of the server's jarfile.
+         * @param checkDir checking directory
+         * @return jarfile name
+        */
+        virtual std::string getJarFile(const std::string& checkDir) const;
+
+        /**
          * Returns the earliest Minecraft version supported by this server.
          * @return earliest Minecraft version supported by this server
         */

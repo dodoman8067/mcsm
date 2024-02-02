@@ -39,7 +39,11 @@ void mcsm::Server::start(mcsm::JvmOption& option){
 }
 
 std::string mcsm::Server::getJarFile() const {
-    mcsm::Option opt(".", "server");
+    return getJarFile(mcsm::getCurrentPath());
+}
+
+std::string mcsm::Server::getJarFile(const std::string& checkDir) const {
+    mcsm::Option opt(checkDir, "server");
     if(opt.exists() && opt.getValue("server_jar") != nullptr){
         if(!opt.getValue("server_jar").is_string()){
             mcsm::error("Value \"server_jar\" has to be a string, but it's not.");

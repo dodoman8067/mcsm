@@ -49,6 +49,7 @@ namespace mcsm {
     std::string getCurrentPath();
     bool fileExists(const std::string& path);
     bool removeFile(const std::string& path);
+    bool mkdir(const std::string& dirName);
 
     bool isDebug();
 }

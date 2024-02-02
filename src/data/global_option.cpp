@@ -68,7 +68,7 @@ bool mcsm::GlobalOption::createDirectories(std::string const &dirName, std::erro
     if(!std::filesystem::create_directories(dirName, err)){
         if(std::filesystem::exists(dirName)){
             err.clear();
-            return true;    
+            return true;
         }
         return false;
     }

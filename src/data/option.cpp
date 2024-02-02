@@ -35,12 +35,12 @@ mcsm::Option::Option(const std::string& path, const std::string& name){
 mcsm::Option::~Option(){
 }
 
-bool mcsm::Option::createDirectories(std::string const &dirName, std::error_code &err) const{
+bool mcsm::Option::createDirectories(const std::string &dirName, std::error_code &err) const{
     err.clear();
     if(!std::filesystem::create_directories(dirName, err)){
         if(std::filesystem::exists(dirName)){
             err.clear();
-            return true;    
+            return true;
         }
         return false;
     }

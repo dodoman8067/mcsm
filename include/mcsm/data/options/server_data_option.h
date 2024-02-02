@@ -24,14 +24,17 @@ SOFTWARE.
 #define __SERVER_DATA_OPTION_H__
 
 #include <mcsm/data/option.h>
+#include <mcsm/util/cli/cli_utils.h>
 #include <chrono>
 
 namespace mcsm {
     class ServerDataOption {
     protected:
+        std::string path;
         std::unique_ptr<mcsm::Option> option;
     public:
         ServerDataOption();
+        ServerDataOption(const std::string& path);
         ~ServerDataOption();
 
         void create(const std::string& lastTimeLaunched);

@@ -36,7 +36,7 @@ void mcsm::ViewServerCommand::execute(const std::vector<std::string>& /* args */
 }
 
 inline bool mcsm::ViewServerCommand::isConfigured(){
-    return std::filesystem::exists("server.json");
+    return mcsm::fileExists(mcsm::getCurrentPath() + "/server.json");
 }
 
 inline void mcsm::ViewServerCommand::printServerInfo(){

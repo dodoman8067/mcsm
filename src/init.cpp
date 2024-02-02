@@ -39,6 +39,7 @@ void mcsm::init::initCommands(const std::string& version){
 
     std::unique_ptr<mcsm::JvmOptionGeneratorCommand> jvmOptionGeneratorCommand = std::make_unique<mcsm::JvmOptionGeneratorCommand>("genJvmProfile", "Generates Java Virtual Machine launch profile.");
     jvmOptionGeneratorCommand->addAlias("generateJvmProfile");
+    jvmOptionGeneratorCommand->addAlias("generatejvmprofile");
     jvmOptionGeneratorCommand->addAlias("generateJavaVirtualMachineProfile");
     jvmOptionGeneratorCommand->addAlias("genjvmprofile");
     mcsm::CommandManager::addCommand(std::move(jvmOptionGeneratorCommand));

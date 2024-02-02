@@ -52,7 +52,7 @@ void mcsm::StartServerCommand::execute(const std::vector<std::string>& args){
         std::exit(1);
     }
     std::unique_ptr<mcsm::JvmOption> jvmOpt = searchOption(args);
-    mcsm::ServerOption sOpt;
+    mcsm::ServerOption sOpt(mcsm::getCurrentPath());
     if(sOpt.getServerType() == "fabric"){
         mcsm::FabricServerOption fsOpt;
         fsOpt.start(std::move(jvmOpt));
@@ -120,5 +120,5 @@ mcsm::SearchTarget mcsm::StartServerCommand::getSearchTarget(const std::vector<s
 
 
 inline bool mcsm::StartServerCommand::isConfigured(){
-    return std::filesystem::exists("server.json");
+    return mcsm::fileExists(mcsm::getCurrentPath() + "/server.json");
 }

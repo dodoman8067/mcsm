@@ -23,32 +23,17 @@ SOFTWARE.
 
 #include <mcsm/data/options/server_option.h>
 
-mcsm::ServerOption::ServerOption(){
-    mcsm::Option option(".", "server");
+mcsm::ServerOption::ServerOption() : ServerOption(mcsm::getCurrentPath()){}
 
-    if(!option.exists()){
-        mcsm::error("File server.json cannot be found.");
-        mcsm::error("Task aborted.");
-        std::exit(1);
+mcsm::ServerOption::ServerOption(const std::string& version, const std::string& path){
+    if(!mcsm::fileExists(path)){
+        if(!mcsm::mkdir(path)){
+            mcsm::warning("Path mkdir failed : " + path);
+            mcsm::warning("Task aborted.");
+            std::exit(1);
+        }
     }
-    if(option.getValue("version") == nullptr){
-        mcsm::error("Option \"version\" cannot be found.");
-        mcsm::error("Task aborted.");
-        std::exit(1);    
-    }
-    if(!option.getValue("version").is_string()){
-        mcsm::error("Value \"version\" has to be a string, but it's not.");
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
-    }
-
-    ServerOption(option.getValue("version"));
-}
-
-mcsm::ServerOption::ServerOption(const std::string& version){
-    mcsm::Option option(".", "server");
+    mcsm::Option option(path, "server");
 
     if(!option.exists()){
         mcsm::error("File server.json cannot be found.");
@@ -70,13 +55,78 @@ mcsm::ServerOption::ServerOption(const std::string& version){
 
     std::string server = option.getValue("type");
     std::shared_ptr<mcsm::Server> sPtr = mcsm::server::detectServerType(server);
+    this->path = path;
     this->version = version;
     this->server = sPtr;
+}
+
+mcsm::ServerOption::ServerOption(const std::string& path){
+    if(!mcsm::fileExists(path)){
+        if(!mcsm::mkdir(path)){
+            mcsm::warning("Path mkdir failed : " + path);
+            mcsm::warning("Task aborted.");
+            std::exit(1);
+        }
+    }
+    mcsm::Option option(path, "server");
+
+    if(!option.exists()){
+        mcsm::error("File server.json cannot be found.");
+        mcsm::error("Task aborted.");
+        std::exit(1);
+    }
+    if(option.getValue("type") == nullptr){
+        mcsm::error("Option \"type\" cannot be found.");
+        mcsm::error("Task aborted.");
+        std::exit(1);    
+    }
+    if(!option.getValue("type").is_string()){
+        mcsm::error("Value \"type\" has to be a string, but it's not.");
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);
+    }
+
+    if(option.getValue("version") == nullptr){
+        mcsm::error("Option \"version\" cannot be found.");
+        mcsm::error("Task aborted.");
+        std::exit(1);    
+    }
+    if(!option.getValue("version").is_string()){
+        mcsm::error("Value \"version\" has to be a string, but it's not.");
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);
+    }
+
+    std::string server = option.getValue("type");
+    std::string version = option.getValue("version");
+    std::shared_ptr<mcsm::Server> sPtr = mcsm::server::detectServerType(server);
+    this->path = path;
+    this->server = sPtr;
+    this->version = version;
 }
 
 mcsm::ServerOption::ServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server){
     this->version = version;
     this->server = server;
+    this->path = mcsm::getCurrentPath();
+}
+
+mcsm::ServerOption::ServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server, const std::string& path){
+    if(!mcsm::fileExists(path)){
+        if(!mcsm::mkdir(path)){
+            mcsm::warning("Path mkdir failed : " + path);
+            mcsm::warning("Task aborted.");
+            std::exit(1);
+        }
+    }
+
+    this->version = version;
+    this->server = server;
+    this->path = path;
 }
 
 mcsm::ServerOption::~ServerOption(){
@@ -84,14 +134,14 @@ mcsm::ServerOption::~ServerOption(){
 }
 
 void mcsm::ServerOption::create(const std::string& name, mcsm::JvmOption& defaultOption){
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     if(option.exists()){
-        mcsm::error("Server is already configured in this directory.");
+        mcsm::error("Server is already configured in directory " + this->path + ".");
         mcsm::error("Please create a server.json file in other directories.");
         std::exit(1);
     }
 
-    mcsm::ServerDataOption serverDataOpt;
+    mcsm::ServerDataOption serverDataOpt(this->path);
     serverDataOpt.create("none");
 
     nlohmann::json profileObj;
@@ -104,7 +154,7 @@ void mcsm::ServerOption::create(const std::string& name, mcsm::JvmOption& defaul
     option.setValue("name", name);
     option.setValue("version", this->version);
     option.setValue("default_launch_profile", profileObj);
-    option.setValue("server_jar", this->server->getJarFile());
+    option.setValue("server_jar", this->server->getJarFile(this->path));
     option.setValue("server_build", "latest");
     option.setValue("type", this->server->getTypeAsString());
     serverDataOpt.updateServerTimeCreated();
@@ -118,7 +168,7 @@ void mcsm::ServerOption::start(){
 void mcsm::ServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
     mcsm::ServerDataOption serverDataOpt;
 
-    if(!std::filesystem::exists("server.json")){
+    if(!mcsm::fileExists(this->path + "/server.json")){
         mcsm::error("File server.json cannot be found.");
         mcsm::error("Task aborted.");
         std::exit(1);
@@ -139,12 +189,12 @@ void mcsm::ServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
 }
 
 bool mcsm::ServerOption::exists(){
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     return option.exists();
 }
 
-std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const{
-    mcsm::Option option(".", "server");
+std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const {
+    mcsm::Option option(this->path, "server");
     if(!option.exists()){
         mcsm::error("Option does not exist; Task aborted.");
         std::exit(1);
@@ -208,7 +258,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const{
 }
 
 void mcsm::ServerOption::setDefaultOption(std::unique_ptr<mcsm::JvmOption> jvmOption){
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     nlohmann::json profileObj;
     profileObj["name"] = jvmOption->getProfileName();
     if(jvmOption->getSearchTarget() == mcsm::SearchTarget::GLOBAL){
@@ -220,7 +270,7 @@ void mcsm::ServerOption::setDefaultOption(std::unique_ptr<mcsm::JvmOption> jvmOp
 }
 
 std::string mcsm::ServerOption::getServerName() const {
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     if(!option.exists()){
         mcsm::error("Option does not exist; Task aborted.");
         std::exit(1);
@@ -243,12 +293,12 @@ std::string mcsm::ServerOption::getServerName() const {
 }
 
 void mcsm::ServerOption::setServerName(const std::string& name){
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     option.setValue("name", name);
 }
 
 std::string mcsm::ServerOption::getServerVersion() const {
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     if(!option.exists()){
         mcsm::error("Option does not exist; Task aborted.");
         std::exit(1);
@@ -271,12 +321,12 @@ std::string mcsm::ServerOption::getServerVersion() const {
 }
 
 void mcsm::ServerOption::setServerVersion(const std::string& version){
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     option.setValue("version", version);    
 }
 
 std::string mcsm::ServerOption::getServerType() const {
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     if(!option.exists()){
         mcsm::error("Option does not exist; Task aborted.");
         std::exit(1);
@@ -299,7 +349,7 @@ std::string mcsm::ServerOption::getServerType() const {
 }
 
 std::string mcsm::ServerOption::getServerJarFile() const{
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     if(!option.exists()){
         mcsm::error("Option does not exist; Task aborted.");
         std::exit(1);
@@ -322,12 +372,12 @@ std::string mcsm::ServerOption::getServerJarFile() const{
 }
 
 void mcsm::ServerOption::setServerJarFile(const std::string& name){
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     option.setValue("server_jar", name);
 }
 
 std::string mcsm::ServerOption::getServerJarBuild() const {
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     if(!option.exists()){
         mcsm::error("Option does not exist; Task aborted.");
         std::exit(1);
@@ -350,7 +400,7 @@ std::string mcsm::ServerOption::getServerJarBuild() const {
 }
 
 void mcsm::ServerOption::setServerJarBuild(const std::string& build){
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     option.setValue("server_build", build);
 }
 

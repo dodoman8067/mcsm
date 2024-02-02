@@ -1,37 +1,22 @@
 #include <mcsm/data/options/modded/fabric_server_option.h>
 
-mcsm::FabricServerOption::FabricServerOption(){
-    mcsm::Option option(".", "server");
+mcsm::FabricServerOption::FabricServerOption() : FabricServerOption(mcsm::getCurrentPath()){}
+
+mcsm::FabricServerOption::FabricServerOption(const std::string& version, const std::string& path){
+    if(!mcsm::fileExists(path)){
+        if(!mcsm::mkdir(path)){
+            mcsm::warning("Path mkdir failed : " + path);
+            mcsm::warning("Task aborted.");
+            std::exit(1);
+        }
+    }
+    mcsm::Option option(path, "server");
 
     if(!option.exists()){
         mcsm::error("File server.json cannot be found.");
         mcsm::error("Task aborted.");
         std::exit(1);
     }
-    if(option.getValue("version") == nullptr){
-        mcsm::error("Option \"version\" cannot be found.");
-        mcsm::error("Task aborted.");
-        std::exit(1);    
-    }
-    if(!option.getValue("version").is_string()){
-        mcsm::error("Value \"version\" has to be a string, but it's not.");
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);      
-    }
-    FabricServerOption(option.getValue("version"));
-}
-
-mcsm::FabricServerOption::FabricServerOption(const std::string& version){
-    mcsm::Option option(".", "server");
-
-    if(!option.exists()){
-        mcsm::error("File server.json cannot be found.");
-        mcsm::error("Task aborted.");
-        std::exit(1);
-    }
-
     if(option.getValue("type") == nullptr){
         mcsm::error("Option \"type\" cannot be found.");
         mcsm::error("Task aborted.");
@@ -44,15 +29,80 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& version){
         mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
-    if(option.getValue("type") != "fabric"){
-        mcsm::error("Class mcsm::FabricServerOption was constructed while the server isn't Fabric based.");
+
+    std::string server = option.getValue("type");
+    std::shared_ptr<mcsm::Server> sPtr = mcsm::server::detectServerType(server);
+    if(sPtr->getTypeAsString() != "fabric"){
+        mcsm::error("Class mcsm::FabricServerOption was constructed while non Fabric server pointer was passed as a parameter.");
         mcsm::error("This has a very high chance to be a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
-
-    std::shared_ptr<mcsm::Server> sPtr = std::make_shared<mcsm::FabricServer>();
+    this->path = path;
     this->version = version;
     this->server = sPtr;
+}
+
+mcsm::FabricServerOption::FabricServerOption(const std::string& path){
+    if(!mcsm::fileExists(path)){
+        if(!mcsm::mkdir(path)){
+            mcsm::warning("Path mkdir failed : " + path);
+            mcsm::warning("Task aborted.");
+            std::exit(1);
+        }
+    }
+    mcsm::Option option(path, "server");
+
+    if(!option.exists()){
+        mcsm::error("File server.json cannot be found.");
+        mcsm::error("Task aborted.");
+        std::exit(1);
+    }
+    if(option.getValue("type") == nullptr){
+        mcsm::error("Option \"type\" cannot be found.");
+        mcsm::error("Task aborted.");
+        std::exit(1);    
+    }
+    if(!option.getValue("type").is_string()){
+        mcsm::error("Value \"type\" has to be a string, but it's not.");
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);
+    }
+
+    if(option.getValue("version") == nullptr){
+        mcsm::error("Option \"version\" cannot be found.");
+        mcsm::error("Task aborted.");
+        std::exit(1);    
+    }
+    if(!option.getValue("version").is_string()){
+        mcsm::error("Value \"version\" has to be a string, but it's not.");
+        mcsm::error("Manually editing the launch profile might have caused this issue.");
+        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        std::exit(1);
+    }
+
+    std::string server = option.getValue("type");
+    std::string version = option.getValue("version");
+    std::shared_ptr<mcsm::Server> sPtr = mcsm::server::detectServerType(server);
+    this->path = path;
+    this->server = sPtr;
+    this->version = version;
+}
+
+mcsm::FabricServerOption::FabricServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server, const std::string& path){
+    if(!mcsm::fileExists(path)){
+        if(!mcsm::mkdir(path)){
+            mcsm::warning("Path mkdir failed : " + path);
+            mcsm::warning("Task aborted.");
+            std::exit(1);
+        }
+    }
+
+    this->version = version;
+    this->server = server;
+    this->path = path;
 }
 
 mcsm::FabricServerOption::FabricServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server){
@@ -63,6 +113,7 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& version, std::sh
     }
     this->server = server;
     this->version = version;
+    this->path = mcsm::getCurrentPath();
 }
 
 mcsm::FabricServerOption::~FabricServerOption(){
@@ -70,14 +121,14 @@ mcsm::FabricServerOption::~FabricServerOption(){
 }
 
 void mcsm::FabricServerOption::create(const std::string& name, mcsm::JvmOption& defaultOption){
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     if(option.exists()){
-        mcsm::error("Server is already configured in this directory.");
+        mcsm::error("Server is already configured in directory " + this->path + ".");
         mcsm::error("Please create a server.json file in other directories.");
         std::exit(1);
     }
 
-    mcsm::FabricServerDataOption serverDataOpt;
+    mcsm::FabricServerDataOption serverDataOpt(this->path);
     serverDataOpt.create("none");
 
     nlohmann::json profileObj;
@@ -90,7 +141,7 @@ void mcsm::FabricServerOption::create(const std::string& name, mcsm::JvmOption& 
     option.setValue("name", name);
     option.setValue("version", this->version);
     option.setValue("default_launch_profile", profileObj);
-    option.setValue("server_jar", this->server->getJarFile());
+    option.setValue("server_jar", this->server->getJarFile(this->path));
     option.setValue("loader_version", "latest");
     option.setValue("installer_version", "latest");
     option.setValue("type", this->server->getTypeAsString());
@@ -105,8 +156,7 @@ void mcsm::FabricServerOption::start(){
 void mcsm::FabricServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
     mcsm::FabricServerDataOption serverDataOpt;
 
-    if(!std::filesystem::exists("server.json")){
-        std::cout << "1\n";
+    if(!mcsm::fileExists(this->path + "/server.json")){
         mcsm::error("File server.json cannot be found.");
         mcsm::error("Task aborted.");
         std::exit(1);
@@ -141,7 +191,7 @@ void mcsm::FabricServerOption::setServerJarBuild(const std::string& build){
 }
 
 std::string mcsm::FabricServerOption::getLoaderVersion() const {
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     if(!option.exists()){
         mcsm::error("Option does not exist; Task aborted.");
         std::exit(1);
@@ -164,12 +214,12 @@ std::string mcsm::FabricServerOption::getLoaderVersion() const {
 }
 
 void mcsm::FabricServerOption::setLoaderVersion(const std::string& version){
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     option.setValue("loader_version", version);
 }
 
 std::string mcsm::FabricServerOption::getInstallerVersion() const{
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     if(!option.exists()){
         mcsm::error("Option does not exist; Task aborted.");
         std::exit(1);
@@ -192,17 +242,17 @@ std::string mcsm::FabricServerOption::getInstallerVersion() const{
 }
 
 void mcsm::FabricServerOption::setInstallerVersion(const std::string& version){
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     option.setValue("installer_version", version);
 }
 
 bool mcsm::FabricServerOption::exists(){
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     return option.exists();
 }
 
 std::unique_ptr<mcsm::JvmOption> mcsm::FabricServerOption::getDefaultOption() const{
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     if(!option.exists()){
         mcsm::error("Option does not exist; Task aborted.");
         std::exit(1);
@@ -266,7 +316,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::FabricServerOption::getDefaultOption() co
 }
 
 void mcsm::FabricServerOption::setDefaultOption(std::unique_ptr<mcsm::JvmOption> jvmOption){
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     nlohmann::json profileObj;
     profileObj["name"] = jvmOption->getProfileName();
     if(jvmOption->getSearchTarget() == mcsm::SearchTarget::GLOBAL){
@@ -278,7 +328,7 @@ void mcsm::FabricServerOption::setDefaultOption(std::unique_ptr<mcsm::JvmOption>
 }
 
 std::string mcsm::FabricServerOption::getServerName() const {
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     if(!option.exists()){
         mcsm::error("Option does not exist; Task aborted.");
         std::exit(1);
@@ -301,12 +351,12 @@ std::string mcsm::FabricServerOption::getServerName() const {
 }
 
 void mcsm::FabricServerOption::setServerName(const std::string& name){
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     option.setValue("name", name);
 }
 
 std::string mcsm::FabricServerOption::getServerVersion() const {
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     if(!option.exists()){
         mcsm::error("Option does not exist; Task aborted.");
         std::exit(1);
@@ -329,12 +379,12 @@ std::string mcsm::FabricServerOption::getServerVersion() const {
 }
 
 void mcsm::FabricServerOption::setServerVersion(const std::string& version){
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     option.setValue("version", version);    
 }
 
 std::string mcsm::FabricServerOption::getServerType() const {
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     if(!option.exists()){
         mcsm::error("Option does not exist; Task aborted.");
         std::exit(1);
@@ -357,7 +407,7 @@ std::string mcsm::FabricServerOption::getServerType() const {
 }
 
 std::string mcsm::FabricServerOption::getServerJarFile() const{
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     if(!option.exists()){
         mcsm::error("Option does not exist; Task aborted.");
         std::exit(1);
@@ -380,7 +430,7 @@ std::string mcsm::FabricServerOption::getServerJarFile() const{
 }
 
 void mcsm::FabricServerOption::setServerJarFile(const std::string& name){
-    mcsm::Option option(".", "server");
+    mcsm::Option option(this->path, "server");
     option.setValue("server_jar", name);
 }
 

@@ -7,6 +7,7 @@ namespace mcsm {
     class FabricServerDataOption : public mcsm::ServerDataOption {
     public:
         FabricServerDataOption();
+        FabricServerDataOption(const std::string& path);
         ~FabricServerDataOption();
 
         std::string getLoaderVersion() const;

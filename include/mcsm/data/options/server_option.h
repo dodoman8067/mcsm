@@ -35,10 +35,13 @@ namespace mcsm {
     private:
         std::shared_ptr<mcsm::Server> server;
         std::string version;
+        std::string path;
     public:
         ServerOption();
-        ServerOption(const std::string& version);
+        ServerOption(const std::string& path);
+        ServerOption(const std::string& version, const std::string& path);
         ServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server);
+        ServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server, const std::string& path);
         ~ServerOption();
 
         void create(const std::string& name, mcsm::JvmOption& defaultOption);

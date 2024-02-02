@@ -1,8 +1,8 @@
 #include <mcsm/data/options/modded/fabric_server_data_option.h>
 
-mcsm::FabricServerDataOption::FabricServerDataOption(){
-    this->option = std::make_unique<mcsm::Option>("./.mcsm/", "server_datas_fabric");
-}
+mcsm::FabricServerDataOption::FabricServerDataOption() : ServerDataOption() {}
+
+mcsm::FabricServerDataOption::FabricServerDataOption(const std::string& path) : ServerDataOption(path) {}
 
 mcsm::FabricServerDataOption::~FabricServerDataOption(){}
 

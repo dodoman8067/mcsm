@@ -22,8 +22,17 @@ SOFTWARE.
 
 #include <mcsm/data/options/server_data_option.h>
 
-mcsm::ServerDataOption::ServerDataOption(){
-    this->option = std::make_unique<mcsm::Option>("./.mcsm/", "server_datas");
+mcsm::ServerDataOption::ServerDataOption() : ServerDataOption(mcsm::getCurrentPath()){}
+
+mcsm::ServerDataOption::ServerDataOption(const std::string& path){
+    if(!mcsm::fileExists(path)){
+        if(!mcsm::mkdir(path)){
+            mcsm::warning("Path mkdir failed : " + path);
+            mcsm::warning("Task aborted.");
+            std::exit(1);
+        }
+    }
+    this->option = std::make_unique<mcsm::Option>(path + "/.mcsm/", "server_datas");
 }
 
 mcsm::ServerDataOption::~ServerDataOption(){

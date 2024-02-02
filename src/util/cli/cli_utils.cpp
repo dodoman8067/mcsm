@@ -100,6 +100,19 @@ bool mcsm::removeFile(const std::string& path){
     return success; 
 }
 
+bool mcsm::mkdir(const std::string& dirName){
+    std::error_code ec;
+    ec.clear();
+    if(!std::filesystem::create_directories(dirName, ec)){
+        if(std::filesystem::exists(dirName)){
+            ec.clear();
+            return true;
+        }
+        return false;
+    }
+    return true;
+}
+
 bool mcsm::isDebug(){
     #ifdef MCSM_DEBUG
         return true;

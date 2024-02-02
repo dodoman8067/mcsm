@@ -10,10 +10,13 @@ namespace mcsm {
     private:
         std::shared_ptr<mcsm::Server> server;
         std::string version;
+        std::string path;
     public:
         FabricServerOption();
-        FabricServerOption(const std::string& version);
+        FabricServerOption(const std::string& path);
+        FabricServerOption(const std::string& version, const std::string& path);
         FabricServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server);
+        FabricServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server, const std::string& path);
         ~FabricServerOption();
 
         bool exists();

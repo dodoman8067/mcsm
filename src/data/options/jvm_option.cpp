@@ -32,7 +32,7 @@ mcsm::JvmOption::JvmOption(const std::string& name, const mcsm::SearchTarget& ta
             if(globalOption.exists()){
                 this->option.reset(new mcsm::GlobalOption("/jvm/profiles", name));
             } else {
-                this->option.reset(new mcsm::Option("./.mcsm/jvm/profiles", name));
+                this->option.reset(new mcsm::Option(mcsm::getCurrentPath() + "/.mcsm/jvm/profiles", name));
             }
             break;
         }
@@ -44,9 +44,9 @@ mcsm::JvmOption::JvmOption(const std::string& name, const mcsm::SearchTarget& ta
             break;
         }
         case mcsm::SearchTarget::CURRENT: {
-            mcsm::Option option("./.mcsm/jvm/profiles", name);
+            mcsm::Option option(mcsm::getCurrentPath() + "/.mcsm/jvm/profiles", name);
             if(option.exists()){
-                this->option.reset(new mcsm::Option("./.mcsm/jvm/profiles", name));
+                this->option.reset(new mcsm::Option(mcsm::getCurrentPath() + "/.mcsm/jvm/profiles", name));
             }
             break;
         }
@@ -96,7 +96,7 @@ void mcsm::JvmOption::create(const std::string& jvmPath, const std::vector<std::
     std::string optionName;
 
     if(target == mcsm::SearchTarget::CURRENT){
-        mcsm::Option option("./.mcsm/jvm/profiles", this->name);
+        mcsm::Option option(mcsm::getCurrentPath() + "/.mcsm/jvm/profiles", this->name);
         filePath = option.getPath();
         optionName = option.getName();
     }else{
@@ -111,14 +111,14 @@ void mcsm::JvmOption::create(const std::string& jvmPath, const std::vector<std::
 
     if(target == mcsm::SearchTarget::ALL) return;
     if(target == mcsm::SearchTarget::CURRENT){
-        mcsm::Option* cOpt = new mcsm::Option("./.mcsm/jvm/profiles", optionName);
+        mcsm::Option* cOpt = new mcsm::Option(mcsm::getCurrentPath() + "/.mcsm/jvm/profiles", optionName);
         cOpt->setValue("path", jvmPath);
         cOpt->setValue("args", jvmOptions);
         cOpt->setValue("server_args", serverOptions);
         this->option.reset(cOpt);
         return;
     }
-    mcsm::GlobalOption* opt = new mcsm::GlobalOption("./jvm/profiles", optionName);
+    mcsm::GlobalOption* opt = new mcsm::GlobalOption("/jvm/profiles", optionName);
     opt->setValue("path", jvmPath);
     opt->setValue("args", jvmOptions);
     opt->setValue("server_args", serverOptions);
