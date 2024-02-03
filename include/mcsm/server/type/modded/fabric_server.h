@@ -54,6 +54,7 @@ namespace mcsm {
         void download(const std::string& version) override;
         void download(const std::string& version, const std::string& path) override;
         void download(const std::string& version, const std::string& path, const std::string& name) override;
+        //void download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
         void download(const std::string& version, const std::string& loaderVersion, const std::string& installerVersion, const std::string& path, const std::string& name);
 
         bool hasVersion(const std::string& version) override;
