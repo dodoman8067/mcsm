@@ -60,6 +60,15 @@ namespace mcsm {
         virtual void download(const std::string& version, const std::string& path, const std::string& name) = 0;
 
         /**
+         * Downloads the server jarfile in the specified directory with the following name.
+         * @param version version of the server
+         * @param path file's path
+         * @param name file's name
+         * @param optionPath server config to check in
+         */
+        virtual void download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) = 0;
+
+        /**
          * Returns if the following server has this version.
          * @param version version of the server
          * @return true when version exists, otherwise false
