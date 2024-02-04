@@ -103,7 +103,7 @@ bool mcsm::Option::hasValue(const std::string& key) const {
 
 bool mcsm::Option::exists() const {
     std::string fullPath = this->path + "/" + this->name;
-    return std::filesystem::exists(fullPath);
+    return mcsm::fileExists(fullPath);
 }
 
 bool mcsm::Option::isGlobal() const {

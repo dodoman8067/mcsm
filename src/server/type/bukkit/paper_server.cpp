@@ -101,12 +101,12 @@ void mcsm::PaperServer::download(const std::string& version, const std::string& 
 }
 
 void mcsm::PaperServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
-    if(!mcsm::fileExists(optionPath + "/server.json")){
+    mcsm::Option opt(optionPath, "server");
+    if(!opt.exists()){
         mcsm::error("File server.json cannot be found.");
         mcsm::error("Task aborted.");
         std::exit(1);
     }
-    mcsm::Option opt(optionPath, "server");
     mcsm::ServerDataOption sDataOpt(optionPath);
     if(opt.hasValue("type") && opt.getValue("type") != "paper"){
         mcsm::warning("Specified server path's server option wasn't for Paper servers.");

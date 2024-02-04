@@ -30,6 +30,7 @@ SOFTWARE.
 #include <mcsm/data/configurable.h>
 #include <mcsm/util/os/os_detection.h>
 #include <mcsm/util/string_utils.h>
+#include <mcsm/util/cli/cli_utils.h>
 
 namespace mcsm {
     class GlobalOption : public mcsm::Configurable {

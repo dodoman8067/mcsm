@@ -134,7 +134,7 @@ bool mcsm::GlobalOption::hasValue(const std::string& key) const {
 
 bool mcsm::GlobalOption::exists() const {
     std::string fullPath = this->path + "/" + this->name;
-    return std::filesystem::exists(fullPath);
+    return mcsm::fileExists(fullPath);
 }
 
 bool mcsm::GlobalOption::isGlobal() const {

@@ -29,6 +29,7 @@ SOFTWARE.
 #include <mcsm/util/cli/logging.h>
 #include <mcsm/data/configurable.h>
 #include <mcsm/util/string_utils.h>
+#include <mcsm/util/cli/cli_utils.h>
 
 namespace mcsm {
     class Option : public mcsm::Configurable {

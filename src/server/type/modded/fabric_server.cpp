@@ -106,8 +106,13 @@ void mcsm::FabricServer::download(const std::string& version, const std::string&
 }
 
 void mcsm::FabricServer::download(const std::string& version, const std::string& path, const std::string& name){
-    mcsm::Option opt(".", "server");
+    mcsm::Option opt(mcsm::getCurrentPath(), "server");
     std::string loaderVer, installerVer;
+    if(opt.hasValue("type") && opt.getValue("type") != "fabric"){
+        mcsm::warning("Specified server path's server option wasn't for Fabric servers.");
+        mcsm::warning("Please try again in other directories.");
+        std::exit(1);
+    }
     if(opt.hasValue("loader_version") && opt.getValue("loader_version") != "latest"){
         loaderVer = opt.getValue("loader_version").get<std::string>();
         if(mcsm::isWhitespaceOrEmpty(loaderVer)){
@@ -140,12 +145,70 @@ void mcsm::FabricServer::download(const std::string& version, const std::string&
         }
     }
 
-    download(version, loaderVer, installerVer, path, name);
+    download(version, loaderVer, installerVer, path, name, mcsm::getCurrentPath());
+}
+
+void mcsm::FabricServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
+    mcsm::Option opt(optionPath, "server");
+    std::string loaderVer, installerVer;
+    if(opt.hasValue("type") && opt.getValue("type") != "fabric"){
+        mcsm::warning("Specified server path's server option wasn't for Fabric servers.");
+        mcsm::warning("Please try again in other directories.");
+        std::exit(1);
+    }
+    if(opt.hasValue("loader_version") && opt.getValue("loader_version") != "latest"){
+        loaderVer = opt.getValue("loader_version").get<std::string>();
+        if(mcsm::isWhitespaceOrEmpty(loaderVer)){
+            mcsm::error("Missing \"loader_version\" option in server.json");
+            mcsm::error("To fix, add \"loader_version\": \"latest\" to server.json for automatic download.");
+            std::exit(1);
+        }
+    }else if(opt.hasValue("loader_version") && opt.getValue("loader_version") == "latest"){
+        loaderVer = getVersion(version);
+        if(mcsm::isWhitespaceOrEmpty(loaderVer)){
+            mcsm::error("Unsupported loader version.");
+            mcsm::error("Please try again with a different version.");
+            std::exit(1);
+        }
+    }
+
+    if(opt.hasValue("installer_version") && opt.getValue("installer_version") != "latest"){
+        installerVer = opt.getValue("installer_version").get<std::string>();
+        if(mcsm::isWhitespaceOrEmpty(installerVer)){
+            mcsm::error("Missing \"installer_version\" option in server.json");
+            mcsm::error("To fix, add \"installer_version\": \"latest\" to server.json for automatic download.");
+            std::exit(1);
+        }
+    }else if(opt.hasValue("installer_version") && opt.getValue("installer_version") == "latest"){
+        installerVer = getVersion();
+        if(mcsm::isWhitespaceOrEmpty(installerVer)){
+            mcsm::error("Unsupported installer version.");
+            mcsm::error("Please try again with a different version.");
+            std::exit(1);
+        }
+    }
+
+    download(version, loaderVer, installerVer, path, name, optionPath);
 }
 
 void mcsm::FabricServer::download(const std::string& version, const std::string& loaderVersion, const std::string& installerVersion, const std::string& path, const std::string& name){
-    mcsm::Option opt(".", "server");
-    mcsm::FabricServerDataOption sDataOpt;
+    download(version, loaderVersion, installerVersion, path, name, mcsm::getCurrentPath());
+}
+
+void mcsm::FabricServer::download(const std::string& version, const std::string& loaderVersion, const std::string& installerVersion, const std::string& path, const std::string& name, const std::string& optionPath){
+    //The reason why variable path and optionPath are separated is because of flexibility
+    mcsm::Option opt(optionPath, "server");
+    if(!opt.exists()){
+        mcsm::error("File server.json cannot be found.");
+        mcsm::error("Task aborted.");
+        std::exit(1);
+    }
+    if(opt.hasValue("type") && opt.getValue("type") != "fabric"){
+        mcsm::warning("Specified server path's server option wasn't for Fabric servers.");
+        mcsm::warning("Please try again in other directories.");
+        std::exit(1);
+    }
+    mcsm::FabricServerDataOption sDataOpt(optionPath);
 
     if(!opt.hasValue("loader_version")){
         mcsm::error("Missing \"loader_version\" option in server.json");
@@ -227,10 +290,6 @@ void mcsm::FabricServer::download(const std::string& version, const std::string&
     mcsm::download(name, url, path, true);
     sDataOpt.updateLoaderVersion(loaderVersion);
     sDataOpt.updateInstallerVersion(installerVersion);
-}
-
-void mcsm::FabricServer::download(const std::string& version, const std::string& loaderVersion, const std::string& installerVersion, const std::string& path, const std::string& name, const std::string& optionPath){
-    //TODO : Implement
 }
 
 void mcsm::FabricServer::start(mcsm::JvmOption& option){

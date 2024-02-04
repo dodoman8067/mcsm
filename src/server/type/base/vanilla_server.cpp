@@ -99,6 +99,10 @@ void mcsm::VanillaServer::download(const std::string& version, const std::string
     mcsm::download(name, url, path);
 }
 
+void mcsm::VanillaServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& /* optionPath */){
+    download(version, path, name);
+}
+
 void mcsm::VanillaServer::start(mcsm::JvmOption& option){
     mcsm::ServerOption sOpt;
     if(!std::filesystem::exists(getJarFile())){
