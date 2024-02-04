@@ -57,7 +57,7 @@ void mcsm::init::initCommands(const std::string& version){
     jvmOptionEditCommand->addAlias("editjvmprofile");
     mcsm::CommandManager::addCommand(std::move(jvmOptionEditCommand));
 
-    std::unique_ptr<mcsm::StartServerCommand> startServerCommand = std::make_unique<mcsm::StartServerCommand>("start", "Starts a server.");
+    std::unique_ptr<mcsm::StartServerCommand> startServerCommand = std::make_unique<mcsm::StartServerCommand>("start", "Starts a configured server.");
     startServerCommand->addAlias("startServer");
     startServerCommand->addAlias("startserver");
     mcsm::CommandManager::addCommand(std::move(startServerCommand));

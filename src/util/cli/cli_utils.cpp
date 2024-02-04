@@ -68,7 +68,7 @@ int mcsm::runCommand(const std::string& command){
 
 std::string mcsm::getCurrentPath(){
     std::error_code ec;
-    std::string path = std::filesystem::current_path(ec);
+    std::string path = std::filesystem::current_path(ec).string();
     if(ec){
         mcsm::error("Getting current path operation failed : " + ec.message());
         mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
