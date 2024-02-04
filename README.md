@@ -34,7 +34,7 @@ To use the compiled executable, type:
 
     mcsm help
 
-By doing this, you can get a list of commands. If it's not working, try this:
+By doing this you can get a list of commands that would help you get started. Try this instead if it isn't working :
 
     ./mcsm help
 
@@ -44,7 +44,7 @@ Currently you can't contribute to this project because it isn't completed right 
 
 ## License
 
-This project is licensed under [MIT](LICENSE).
+This project is under [MIT](LICENSE) license.
 
 * [cURL](https://curl.se/docs/copyright.html)
 * [libgit2](https://github.com/libgit2/libgit2/blob/main/COPYING)
