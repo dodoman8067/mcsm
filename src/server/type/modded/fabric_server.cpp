@@ -229,6 +229,10 @@ void mcsm::FabricServer::download(const std::string& version, const std::string&
     sDataOpt.updateInstallerVersion(installerVersion);
 }
 
+void mcsm::FabricServer::download(const std::string& version, const std::string& loaderVersion, const std::string& installerVersion, const std::string& path, const std::string& name, const std::string& optionPath){
+    //TODO : Implement
+}
+
 void mcsm::FabricServer::start(mcsm::JvmOption& option){
     mcsm::ServerOption sOpt;
     if(!std::filesystem::exists(getJarFile())){

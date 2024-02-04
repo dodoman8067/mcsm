@@ -66,7 +66,7 @@ namespace mcsm {
          * @param name file's name
          * @param optionPath server config to check in
          */
-        //virtual void download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) = 0;
+        virtual void download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) = 0;
 
         /**
          * Returns if the following server has this version.

@@ -88,21 +88,36 @@ std::string mcsm::PaperServer::getGitHub() const {
 }
 
 void mcsm::PaperServer::download(const std::string& version){
-    download(version, mcsm::getCurrentPath(), getJarFile());
+    std::string path = mcsm::getCurrentPath();
+    download(version, path, getJarFile(), path);
 }
 
 void mcsm::PaperServer::download(const std::string& version, const std::string& path){
-    download(version, path, getJarFile());
+    download(version, path, getJarFile(), mcsm::getCurrentPath());
 }
 
 void mcsm::PaperServer::download(const std::string& version, const std::string& path, const std::string& name){
-    mcsm::Option opt(".", "server");
-    mcsm::ServerDataOption sDataOpt;
+    download(version, path, name, mcsm::getCurrentPath());
+}
+
+void mcsm::PaperServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
+    if(!mcsm::fileExists(optionPath + "/server.json")){
+        mcsm::error("File server.json cannot be found.");
+        mcsm::error("Task aborted.");
+        std::exit(1);
+    }
+    mcsm::Option opt(optionPath, "server");
+    mcsm::ServerDataOption sDataOpt(optionPath);
+    if(opt.hasValue("type") && opt.getValue("type") != "paper"){
+        mcsm::warning("Specified server path's server option wasn't for Paper servers.");
+        mcsm::warning("Please try again in other directories.");
+        std::exit(1);
+    }
     if(opt.hasValue("server_build") && opt.getValue("server_build") != "latest"){
         if(!opt.getValue("server_build").is_string()){
             mcsm::error("Value \"server_build\" option in server.json must be a string type.");
             mcsm::error("To fix, change it into \"server_build\": \"latest\" .");
-            std::exit(1);            
+            std::exit(1);
         }
         std::string build = opt.getValue("server_build").get<std::string>();
         if(mcsm::isWhitespaceOrEmpty(build)){
