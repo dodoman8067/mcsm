@@ -23,6 +23,7 @@ SOFTWARE.
 #ifndef __MCSM_RESULT_H__
 #define __MCSM_RESULT_H__
 
+#include <vector>
 #include <mcsm/util/cli/logging.h>
 
 namespace mcsm {
@@ -32,10 +33,14 @@ namespace mcsm {
     };
 
     class Result {
+    private:
+        mcsm::ResultType result;
+        std::vector<std::string> message;
     public:
-        Result();
+        Result(const mcsm::ResultType& type, const std::vector<std::string>& message);
         ~Result();
-        ResultType getResult() const;
+        const mcsm::ResultType getResult() const;
+        const std::vector<std::string> getMessage() const;
         void printMessage(const mcsm::ResultType& type);
     };
 }
