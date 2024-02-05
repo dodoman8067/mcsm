@@ -27,7 +27,7 @@ SOFTWARE.
 
 namespace mcsm {
     // Represents an enum of Minecraft server type.
-    enum ServerType {
+    enum class ServerType {
         // Represents vanilla server
         VANILLA,
         // Represents bukkit server
@@ -49,7 +49,7 @@ namespace mcsm {
     };
 
     // Represents an enum of server type that implements bukkit api.
-    enum BukkitServerType {
+    enum class BukkitServerType {
         // Represents craftbukkit
         CRAFTBUKKIT,
         // Represents spigot
