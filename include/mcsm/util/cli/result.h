@@ -29,6 +29,7 @@ SOFTWARE.
 namespace mcsm {
     enum class ResultType {
         MCSM_OK,
+        MCSM_WARN,
         MCSM_FAIL
     };
 
@@ -36,11 +37,14 @@ namespace mcsm {
     private:
         mcsm::ResultType result;
         std::vector<std::string> message;
+        std::pair<mcsm::ResultType, std::vector<std::string>> resPair;
     public:
         Result(const mcsm::ResultType& type, const std::vector<std::string>& message);
         ~Result();
-        const mcsm::ResultType getResult() const;
-        const std::vector<std::string> getMessage() const;
+        mcsm::ResultType getResult() const;
+        std::vector<std::string> getMessage() const;
+        std::pair<mcsm::ResultType, std::vector<std::string>> getResultPair() const;
+        bool isSuccess() const;
         void printMessage(const mcsm::ResultType& type);
     };
 }
