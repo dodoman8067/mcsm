@@ -9,15 +9,12 @@ mcsm::Result mcsm::cloneRepo(const std::string& url, const std::string& path){
     git_repository *repo = nullptr;
     int error = git_clone(&repo, url.c_str(), path.c_str(), NULL);
 	if(error != 0){
-        std::string msg = "Failed to clone git repository " + url + " with the following error : " + git_error_last()->message;
-        std::vector<std::string> message = { msg };
-        mcsm::Result res(mcsm::ResultType::MCSM_FAIL, message);
+        mcsm::Result res(mcsm::ResultType::MCSM_FAIL, { "Failed to clone git repository " + url + " with the following error : " + git_error_last()->message });
         git_repository_free(repo);
         git_libgit2_shutdown();
 		return res;
 	}
-    std::vector<std::string> message = { "Success" };
-    mcsm::Result res(mcsm::ResultType::MCSM_OK, message);
+    mcsm::Result res(mcsm::ResultType::MCSM_OK, { "Success" });
     git_repository_free(repo);
     git_libgit2_shutdown();
     return res;

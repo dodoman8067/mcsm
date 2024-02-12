@@ -22,10 +22,13 @@ SOFTWARE.
 
 #include <mcsm/util/cli/result.h>
 
+static std::pair<mcsm::ResultType, std::vector<std::string>> res = {mcsm::ResultType::MCSM_UNKNOWN, { "Not updated" }};
+
 mcsm::Result::Result(const mcsm::ResultType& type, const std::vector<std::string>& message){
     this->result = type;
     this->message = message;
     this->resPair = {type, message};
+    mcsm::updateLastResult(this->resPair);
 }
 
 mcsm::Result::~Result(){
@@ -65,6 +68,11 @@ void mcsm::Result::printMessage(const mcsm::ResultType& type){
                 mcsm::error(str);
             }
             break;
+        case mcsm::ResultType::MCSM_UNKNOWN:
+            for(const std::string& str : message){
+                mcsm::warning(str);
+            }
+            break;
         default:
             for(const std::string& str : message){
                 mcsm::error(str);
@@ -72,4 +80,12 @@ void mcsm::Result::printMessage(const mcsm::ResultType& type){
             mcsm::error("FATAL : Unknown usage of mcsm::ResultType detected. Please report this to GitHub. (https://github.com/dodoman8067/mcsm)");
             break;    
     }
+}
+
+std::pair<mcsm::ResultType, std::vector<std::string>> mcsm::getLastResult(){
+    return res;
+}
+
+void mcsm::updateLastResult(const std::pair<mcsm::ResultType, std::vector<std::string>> newRes){
+    res = newRes;
 }

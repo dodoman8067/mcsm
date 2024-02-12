@@ -21,6 +21,7 @@ SOFTWARE.
 */
 
 #include <mcsm/init.h>
+#include <mcsm/util/git/clone_utils.h>
 
 const std::string version = "0.1.0.0";
 

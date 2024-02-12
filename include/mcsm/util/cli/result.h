@@ -30,7 +30,8 @@ namespace mcsm {
     enum class ResultType {
         MCSM_OK,
         MCSM_WARN,
-        MCSM_FAIL
+        MCSM_FAIL,
+        MCSM_UNKNOWN
     };
 
     class Result {
@@ -48,6 +49,9 @@ namespace mcsm {
         void printMessage();
         void printMessage(const mcsm::ResultType& type);
     };
+
+    std::pair<mcsm::ResultType, std::vector<std::string>> getLastResult();
+    void updateLastResult(const std::pair<mcsm::ResultType, std::vector<std::string>> newRes);
 }
 
 
