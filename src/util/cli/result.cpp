@@ -43,8 +43,12 @@ std::vector<std::string> mcsm::Result::getMessage() const {
     return this->message;
 }
 
-std::pair<mcsm::ResultType, std::vector<std::string>> mcsm::Result::getResultPair() const{
+std::pair<mcsm::ResultType, std::vector<std::string>> mcsm::Result::getResultPair() const {
     return this->resPair;
+}
+
+bool mcsm::Result::isSuccess() const {
+    return this->result == mcsm::ResultType::MCSM_OK;
 }
 
 void mcsm::Result::printMessage(){
