@@ -44,6 +44,10 @@ std::pair<mcsm::ResultType, std::vector<std::string>> mcsm::Result::getResultPai
     return this->resPair;
 }
 
+void mcsm::Result::printMessage(){
+    printMessage(this->result);
+}
+
 void mcsm::Result::printMessage(const mcsm::ResultType& type){
     switch (type){
         case mcsm::ResultType::MCSM_OK:

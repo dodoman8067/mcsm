@@ -45,6 +45,7 @@ namespace mcsm {
         std::vector<std::string> getMessage() const;
         std::pair<mcsm::ResultType, std::vector<std::string>> getResultPair() const;
         bool isSuccess() const;
+        void printMessage();
         void printMessage(const mcsm::ResultType& type);
     };
 }
