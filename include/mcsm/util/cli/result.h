@@ -55,6 +55,7 @@ namespace mcsm {
         inline std::vector<std::string> jsonNotFound(const std::string& key, const std::string& type);
         inline std::vector<std::string> jsonNotFoundPlusFix(const std::string& key, const std::string& type, const std::string& changeInto);
         inline std::vector<std::string> jsonParseFailed();
+        inline std::vector<std::string> jsonParseFailedCannotBeModified();
 
         inline std::vector<std::string> serverAlreadyConfigured();
         inline std::vector<std::string> serverWrongInstanceGenerated(const std::string& serverName);
