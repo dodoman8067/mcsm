@@ -168,14 +168,18 @@ void mcsm::PaperServer::start(mcsm::JvmOption& option){
 }
 
 void mcsm::PaperServer::update(){
+    update(mcsm::getCurrentPath());
+}
+
+void mcsm::PaperServer::update(const std::string& optionPath){
     // If you change the default build to specific build from latest build, it won't downgrade automatically. (You'll have to manually delete the server jarfile) This is an intented feature.
     mcsm::info("Checking updates...");
-    mcsm::ServerDataOption sDataOpt;
-    mcsm::Option opt(".", "server");
+    mcsm::ServerDataOption sDataOpt(optionPath);
+    mcsm::Option opt(optionPath, "server");
     if(!opt.getValue("server_build").is_string()){
         mcsm::error("Value \"server_build\" option in server.json must be a string type.");
         mcsm::error("To fix, change it into \"server_build\": \"latest\" .");
-        std::exit(1);            
+        std::exit(1);
     }
     std::string build = opt.getValue("server_build").get<std::string>();
     if(build != "latest"){
@@ -210,10 +214,10 @@ void mcsm::PaperServer::update(){
         return;
     }
     mcsm::success("Update found : "  + strVer + ". Current build : " + sDataOpt.getLastDownloadedBuild());
-    if(std::filesystem::exists(getJarFile())){
-        std::filesystem::remove(getJarFile());
+    if(std::filesystem::exists(getJarFile(optionPath))){
+        std::filesystem::remove(getJarFile(optionPath));
     }
-    download(version);
+    download(version, optionPath, getJarFile(), optionPath);
 }
 
 bool mcsm::PaperServer::hasVersion(const std::string& version){
