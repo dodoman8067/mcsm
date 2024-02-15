@@ -51,6 +51,7 @@ inline void mcsm::ViewServerCommand::printServerInfo(){
 
     mcsm::ServerDataOption* sDataOpt;
     if(sOpt.getServerType() == "fabric"){
+        //if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK) { mcsm::printMessage(); std::exit(1); }
         sDataOpt = new mcsm::FabricServerDataOption();
     }else{
         sDataOpt = new mcsm::ServerDataOption();
