@@ -93,3 +93,40 @@ std::pair<mcsm::ResultType, std::vector<std::string>> mcsm::getLastResult(){
 void mcsm::updateLastResult(const std::pair<mcsm::ResultType, std::vector<std::string>> newRes){
     res = newRes;
 }
+
+void mcsm::printResultMessage(){
+    printResultMessage(getLastResult());
+}
+
+void mcsm::printResultMessage(const std::pair<mcsm::ResultType, std::vector<std::string>> res){
+    mcsm::ResultType type = res.first;
+    std::vector<std::string> message = res.second;
+    switch (type){
+        case mcsm::ResultType::MCSM_OK:
+            for(const std::string& str : message){
+                mcsm::info(str);
+            }
+            break;
+        case mcsm::ResultType::MCSM_WARN:
+            for(const std::string& str : message){
+                mcsm::warning(str);
+            }
+            break;
+        case mcsm::ResultType::MCSM_FAIL:
+            for(const std::string& str : message){
+                mcsm::error(str);
+            }
+            break;
+        case mcsm::ResultType::MCSM_UNKNOWN:
+            for(const std::string& str : message){
+                mcsm::warning(str);
+            }
+            break;
+        default:
+            for(const std::string& str : message){
+                mcsm::error(str);
+            }
+            mcsm::error("FATAL : Unknown usage of mcsm::ResultType detected. Please report this to GitHub. (https://github.com/dodoman8067/mcsm)");
+            break;    
+    }
+}

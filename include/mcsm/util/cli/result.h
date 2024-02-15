@@ -50,8 +50,31 @@ namespace mcsm {
         void printMessage(const mcsm::ResultType& type);
     };
 
+    namespace message_utils {
+        inline std::vector<std::string> jsonWrongType(const std::string& key, const std::string& type);
+        inline std::vector<std::string> jsonNotFound(const std::string& key, const std::string& type);
+        inline std::vector<std::string> jsonNotFoundPlusFix(const std::string& key, const std::string& type, const std::string& changeInto);
+        inline std::vector<std::string> jsonParseFailed();
+
+        inline std::vector<std::string> serverAlreadyConfigured();
+        inline std::vector<std::string> serverWrongInstanceGenerated(const std::string& serverName);
+        inline std::vector<std::string> serverUnsupportedVersion();
+        inline std::vector<std::string> serverUnsupportedVersion(const std::string& build);
+
+        inline std::vector<std::string> fileCreateFailed(const std::string& name);
+        inline std::vector<std::string> fileSaveFailed(const std::string& name);
+        inline std::vector<std::string> fileNotFound(const std::string& name);
+
+        inline std::vector<std::string> curlInitFailed();
+        inline std::vector<std::string> getRequestFailed(const std::string& url);
+        inline std::vector<std::string> downloadRequestFailed(const std::string& url);
+        inline std::vector<std::string> downloadTargetIsNotText(const std::string& url);
+    }
+
     std::pair<mcsm::ResultType, std::vector<std::string>> getLastResult();
     void updateLastResult(const std::pair<mcsm::ResultType, std::vector<std::string>> newRes);
+    void printResultMessage();
+    void printResultMessage(const std::pair<mcsm::ResultType, std::vector<std::string>> res);
 }
 
 
