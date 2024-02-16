@@ -51,7 +51,7 @@ const std::string mcsm::get(const std::string& url){
 
     CURLcode res = curl_easy_perform(curl);
 
-    if (res != CURLE_OK) {
+    if(res != CURLE_OK){
         mcsm::error("Failed to perform GET request in the following url : " + url + " with the following reason : " + curl_easy_strerror(res));
         curl_easy_cleanup(curl);
         curl_global_cleanup();
