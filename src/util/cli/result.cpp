@@ -130,3 +130,87 @@ void mcsm::printResultMessage(const std::pair<mcsm::ResultType, std::vector<std:
             break;    
     }
 }
+
+namespace mcsm::message_utils {
+    inline std::vector<std::string> jsonWrongType(const std::string& key, const std::string& type){
+        return {
+            "Value \"" + key + "\" has to be a " + type + ", but it's not.",
+            "Manually editing the launch profile might have caused this issue.",
+            "If you know what you're doing, I believe you that you know how to handle this issue.",
+            "If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+        };
+    }
+
+    inline std::vector<std::string> jsonNotFound(const std::string& key, const std::string& name){
+        return {
+            "No \""+ key +"\" value specified in file " + name,
+            "Manually editing the launch profile might have caused this issue.",
+            "If you know what you're doing, I believe you that you know how to handle this issue.",
+            "If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+        };
+    }
+
+    inline std::vector<std::string> jsonNotFoundPlusFix(const std::string& key, const std::string& name, const std::string& changeInto){
+        return {
+            "Missing \"" + key + "\" option in " + name,
+            "To fix, add " + changeInto + " to " + name + "."
+        };
+    }
+
+    inline std::vector<std::string> jsonParseFailed(const std::string& name){
+        return {
+            "Failed to parse json " + name,
+            "There might be many reasons why you see this error.",
+            "1. Comments: Comments are not allowed in JSON. If you used the comment syntax like other programming languages, you must remove them and try again.",
+            "2. Unclosed Brackets: Check if all curly braces '{}' and square brackets '[]' are properly closed.",
+            "3. Trailing Commas: Trailing Commas are not allowed in JSON. Make sure that end of the element doesn't end with comma.",
+            "4. Incorrect Escape Sequences: Check if all escaped are used properly.",
+            "5. Data types: Double check each element is storing the correct data types.",
+            "6. File Access Permissions: Check if your OS or security software is blocking the access to the file. Creating the file in system directories may cause this problem."
+        };
+    }
+
+    inline std::vector<std::string> jsonParseFailedCannotBeModified(){
+        return {
+            "Parse of json failed.",
+            "If you believe that this is a software issue, please report it to GitHub. (https://github.com/dodoman8067/mcsm)"
+        };
+    }
+
+    inline std::vector<std::string> serverAlreadyConfigured(){
+        return {
+            "Server is already configured in directory.",
+            "Please create a server.json file in other directories."
+        };
+    }
+
+    inline std::vector<std::string> serverWrongInstanceGenerated(const std::string& serverName){
+        return { 
+            "Specified server path's server option wasn't for" + serverName + "servers.",
+            "Please try again in other directories." 
+        };
+    }
+
+    inline std::vector<std::string> serverUnsupportedVersion(){
+        return {
+            "Unsupported version.",
+            "Please try again with a different version."
+        };
+    }
+
+    inline std::vector<std::string> serverUnsupportedVersion(const std::string& build){
+        return {
+            "Unsupported version : " + build,
+            "Please try again with a different version."
+        };
+    }
+
+    inline std::vector<std::string> fileCreateFailed(const std::string& name);
+    inline std::vector<std::string> fileSaveFailed(const std::string& name);
+    inline std::vector<std::string> fileNotFound(const std::string& name);
+
+    inline std::vector<std::string> curlInitFailed();
+    inline std::vector<std::string> getRequestFailed(const std::string& url);
+    inline std::vector<std::string> downloadRequestFailed(const std::string& url);
+    inline std::vector<std::string> downloadTargetIsNotText(const std::string& url);
+}

@@ -52,9 +52,9 @@ namespace mcsm {
 
     namespace message_utils {
         inline std::vector<std::string> jsonWrongType(const std::string& key, const std::string& type);
-        inline std::vector<std::string> jsonNotFound(const std::string& key, const std::string& type);
-        inline std::vector<std::string> jsonNotFoundPlusFix(const std::string& key, const std::string& type, const std::string& changeInto);
-        inline std::vector<std::string> jsonParseFailed();
+        inline std::vector<std::string> jsonNotFound(const std::string& key, const std::string& name);
+        inline std::vector<std::string> jsonNotFoundPlusFix(const std::string& key, const std::string& name, const std::string& changeInto);
+        inline std::vector<std::string> jsonParseFailed(const std::string& name);
         inline std::vector<std::string> jsonParseFailedCannotBeModified();
 
         inline std::vector<std::string> serverAlreadyConfigured();
