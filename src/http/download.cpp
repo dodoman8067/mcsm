@@ -93,7 +93,7 @@ void mcsm::download(const std::string& name, const std::string& url, const std::
     if(percentages) std::cout << "\n";
 
     if(res != CURLE_OK){
-        mcsm::error("Failed to download a file in the following url : " + url + " with the following reason : " + curl_easy_strerror(res));
+        mcsm::error("Failed to download the file in the following url : " + url + " with the following reason : " + curl_easy_strerror(res));
         std::fclose(file);
         curl_easy_cleanup(curl);
         curl_global_cleanup();

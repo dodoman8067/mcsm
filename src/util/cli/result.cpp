@@ -228,8 +228,29 @@ namespace mcsm::message_utils {
         };
     }
 
-    inline std::vector<std::string> curlInitFailed();
-    inline std::vector<std::string> getRequestFailed(const std::string& url);
-    inline std::vector<std::string> downloadRequestFailed(const std::string& url);
-    inline std::vector<std::string> downloadTargetIsNotText(const std::string& url);
+    inline std::vector<std::string> curlInitFailed(){
+        return {
+            "Unable to initialize curl",
+            "Please try re-running the program, reboot the PC or reinstall the program.",
+            "If none of it isn't working for you, please open a new issue in GitHub (https://github.com/dodoman8067/mcsm)."
+        };
+    }
+
+    inline std::vector<std::string> getRequestFailed(const std::string& url, const std::string& reason){
+        return {
+            "Failed to perform GET request in the following url : " + url + " with the following reason : " + reason
+        };
+    }
+
+    inline std::vector<std::string> downloadRequestFailed(const std::string& url, const std::string& reason){
+        return {
+            "Failed to download the file in the following url : " + url + " with the following reason : " + reason
+        };
+    }
+
+    inline std::vector<std::string> downloadTargetIsNotText(const std::string& url, const std::string reason){
+        return {
+            "Failed to check if the following url : " + url + " returns a text with the following reason : " + reason
+        };
+    }
 }

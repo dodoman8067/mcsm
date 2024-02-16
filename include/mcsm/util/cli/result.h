@@ -67,9 +67,9 @@ namespace mcsm {
         inline std::vector<std::string> fileNotFound(const std::string& name);
 
         inline std::vector<std::string> curlInitFailed();
-        inline std::vector<std::string> getRequestFailed(const std::string& url);
-        inline std::vector<std::string> downloadRequestFailed(const std::string& url);
-        inline std::vector<std::string> downloadTargetIsNotText(const std::string& url);
+        inline std::vector<std::string> getRequestFailed(const std::string& url, const std::string& reason);
+        inline std::vector<std::string> downloadRequestFailed(const std::string& url, const std::string& reason);
+        inline std::vector<std::string> downloadTargetIsNotText(const std::string& url, const std::string reason);
     }
 
     std::pair<mcsm::ResultType, std::vector<std::string>> getLastResult();
