@@ -21,7 +21,7 @@ SOFTWARE.
 */
 
 #include <mcsm/init.h>
-#include <mcsm/util/git/clone_utils.h>
+#include <mcsm/util/cli/result.h>
 
 const std::string version = "0.1.0.0";
 
@@ -48,6 +48,9 @@ int main(int argc, char *argv[]){
     if(argc < 2){
         std::cout << "Welcome to MCSM (Minecraft Server Manager).\n";
         std::cout << "Type \'mcsm help\' for list of commands.\n";
+        for(const std::string& str : mcsm::message_utils::jsonNotFound("asd", "asd.json")){
+            std::cout << str << "\n";
+        }
         return 0;
     }
 
