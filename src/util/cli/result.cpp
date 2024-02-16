@@ -205,9 +205,28 @@ namespace mcsm::message_utils {
         };
     }
 
-    inline std::vector<std::string> fileCreateFailed(const std::string& name);
-    inline std::vector<std::string> fileSaveFailed(const std::string& name);
-    inline std::vector<std::string> fileNotFound(const std::string& name);
+    inline std::vector<std::string> fileCreateFailed(const std::string& name){
+        return {
+            "Cannot create directory/file " + name,
+            "This might have caused because of permissions or file name problems.",
+            "If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+        };
+    }
+
+    inline std::vector<std::string> fileSaveFailed(const std::string& name){
+        return {
+            "Cannot save file " + name,
+            "This might have caused because of permissions or file name problems.",
+            "If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+        };
+    }
+
+    inline std::vector<std::string> fileNotFound(const std::string& name){
+        return {
+            "File " + name + " cannot be found.",
+            "If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+        };
+    }
 
     inline std::vector<std::string> curlInitFailed();
     inline std::vector<std::string> getRequestFailed(const std::string& url);
