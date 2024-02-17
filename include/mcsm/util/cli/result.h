@@ -55,7 +55,7 @@ namespace mcsm {
     namespace message_utils {
         inline std::vector<std::string> jsonWrongType(const std::string& key, const std::string& type){
             return {
-                "Value \"" + key + "\" has to be a " + type + ", but it's not.",
+                "Value " + key + " has to be a " + type + ", but it's not.",
                 "Manually editing the launch profile might have caused this issue.",
                 "If you know what you're doing, I believe you that you know how to handle this issue.",
                 "If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
@@ -64,7 +64,7 @@ namespace mcsm {
 
         inline std::vector<std::string> jsonNotFound(const std::string& key, const std::string& name){
             return {
-                "No \""+ key +"\" value specified in file " + name,
+                "No "+ key +" value specified in file " + name,
                 "Manually editing the launch profile might have caused this issue.",
                 "If you know what you're doing, I believe you that you know how to handle this issue.",
                 "If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
@@ -73,7 +73,7 @@ namespace mcsm {
 
         inline std::vector<std::string> jsonNotFoundPlusFix(const std::string& key, const std::string& name, const std::string& changeInto){
             return {
-                "Missing \"" + key + "\" option in " + name,
+                "Missing " + key + " option in " + name,
                 "To fix, add " + changeInto + " to " + name + "."
             };
         }
@@ -102,6 +102,13 @@ namespace mcsm {
             return {
                 "Server is already configured in directory.",
                 "Please create a server.json file in other directories."
+            };
+        }
+
+        inline std::vector<std::string> serverDataAlreadyConfigured(){
+            return {
+                "Server data config is already in its place.",
+                "Please try again in other directories."
             };
         }
 
@@ -142,6 +149,14 @@ namespace mcsm {
             };
         }
 
+        inline std::vector<std::string> fileOpenFailed(const std::string& name){
+            return {
+                "Cannot open file " + name,
+                "This might have caused because of permissions or file name problems.",
+                "If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+            };
+        }
+
         inline std::vector<std::string> fileNotFound(const std::string& name){
             return {
                 "File " + name + " cannot be found.",
@@ -172,6 +187,13 @@ namespace mcsm {
         inline std::vector<std::string> downloadTargetIsNotText(const std::string& url, const std::string reason){
             return {
                 "Failed to check if the following url : " + url + " returns a text with the following reason : " + reason
+            };
+        }
+
+        inline std::vector<std::string> platformNotSupported(){
+            return {
+                "Current operating system is not supported.",
+                "If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
             };
         }
     }

@@ -54,10 +54,8 @@ nlohmann::json mcsm::Option::load() const {
         createDirectories(this->path, ec);
         std::ofstream ofs(fullPath);
         if(!ofs.is_open()){
-            mcsm::error("Cannot create directory/file " + fullPath);
-            mcsm::error("This might have caused because of permissions or file name problems.");
-            mcsm::error("If you believe that this is from name problems, try regenerating the file again with only English characters.");
-            std::exit(1);
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::fileCreateFailed(fullPath)});
+            return nullptr;
         }
         
         ofs << "{}";
@@ -65,30 +63,25 @@ nlohmann::json mcsm::Option::load() const {
     }
 
     std::ifstream fileStream(fullPath);
-    if (!fileStream.is_open()) {
-        mcsm::error("Cannot load file " + fullPath);
-        std::exit(1);
+    if(!fileStream.is_open()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::fileOpenFailed(fullPath)});
+        return nullptr;
     }
 
     std::string content((std::istreambuf_iterator<char>(fileStream)), std::istreambuf_iterator<char>());
     fileStream.close();
     nlohmann::json finalValue = nlohmann::json::parse(content, nullptr, false);
     if(finalValue.is_discarded()) {
-        mcsm::error("Failed to parse json " + fullPath);
-        mcsm::error("There might be many reasons why you see this error.");
-        mcsm::error("1. Comments: Comments are not allowed in JSON. If you used the comment syntax like other programming languages, you must remove them and try again.");
-        mcsm::error("2. Unclosed Brackets: Check if all curly braces '{}' and square brackets '[]' are properly closed.");
-        mcsm::error("3. Trailing Commas: Trailing Commas are not allowed in JSON. Make sure that end of the element doesn't end with comma.");
-        mcsm::error("4. Incorrect Escape Sequences: Check if all escaped are used properly.");
-        mcsm::error("5. Data types: Double check each element is storing the correct data types.");
-        mcsm::error("6. File Access Permissions: Check if your OS or security software is blocking the access to the file. Creating the file in system directories may cause this problem.");
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailed(fullPath)});
+        return nullptr;
     }
+    mcsm::Result res({mcsm::ResultType::MCSM_OK, {"Success"}});
     return finalValue;
 }
 
 nlohmann::json mcsm::Option::getValue(const std::string& key) const {
     nlohmann::json jsonData = load();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return nullptr;
     if(jsonData.find(key) != jsonData.end()){
         return jsonData[key];
     }else{
@@ -98,6 +91,7 @@ nlohmann::json mcsm::Option::getValue(const std::string& key) const {
 
 bool mcsm::Option::hasValue(const std::string& key) const {
     nlohmann::json data = load();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return false;
     return data.find(key) != data.end();
 }
 
@@ -110,36 +104,45 @@ bool mcsm::Option::isGlobal() const {
     return false;
 }
 
-void mcsm::Option::setValue(const std::string& key, const nlohmann::json& value) const {
+mcsm::Result mcsm::Option::setValue(const std::string& key, const nlohmann::json& value) const {
     std::string fullPath = this->path + "/" + this->name;
     nlohmann::json jsonData = load();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
 
     jsonData[key] = value;
-    save(jsonData);
+    return save(jsonData);
 }
 
-void mcsm::Option::save(const nlohmann::json& jsonData) const {
+mcsm::Result mcsm::Option::save(const nlohmann::json& jsonData) const {
     std::string fullPath = this->path + "/" + this->name;
     std::ofstream outFile(fullPath);
     if (outFile.is_open()) {
         outFile << jsonData.dump(2); 
         outFile.close();
     }else{
-        mcsm::error("Cannot save file " + fullPath);
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::fileSaveFailed(fullPath)});
+        return res;
     }
+    mcsm::Result res({mcsm::ResultType::MCSM_OK, {"Success"}});
+    return res;
 }
 
-void mcsm::Option::reset() const {
+mcsm::Result mcsm::Option::reset() const {
     std::string fullPath = this->path + "/" + this->name;
     std::ofstream outFile(fullPath);
     if (outFile.is_open()) {
         outFile << "{}";
         outFile.close();
     }else{
-        mcsm::error("Cannot save file " + fullPath);
-        std::exit(1);
-    }    
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::fileSaveFailed(fullPath)});
+        return res;
+    }
+    mcsm::Result res({mcsm::ResultType::MCSM_OK, {"Success"}});
+    return res; 
 }
 
 std::string mcsm::Option::getName(){

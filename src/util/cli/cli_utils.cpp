@@ -40,8 +40,8 @@ int mcsm::runCommandQuietly(const std::string& command){
             return 1;
         #endif
     }else{
-        mcsm::error("This platform is not supported. Please use Windows or Linux.");
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"This platform is not supported. Please use Windows or Linux."}});
+        return 1;
     }
 }
 
@@ -61,8 +61,8 @@ int mcsm::runCommand(const std::string& command){
             return 1;
         #endif
     }else{
-        mcsm::error("This platform is not supported. Please use Windows or Linux.");
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"This platform is not supported. Please use Windows or Linux."}});
+        return 1;
     }
 }
 
@@ -70,9 +70,11 @@ std::string mcsm::getCurrentPath(){
     std::error_code ec;
     std::string path = std::filesystem::current_path(ec).string();
     if(ec){
-        mcsm::error("Getting current path operation failed : " + ec.message());
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Getting current path operation failed : " + ec.message(), 
+            "If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+            }});
+        return "";
     }
     return path;
 }
@@ -81,9 +83,11 @@ bool mcsm::fileExists(const std::string& path){
     std::error_code ec;
     bool exists = std::filesystem::exists(path, ec);
     if(ec){
-        mcsm::error("Checking if file/directory " + path + "operation failed : " + ec.message());
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Checking if file/directory " + path + "operation failed : " + ec.message(), 
+            "If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+            }});
+        return false;
     }
     return exists;
 }
@@ -93,9 +97,11 @@ bool mcsm::removeFile(const std::string& path){
     std::error_code ec;
     bool success = std::filesystem::remove(path, ec);
     if(ec){
-        mcsm::error("Removing file " + path + "operation failed : " + ec.message());
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Removing file " + path + "operation failed : " + ec.message(), 
+            "If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+            }});
+        return false;
     }
     return success; 
 }

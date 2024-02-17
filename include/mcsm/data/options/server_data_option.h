@@ -37,18 +37,18 @@ namespace mcsm {
         ServerDataOption(const std::string& path);
         ~ServerDataOption();
 
-        void create(const std::string& lastTimeLaunched);
+        mcsm::Result create(const std::string& lastTimeLaunched);
 
-        void reset();
+        mcsm::Result reset();
 
         std::string getLastTimeLaunched() const;
-        void updateLastTimeLaunched();
+        mcsm::Result updateLastTimeLaunched();
 
         std::string getServerTimeCreated() const;
-        void updateServerTimeCreated();
+        mcsm::Result updateServerTimeCreated();
 
         std::string getLastDownloadedBuild() const;
-        void updateLastDownloadedBuild(const std::string& build);
+        mcsm::Result updateLastDownloadedBuild(const std::string& build);
         
         bool exists() const;
     };

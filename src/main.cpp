@@ -34,6 +34,7 @@ int main(int argc, char *argv[]){
 
     mcsm::init init;
     init.initMCSM(version);
+    std::cout << "Before start : Currently almost every error handling code is being rewritted.\nIt is very unstable and we are NOT responsible for any kinds of damage cause by this.\n";
 
     if(!init.isInitialized()){
         std::cerr << "Program initialization failed.\n";

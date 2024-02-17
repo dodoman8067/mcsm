@@ -27,9 +27,8 @@ mcsm::ServerDataOption::ServerDataOption() : ServerDataOption(mcsm::getCurrentPa
 mcsm::ServerDataOption::ServerDataOption(const std::string& path){
     if(!mcsm::fileExists(path)){
         if(!mcsm::mkdir(path)){
-            mcsm::warning("Path mkdir failed : " + path);
-            mcsm::warning("Task aborted.");
-            std::exit(1);
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::fileCreateFailed(path)});
+            return;
         }
     }
     this->option = std::make_unique<mcsm::Option>(path + "/.mcsm/", "server_datas");
@@ -39,42 +38,34 @@ mcsm::ServerDataOption::~ServerDataOption(){
 
 }
 
-void mcsm::ServerDataOption::create(const std::string& lastTimeLaunched){
+mcsm::Result mcsm::ServerDataOption::create(const std::string& lastTimeLaunched){
     if(this->option->exists()){
-        mcsm::error("Server data config already in place.");
-        mcsm::error("Task aborted.");
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverDataAlreadyConfigured()});
     }
-    this->option->setValue("last_time_launched", lastTimeLaunched);
+    return this->option->setValue("last_time_launched", lastTimeLaunched);
 }
 
-void mcsm::ServerDataOption::reset(){
-    this->option->reset();
+mcsm::Result mcsm::ServerDataOption::reset(){
+    return this->option->reset();
 }
 
 std::string mcsm::ServerDataOption::getLastTimeLaunched() const {
     if(!this->option->exists()){
-        mcsm::error("Option does not exist; Task aborted.");
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::fileNotFound(this->option->getName())});
+        return "";
     }
     if(this->option->getValue("last_time_launched") == nullptr){
-        mcsm::error("No \"last_time_launched\" value specified in file " + this->option->getName());
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"last_time_launched\"", this->option->getName())});
+        return "";
     }
     if(!this->option->getValue("last_time_launched").is_string()){
-        mcsm::error("Value \"last_time_launched\" has to be a string, but it's not.");
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"last_time_launched\"", "string")});
+        return "";
     }
     return this->option->getValue("last_time_launched");
 }
 
-void mcsm::ServerDataOption::updateLastTimeLaunched(){
+mcsm::Result mcsm::ServerDataOption::updateLastTimeLaunched(){
     char buffer[80];
 
     auto currentTimePoint = std::chrono::system_clock::now();
@@ -82,32 +73,26 @@ void mcsm::ServerDataOption::updateLastTimeLaunched(){
 
     std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", std::localtime(&currentTime));
 
-    this->option->setValue("last_time_launched", buffer);
+    return this->option->setValue("last_time_launched", buffer);
 }
 
 std::string mcsm::ServerDataOption::getServerTimeCreated() const {
     if(!this->option->exists()){
-        mcsm::error("Option does not exist; Task aborted.");
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::fileNotFound(this->option->getName())});
+        return "";
     }
     if(this->option->getValue("server_time_created") == nullptr){
-        mcsm::error("No \"server_time_created\" value specified in file " + this->option->getName());
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"server_time_created\"", this->option->getName())});
+        return "";
     }
     if(!this->option->getValue("server_time_created").is_string()){
-        mcsm::error("Value \"server_time_created\" has to be a string, but it's not.");
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"server_time_created\"", "string")});
+        return "";
     }
     return this->option->getValue("server_time_created");
 }
 
-void mcsm::ServerDataOption::updateServerTimeCreated(){
+mcsm::Result mcsm::ServerDataOption::updateServerTimeCreated(){
     char buffer[80];
 
     auto currentTimePoint = std::chrono::system_clock::now();
@@ -115,33 +100,27 @@ void mcsm::ServerDataOption::updateServerTimeCreated(){
 
     std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", std::localtime(&currentTime));
 
-    this->option->setValue("server_time_created", buffer);
+    return this->option->setValue("server_time_created", buffer);
 }
 
 std::string mcsm::ServerDataOption::getLastDownloadedBuild() const {
     if(!this->option->exists()){
-        mcsm::error("Option does not exist; Task aborted.");
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::fileNotFound(this->option->getName())});
+        return "";
     }
     if(this->option->getValue("last_downloaded_build") == nullptr){
-        mcsm::error("No \"last_downloaded_build\" value specified in file " + this->option->getName());
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"last_downloaded_build\"", this->option->getName())});
+        return "";
     }
     if(!this->option->getValue("last_downloaded_build").is_string()){
-        mcsm::error("Value \"last_downloaded_build\" has to be a string, but it's not.");
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"last_downloaded_build\"", "string")});
+        return "";
     }
     return this->option->getValue("last_downloaded_build");
 }
 
-void mcsm::ServerDataOption::updateLastDownloadedBuild(const std::string& build){
-    this->option->setValue("last_downloaded_build", build);
+mcsm::Result mcsm::ServerDataOption::updateLastDownloadedBuild(const std::string& build){
+    return this->option->setValue("last_downloaded_build", build);
 }
 
 bool mcsm::ServerDataOption::exists() const {

@@ -49,16 +49,16 @@ namespace mcsm {
         std::string getName();
 
         nlohmann::json getValue(const std::string& key) const;
-        void setValue(const std::string& key, const nlohmann::json& value) const;
+        mcsm::Result setValue(const std::string& key, const nlohmann::json& value) const;
         bool hasValue(const std::string& key) const;
 
         bool exists() const override;
 
         bool isGlobal() const override;
 
-        void save(const nlohmann::json& jsonData) const;
+        mcsm::Result save(const nlohmann::json& jsonData) const;
         
-        void reset() const;
+        mcsm::Result reset() const;
     };
 }
 
