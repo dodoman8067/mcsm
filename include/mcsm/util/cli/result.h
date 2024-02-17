@@ -28,8 +28,10 @@ SOFTWARE.
 
 namespace mcsm {
     enum class ResultType {
+        MCSM_SUCCESS,
         MCSM_OK,
         MCSM_WARN,
+        MCSM_WARN_NOEXIT,
         MCSM_FAIL,
         MCSM_UNKNOWN
     };

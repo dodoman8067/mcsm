@@ -48,7 +48,7 @@ std::pair<mcsm::ResultType, std::vector<std::string>> mcsm::Result::getResultPai
 }
 
 bool mcsm::Result::isSuccess() const {
-    return this->result == mcsm::ResultType::MCSM_OK;
+    return this->result == mcsm::ResultType::MCSM_SUCCESS || this->result == mcsm::ResultType::MCSM_OK;
 }
 
 void mcsm::Result::printMessage(){
@@ -102,12 +102,22 @@ void mcsm::printResultMessage(const std::pair<mcsm::ResultType, std::vector<std:
     mcsm::ResultType type = res.first;
     std::vector<std::string> message = res.second;
     switch (type){
+        case mcsm::ResultType::MCSM_SUCCESS:
+            for(const std::string& str : message){
+                mcsm::success(str);
+            }
+            break;            
         case mcsm::ResultType::MCSM_OK:
             for(const std::string& str : message){
                 mcsm::info(str);
             }
             break;
         case mcsm::ResultType::MCSM_WARN:
+            for(const std::string& str : message){
+                mcsm::warning(str);
+            }
+            break;
+        case mcsm::ResultType::MCSM_WARN_NOEXIT:
             for(const std::string& str : message){
                 mcsm::warning(str);
             }
