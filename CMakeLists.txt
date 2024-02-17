@@ -80,7 +80,7 @@ target_link_libraries(mcsm PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(mcsm PRIVATE termcolor::termcolor)
 
 # Some dependencies for libgit2 in Windows
-if(MINGW OR WIN32)
+if(WIN32)
     target_link_libraries(mcsm PRIVATE Winhttp)
     target_link_libraries(mcsm PRIVATE Rpcrt4)
 endif()
