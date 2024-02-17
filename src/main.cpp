@@ -34,7 +34,9 @@ int main(int argc, char *argv[]){
 
     mcsm::init init;
     init.initMCSM(version);
-    std::cout << "Before start : Currently almost every error handling code is being rewritted.\nIt is very unstable and we are NOT responsible for any kinds of damage cause by this.\n";
+    std::cout << "Before start : Currently almost every error handling code is being rewritted." 
+    << "\nIt is very unstable and we are NOT responsible for any kinds of damage cause by this."
+    << "\nIf you find an issue that only occurs from beta branch please let me know on Github. (https://github.com/dodoman8067/mcsm)\n";
 
     if(!init.isInitialized()){
         std::cerr << "Program initialization failed.\n";
