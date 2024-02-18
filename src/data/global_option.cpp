@@ -38,7 +38,7 @@ mcsm::GlobalOption::~GlobalOption(){
 
 std::string mcsm::GlobalOption::getDataPathPerOS(){
     std::string returnPath;
-    switch(mcsm::getCurrentOS()){
+    switch (mcsm::getCurrentOS()){
         case mcsm::OS::WINDOWS: {
             std::string windowsPath = getenv("USERPROFILE");
             windowsPath.append("/AppData/Local/mcsm");
@@ -59,6 +59,7 @@ std::string mcsm::GlobalOption::getDataPathPerOS(){
             break;
         }
     }
+    mcsm::Result res({mcsm::ResultType::MCSM_OK, {"Success"}});
     return returnPath;
 }
 
