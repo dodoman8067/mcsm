@@ -55,7 +55,7 @@ namespace mcsm {
     namespace message_utils {
         inline std::vector<std::string> jsonWrongType(const std::string& key, const std::string& type){
             return {
-                "Value " + key + " has to be a " + type + ", but it's not.",
+                "Value " + key + " has to be a(n) " + type + ", but it's not.",
                 "Manually editing the launch profile might have caused this issue.",
                 "If you know what you're doing, I believe you that you know how to handle this issue.",
                 "If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
@@ -144,7 +144,7 @@ namespace mcsm {
             return {
                 "JVM detection failed.",
                 "This error can be fixed by setting JAVA_HOME enviroment variable.",
-                
+
             };
         }
 
