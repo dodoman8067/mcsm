@@ -191,62 +191,33 @@ bool mcsm::JvmOption::exists(){
 }
 
 std::vector<std::string> mcsm::JvmOption::getJvmArguments(){
-    if(!exists()){
-        mcsm::error("This jvm option does not exist.");
-        mcsm::error("Please edit the launch profile after creating.");
-        std::exit(1);
+    bool profileExists = exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
+    if(!profileExists){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jvmProfileNotFound()});
+        return {};
     }
     if(this->option->isGlobal()){
         mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
-        if(opt->getValue("args") == nullptr){
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
+        
+        nlohmann::json value = opt->getValue("args");
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
+        
+        if(value == nullptr){
             mcsm::error("No \"args\" value specified in file " + opt->getName());
             mcsm::error("Manually editing the launch profile might have caused this issue.");
             mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
             mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
             std::exit(1);
         }
-        if(!opt->getValue("args").is_array()){
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
-            mcsm::error("Value \"args\" has to be a array, but it's not.");
+        if(!value.is_string()){
+            mcsm::error("Value \"args\" has to be a string, but it's not.");
             mcsm::error("Manually editing the launch profile might have caused this issue.");
             mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
             mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
             std::exit(1);
         }
-        for(auto& v : opt->getValue("args")){
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
-            if(!v.is_string()){
-                mcsm::error("Value \"args\" has to be a array of string, but it's not.");
-                mcsm::error("Manually editing the launch profile might have caused this issue.");
-                mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-                mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-                std::exit(1);
-            }
-        }
-        std::vector<std::string> args = opt->getValue("args");
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
-        return args;
-    }else{
-        mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
-        if(opt2->getValue("args") == nullptr){
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
-            mcsm::error("No \"args\" value specified in file " + opt2->getName());
-            mcsm::error("Manually editing the launch profile might have caused this issue.");
-            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-            std::exit(1);
-        }
-        if(!opt2->getValue("args").is_array()){
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
-            mcsm::error("Value \"args\" has to be a array, but it's not.");
-            mcsm::error("Manually editing the launch profile might have caused this issue.");
-            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-            std::exit(1);
-        }
-        for(auto& v : opt2->getValue("args")){
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
+        for(auto& v : value){
             if(!v.is_string()){
                 mcsm::error("Value \"args\" has to be a array of string, but it's not.");
                 mcsm::error("Manually editing the launch profile might have caused this issue.");
@@ -255,17 +226,51 @@ std::vector<std::string> mcsm::JvmOption::getJvmArguments(){
                 std::exit(1);             
             }
         }
-        std::vector<std::string> args = opt2->getValue("args");
+        std::vector<std::string> args = value;
+        return args;
+    }else{
+        mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
+        
+        nlohmann::json value = opt2->getValue("args");
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
+        
+        if(value == nullptr){
+            mcsm::error("No \"args\" value specified in file " + opt2->getName());
+            mcsm::error("Manually editing the launch profile might have caused this issue.");
+            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+            std::exit(1);
+        }
+        if(!value.is_string()){
+            mcsm::error("Value \"args\" has to be a string, but it's not.");
+            mcsm::error("Manually editing the launch profile might have caused this issue.");
+            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+            std::exit(1);
+        }
+        for(auto& v : value){
+            if(!v.is_string()){
+                mcsm::error("Value \"args\" has to be a array of string, but it's not.");
+                mcsm::error("Manually editing the launch profile might have caused this issue.");
+                mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
+                mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+                std::exit(1);
+            }
+        }
+        std::vector<std::string> args = value;
         return args;
     }
 }
 
 mcsm::Result mcsm::JvmOption::setJvmArguments(const std::vector<std::string>& jvmArgs){
-    if(!exists()){
-        mcsm::error("This jvm option does not exist.");
-        mcsm::error("Please edit the launch profile after creating.");
-        std::exit(1);
+    bool profileExists = exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::Result res({mcsm::getLastResult().first, mcsm::getLastResult().second});
+        return res;
+    }
+    if(!profileExists){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jvmProfileNotFound()});
+        return res;
     }
     if(this->option->isGlobal()){
         mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
@@ -277,61 +282,68 @@ mcsm::Result mcsm::JvmOption::setJvmArguments(const std::vector<std::string>& jv
 }
 
 std::string mcsm::JvmOption::getJvmPath(){
-    if(!exists()){
-        mcsm::error("This jvm option does not exist.");
-        mcsm::error("Please edit the launch profile after creating.");
-        std::exit(1);
+    bool profileExists = exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    if(!profileExists){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jvmProfileNotFound()});
+        return "";
     }
     if(this->option->isGlobal()){
         mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
-        if(opt->getValue("path") == nullptr){
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+        
+        nlohmann::json value = opt->getValue("path");
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+        
+        if(value == nullptr){
             mcsm::error("No \"path\" value specified in file " + opt->getName());
             mcsm::error("Manually editing the launch profile might have caused this issue.");
             mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
             mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
             std::exit(1);
         }
-        if(!opt->getValue("path").is_string()){
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+        if(!value.is_string()){
             mcsm::error("Value \"path\" has to be a string, but it's not.");
             mcsm::error("Manually editing the launch profile might have caused this issue.");
             mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
             mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
             std::exit(1);
         }
-        std::string args = opt->getValue("path");
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-        return args;
+        std::string path = value;
+        return path;
     }else{
         mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
-        if(opt2->getValue("path") == nullptr){
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+        
+        nlohmann::json value = opt2->getValue("path");
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
+        
+        if(value == nullptr){
             mcsm::error("No \"path\" value specified in file " + opt2->getName());
             mcsm::error("Manually editing the launch profile might have caused this issue.");
             mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
             mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
             std::exit(1);
         }
-        if(!opt2->getValue("path").is_string()){
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+        if(!value.is_string()){
             mcsm::error("Value \"path\" has to be a string, but it's not.");
             mcsm::error("Manually editing the launch profile might have caused this issue.");
             mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
             mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
             std::exit(1);
         }
-        std::string args = opt2->getValue("path");
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-        return args;
+        std::string path = value;
+        return path;
     }
 }
 
 mcsm::Result mcsm::JvmOption::setJvmPath(const std::string& jvmPath){
-    if(!exists()){
-        mcsm::error("This jvm option does not exist.");
-        mcsm::error("Please edit the launch profile after creating.");
-        std::exit(1);
+    bool profileExists = exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::Result res({mcsm::getLastResult().first, mcsm::getLastResult().second});
+        return res;
+    }
+    if(!profileExists){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jvmProfileNotFound()});
+        return res;
     }
     if(this->option->isGlobal()){
         mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
@@ -343,31 +355,33 @@ mcsm::Result mcsm::JvmOption::setJvmPath(const std::string& jvmPath){
 }
 
 std::vector<std::string> mcsm::JvmOption::getServerArguments(){
-    if(!exists()){
-        mcsm::error("This jvm option does not exist.");
-        mcsm::error("Please edit the launch profile after creating.");
-        std::exit(1);
+    bool profileExists = exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
+    if(!profileExists){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jvmProfileNotFound()});
+        return {};
     }
     if(this->option->isGlobal()){
         mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
-        if(opt->getValue("server_args") == nullptr){
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
+        
+        nlohmann::json value = opt->getValue("server_args");
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
+        
+        if(value == nullptr){
             mcsm::error("No \"server_args\" value specified in file " + opt->getName());
             mcsm::error("Manually editing the launch profile might have caused this issue.");
             mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
             mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
             std::exit(1);
         }
-        if(!opt->getValue("server_args").is_array()){
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
-            mcsm::error("Value \"server_args\" has to be a array, but it's not.");
+        if(!value.is_string()){
+            mcsm::error("Value \"server_args\" has to be a string, but it's not.");
             mcsm::error("Manually editing the launch profile might have caused this issue.");
             mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
             mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
             std::exit(1);
         }
-        for(auto& v : opt->getValue("server_args")){
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
+        for(auto& v : value){
             if(!v.is_string()){
                 mcsm::error("Value \"server_args\" has to be a array of string, but it's not.");
                 mcsm::error("Manually editing the launch profile might have caused this issue.");
@@ -376,48 +390,51 @@ std::vector<std::string> mcsm::JvmOption::getServerArguments(){
                 std::exit(1);             
             }
         }
-        std::vector<std::string> args = opt->getValue("server_args");
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
+        std::vector<std::string> args = value;
         return args;
     }else{
         mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
-        if(opt2->getValue("server_args") == nullptr){
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
+        
+        nlohmann::json value = opt2->getValue("server_args");
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
+        
+        if(value == nullptr){
             mcsm::error("No \"server_args\" value specified in file " + opt2->getName());
             mcsm::error("Manually editing the launch profile might have caused this issue.");
             mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
             mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
             std::exit(1);
         }
-        if(!opt2->getValue("server_args").is_array()){
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
-            mcsm::error("Value \"server_args\" has to be a array, but it's not.");
+        if(!value.is_string()){
+            mcsm::error("Value \"server_args\" has to be a string, but it's not.");
             mcsm::error("Manually editing the launch profile might have caused this issue.");
             mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
             mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
             std::exit(1);
         }
-        for(auto& v : opt2->getValue("server_args")){
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
+        for(auto& v : value){
             if(!v.is_string()){
                 mcsm::error("Value \"server_args\" has to be a array of string, but it's not.");
                 mcsm::error("Manually editing the launch profile might have caused this issue.");
                 mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
                 mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-                std::exit(1);             
+                std::exit(1);
             }
         }
-        std::vector<std::string> args = opt2->getValue("server_args");
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
+        std::vector<std::string> args = value;
         return args;
     }
 }
 
 mcsm::Result mcsm::JvmOption::setServerArguments(const std::vector<std::string>& serverArgs){
-    if(!exists()){
-        mcsm::error("This jvm option does not exist.");
-        mcsm::error("Please edit the launch profile after creating.");
-        std::exit(1);
+    bool profileExists = exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::Result res({mcsm::getLastResult().first, mcsm::getLastResult().second});
+        return res;
+    }
+    if(!profileExists){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jvmProfileNotFound()});
+        return res;
     }
     if(this->option->isGlobal()){
         mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());

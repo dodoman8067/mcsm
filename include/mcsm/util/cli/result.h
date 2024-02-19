@@ -81,7 +81,7 @@ namespace mcsm {
         inline std::vector<std::string> jsonParseFailed(const std::string& name){
             return {
                 "Failed to parse json " + name,
-                "There might be many reasons why you see this error.",
+                "There are many reasons why you see this error.",
                 "1. Comments: Comments are not allowed in JSON. If you used the comment syntax like other programming languages, you must remove them and try again.",
                 "2. Unclosed Brackets: Check if all curly braces '{}' and square brackets '[]' are properly closed.",
                 "3. Trailing Commas: Trailing Commas are not allowed in JSON. Make sure that end of the element doesn't end with comma.",
@@ -130,6 +130,21 @@ namespace mcsm {
             return {
                 "Unsupported version : " + build,
                 "Please try again with a different version."
+            };
+        }
+
+        inline std::vector<std::string> jvmProfileNotFound(){
+            return {
+                "This jvm option does not exist.",
+                "Please edit the launch profile after creating."
+            };
+        }
+
+        inline std::vector<std::string> jvmDetectionFailed(){
+            return {
+                "JVM detection failed.",
+                "This error can be fixed by setting JAVA_HOME enviroment variable.",
+                
             };
         }
 
