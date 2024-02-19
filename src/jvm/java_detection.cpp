@@ -31,15 +31,15 @@ SOFTWARE.
 
 std::string mcsm::getJavaFromHome(){
     const char* path = std::getenv("JAVA_HOME");
-    if(path == nullptr || path == NULL) return std::move("");
+    if(path == nullptr || path == NULL) return "";
     if(mcsm::isWhitespaceOrEmpty(path)){
-        return std::move("");
+        return "";
     }
     std::string strPath = path;
-    if(!std::filesystem::exists(strPath + "/bin")) return std::move("");
-    if(std::filesystem::exists(strPath + "/bin/java")) return std::move(strPath + "/bin/java");
-    if(std::filesystem::exists(strPath + "/bin/java.exe")) return std::move(strPath + "/bin/java.exe");
-    return std::move("");
+    if(!std::filesystem::exists(strPath + "/bin")) return "";
+    if(std::filesystem::exists(strPath + "/bin/java")) return strPath + "/bin/java";
+    if(std::filesystem::exists(strPath + "/bin/java.exe")) return strPath + "/bin/java.exe";
+    return "";
 }
 
 std::string mcsm::getJavaFromPath(){
@@ -76,7 +76,7 @@ std::string mcsm::getJavaFromPath(){
             }
         }
     }
-    return std::move("");
+    return "";
 }
 
 std::string mcsm::detectJava(){

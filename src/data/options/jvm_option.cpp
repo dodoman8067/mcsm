@@ -57,6 +57,7 @@ mcsm::JvmOption::JvmOption(const std::string& name, const mcsm::SearchTarget& ta
             break;
         }
     }
+    mcsm::Result res({mcsm::ResultType::MCSM_OK, {"Success"}});
 }
 
 mcsm::Result mcsm::JvmOption::create(){
@@ -70,10 +71,8 @@ mcsm::Result mcsm::JvmOption::create(){
         "nogui"
     };
     if(mcsm::isWhitespaceOrEmpty(jvm)){
-        mcsm::error("JVM detection failed.");
-        mcsm::error("This error can be fixed by setting JAVA_HOME enviroment variable.");
-        mcsm::error("Or if you believe this is a software issue, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jvmDetectionFailed()});
+        return res;
     }
     return create(jvm, jvmArgs, serverArgs, mcsm::SearchTarget::GLOBAL);
 }
@@ -136,7 +135,7 @@ mcsm::Result mcsm::JvmOption::create(const std::string& jvmPath, const std::vect
         }
     }
 
-    mcsm::Result invaildPath({mcsm::ResultType::MCSM_FAIL, {"Invaild jvm path.", "High chance to be a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."}});
+    mcsm::Result invaildPath({mcsm::ResultType::MCSM_SUCCESS, {"Invaild jvm path.", "High chance to be a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."}});
     if(target == mcsm::SearchTarget::ALL) return invaildPath;
     if(target == mcsm::SearchTarget::CURRENT){
         mcsm::Option* cOpt = new mcsm::Option(mcsm::getCurrentPath() + "/.mcsm/jvm/profiles", optionName);
