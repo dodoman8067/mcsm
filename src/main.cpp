@@ -49,7 +49,7 @@ int main(int argc, char *argv[]){
     //Prints default message when no arguments
     if(argc < 2){
         std::cout << "Welcome to MCSM (Minecraft Server Manager).\n";
-        std::cout << "Type \'mcsm help\' for list of commands.\n";
+        std::cout << "Type \"mcsm help\" for a list of commands.\n";
         return 0;
     }
 
