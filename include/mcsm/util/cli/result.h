@@ -100,8 +100,15 @@ namespace mcsm {
 
         inline std::vector<std::string> serverAlreadyConfigured(){
             return {
-                "Server is already configured in directory.",
+                "Server is already configured in this directory.",
                 "Please create a server.json file in other directories."
+            };
+        }
+
+        inline std::vector<std::string> serverNotConfigured(){
+            return {
+                "Server isn't configured in this directory",
+                "Run \"mcsm init\" to configure a server."
             };
         }
 
@@ -109,6 +116,14 @@ namespace mcsm {
             return {
                 "Server data config is already in its place.",
                 "Please try again in other directories."
+            };
+        }
+
+        inline std::vector<std::string> serverDataNotConfigured(){
+            return {
+                "Server data file isn't configured in this directory",
+                "Modifying .mcsm folder might have caused this issue.",
+                "If you believe that this is a software issue and not your fault, please report this to GitHub. (https://github.com/dodoman8067/mcsm)"
             };
         }
 

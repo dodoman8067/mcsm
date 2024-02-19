@@ -3,117 +3,154 @@
 mcsm::FabricServerOption::FabricServerOption() : FabricServerOption(mcsm::getCurrentPath()){}
 
 mcsm::FabricServerOption::FabricServerOption(const std::string& version, const std::string& path){
-    if(!mcsm::fileExists(path)){
+    bool fileExists = mcsm::fileExists(path);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+
+    if(!fileExists){
         if(!mcsm::mkdir(path)){
-            mcsm::warning("Path mkdir failed : " + path);
-            mcsm::warning("Task aborted.");
-            std::exit(1);
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+                "Path mkdir failed : " + path,
+                "High chance to be a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+            }});
+            return;
         }
     }
     mcsm::Option option(path, "server");
 
-    if(!option.exists()){
-        mcsm::error("File server.json cannot be found.");
-        mcsm::error("Task aborted.");
-        std::exit(1);
-    }
-    if(option.getValue("type") == nullptr){
-        mcsm::error("Option \"type\" cannot be found.");
-        mcsm::error("Task aborted.");
-        std::exit(1);    
-    }
-    if(!option.getValue("type").is_string()){
-        mcsm::error("Value \"type\" has to be a string, but it's not.");
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+    bool exists = option.exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+
+    if(!exists){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        return;
     }
 
-    std::string server = option.getValue("type");
-    std::shared_ptr<mcsm::Server> sPtr = mcsm::server::detectServerType(server);
-    if(sPtr->getTypeAsString() != "fabric"){
-        mcsm::error("Class mcsm::FabricServerOption was constructed while non Fabric server pointer was passed as a parameter.");
-        mcsm::error("This has a very high chance to be a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+    nlohmann::json type = option.getValue("type");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+
+    if(type == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"type\"", "server.json")});
+        return; 
+    }
+    if(!type.is_string()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"type\"", "string")});
+        return; 
+    }
+
+    std::shared_ptr<mcsm::Server> sPtr = mcsm::server::detectServerType(type);
+    //if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+    std::string sType = sPtr->getTypeAsString();
+    //if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+    if(sType != "fabric"){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Class mcsm::FabricServerOption was constructed while non Fabric server pointer was passed as a parameter.",
+            "This has a very high chance to be a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+        }});
+        return;
     }
     this->path = path;
     this->version = version;
     this->server = sPtr;
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
 }
 
 mcsm::FabricServerOption::FabricServerOption(const std::string& path){
-    if(!mcsm::fileExists(path)){
+    bool fileExists = mcsm::fileExists(path);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+
+    if(!fileExists){
         if(!mcsm::mkdir(path)){
-            mcsm::warning("Path mkdir failed : " + path);
-            mcsm::warning("Task aborted.");
-            std::exit(1);
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+                "Path mkdir failed : " + path,
+                "High chance to be a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+            }});
+            return;
         }
     }
     mcsm::Option option(path, "server");
 
-    if(!option.exists()){
-        mcsm::error("File server.json cannot be found.");
-        mcsm::error("Task aborted.");
-        std::exit(1);
-    }
-    if(option.getValue("type") == nullptr){
-        mcsm::error("Option \"type\" cannot be found.");
-        mcsm::error("Task aborted.");
-        std::exit(1);    
-    }
-    if(!option.getValue("type").is_string()){
-        mcsm::error("Value \"type\" has to be a string, but it's not.");
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+    bool exists = option.exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+
+    if(!exists){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        return;
     }
 
-    if(option.getValue("version") == nullptr){
-        mcsm::error("Option \"version\" cannot be found.");
-        mcsm::error("Task aborted.");
-        std::exit(1);    
+    nlohmann::json type = option.getValue("type");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+
+    if(type == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"type\"", "server.json")});
+        return; 
     }
-    if(!option.getValue("version").is_string()){
-        mcsm::error("Value \"version\" has to be a string, but it's not.");
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+    if(!type.is_string()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"type\"", "string")});
+        return; 
     }
 
-    std::string server = option.getValue("type");
-    std::string version = option.getValue("version");
-    std::shared_ptr<mcsm::Server> sPtr = mcsm::server::detectServerType(server);
+    nlohmann::json version = option.getValue("version");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+
+    if(version == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"version\"", "server.json")});
+        return;   
+    }
+    if(!version.is_string()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"version\"", "string")});
+        return; 
+    }
+
+    std::shared_ptr<mcsm::Server> sPtr = mcsm::server::detectServerType(type);
+    //if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+    std::string sType = sPtr->getTypeAsString();
+    //if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+    if(sType != "fabric"){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Class mcsm::FabricServerOption was constructed while non Fabric server pointer was passed as a parameter.",
+            "This has a very high chance to be a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+        }});
+        return;
+    }
     this->path = path;
     this->server = sPtr;
     this->version = version;
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+}
+
+mcsm::FabricServerOption::FabricServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server){
+    this->version = version;
+    this->server = server;
+    std::string sType = server->getTypeAsString();
+    //if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+    if(sType != "fabric"){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Class mcsm::FabricServerOption was constructed while non Fabric server pointer was passed as a parameter.",
+            "This has a very high chance to be a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+        }});
+        return;
+    }
+    std::string path1 = mcsm::getCurrentPath();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+    this->path = path1;
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
 }
 
 mcsm::FabricServerOption::FabricServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server, const std::string& path){
     if(!mcsm::fileExists(path)){
         if(!mcsm::mkdir(path)){
-            mcsm::warning("Path mkdir failed : " + path);
-            mcsm::warning("Task aborted.");
-            std::exit(1);
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+                "Path mkdir failed : " + path,
+                "High chance to be a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+            }});
+            return;
         }
     }
 
     this->version = version;
     this->server = server;
     this->path = path;
-}
-
-mcsm::FabricServerOption::FabricServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server){
-    if(server->getTypeAsString() != "fabric"){
-        mcsm::error("Class mcsm::FabricServerOption was constructed while non Fabric server pointer was passed as a parameter.");
-        mcsm::error("This has a very high chance to be a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
-    }
-    this->server = server;
-    this->version = version;
-    this->path = mcsm::getCurrentPath();
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
 }
 
 mcsm::FabricServerOption::~FabricServerOption(){
