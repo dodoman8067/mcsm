@@ -144,7 +144,6 @@ namespace mcsm {
             return {
                 "JVM detection failed.",
                 "This error can be fixed by setting JAVA_HOME enviroment variable.",
-
             };
         }
 
