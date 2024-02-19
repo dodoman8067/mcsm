@@ -204,26 +204,17 @@ std::vector<std::string> mcsm::JvmOption::getJvmArguments(){
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
         
         if(value == nullptr){
-            mcsm::error("No \"args\" value specified in file " + opt->getName());
-            mcsm::error("Manually editing the launch profile might have caused this issue.");
-            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-            std::exit(1);
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"args\"", opt->getName())});
+            return {};
         }
-        if(!value.is_string()){
-            mcsm::error("Value \"args\" has to be a string, but it's not.");
-            mcsm::error("Manually editing the launch profile might have caused this issue.");
-            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-            std::exit(1);
+        if(!value.is_array()){
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"args\"", "array of string")});
+            return {};
         }
         for(auto& v : value){
             if(!v.is_string()){
-                mcsm::error("Value \"args\" has to be a array of string, but it's not.");
-                mcsm::error("Manually editing the launch profile might have caused this issue.");
-                mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-                mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-                std::exit(1);             
+                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"args\"", "array of string")});
+                return {};          
             }
         }
         std::vector<std::string> args = value;
@@ -235,26 +226,17 @@ std::vector<std::string> mcsm::JvmOption::getJvmArguments(){
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
         
         if(value == nullptr){
-            mcsm::error("No \"args\" value specified in file " + opt2->getName());
-            mcsm::error("Manually editing the launch profile might have caused this issue.");
-            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-            std::exit(1);
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"args\"", opt2->getName())});
+            return {};
         }
-        if(!value.is_string()){
-            mcsm::error("Value \"args\" has to be a string, but it's not.");
-            mcsm::error("Manually editing the launch profile might have caused this issue.");
-            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-            std::exit(1);
+        if(!value.is_array()){
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"args\"", "array of string")});
+            return {};
         }
         for(auto& v : value){
             if(!v.is_string()){
-                mcsm::error("Value \"args\" has to be a array of string, but it's not.");
-                mcsm::error("Manually editing the launch profile might have caused this issue.");
-                mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-                mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-                std::exit(1);
+                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"args\"", "array of string")});
+                return {};
             }
         }
         std::vector<std::string> args = value;
@@ -295,18 +277,12 @@ std::string mcsm::JvmOption::getJvmPath(){
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
         
         if(value == nullptr){
-            mcsm::error("No \"path\" value specified in file " + opt->getName());
-            mcsm::error("Manually editing the launch profile might have caused this issue.");
-            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-            std::exit(1);
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"path\"", opt->getName())});
+            return "";
         }
         if(!value.is_string()){
-            mcsm::error("Value \"path\" has to be a string, but it's not.");
-            mcsm::error("Manually editing the launch profile might have caused this issue.");
-            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-            std::exit(1);
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"path\"", "string")});
+            return "";
         }
         std::string path = value;
         return path;
@@ -317,18 +293,12 @@ std::string mcsm::JvmOption::getJvmPath(){
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
         
         if(value == nullptr){
-            mcsm::error("No \"path\" value specified in file " + opt2->getName());
-            mcsm::error("Manually editing the launch profile might have caused this issue.");
-            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-            std::exit(1);
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"path\"", opt2->getName())});
+            return "";
         }
         if(!value.is_string()){
-            mcsm::error("Value \"path\" has to be a string, but it's not.");
-            mcsm::error("Manually editing the launch profile might have caused this issue.");
-            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-            std::exit(1);
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"path\"", "string")});
+            return "";
         }
         std::string path = value;
         return path;
@@ -368,26 +338,17 @@ std::vector<std::string> mcsm::JvmOption::getServerArguments(){
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
         
         if(value == nullptr){
-            mcsm::error("No \"server_args\" value specified in file " + opt->getName());
-            mcsm::error("Manually editing the launch profile might have caused this issue.");
-            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-            std::exit(1);
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"server_args\"", opt->getName())});
+            return {};
         }
-        if(!value.is_string()){
-            mcsm::error("Value \"server_args\" has to be a string, but it's not.");
-            mcsm::error("Manually editing the launch profile might have caused this issue.");
-            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-            std::exit(1);
+        if(!value.is_array()){
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"server_args\"", "array of string")});
+            return {};
         }
         for(auto& v : value){
             if(!v.is_string()){
-                mcsm::error("Value \"server_args\" has to be a array of string, but it's not.");
-                mcsm::error("Manually editing the launch profile might have caused this issue.");
-                mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-                mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-                std::exit(1);             
+                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"server_args\"", "array of string")});
+                return {};         
             }
         }
         std::vector<std::string> args = value;
@@ -399,26 +360,17 @@ std::vector<std::string> mcsm::JvmOption::getServerArguments(){
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
         
         if(value == nullptr){
-            mcsm::error("No \"server_args\" value specified in file " + opt2->getName());
-            mcsm::error("Manually editing the launch profile might have caused this issue.");
-            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-            std::exit(1);
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"server_args\"", opt2->getName())});
+            return {};
         }
-        if(!value.is_string()){
-            mcsm::error("Value \"server_args\" has to be a string, but it's not.");
-            mcsm::error("Manually editing the launch profile might have caused this issue.");
-            mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-            mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-            std::exit(1);
+        if(!value.is_array()){
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"server_args\"", "array of string")});
+            return {};
         }
         for(auto& v : value){
             if(!v.is_string()){
-                mcsm::error("Value \"server_args\" has to be a array of string, but it's not.");
-                mcsm::error("Manually editing the launch profile might have caused this issue.");
-                mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-                mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
-                std::exit(1);
+                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"server_args\"", "array of string")});
+                return {};
             }
         }
         std::vector<std::string> args = value;
