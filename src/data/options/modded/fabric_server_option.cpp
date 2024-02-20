@@ -10,7 +10,7 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& version, const s
         if(!mcsm::mkdir(path)){
             mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
                 "Path mkdir failed : " + path,
-                "High chance to be a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+                "High chance to be a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
             }});
             return;
         }
@@ -44,7 +44,7 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& version, const s
     if(sType != "fabric"){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "Class mcsm::FabricServerOption was constructed while non Fabric server pointer was passed as a parameter.",
-            "This has a very high chance to be a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+            "This has a very high chance to be a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
         }});
         return;
     }
@@ -62,7 +62,7 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& path){
         if(!mcsm::mkdir(path)){
             mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
                 "Path mkdir failed : " + path,
-                "High chance to be a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+                "High chance to be a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
             }});
             return;
         }
@@ -108,7 +108,7 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& path){
     if(sType != "fabric"){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "Class mcsm::FabricServerOption was constructed while non Fabric server pointer was passed as a parameter.",
-            "This has a very high chance to be a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+            "This has a very high chance to be a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
         }});
         return;
     }
@@ -126,7 +126,7 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& version, std::sh
     if(sType != "fabric"){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "Class mcsm::FabricServerOption was constructed while non Fabric server pointer was passed as a parameter.",
-            "This has a very high chance to be a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+            "This has a very high chance to be a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
         }});
         return;
     }
@@ -141,7 +141,7 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& version, std::sh
         if(!mcsm::mkdir(path)){
             mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
                 "Path mkdir failed : " + path,
-                "High chance to be a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+                "High chance to be a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
             }});
             return;
         }
@@ -201,7 +201,7 @@ void mcsm::FabricServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
 
     if(getServerType() != "fabric"){
         mcsm::error("Class mcsm::FabricServerOption was constructed while non Fabric server pointer was passed as a parameter.");
-        mcsm::error("This has a very high chance to be a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("This has a very high chance to be a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
 
@@ -237,14 +237,14 @@ std::string mcsm::FabricServerOption::getLoaderVersion() const {
         mcsm::error("No \"loader_version\" value specified in file " + option.getName());
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     if(!option.getValue("loader_version").is_string()){
         mcsm::error("Value \"loader_version\" has to be a string, but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     return option.getValue("loader_version");
@@ -265,14 +265,14 @@ std::string mcsm::FabricServerOption::getInstallerVersion() const{
         mcsm::error("No \"installer_version\" value specified in file " + option.getName());
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     if(!option.getValue("installer_version").is_string()){
         mcsm::error("Value \"installer_version\" has to be a string, but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     return option.getValue("installer_version");
@@ -299,35 +299,35 @@ std::unique_ptr<mcsm::JvmOption> mcsm::FabricServerOption::getDefaultOption() co
         mcsm::error("No default launch profile specified in file " + option.getName());
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);       
     }
     if(profileObj["name"] == nullptr){
         mcsm::error("No default launch profile name specified in file " + option.getName());
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);         
     }
     if(!profileObj["name"].is_string()){
         mcsm::error("Value \"name\" in \"default_launch_profile\" has to be a string, but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     if(profileObj["location"] == nullptr){
         mcsm::error("No default launch profile location specified in file " + option.getName());
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);       
     }
     if(!profileObj["location"].is_string()){
         mcsm::error("Value \"location\" in \"default_launch_profile\" has to be a string, but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     mcsm::SearchTarget target;
@@ -339,7 +339,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::FabricServerOption::getDefaultOption() co
         mcsm::error("Value \"location\" in \"default_launch_profile\" has to be \"global\" or \"current\", but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     std::unique_ptr<mcsm::JvmOption> jvmOption = std::make_unique<mcsm::JvmOption>(profileObj["name"], target);
@@ -374,14 +374,14 @@ std::string mcsm::FabricServerOption::getServerName() const {
         mcsm::error("No \"name\" value specified in file " + option.getName());
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     if(!option.getValue("name").is_string()){
         mcsm::error("Value \"name\" has to be a string, but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     return option.getValue("name");
@@ -402,14 +402,14 @@ std::string mcsm::FabricServerOption::getServerVersion() const {
         mcsm::error("No \"version\" value specified in file " + option.getName());
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     if(!option.getValue("version").is_string()){
         mcsm::error("Value \"version\" has to be a string, but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     return option.getValue("version");
@@ -430,14 +430,14 @@ std::string mcsm::FabricServerOption::getServerType() const {
         mcsm::error("No \"type\" value specified in file " + option.getName());
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     if(!option.getValue("type").is_string()){
         mcsm::error("Value \"type\" has to be a string, but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     return option.getValue("type");
@@ -453,14 +453,14 @@ std::string mcsm::FabricServerOption::getServerJarFile() const{
         mcsm::error("No \"server_jar\" value specified in file " + option.getName());
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     if(!option.getValue("server_jar").is_string()){
         mcsm::error("Value \"server_jar\" has to be a string, but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     return option.getValue("server_jar");
@@ -474,6 +474,6 @@ void mcsm::FabricServerOption::setServerJarFile(const std::string& name){
 std::shared_ptr<mcsm::Server> mcsm::FabricServerOption::getServer() const {
     if(this->server != nullptr) return this->server;
     mcsm::error("Server instance null.");
-    mcsm::error("There's a high chance to be a software issue. Please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+    mcsm::error("There's a high chance to be a software issue. please report this to GitHub (https://github.com/dodoman8067/mcsm).");
     std::exit(1);
 }

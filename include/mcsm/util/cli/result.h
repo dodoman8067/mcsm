@@ -58,7 +58,7 @@ namespace mcsm {
                 "Value " + key + " has to be a(n) " + type + ", but it's not.",
                 "Manually editing the launch profile might have caused this issue.",
                 "If you know what you're doing, I believe you that you know how to handle this issue.",
-                "If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+                "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
             };
         }
 
@@ -67,7 +67,7 @@ namespace mcsm {
                 "No "+ key +" value specified in file " + name,
                 "Manually editing the launch profile might have caused this issue.",
                 "If you know what you're doing, I believe you that you know how to handle this issue.",
-                "If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+                "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
             };
         }
 
@@ -94,7 +94,7 @@ namespace mcsm {
         inline std::vector<std::string> jsonParseFailedCannotBeModified(){
             return {
                 "Parse of json failed.",
-                "If you believe that this is a software issue, please report it to GitHub. (https://github.com/dodoman8067/mcsm)"
+                "If you believe that this is a software issue, please report this to GitHub. (https://github.com/dodoman8067/mcsm)"
             };
         }
 
@@ -166,7 +166,7 @@ namespace mcsm {
             return {
                 "Cannot create directory/file " + name,
                 "This might have caused because of permissions or file name problems.",
-                "If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+                "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
             };
         }
 
@@ -174,7 +174,7 @@ namespace mcsm {
             return {
                 "Cannot save file " + name,
                 "This might have caused because of permissions or file name problems.",
-                "If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+                "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
             };
         }
 
@@ -182,14 +182,14 @@ namespace mcsm {
             return {
                 "Cannot open file " + name,
                 "This might have caused because of permissions or file name problems.",
-                "If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+                "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
             };
         }
 
         inline std::vector<std::string> fileNotFound(const std::string& name){
             return {
                 "File " + name + " cannot be found.",
-                "If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+                "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
             };
         }
 
@@ -222,7 +222,7 @@ namespace mcsm {
         inline std::vector<std::string> platformNotSupported(){
             return {
                 "Current operating system is not supported.",
-                "If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+                "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
             };
         }
     }

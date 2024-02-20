@@ -23,6 +23,7 @@ SOFTWARE.
 
 #include <mcsm/data/options/server_option.h>
 
+// You might be wondering why server option crating class would fail due to no file; It's because first three constructors are for loading existing config.
 mcsm::ServerOption::ServerOption() : ServerOption(mcsm::getCurrentPath()){}
 
 mcsm::ServerOption::ServerOption(const std::string& version, const std::string& path){
@@ -33,7 +34,7 @@ mcsm::ServerOption::ServerOption(const std::string& version, const std::string& 
         if(!mcsm::mkdir(path)){
             mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
                 "Path mkdir failed : " + path,
-                "High chance to be a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+                "High chance to be a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
             }});
             return;
         }
@@ -76,7 +77,7 @@ mcsm::ServerOption::ServerOption(const std::string& path){
         if(!mcsm::mkdir(path)){
             mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
                 "Path mkdir failed : " + path,
-                "High chance to be a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+                "High chance to be a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
             }});
             return;
         }
@@ -137,7 +138,7 @@ mcsm::ServerOption::ServerOption(const std::string& version, std::shared_ptr<mcs
         if(!mcsm::mkdir(path)){
             mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
                 "Path mkdir failed : " + path,
-                "High chance to be a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm)."
+                "High chance to be a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
             }});
             return;
         }
@@ -224,35 +225,35 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const {
         mcsm::error("No default launch profile specified in file " + option.getName());
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);       
     }
     if(profileObj["name"] == nullptr){
         mcsm::error("No default launch profile name specified in file " + option.getName());
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);         
     }
     if(!profileObj["name"].is_string()){
         mcsm::error("Value \"name\" in \"default_launch_profile\" has to be a string, but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     if(profileObj["location"] == nullptr){
         mcsm::error("No default launch profile location specified in file " + option.getName());
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);       
     }
     if(!profileObj["location"].is_string()){
         mcsm::error("Value \"location\" in \"default_launch_profile\" has to be a string, but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     mcsm::SearchTarget target;
@@ -264,7 +265,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const {
         mcsm::error("Value \"location\" in \"default_launch_profile\" has to be \"global\" or \"current\", but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     std::unique_ptr<mcsm::JvmOption> jvmOption = std::make_unique<mcsm::JvmOption>(profileObj["name"], target);
@@ -299,14 +300,14 @@ std::string mcsm::ServerOption::getServerName() const {
         mcsm::error("No \"name\" value specified in file " + option.getName());
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     if(!option.getValue("name").is_string()){
         mcsm::error("Value \"name\" has to be a string, but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     return option.getValue("name");
@@ -327,14 +328,14 @@ std::string mcsm::ServerOption::getServerVersion() const {
         mcsm::error("No \"version\" value specified in file " + option.getName());
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     if(!option.getValue("version").is_string()){
         mcsm::error("Value \"version\" has to be a string, but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     return option.getValue("version");
@@ -355,14 +356,14 @@ std::string mcsm::ServerOption::getServerType() const {
         mcsm::error("No \"type\" value specified in file " + option.getName());
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     if(!option.getValue("type").is_string()){
         mcsm::error("Value \"type\" has to be a string, but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     return option.getValue("type");
@@ -378,14 +379,14 @@ std::string mcsm::ServerOption::getServerJarFile() const{
         mcsm::error("No \"server_jar\" value specified in file " + option.getName());
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     if(!option.getValue("server_jar").is_string()){
         mcsm::error("Value \"server_jar\" has to be a string, but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     return option.getValue("server_jar");
@@ -406,14 +407,14 @@ std::string mcsm::ServerOption::getServerJarBuild() const {
         mcsm::error("No \"server_build\" value specified in file " + option.getName());
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     if(!option.getValue("server_build").is_string()){
         mcsm::error("Value \"server_build\" has to be a string, but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     return option.getValue("server_build");
@@ -427,6 +428,6 @@ void mcsm::ServerOption::setServerJarBuild(const std::string& build){
 std::shared_ptr<mcsm::Server> mcsm::ServerOption::getServer() const {
     if(this->server != nullptr) return this->server;
     mcsm::error("Server instance null.");
-    mcsm::error("There's a high chance to be a software issue. Please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+    mcsm::error("There's a high chance to be a software issue. please report this to GitHub (https://github.com/dodoman8067/mcsm).");
     std::exit(1);
 }

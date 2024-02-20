@@ -35,7 +35,7 @@ std::string mcsm::FabricServer::getVersion(const std::string& ver) const {
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
     if(json.is_discarded()){
         mcsm::error("Parse of json failed.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub. (https://github.com/dodoman8067/mcsm)");
         mcsm::error("Error informations : ");
         mcsm::error("Called method : mcsm::FabricServer::getVersion() with arguments : " + ver);
         std::exit(1);
@@ -58,7 +58,7 @@ std::string mcsm::FabricServer::getVersion() const {
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
     if(json.is_discarded()){
         mcsm::error("Parse of json failed.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub. (https://github.com/dodoman8067/mcsm)");
         mcsm::error("Error informations : ");
         mcsm::error("Called method : mcsm::FabricServer::getVersion()");
         std::exit(1);
@@ -282,7 +282,7 @@ void mcsm::FabricServer::download(const std::string& version, const std::string&
             std::exit(1);
         }else{
             mcsm::error("Cannot download the file due to the following reason : " + res);
-            mcsm::error("Please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+            mcsm::error("please report this to GitHub (https://github.com/dodoman8067/mcsm).");
             std::exit(1);
         }
     }
@@ -343,14 +343,14 @@ void mcsm::FabricServer::update(){
         mcsm::error("No \"version\" value specified in file " + opt.getName());
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);
     }
     if(!opt.getValue("version").is_string()){
         mcsm::error("Value \"version\" has to be a string, but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
         std::exit(1);            
     }
 

@@ -43,7 +43,7 @@ void mcsm::BukkitPlugin::init(){
         if(json.is_discarded()){
             if(!mcsm::isDebug()){ this->found = false; }
             mcsm::error("Parse of json or API request failed.");
-            mcsm::error("If you believe that this is a software issue, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
+            mcsm::error("If you believe that this is a software issue, please report this to GitHub. (https://github.com/dodoman8067/mcsm)");
             this->found = false;
         }
         this->author = spigetGetAuthor(json);
@@ -79,7 +79,7 @@ std::string mcsm::BukkitPlugin::spigetGetAuthor(const nlohmann::json& json){
     if(plugin["author"] == nullptr){
         if(!mcsm::isDebug()){ this->found = false; return ""; }
         mcsm::error("API request failed. (Failed to get author)");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub. (https://github.com/dodoman8067/mcsm)");
         this->found = false;
         return "";
     }
@@ -89,7 +89,7 @@ std::string mcsm::BukkitPlugin::spigetGetAuthor(const nlohmann::json& json){
     if(!author.is_object()){
         if(!mcsm::isDebug()){ this->found = false; return ""; }
         mcsm::error("API request failed. (Failed to get author id number)");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub. (https://github.com/dodoman8067/mcsm)");
         this->found = false;
         return "";
     }
@@ -97,7 +97,7 @@ std::string mcsm::BukkitPlugin::spigetGetAuthor(const nlohmann::json& json){
     if(author["id"] == nullptr){
         if(!mcsm::isDebug()){ this->found = false; return ""; }
         mcsm::error("API request failed. (Failed to get author id number)");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub. (https://github.com/dodoman8067/mcsm)");
         this->found = false;
         return "";
     }
@@ -105,7 +105,7 @@ std::string mcsm::BukkitPlugin::spigetGetAuthor(const nlohmann::json& json){
     if(!author["id"].is_number_integer()){
         if(!mcsm::isDebug()){ this->found = false; return ""; }
         mcsm::error("API request failed. (Failed to get author id number)");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub. (https://github.com/dodoman8067/mcsm)");
         this->found = false;
         return "";
     }
@@ -117,7 +117,7 @@ std::string mcsm::BukkitPlugin::spigetGetAuthor(const nlohmann::json& json){
     if(json.is_discarded()){
         if(!mcsm::isDebug()){ this->found = false; return ""; }
         mcsm::error("Parse of json or API request failed.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub. (https://github.com/dodoman8067/mcsm)");
         this->found = false;
         return "";
     }
@@ -126,7 +126,7 @@ std::string mcsm::BukkitPlugin::spigetGetAuthor(const nlohmann::json& json){
         if(!mcsm::isDebug()){ this->found = false; return ""; }
         std::string authorReason = authorJson["error"];
         mcsm::error("API request failed. Reason : " + authorReason);
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub. (https://github.com/dodoman8067/mcsm)");
         this->found = false;
         return "";
     }
@@ -134,7 +134,7 @@ std::string mcsm::BukkitPlugin::spigetGetAuthor(const nlohmann::json& json){
     if(authorJson["name"] == nullptr){
         if(!mcsm::isDebug()){ this->found = false; return ""; }
         mcsm::error("API request failed. (Failed to get author name)");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub. (https://github.com/dodoman8067/mcsm)");
         this->found = false;
         return "";
     }
@@ -142,7 +142,7 @@ std::string mcsm::BukkitPlugin::spigetGetAuthor(const nlohmann::json& json){
     if(!authorJson["name"].is_string()){
         if(!mcsm::isDebug()){ this->found = false; return ""; }
         mcsm::error("API request failed. (Failed to get author name)");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub. (https://github.com/dodoman8067/mcsm)");
+        mcsm::error("If you believe that this is a software issue, please report this to GitHub. (https://github.com/dodoman8067/mcsm)");
         this->found = false;
         return "";
     }
