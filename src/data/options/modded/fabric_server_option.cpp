@@ -157,7 +157,7 @@ mcsm::FabricServerOption::~FabricServerOption(){
 
 }
 
-void mcsm::FabricServerOption::create(const std::string& name, mcsm::JvmOption& defaultOption){
+mcsm::Result mcsm::FabricServerOption::create(const std::string& name, mcsm::JvmOption& defaultOption){
     mcsm::Option option(this->path, "server");
     if(option.exists()){
         mcsm::error("Server is already configured in directory " + this->path + ".");
@@ -185,12 +185,12 @@ void mcsm::FabricServerOption::create(const std::string& name, mcsm::JvmOption& 
     serverDataOpt.updateServerTimeCreated();
 }
 
-void mcsm::FabricServerOption::start(){
+mcsm::Result mcsm::FabricServerOption::start(){
     std::unique_ptr<mcsm::JvmOption> jvmOpt = getDefaultOption();
-    start(std::move(jvmOpt));
+    return start(std::move(jvmOpt));
 }
 
-void mcsm::FabricServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
+mcsm::Result mcsm::FabricServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
     mcsm::FabricServerDataOption serverDataOpt;
 
     if(!mcsm::fileExists(this->path + "/server.json")){
@@ -223,8 +223,8 @@ std::string mcsm::FabricServerOption::getServerJarBuild() const {
     return getLoaderVersion();
 }
 
-void mcsm::FabricServerOption::setServerJarBuild(const std::string& build){
-    setLoaderVersion(build);
+mcsm::Result mcsm::FabricServerOption::setServerJarBuild(const std::string& build){
+    return setLoaderVersion(build);
 }
 
 std::string mcsm::FabricServerOption::getLoaderVersion() const {
@@ -250,9 +250,9 @@ std::string mcsm::FabricServerOption::getLoaderVersion() const {
     return option.getValue("loader_version");
 }
 
-void mcsm::FabricServerOption::setLoaderVersion(const std::string& version){
+mcsm::Result mcsm::FabricServerOption::setLoaderVersion(const std::string& version){
     mcsm::Option option(this->path, "server");
-    option.setValue("loader_version", version);
+    return option.setValue("loader_version", version);
 }
 
 std::string mcsm::FabricServerOption::getInstallerVersion() const{
@@ -278,9 +278,9 @@ std::string mcsm::FabricServerOption::getInstallerVersion() const{
     return option.getValue("installer_version");
 }
 
-void mcsm::FabricServerOption::setInstallerVersion(const std::string& version){
+mcsm::Result mcsm::FabricServerOption::setInstallerVersion(const std::string& version){
     mcsm::Option option(this->path, "server");
-    option.setValue("installer_version", version);
+    return option.setValue("installer_version", version);
 }
 
 bool mcsm::FabricServerOption::exists(){
@@ -352,7 +352,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::FabricServerOption::getDefaultOption() co
     return jvmOption;
 }
 
-void mcsm::FabricServerOption::setDefaultOption(std::unique_ptr<mcsm::JvmOption> jvmOption){
+mcsm::Result mcsm::FabricServerOption::setDefaultOption(std::unique_ptr<mcsm::JvmOption> jvmOption){
     mcsm::Option option(this->path, "server");
     nlohmann::json profileObj;
     profileObj["name"] = jvmOption->getProfileName();
@@ -361,7 +361,7 @@ void mcsm::FabricServerOption::setDefaultOption(std::unique_ptr<mcsm::JvmOption>
     }else{
         profileObj["location"] = "current";
     }
-    option.setValue("default_launch_profile", profileObj);
+    return option.setValue("default_launch_profile", profileObj);
 }
 
 std::string mcsm::FabricServerOption::getServerName() const {
@@ -387,9 +387,9 @@ std::string mcsm::FabricServerOption::getServerName() const {
     return option.getValue("name");
 }
 
-void mcsm::FabricServerOption::setServerName(const std::string& name){
+mcsm::Result mcsm::FabricServerOption::setServerName(const std::string& name){
     mcsm::Option option(this->path, "server");
-    option.setValue("name", name);
+    return option.setValue("name", name);
 }
 
 std::string mcsm::FabricServerOption::getServerVersion() const {
@@ -415,9 +415,9 @@ std::string mcsm::FabricServerOption::getServerVersion() const {
     return option.getValue("version");
 }
 
-void mcsm::FabricServerOption::setServerVersion(const std::string& version){
+mcsm::Result mcsm::FabricServerOption::setServerVersion(const std::string& version){
     mcsm::Option option(this->path, "server");
-    option.setValue("version", version);    
+    return option.setValue("version", version);    
 }
 
 std::string mcsm::FabricServerOption::getServerType() const {
@@ -466,9 +466,9 @@ std::string mcsm::FabricServerOption::getServerJarFile() const{
     return option.getValue("server_jar");
 }
 
-void mcsm::FabricServerOption::setServerJarFile(const std::string& name){
+mcsm::Result mcsm::FabricServerOption::setServerJarFile(const std::string& name){
     mcsm::Option option(this->path, "server");
-    option.setValue("server_jar", name);
+    return option.setValue("server_jar", name);
 }
 
 std::shared_ptr<mcsm::Server> mcsm::FabricServerOption::getServer() const {

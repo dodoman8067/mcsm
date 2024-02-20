@@ -36,30 +36,32 @@ namespace mcsm {
         std::string version;
     public:
         CustomServerOption();
-        CustomServerOption(const std::string& version);
+        CustomServerOption(const std::string& path);
+        CustomServerOption(const std::string& version, const std::string& path);
         CustomServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server);
+        CustomServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server, const std::string& path);
         ~CustomServerOption();
 
-        void create(const std::string& name, mcsm::JvmOption& defaultOption);
+        mcsm::Result create(const std::string& name, mcsm::JvmOption& defaultOption);
         
-        void start();
-        void start(std::unique_ptr<mcsm::JvmOption> option);
+        mcsm::Result start();
+        mcsm::Result start(std::unique_ptr<mcsm::JvmOption> option);
 
         bool exists();
 
         std::string getServerName() const;
-        void setServerName(const std::string& name);
+        mcsm::Result setServerName(const std::string& name);
 
         std::unique_ptr<mcsm::JvmOption> getDefaultOption() const;
-        void setDefaultOption(std::unique_ptr<mcsm::JvmOption> jvmOption);
+        mcsm::Result setDefaultOption(std::unique_ptr<mcsm::JvmOption> jvmOption);
 
         std::string getServerType() const;
 
         std::string getServerJarLocation() const;
-        void setServerJarLocation(const std::string& location);
+        mcsm::Result setServerJarLocation(const std::string& location);
 
         std::string getServerJarFile() const;
-        void setServerJarFile(const std::string& name);
+        mcsm::Result setServerJarFile(const std::string& name);
 
         std::shared_ptr<mcsm::Server> getServer() const;
     };

@@ -154,7 +154,7 @@ mcsm::ServerOption::~ServerOption(){
     
 }
 
-void mcsm::ServerOption::create(const std::string& name, mcsm::JvmOption& defaultOption){
+mcsm::Result mcsm::ServerOption::create(const std::string& name, mcsm::JvmOption& defaultOption){
     mcsm::Option option(this->path, "server");
     if(option.exists()){
         mcsm::error("Server is already configured in directory " + this->path + ".");
@@ -181,12 +181,12 @@ void mcsm::ServerOption::create(const std::string& name, mcsm::JvmOption& defaul
     serverDataOpt.updateServerTimeCreated();
 }
 
-void mcsm::ServerOption::start(){
+mcsm::Result mcsm::ServerOption::start(){
     std::unique_ptr<mcsm::JvmOption> jvmOpt = getDefaultOption();
-    start(std::move(jvmOpt));
+    return start(std::move(jvmOpt));
 }
 
-void mcsm::ServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
+mcsm::Result mcsm::ServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
     mcsm::ServerDataOption serverDataOpt;
 
     if(!mcsm::fileExists(this->path + "/server.json")){
@@ -278,7 +278,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const {
     return jvmOption;
 }
 
-void mcsm::ServerOption::setDefaultOption(std::unique_ptr<mcsm::JvmOption> jvmOption){
+mcsm::Result mcsm::ServerOption::setDefaultOption(std::unique_ptr<mcsm::JvmOption> jvmOption){
     mcsm::Option option(this->path, "server");
     nlohmann::json profileObj;
     profileObj["name"] = jvmOption->getProfileName();
@@ -287,7 +287,7 @@ void mcsm::ServerOption::setDefaultOption(std::unique_ptr<mcsm::JvmOption> jvmOp
     }else{
         profileObj["location"] = "current";
     }
-    option.setValue("default_launch_profile", profileObj);
+    return option.setValue("default_launch_profile", profileObj);
 }
 
 std::string mcsm::ServerOption::getServerName() const {
@@ -313,9 +313,9 @@ std::string mcsm::ServerOption::getServerName() const {
     return option.getValue("name");
 }
 
-void mcsm::ServerOption::setServerName(const std::string& name){
+mcsm::Result mcsm::ServerOption::setServerName(const std::string& name){
     mcsm::Option option(this->path, "server");
-    option.setValue("name", name);
+    return option.setValue("name", name);
 }
 
 std::string mcsm::ServerOption::getServerVersion() const {
@@ -341,9 +341,9 @@ std::string mcsm::ServerOption::getServerVersion() const {
     return option.getValue("version");
 }
 
-void mcsm::ServerOption::setServerVersion(const std::string& version){
+mcsm::Result mcsm::ServerOption::setServerVersion(const std::string& version){
     mcsm::Option option(this->path, "server");
-    option.setValue("version", version);    
+    return option.setValue("version", version);    
 }
 
 std::string mcsm::ServerOption::getServerType() const {
@@ -392,9 +392,9 @@ std::string mcsm::ServerOption::getServerJarFile() const{
     return option.getValue("server_jar");
 }
 
-void mcsm::ServerOption::setServerJarFile(const std::string& name){
+mcsm::Result mcsm::ServerOption::setServerJarFile(const std::string& name){
     mcsm::Option option(this->path, "server");
-    option.setValue("server_jar", name);
+    return option.setValue("server_jar", name);
 }
 
 std::string mcsm::ServerOption::getServerJarBuild() const {
@@ -420,9 +420,9 @@ std::string mcsm::ServerOption::getServerJarBuild() const {
     return option.getValue("server_build");
 }
 
-void mcsm::ServerOption::setServerJarBuild(const std::string& build){
+mcsm::Result mcsm::ServerOption::setServerJarBuild(const std::string& build){
     mcsm::Option option(this->path, "server");
-    option.setValue("server_build", build);
+    return option.setValue("server_build", build);
 }
 
 std::shared_ptr<mcsm::Server> mcsm::ServerOption::getServer() const {
