@@ -101,7 +101,7 @@ namespace mcsm {
         inline std::vector<std::string> serverAlreadyConfigured(){
             return {
                 "Server is already configured in this directory.",
-                "Please create a server.json file in other directories."
+                "Please try again in other directories."
             };
         }
 
