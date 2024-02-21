@@ -156,29 +156,66 @@ mcsm::ServerOption::~ServerOption(){
 
 mcsm::Result mcsm::ServerOption::create(const std::string& name, mcsm::JvmOption& defaultOption){
     mcsm::Option option(this->path, "server");
-    if(option.exists()){
-        mcsm::error("Server is already configured in directory " + this->path + ".");
-        mcsm::error("Please create a server.json file in other directories.");
-        std::exit(1);
+    
+    bool optExists = option.exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    if(optExists){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverAlreadyConfigured()});
+        return res;
     }
 
     mcsm::ServerDataOption serverDataOpt(this->path);
-    serverDataOpt.create("none");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    mcsm::Result res1 = serverDataOpt.create("none");
+    if(!res1.isSuccess()) return res1;
 
     nlohmann::json profileObj;
     profileObj["name"] = defaultOption.getProfileName();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
     if(defaultOption.getSearchTarget() == mcsm::SearchTarget::GLOBAL){
         profileObj["location"] = "global";
     }else{
         profileObj["location"] = "current";
     }
-    option.setValue("name", name);
-    option.setValue("version", this->version);
-    option.setValue("default_launch_profile", profileObj);
-    option.setValue("server_jar", this->server->getJarFile(this->path));
-    option.setValue("server_build", "latest");
-    option.setValue("type", this->server->getTypeAsString());
-    serverDataOpt.updateServerTimeCreated();
+    
+    mcsm::Result res2 = option.setValue("name", name);
+    if(!res2.isSuccess()) return res2;
+    
+    mcsm::Result res3 = option.setValue("version", this->version);
+    if(!res3.isSuccess()) return res3;
+    
+    mcsm::Result res4 = option.setValue("default_launch_profile", profileObj);
+    if(!res4.isSuccess()) return res4;
+    
+    mcsm::Result res5 = option.setValue("server_jar", this->server->getJarFile(this->path));
+    if(!res5.isSuccess()) return res5;
+    
+    mcsm::Result res6 = option.setValue("server_build", "latest");
+    if(!res6.isSuccess()) return res6;
+    
+    mcsm::Result res7 = option.setValue("type", this->server->getTypeAsString());
+    if(!res7.isSuccess()) return res7;
+    
+    mcsm::Result res8 = serverDataOpt.updateServerTimeCreated();
+    if(!res8.isSuccess()) return res8;
+
+    mcsm::Result res9({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    return res9;
 }
 
 mcsm::Result mcsm::ServerOption::start(){
@@ -188,25 +225,67 @@ mcsm::Result mcsm::ServerOption::start(){
 
 mcsm::Result mcsm::ServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
     mcsm::ServerDataOption serverDataOpt;
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
 
-    if(!mcsm::fileExists(this->path + "/server.json")){
-        mcsm::error("File server.json cannot be found.");
-        mcsm::error("Task aborted.");
-        std::exit(1);
+    bool fileExists = mcsm::fileExists(this->path + "/server.json");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    if(!fileExists){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        return res;
     }
 
     if(this->server == nullptr){
         this->server.reset();
         this->server = mcsm::server::detectServerType(getServerType());
+        /*
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }*/
+    }
+
+    std::string name = getServerName();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    std::string version = getServerVersion();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    std::string profileName = option->getProfileName();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
     }
 
     mcsm::success("Starting server..");
-    mcsm::info("Server name : " + getServerName());
-    mcsm::info("Server MC version : " + getServerVersion());
-    mcsm::info("Server JVM launch profile : " + option->getProfileName());
-    serverDataOpt.updateLastTimeLaunched();
+    mcsm::info("Server name : " + name);
+    mcsm::info("Server MC version : " + version);
+    mcsm::info("Server JVM launch profile : " + profileName);
+    mcsm::Result res = serverDataOpt.updateLastTimeLaunched();
+    if(!res.isSuccess()) return res;
     this->server->start(*option);
     mcsm::info("Server stopped.\n");
+
+    mcsm::Result res2({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    return res2;
 }
 
 bool mcsm::ServerOption::exists(){
