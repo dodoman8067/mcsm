@@ -38,9 +38,9 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& version, const s
     }
 
     std::shared_ptr<mcsm::Server> sPtr = mcsm::server::detectServerType(type);
-    //if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
     std::string sType = sPtr->getTypeAsString();
-    //if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
     if(sType != "fabric"){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "Class mcsm::FabricServerOption was constructed while non Fabric server pointer was passed as a parameter.",
@@ -102,9 +102,9 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& path){
     }
 
     std::shared_ptr<mcsm::Server> sPtr = mcsm::server::detectServerType(type);
-    //if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
     std::string sType = sPtr->getTypeAsString();
-    //if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
     if(sType != "fabric"){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "Class mcsm::FabricServerOption was constructed while non Fabric server pointer was passed as a parameter.",
@@ -122,7 +122,7 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& version, std::sh
     this->version = version;
     this->server = server;
     std::string sType = server->getTypeAsString();
-    //if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
     if(sType != "fabric"){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "Class mcsm::FabricServerOption was constructed while non Fabric server pointer was passed as a parameter.",

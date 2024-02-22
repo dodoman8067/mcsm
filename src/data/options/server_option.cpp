@@ -62,7 +62,7 @@ mcsm::ServerOption::ServerOption(const std::string& version, const std::string& 
     }
 
     std::shared_ptr<mcsm::Server> sPtr = mcsm::server::detectServerType(type);
-    //if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
     this->path = path;
     this->version = version;
     this->server = sPtr;
@@ -117,7 +117,7 @@ mcsm::ServerOption::ServerOption(const std::string& path){
     }
 
     std::shared_ptr<mcsm::Server> sPtr = mcsm::server::detectServerType(type);
-    //if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
     this->path = path;
     this->server = sPtr;
     this->version = version;
@@ -246,12 +246,12 @@ mcsm::Result mcsm::ServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
     if(this->server == nullptr){
         this->server.reset();
         this->server = mcsm::server::detectServerType(getServerType());
-        /*
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }*/
+        
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
     }
 
     std::string name = getServerName();
