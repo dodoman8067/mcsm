@@ -290,14 +290,18 @@ mcsm::Result mcsm::ServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
 
 bool mcsm::ServerOption::exists(){
     mcsm::Option option(this->path, "server");
-    return option.exists();
+    bool rt = option.exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return false;
+    return rt;
 }
 
 std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const {
     mcsm::Option option(this->path, "server");
-    if(!option.exists()){
-        mcsm::error("Option does not exist; Task aborted.");
-        std::exit(1);
+    bool optExists = option.exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return nullptr;
+    if(!optExists){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        return nullptr;
     }
     nlohmann::json profileObj = option.getValue("default_launch_profile");
     if(profileObj == nullptr){
@@ -371,9 +375,11 @@ mcsm::Result mcsm::ServerOption::setDefaultOption(std::unique_ptr<mcsm::JvmOptio
 
 std::string mcsm::ServerOption::getServerName() const {
     mcsm::Option option(this->path, "server");
-    if(!option.exists()){
-        mcsm::error("Option does not exist; Task aborted.");
-        std::exit(1);
+    bool optExists = option.exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    if(!optExists){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        return "";
     }
     if(option.getValue("name") == nullptr){
         mcsm::error("No \"name\" value specified in file " + option.getName());
@@ -399,9 +405,11 @@ mcsm::Result mcsm::ServerOption::setServerName(const std::string& name){
 
 std::string mcsm::ServerOption::getServerVersion() const {
     mcsm::Option option(this->path, "server");
-    if(!option.exists()){
-        mcsm::error("Option does not exist; Task aborted.");
-        std::exit(1);
+    bool optExists = option.exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    if(!optExists){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        return "";
     }
     if(option.getValue("version") == nullptr){
         mcsm::error("No \"version\" value specified in file " + option.getName());
@@ -427,9 +435,11 @@ mcsm::Result mcsm::ServerOption::setServerVersion(const std::string& version){
 
 std::string mcsm::ServerOption::getServerType() const {
     mcsm::Option option(this->path, "server");
-    if(!option.exists()){
-        mcsm::error("Option does not exist; Task aborted.");
-        std::exit(1);
+    bool optExists = option.exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    if(!optExists){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        return "";
     }
     if(option.getValue("type") == nullptr){
         mcsm::error("No \"type\" value specified in file " + option.getName());
@@ -450,9 +460,11 @@ std::string mcsm::ServerOption::getServerType() const {
 
 std::string mcsm::ServerOption::getServerJarFile() const{
     mcsm::Option option(this->path, "server");
-    if(!option.exists()){
-        mcsm::error("Option does not exist; Task aborted.");
-        std::exit(1);
+    bool optExists = option.exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    if(!optExists){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        return "";
     }
     if(option.getValue("server_jar") == nullptr){
         mcsm::error("No \"server_jar\" value specified in file " + option.getName());
@@ -478,9 +490,11 @@ mcsm::Result mcsm::ServerOption::setServerJarFile(const std::string& name){
 
 std::string mcsm::ServerOption::getServerJarBuild() const {
     mcsm::Option option(this->path, "server");
-    if(!option.exists()){
-        mcsm::error("Option does not exist; Task aborted.");
-        std::exit(1);
+    bool optExists = option.exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    if(!optExists){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        return "";
     }
     if(option.getValue("server_build") == nullptr){
         mcsm::error("No \"server_build\" value specified in file " + option.getName());
