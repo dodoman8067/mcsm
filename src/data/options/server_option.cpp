@@ -303,7 +303,10 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const {
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
         return nullptr;
     }
+
     nlohmann::json profileObj = option.getValue("default_launch_profile");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return nullptr;
+
     if(profileObj == nullptr){
         mcsm::error("No default launch profile specified in file " + option.getName());
         mcsm::error("Manually editing the launch profile might have caused this issue.");
@@ -319,6 +322,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const {
         std::exit(1);         
     }
     if(!profileObj["name"].is_string()){
+        // Don't use jsonWrongType
         mcsm::error("Value \"name\" in \"default_launch_profile\" has to be a string, but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
@@ -333,6 +337,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const {
         std::exit(1);       
     }
     if(!profileObj["location"].is_string()){
+        // Don't use jsonWrongType
         mcsm::error("Value \"location\" in \"default_launch_profile\" has to be a string, but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
@@ -345,6 +350,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const {
     }else if(profileObj["location"] == "current"){
         target = mcsm::SearchTarget::CURRENT;
     }else{
+        // Don't use jsonWrongType
         mcsm::error("Value \"location\" in \"default_launch_profile\" has to be \"global\" or \"current\", but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");

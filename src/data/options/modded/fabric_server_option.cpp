@@ -411,6 +411,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::FabricServerOption::getDefaultOption() co
         std::exit(1);         
     }
     if(!profileObj["name"].is_string()){
+        // Don't use jsonWrongType
         mcsm::error("Value \"name\" in \"default_launch_profile\" has to be a string, but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
@@ -425,6 +426,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::FabricServerOption::getDefaultOption() co
         std::exit(1);       
     }
     if(!profileObj["location"].is_string()){
+        // Don't use jsonWrongType
         mcsm::error("Value \"location\" in \"default_launch_profile\" has to be a string, but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
@@ -437,6 +439,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::FabricServerOption::getDefaultOption() co
     }else if(profileObj["location"] == "current"){
         target = mcsm::SearchTarget::CURRENT;
     }else{
+        // Don't use jsonWrongType
         mcsm::error("Value \"location\" in \"default_launch_profile\" has to be \"global\" or \"current\", but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
