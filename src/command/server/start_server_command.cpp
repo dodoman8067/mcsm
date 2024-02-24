@@ -51,6 +51,7 @@ void mcsm::StartServerCommand::execute(const std::vector<std::string>& args){
         mcsm::warning("Task aborted.");
         std::exit(1);
     }
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     std::unique_ptr<mcsm::JvmOption> jvmOpt = searchOption(args);
     mcsm::ServerOption sOpt(mcsm::getCurrentPath());
     if(sOpt.getServerType() == "fabric"){
