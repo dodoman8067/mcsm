@@ -104,7 +104,8 @@ mcsm::Result mcsm::server::generateVanilla(const std::string& name, mcsm::JvmOpt
 }
 
 mcsm::Result mcsm::server::generateForge(const std::string& /* name */, mcsm::JvmOption& /* option */, const std::string& /* version */){
-
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    return res;
 }
 
 mcsm::Result mcsm::server::generateFabric(const std::string& name, mcsm::JvmOption& option, const std::string& version){
@@ -143,7 +144,7 @@ mcsm::Result mcsm::server::generateFabric(const std::string& name, mcsm::JvmOpti
     mcsm::Result sRes = serverOption->create(name, option);
     if(!sRes.isSuccess()) return sRes;
 
-    std::string name = serverOption->getServerName();
+    std::string sName = serverOption->getServerName();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -157,7 +158,7 @@ mcsm::Result mcsm::server::generateFabric(const std::string& name, mcsm::JvmOpti
         return res;
     }
 
-    std::string version = serverOption->getServerVersion();
+    std::string sVersion = serverOption->getServerVersion();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -172,9 +173,9 @@ mcsm::Result mcsm::server::generateFabric(const std::string& name, mcsm::JvmOpti
     }
 
     mcsm::success("Configured server information : ");
-    mcsm::info("Server name : " + name);
+    mcsm::info("Server name : " + sName);
     mcsm::info("Server type : " + type);
-    mcsm::info("Server version : " + version);
+    mcsm::info("Server version : " + sVersion);
     mcsm::info("Server JVM launch profile : " + profile);
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
@@ -182,11 +183,13 @@ mcsm::Result mcsm::server::generateFabric(const std::string& name, mcsm::JvmOpti
 }
 
 mcsm::Result mcsm::server::generateSponge(const std::string& /* name */, mcsm::JvmOption& /* option */, const std::string& /* version */){
-
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    return res;
 }
 
 mcsm::Result mcsm::server::generateCustom(const std::string& /* name */, mcsm::JvmOption& /* option */, const std::string& /* filePath */, const std::string& /* version */){
-
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    return res;
 }
 
 mcsm::Result mcsm::server::configure(std::unique_ptr<mcsm::ServerOption> serverOption, const std::string& name, mcsm::JvmOption& option){
@@ -203,7 +206,7 @@ mcsm::Result mcsm::server::configure(std::unique_ptr<mcsm::ServerOption> serverO
     mcsm::Result sRes = serverOption->create(name, option);
     if(!sRes.isSuccess()) return sRes;
 
-    std::string name = serverOption->getServerName();
+    std::string sName = serverOption->getServerName();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -217,7 +220,7 @@ mcsm::Result mcsm::server::configure(std::unique_ptr<mcsm::ServerOption> serverO
         return res;
     }
 
-    std::string version = serverOption->getServerVersion();
+    std::string sVersion = serverOption->getServerVersion();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -232,9 +235,9 @@ mcsm::Result mcsm::server::configure(std::unique_ptr<mcsm::ServerOption> serverO
     }
 
     mcsm::success("Configured server information : ");
-    mcsm::info("Server name : " + name);
+    mcsm::info("Server name : " + sName);
     mcsm::info("Server type : " + type);
-    mcsm::info("Server version : " + version);
+    mcsm::info("Server version : " + sVersion);
     mcsm::info("Server JVM launch profile : " + profile);
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
