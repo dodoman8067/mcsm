@@ -83,6 +83,7 @@ nlohmann::json mcsm::Option::getValue(const std::string& key) const {
     nlohmann::json jsonData = load();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return nullptr;
     if(jsonData.find(key) != jsonData.end()){
+        mcsm::Result res({mcsm::ResultType::MCSM_OK, {"Success"}});
         return jsonData[key];
     }else{
         return nullptr;

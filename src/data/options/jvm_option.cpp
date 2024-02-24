@@ -216,6 +216,7 @@ std::vector<std::string> mcsm::JvmOption::getJvmArguments(){
                 return {};          
             }
         }
+        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         std::vector<std::string> args = value;
         return args;
     }else{
@@ -238,6 +239,7 @@ std::vector<std::string> mcsm::JvmOption::getJvmArguments(){
                 return {};
             }
         }
+        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         std::vector<std::string> args = value;
         return args;
     }
@@ -283,6 +285,7 @@ std::string mcsm::JvmOption::getJvmPath(){
             mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"path\"", "string")});
             return "";
         }
+        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         std::string path = value;
         return path;
     }else{
@@ -299,6 +302,7 @@ std::string mcsm::JvmOption::getJvmPath(){
             mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"path\"", "string")});
             return "";
         }
+        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         std::string path = value;
         return path;
     }
@@ -350,6 +354,7 @@ std::vector<std::string> mcsm::JvmOption::getServerArguments(){
                 return {};         
             }
         }
+        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         std::vector<std::string> args = value;
         return args;
     }else{
@@ -372,6 +377,7 @@ std::vector<std::string> mcsm::JvmOption::getServerArguments(){
                 return {};
             }
         }
+        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         std::vector<std::string> args = value;
         return args;
     }
