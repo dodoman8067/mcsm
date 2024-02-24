@@ -328,21 +328,21 @@ std::string mcsm::FabricServerOption::getLoaderVersion() const {
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
         return "";
     }
-    if(option.getValue("loader_version") == nullptr){
-        mcsm::error("No \"loader_version\" value specified in file " + option.getName());
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+
+    nlohmann::json value = option.getValue("loader_version");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+
+    if(value == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"loader_version\"", option.getName())});
+        return "";
     }
-    if(!option.getValue("loader_version").is_string()){
-        mcsm::error("Value \"loader_version\" has to be a string, but it's not.");
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+    if(!value.is_string()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"loader_version\"", "string")});
+        return "";
     }
-    return option.getValue("loader_version");
+
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    return value;
 }
 
 mcsm::Result mcsm::FabricServerOption::setLoaderVersion(const std::string& version){
@@ -358,21 +358,21 @@ std::string mcsm::FabricServerOption::getInstallerVersion() const{
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
         return "";
     }
-    if(option.getValue("installer_version") == nullptr){
-        mcsm::error("No \"installer_version\" value specified in file " + option.getName());
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+
+    nlohmann::json value = option.getValue("installer_version");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+
+    if(value == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"installer_version\"", option.getName())});
+        return "";
     }
-    if(!option.getValue("installer_version").is_string()){
-        mcsm::error("Value \"installer_version\" has to be a string, but it's not.");
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+    if(!value.is_string()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"installer_version\"", "string")});
+        return "";
     }
-    return option.getValue("installer_version");
+
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    return value;
 }
 
 mcsm::Result mcsm::FabricServerOption::setInstallerVersion(const std::string& version){
@@ -473,21 +473,21 @@ std::string mcsm::FabricServerOption::getServerName() const {
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
         return "";
     }
-    if(option.getValue("name") == nullptr){
-        mcsm::error("No \"name\" value specified in file " + option.getName());
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+
+    nlohmann::json value = option.getValue("name");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+
+    if(value == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"name\"", option.getName())});
+        return "";
     }
-    if(!option.getValue("name").is_string()){
-        mcsm::error("Value \"name\" has to be a string, but it's not.");
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+    if(!value.is_string()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"name\"", "string")});
+        return "";
     }
-    return option.getValue("name");
+
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    return value;
 }
 
 mcsm::Result mcsm::FabricServerOption::setServerName(const std::string& name){
@@ -503,21 +503,21 @@ std::string mcsm::FabricServerOption::getServerVersion() const {
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
         return "";
     }
-    if(option.getValue("version") == nullptr){
-        mcsm::error("No \"version\" value specified in file " + option.getName());
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+
+    nlohmann::json value = option.getValue("version");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+
+    if(value == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"version\"", option.getName())});
+        return "";
     }
-    if(!option.getValue("version").is_string()){
-        mcsm::error("Value \"version\" has to be a string, but it's not.");
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+    if(!value.is_string()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"version\"", "string")});
+        return "";
     }
-    return option.getValue("version");
+
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    return value;
 }
 
 mcsm::Result mcsm::FabricServerOption::setServerVersion(const std::string& version){
@@ -533,21 +533,21 @@ std::string mcsm::FabricServerOption::getServerType() const {
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
         return "";
     }
-    if(option.getValue("type") == nullptr){
-        mcsm::error("No \"type\" value specified in file " + option.getName());
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+
+    nlohmann::json value = option.getValue("type");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+
+    if(value == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"type\"", option.getName())});
+        return "";
     }
-    if(!option.getValue("type").is_string()){
-        mcsm::error("Value \"type\" has to be a string, but it's not.");
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+    if(!value.is_string()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"type\"", "string")});
+        return "";
     }
-    return option.getValue("type");
+
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    return value;
 }
 
 std::string mcsm::FabricServerOption::getServerJarFile() const{
@@ -558,21 +558,21 @@ std::string mcsm::FabricServerOption::getServerJarFile() const{
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
         return "";
     }
-    if(option.getValue("server_jar") == nullptr){
-        mcsm::error("No \"server_jar\" value specified in file " + option.getName());
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+
+    nlohmann::json value = option.getValue("server_jar");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+
+    if(value == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"server_jar\"", option.getName())});
+        return "";
     }
-    if(!option.getValue("server_jar").is_string()){
-        mcsm::error("Value \"server_jar\" has to be a string, but it's not.");
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+    if(!value.is_string()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"server_jar\"", "string")});
+        return "";
     }
-    return option.getValue("server_jar");
+
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    return value;
 }
 
 mcsm::Result mcsm::FabricServerOption::setServerJarFile(const std::string& name){
@@ -581,7 +581,7 @@ mcsm::Result mcsm::FabricServerOption::setServerJarFile(const std::string& name)
 }
 
 std::shared_ptr<mcsm::Server> mcsm::FabricServerOption::getServer() const {
-    if(this->server != nullptr) return this->server;
+    if(this->server != nullptr){ mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}}); return this->server; }
     mcsm::error("Server instance null.");
     mcsm::error("There's a high chance to be a software issue. please report this to GitHub (https://github.com/dodoman8067/mcsm).");
     std::exit(1);
