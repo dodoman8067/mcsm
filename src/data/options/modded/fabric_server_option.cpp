@@ -411,26 +411,32 @@ std::unique_ptr<mcsm::JvmOption> mcsm::FabricServerOption::getDefaultOption() co
     }
     if(!profileObj["name"].is_string()){
         // Don't use jsonWrongType
-        mcsm::error("Value \"name\" in \"default_launch_profile\" has to be a string, but it's not.");
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Value \"name\" in \"default_launch_profile\" has to be a string, but it's not.",
+            "Manually editing the launch profile might have caused this issue.",
+            "If you know what you're doing, I believe you that you know how to handle this issue.",
+            "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+        }});
+        return nullptr;
     }
     if(profileObj["location"] == nullptr){
-        mcsm::error("No default launch profile location specified in file " + option.getName());
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);       
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "No default launch profile location specified in file " + option.getName(),
+            "Manually editing the launch profile might have caused this issue.",
+            "If you know what you're doing, I believe you that you know how to handle this issue.",
+            "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+        }});
+        return nullptr;
     }
     if(!profileObj["location"].is_string()){
         // Don't use jsonWrongType
-        mcsm::error("Value \"location\" in \"default_launch_profile\" has to be a string, but it's not.");
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Value \"location\" in \"default_launch_profile\" has to be a string, but it's not.",
+            "Manually editing the launch profile might have caused this issue.",
+            "If you know what you're doing, I believe you that you know how to handle this issue.",
+            "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+        }});
+        return nullptr;
     }
     mcsm::SearchTarget target;
     if(profileObj["location"] == "global"){
@@ -439,19 +445,25 @@ std::unique_ptr<mcsm::JvmOption> mcsm::FabricServerOption::getDefaultOption() co
         target = mcsm::SearchTarget::CURRENT;
     }else{
         // Don't use jsonWrongType
-        mcsm::error("Value \"location\" in \"default_launch_profile\" has to be \"global\" or \"current\", but it's not.");
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Value \"location\" in \"default_launch_profile\" has to be \"global\" or \"current\", but it's not.",
+            "Manually editing the launch profile might have caused this issue.",
+            "If you know what you're doing, I believe you that you know how to handle this issue.",
+            "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+        }});
+        return nullptr;
     }
     std::unique_ptr<mcsm::JvmOption> jvmOption = std::make_unique<mcsm::JvmOption>(profileObj["name"], target);
     if(!jvmOption->exists() || jvmOption == nullptr){
-        mcsm::error("Invalid default launch profile.");
-        mcsm::error("File server.json might be corrupted or the profile is removed.");
-        mcsm::error("Please change the profile or create a new server.json file.");
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Invalid default launch profile.",
+            "File server.json might be corrupted or the profile is removed.",
+            "Please change the profile or create a new server.json file."
+        }});
+        return nullptr;
     }
+
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return jvmOption;
 }
 
@@ -584,7 +596,9 @@ mcsm::Result mcsm::FabricServerOption::setServerJarFile(const std::string& name)
 
 std::shared_ptr<mcsm::Server> mcsm::FabricServerOption::getServer() const {
     if(this->server != nullptr){ mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}}); return this->server; }
-    mcsm::error("Server instance null.");
-    mcsm::error("There's a high chance to be a software issue. please report this to GitHub (https://github.com/dodoman8067/mcsm).");
-    std::exit(1);
+    mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+        "Server instance null.",
+        "There's a high chance to be a software issue. please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+    }});
+    return nullptr;
 }
