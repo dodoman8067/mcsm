@@ -308,18 +308,17 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const {
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return nullptr;
 
     if(profileObj == nullptr){
-        mcsm::error("No default launch profile specified in file " + option.getName());
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);       
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverDefaultProfileNotFound(option.getName())});
+        return nullptr;
     }
     if(profileObj["name"] == nullptr){
-        mcsm::error("No default launch profile name specified in file " + option.getName());
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);         
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "No default launch profile name specified in file " + option.getName(),
+            "Manually editing the launch profile might have caused this issue.",
+            "If you know what you're doing, I believe you that you know how to handle this issue.",
+            "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+        }});
+        return nullptr;      
     }
     if(!profileObj["name"].is_string()){
         // Don't use jsonWrongType

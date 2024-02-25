@@ -1,0 +1,131 @@
+0000000000000000000000000000000000000000 e520d8ecac3778733fc276e81193961c115f9892 dodoman <dodoman@DESKTOP-46B0V94> 1703416048 +0900	clone: from https://github.com/dodoman8067/mcsm.git
+e520d8ecac3778733fc276e81193961c115f9892 61b7f2a8b2e868e92c92bc6b9d5fa6828872f8f7 dodoman <dodoman@DESKTOP-46B0V94> 1703470538 +0900	checkout: moving from main to beta
+61b7f2a8b2e868e92c92bc6b9d5fa6828872f8f7 e520d8ecac3778733fc276e81193961c115f9892 dodoman <dodoman@DESKTOP-46B0V94> 1703470558 +0900	checkout: moving from beta to main
+e520d8ecac3778733fc276e81193961c115f9892 61b7f2a8b2e868e92c92bc6b9d5fa6828872f8f7 dodoman <dodoman@DESKTOP-46B0V94> 1703470582 +0900	checkout: moving from main to beta
+61b7f2a8b2e868e92c92bc6b9d5fa6828872f8f7 493a53028f4fa08dbe14cbea5aa5ffe08b3ba771 dodoman8067 <dodoman8067@gmail.com> 1703488368 +0900	commit: Remove backward
+493a53028f4fa08dbe14cbea5aa5ffe08b3ba771 25f64a73096065e66587ddddc7e4676778c9f596 dodoman8067 <dodoman8067@gmail.com> 1703495329 +0900	revert: Revert "Remove backward"
+25f64a73096065e66587ddddc7e4676778c9f596 2693a0047cba0bd46101552968c16ba815cd5472 dodoman8067 <dodoman8067@gmail.com> 1703501857 +0900	commit: Commmand -> command
+2693a0047cba0bd46101552968c16ba815cd5472 34a2ce02ca4540d58a2f568700b6e7853716bb00 dodoman8067 <dodoman8067@gmail.com> 1703773584 +0900	commit: Add libgit2 to README dependencies
+34a2ce02ca4540d58a2f568700b6e7853716bb00 98c0569c03a1d15fafc50149369f5b50a3d6f4bd dodoman8067 <dodoman8067@gmail.com> 1703776742 +0900	commit: Add download progress
+98c0569c03a1d15fafc50149369f5b50a3d6f4bd 5099d88f35ff63275919ab895bcab8154961df68 dodoman8067 <dodoman8067@gmail.com> 1703807721 +0900	commit: Change error message
+5099d88f35ff63275919ab895bcab8154961df68 8c2d9e1ffbef197b372cc8788eafaff68e92bb8e dodoman8067 <dodoman8067@gmail.com> 1703814650 +0900	pull: Fast-forward
+8c2d9e1ffbef197b372cc8788eafaff68e92bb8e eb33daaaafb15478eb6257f38b8fec5cdde09b71 dodoman8067 <dodoman8067@gmail.com> 1703833420 +0900	commit: Add base fabric server code
+eb33daaaafb15478eb6257f38b8fec5cdde09b71 370ae5186dacc1995966ca7848c513646ad5d55a dodoman8067 <dodoman8067@gmail.com> 1703839935 +0900	commit: Add base fabric server option code
+370ae5186dacc1995966ca7848c513646ad5d55a bfe4beaf26001817b1e7433bbf81a6f78f451be5 dodoman8067 <dodoman8067@gmail.com> 1703856765 +0900	commit: Fully implement mcsm::FabricServerDataOption
+bfe4beaf26001817b1e7433bbf81a6f78f451be5 bd278e6fbe6cff4f1cbfd182e76ca9a539503ddc dodoman8067 <dodoman8067@gmail.com> 1703902062 +0900	commit: Implement mcsm::FabricServer::getVersion
+bd278e6fbe6cff4f1cbfd182e76ca9a539503ddc dece85dc37ac2a8f548ff73e853b0e431c9d2332 dodoman8067 <dodoman8067@gmail.com> 1703902364 +0900	commit: Change minimal supported version
+dece85dc37ac2a8f548ff73e853b0e431c9d2332 47792333c47b5703fb283ae84bb2e9a1243b51c5 dodoman8067 <dodoman8067@gmail.com> 1703902800 +0900	commit: Remove getJarfile from overriding
+47792333c47b5703fb283ae84bb2e9a1243b51c5 4973fb56575bddb0c783d356d227393948853e10 dodoman8067 <dodoman8067@gmail.com> 1703902986 +0900	commit: Temporarily remove parameters
+4973fb56575bddb0c783d356d227393948853e10 96966a5b89eefa5e9bf76d06c9a7e92c268ba30c dodoman8067 <dodoman8067@gmail.com> 1703903192 +0900	commit: Add some methods
+96966a5b89eefa5e9bf76d06c9a7e92c268ba30c f08d96194d2dc0e9058e9facb8366047073a836b dodoman8067 <dodoman8067@gmail.com> 1703940307 +0900	commit: Add some base code
+f08d96194d2dc0e9058e9facb8366047073a836b d1ea8ab43a6fafa0977da326bdde84e1a2a15dd9 dodoman8067 <dodoman8067@gmail.com> 1703945954 +0900	commit: Implement gettter and setter
+d1ea8ab43a6fafa0977da326bdde84e1a2a15dd9 9deee3bd205231b6b17f25971e3fcf2d85e349c7 dodoman8067 <dodoman8067@gmail.com> 1703946227 +0900	commit: Remove Makefile as it's not used
+9deee3bd205231b6b17f25971e3fcf2d85e349c7 3c563a4621954c98ffdc63ea8b39f44d617b0105 dodoman8067 <dodoman8067@gmail.com> 1704016565 +0900	commit: Fix program not exiting after error
+3c563a4621954c98ffdc63ea8b39f44d617b0105 2298077ddb4b02104816c8f7cdcf5aa78a603c6e dodoman8067 <dodoman8067@gmail.com> 1704034944 +0900	commit: Add checks if specified version exists
+2298077ddb4b02104816c8f7cdcf5aa78a603c6e 2a5117838980badf27fc4e745d6befb33a3c00e3 dodoman8067 <dodoman8067@gmail.com> 1704034971 +0900	commit: Add a message for future me
+2a5117838980badf27fc4e745d6befb33a3c00e3 b8a76efe0548632ba245a919ec98ce1f59eb2fad dodoman8067 <dodoman8067@gmail.com> 1704077961 +0900	commit: Implement generateFabric
+b8a76efe0548632ba245a919ec98ce1f59eb2fad 70ae7aa11f29eeea2c62b2f43d70ed913f3aaf9c dodoman8067 <dodoman8067@gmail.com> 1704105937 +0900	commit: Fully implement fabric server download system
+70ae7aa11f29eeea2c62b2f43d70ed913f3aaf9c 1117b05aef6ce13241e86b1cb350d439c8c5cf0c dodoman8067 <dodoman8067@gmail.com> 1704107808 +0900	commit: Remove backward
+1117b05aef6ce13241e86b1cb350d439c8c5cf0c 4f6886173b10ee33b7dfabd9a6a62abdd5cf63fc dodoman8067 <dodoman8067@gmail.com> 1704114631 +0900	commit: Add a function that checks if the following URL returns a text
+4f6886173b10ee33b7dfabd9a6a62abdd5cf63fc acf3748bf762fe85326e62c726747f5bd1ebbdc6 dodoman8067 <dodoman8067@gmail.com> 1704115052 +0900	commit: Add json as texts
+acf3748bf762fe85326e62c726747f5bd1ebbdc6 3b603d29f63bd33bf0ecf2d01f3cd7006796d0a0 dodoman8067 <dodoman8067@gmail.com> 1704115266 +0900	commit: Fix json detection not working properly
+3b603d29f63bd33bf0ecf2d01f3cd7006796d0a0 3df0a116f09de049c8618c3485610bec224e407d dodoman8067 <dodoman8067@gmail.com> 1704117998 +0900	commit: Check if url returns a text first then print error messages
+3df0a116f09de049c8618c3485610bec224e407d 98463aa3e068ad73ce57faf2d2ff856d38d3562c dodoman8067 <dodoman8067@gmail.com> 1704193505 +0900	commit: Make Findlibgit2 support static or non-static
+98463aa3e068ad73ce57faf2d2ff856d38d3562c 9d1697eb397290158c49617c743b487e4331f082 dodoman8067 <dodoman8067@gmail.com> 1704413209 +0900	commit: Add some changes to update()
+9d1697eb397290158c49617c743b487e4331f082 e09476b801bc9f6e6419d59ee3f60e68d0d5a17f dodoman8067 <dodoman8067@gmail.com> 1704456013 +0900	commit: Fully implement update system in Fabric
+e09476b801bc9f6e6419d59ee3f60e68d0d5a17f 9b01e9b770a2b8a981ffc23756acd5311d05c8c8 dodoman8067 <dodoman8067@gmail.com> 1704458468 +0900	commit: Separate init tasks
+9b01e9b770a2b8a981ffc23756acd5311d05c8c8 754399c16316525979bdbd2d9ba061897e6bd09b dodoman8067 <dodoman8067@gmail.com> 1704458584 +0900	commit: Fix start command not updating last launch date and view command causing error while using fabric
+754399c16316525979bdbd2d9ba061897e6bd09b e520d8ecac3778733fc276e81193961c115f9892 dodoman8067 <dodoman8067@gmail.com> 1704468406 +0900	checkout: moving from beta to main
+e520d8ecac3778733fc276e81193961c115f9892 8c47968747c1b2830ea737eede665c79028b9453 dodoman8067 <dodoman8067@gmail.com> 1704468408 +0900	pull: Fast-forward
+8c47968747c1b2830ea737eede665c79028b9453 754399c16316525979bdbd2d9ba061897e6bd09b dodoman8067 <dodoman8067@gmail.com> 1704468424 +0900	checkout: moving from main to beta
+754399c16316525979bdbd2d9ba061897e6bd09b f957b76ae0ddbd8b2e7fa3263533e72a0ddd5cfe dodoman8067 <dodoman8067@gmail.com> 1704468550 +0900	commit: No important changes
+f957b76ae0ddbd8b2e7fa3263533e72a0ddd5cfe 5985aa08152c7fb4bde73c4f7a20073908160afd dodoman8067 <dodoman8067@gmail.com> 1704468647 +0900	commit: Update README.md
+5985aa08152c7fb4bde73c4f7a20073908160afd f35aec8199482721d6bc99dd83e6b986e803d84e dodoman8067 <dodoman8067@gmail.com> 1704468673 +0900	commit: Update README.md
+f35aec8199482721d6bc99dd83e6b986e803d84e 3ca6465c986eb5da12f748e1b72eeec7cc3a978f dodoman8067 <dodoman8067@gmail.com> 1704526506 +0900	commit: Fix usage of legacy path system
+3ca6465c986eb5da12f748e1b72eeec7cc3a978f 41df4c46a14df4cd8cdec024b56c4f4ac1f9954d dodoman8067 <dodoman8067@gmail.com> 1704703320 +0900	commit: Check if initializing failed
+41df4c46a14df4cd8cdec024b56c4f4ac1f9954d 30f942e7e35f55b4b8531ec10eb4a91ea90aa596 dodoman8067 <dodoman8067@gmail.com> 1704983571 +0900	commit: Add some other strings to detection
+30f942e7e35f55b4b8531ec10eb4a91ea90aa596 66d62d93b064785cf76c3d674f9eaa7533c80971 dodoman8067 <dodoman8067@gmail.com> 1704983629 +0900	commit: Only build static exe when the option is marked as true (ignore if it's in release mode)
+66d62d93b064785cf76c3d674f9eaa7533c80971 380d2ac37e3c15138e34414c0e4f8083df2157eb dodoman8067 <dodoman8067@gmail.com> 1705070813 +0900	commit: Set user agent tag
+380d2ac37e3c15138e34414c0e4f8083df2157eb d75a61af9965c6952a4cd9ea1875f36daedf82ef dodoman8067 <dodoman8067@gmail.com> 1705070821 +0900	commit: Add base Plugin class
+d75a61af9965c6952a4cd9ea1875f36daedf82ef dce26693409f8bd1ac3e084b1fbe07c925c5b2fb dodoman8067 <dodoman8067@gmail.com> 1705145351 +0900	commit: Remove stuff (gonna add it back someday)
+dce26693409f8bd1ac3e084b1fbe07c925c5b2fb 6ea3f9e991b7ab6135e32fce9b8d52469ffe26ac dodoman8067 <dodoman8067@gmail.com> 1705159802 +0900	commit: Implement clone functions
+6ea3f9e991b7ab6135e32fce9b8d52469ffe26ac 0b3d582f2a994462b59edda4aa846127c2d4289e dodoman8067 <dodoman8067@gmail.com> 1705197012 +0900	revert: Revert "Remove stuff (gonna add it back someday)"
+0b3d582f2a994462b59edda4aa846127c2d4289e cb9ddd5e84a0ebb720b7891e21f36c1f940f95d6 dodoman8067 <dodoman8067@gmail.com> 1705224785 +0900	commit: Implement spigetGetAuthor()
+cb9ddd5e84a0ebb720b7891e21f36c1f940f95d6 41d6cca3831d5a3e294cc75026b9ae9b83b891c3 dodoman8067 <dodoman8067@gmail.com> 1705323691 +0900	commit: Add // to unimplemented functions
+41d6cca3831d5a3e294cc75026b9ae9b83b891c3 02882cfeb77a6516926e8b36f2e788a2f5f4eb84 dodoman8067 <dodoman8067@gmail.com> 1705458084 +0900	pull: Fast-forward
+02882cfeb77a6516926e8b36f2e788a2f5f4eb84 fa2fb4ddb322a6a5be5d397f7c93e105d4c84cea dodoman8067 <dodoman8067@gmail.com> 1705480854 +0900	commit: Add license comment
+fa2fb4ddb322a6a5be5d397f7c93e105d4c84cea b49c9ad3337df281624f858e43c542f4a7b41689 dodoman8067 <dodoman8067@gmail.com> 1705540232 +0900	commit: Reduce amount of GET request
+b49c9ad3337df281624f858e43c542f4a7b41689 bed652f4db42d3d365051ace076390c2b078f601 dodoman8067 <dodoman8067@gmail.com> 1705930969 +0900	commit: Rename DEBUG to MCSM_DEBUG
+bed652f4db42d3d365051ace076390c2b078f601 b19866e7890882071fb4b53b21ba7bddb2b8732e dodoman8067 <dodoman8067@gmail.com> 1705982340 +0900	commit: Add some lines between code so it's easier to read
+b19866e7890882071fb4b53b21ba7bddb2b8732e a24f03cd9d648ece9862ce1a9cddd2cb52dba686 dodoman8067 <dodoman8067@gmail.com> 1705982417 +0900	commit: Update .gitignore
+a24f03cd9d648ece9862ce1a9cddd2cb52dba686 340b58013010d857fda3a1ba16c19c3150e22091 dodoman8067 <dodoman8067@gmail.com> 1705983364 +0900	commit: Fix grammar issues
+340b58013010d857fda3a1ba16c19c3150e22091 e5b22c3c7056e4063685dd1da19f2b57851ef667 dodoman8067 <dodoman8067@gmail.com> 1705984129 +0900	commit: Add more aliases
+e5b22c3c7056e4063685dd1da19f2b57851ef667 28c5cd30816a9787f9df142688af46e93ad89845 dodoman8067 <dodoman8067@gmail.com> 1706062535 +0900	commit: Fix somehow missing curl_global_init()
+28c5cd30816a9787f9df142688af46e93ad89845 ade58896ec1a11d56e899c5945806d1b336a196a dodoman8067 <dodoman8067@gmail.com> 1706440358 +0900	commit: Add base code of CustomServerOption
+ade58896ec1a11d56e899c5945806d1b336a196a c1ae6d0d5f7faca3c05302e6358428feeef2b693 dodoman8067 <dodoman8067@gmail.com> 1706453060 +0900	commit: Implement basic class behavior
+c1ae6d0d5f7faca3c05302e6358428feeef2b693 4e6ec9d68f149b4e57c2a418f049a5b641dd363f dodoman8067 <dodoman8067@gmail.com> 1706538856 +0900	commit: Add some basic server class header structure
+4e6ec9d68f149b4e57c2a418f049a5b641dd363f c76029e870148c4cb1a83577601952ac1e1569d9 dodoman8067 <dodoman8067@gmail.com> 1706619350 +0900	commit: Add CUSTOM value in mcsm::ServerType
+c76029e870148c4cb1a83577601952ac1e1569d9 84aa0f66401fdeb49d8b1b2d3a34ec2962a3c5a4 dodoman8067 <dodoman8067@gmail.com> 1706619466 +0900	commit: Add some tweaks to mcsm::CustomServer
+84aa0f66401fdeb49d8b1b2d3a34ec2962a3c5a4 c2987147ef1dbf1b85b93523a15ecc35d472852c dodoman8067 <dodoman8067@gmail.com> 1706621593 +0900	commit: Move some functions' location
+c2987147ef1dbf1b85b93523a15ecc35d472852c 6c8e838b7540406b58e035703f1622d4cefb7b9b dodoman8067 <dodoman8067@gmail.com> 1706626289 +0900	commit: Return code 1 when no command found
+6c8e838b7540406b58e035703f1622d4cefb7b9b 288ad58e54f1f1c678b002cb3f4605dd07781ef4 dodoman8067 <dodoman8067@gmail.com> 1706709483 +0900	commit: Add jar_location in server.json option
+288ad58e54f1f1c678b002cb3f4605dd07781ef4 1c99a503985385e835697a2aeeacf7018a430ef7 dodoman8067 <dodoman8067@gmail.com> 1706799192 +0900	commit: Replace fs::current_path() with mcsm::getCurrentPath() that handles error code + url checking code
+1c99a503985385e835697a2aeeacf7018a430ef7 890f73f93e8ec6e729232bbf474e11c8c0fff14b dodoman8067 <dodoman8067@gmail.com> 1706799274 +0900	commit: Remove test code
+890f73f93e8ec6e729232bbf474e11c8c0fff14b c542d78b44c0338b893ecab4561a969c997237cc dodoman8067 <dodoman8067@gmail.com> 1706799860 +0900	commit: Add mcsm::fileExists and mcsm::removeFile
+c542d78b44c0338b893ecab4561a969c997237cc e63d87b112950f4324f42ae86a7cb0ee44677ec1 dodoman8067 <dodoman8067@gmail.com> 1706883101 +0900	commit: Support server creation/launch in different directories
+e63d87b112950f4324f42ae86a7cb0ee44677ec1 7d2933bcd1b714142bd65520a4690e311c662575 dodoman8067 <dodoman8067@gmail.com> 1706883791 +0900	commit: Gonna do it someday
+7d2933bcd1b714142bd65520a4690e311c662575 c9b3a36e99570026091323e65b40b8150b03fd8d dodoman8067 <dodoman8067@gmail.com> 1706884028 +0900	commit: Update README.md
+c9b3a36e99570026091323e65b40b8150b03fd8d 33313c39b70507acd13d2400e18b97760bb118d3 dodoman8067 <dodoman8067@gmail.com> 1706944531 +0900	commit: MCSM can actually generate servers now so no more alpha stage
+33313c39b70507acd13d2400e18b97760bb118d3 c477f9ab93e770f523dc4390b5e0d268a8410006 dodoman8067 <dodoman8067@gmail.com> 1706966986 +0900	commit: No changes
+c477f9ab93e770f523dc4390b5e0d268a8410006 f177924783834efe2c21925d63ecaaca4d33b6d0 dodoman8067 <dodoman8067@gmail.com> 1707014050 +0900	commit: Add download witn custom path (untested)
+f177924783834efe2c21925d63ecaaca4d33b6d0 78cc47f1ddcefa577ad46c89602b501492bacb20 dodoman8067 <dodoman8067@gmail.com> 1707037924 +0900	commit: Add support to server config in other directories
+78cc47f1ddcefa577ad46c89602b501492bacb20 5091dd06ec409d26fc68560fff009d4c5ee90c25 dodoman8067 <dodoman8067@gmail.com> 1707040304 +0900	pull: Fast-forward
+5091dd06ec409d26fc68560fff009d4c5ee90c25 0dee4db4aca8592dd85382405fdaa47af1081278 dodoman8067 <dodoman8067@gmail.com> 1707040358 +0900	commit: Update README
+0dee4db4aca8592dd85382405fdaa47af1081278 85b4d3bcd2080bedd783c7c00dca976d3eff7f19 dodoman8067 <dodoman8067@gmail.com> 1707118513 +0900	commit: Design Result class that is going to be used in error handling system
+85b4d3bcd2080bedd783c7c00dca976d3eff7f19 e9bc58495f941a278b1f9b7dd47555c8e6dcbe3c dodoman8067 <dodoman8067@gmail.com> 1707138852 +0900	commit: Add message vector for printing messages in mcsm::Result enum
+e9bc58495f941a278b1f9b7dd47555c8e6dcbe3c 89994047127dd34cc64ad85bc01f07c746e9c476 dodoman8067 <dodoman8067@gmail.com> 1707564441 +0900	commit: Add printmessage implementation
+89994047127dd34cc64ad85bc01f07c746e9c476 ac3b5204f90a13a029fdee76a2c0b2797d6b7d1e dodoman8067 <dodoman8067@gmail.com> 1707744940 +0900	commit: Try using mcsm::Result in cloneRepo
+ac3b5204f90a13a029fdee76a2c0b2797d6b7d1e 46b57db84e05f4baf2d52ac1f6d8c442adf9a70e dodoman8067 <dodoman8067@gmail.com> 1707748212 +0900	commit: Add getLastResult() for some functions that return something else
+46b57db84e05f4baf2d52ac1f6d8c442adf9a70e 93cbd9c52e05faf965106291457ec63dc0733e10 dodoman8067 <dodoman8067@gmail.com> 1707748461 +0900	commit: Implement mcsm::Result::isSuccess()
+93cbd9c52e05faf965106291457ec63dc0733e10 553581f06c3cbd14caced6290ddf17e65b876b66 dodoman8067 <dodoman8067@gmail.com> 1708008597 +0900	commit: Support update() function in different path
+553581f06c3cbd14caced6290ddf17e65b876b66 ae8b00eb4ac1a775ef7a6913c17d30d854a6ebc4 dodoman8067 <dodoman8067@gmail.com> 1708008616 +0900	commit: Add result message utils (not implemented)
+ae8b00eb4ac1a775ef7a6913c17d30d854a6ebc4 bcae0bdd9d32e7ac603194749fce23c734c6627a dodoman8067 <dodoman8067@gmail.com> 1708008843 +0900	commit: Add more message utils
+bcae0bdd9d32e7ac603194749fce23c734c6627a 631364095f85e2118c69dc302f5a6d1519289aa4 dodoman8067 <dodoman8067@gmail.com> 1708008890 +0900	commit: Update TODO
+631364095f85e2118c69dc302f5a6d1519289aa4 72c6000b54020aac0091bfe221532e5c783fc9a2 dodoman8067 <dodoman8067@gmail.com> 1708008920 +0900	commit: Update TODO
+72c6000b54020aac0091bfe221532e5c783fc9a2 313a38e3b70ff9cf3d54f40b919f091b2cda1169 dodoman8067 <dodoman8067@gmail.com> 1708009327 +0900	commit: Add example usage of mcsm::Result
+313a38e3b70ff9cf3d54f40b919f091b2cda1169 a19b8cc88fd15b99cfcd8ad53b0302bb12450179 dodoman8067 <dodoman8067@gmail.com> 1708059097 +0900	commit: Implement few message_utils
+a19b8cc88fd15b99cfcd8ad53b0302bb12450179 8d33af2f1f71ee159e6c2e2f3575a7767376c909 dodoman8067 <dodoman8067@gmail.com> 1708073683 +0900	commit: Add more error messages
+8d33af2f1f71ee159e6c2e2f3575a7767376c909 0c8b351ab2079a3d6d63f7cdb1d9b65a692270cd dodoman8067 <dodoman8067@gmail.com> 1708097502 +0900	commit: Implement all error message utils
+0c8b351ab2079a3d6d63f7cdb1d9b65a692270cd 23186406a1e2697c50e498911ebc6bd835a85f8b dodoman8067 <dodoman8067@gmail.com> 1708097677 +0900	commit: Remove spaces
+23186406a1e2697c50e498911ebc6bd835a85f8b 450e29183ee73293d7b9842bb24f6fdabc39163c dodoman8067 <dodoman8067@gmail.com> 1708098566 +0900	commit: Test
+450e29183ee73293d7b9842bb24f6fdabc39163c 50e3094cc35afeef70426718010874e915ffc9c2 dodoman8067 <dodoman8067@gmail.com> 1708099451 +0900	commit: Fix inline function issues
+50e3094cc35afeef70426718010874e915ffc9c2 25d29d2c8e205a3a583958088a87161a990d041c dodoman8067 <dodoman8067@gmail.com> 1708155072 +0900	commit: Fix linking to WinHttp in MinGW(has to be win32)
+25d29d2c8e205a3a583958088a87161a990d041c 1b885131756820d8ca090f2044f7b0e0435d0d41 dodoman8067 <dodoman8067@gmail.com> 1708156724 +0900	commit: Add more enum types
+1b885131756820d8ca090f2044f7b0e0435d0d41 aac8dff60ed6a569498d5b81744b48b3581b8e35 dodoman8067 <dodoman8067@gmail.com> 1708183795 +0900	commit: Change error handling
+aac8dff60ed6a569498d5b81744b48b3581b8e35 0d3e4295245d49140c33ea7b991219e6fc50d84f dodoman8067 <dodoman8067@gmail.com> 1708184833 +0900	commit: Change important message
+0d3e4295245d49140c33ea7b991219e6fc50d84f eab8868025c920eafe2614423aa76f541e4a6af6 dodoman8067 <dodoman8067@gmail.com> 1708184980 +0900	commit: Add one more new line
+eab8868025c920eafe2614423aa76f541e4a6af6 ee57a74d9786321e144077d13389d997f0fe3eac dodoman8067 <dodoman8067@gmail.com> 1708222928 +0900	commit: Add mcsm::Result usage
+ee57a74d9786321e144077d13389d997f0fe3eac be6ff9725f048f0e802034feacfbefea7f1d1091 dodoman8067 <dodoman8067@gmail.com> 1708313374 +0900	commit: Make gettters use one opt->getValue
+be6ff9725f048f0e802034feacfbefea7f1d1091 511dae5810c424995bfb7a6e36921f44e63b1f79 dodoman8067 <dodoman8067@gmail.com> 1708314103 +0900	commit: Change error messages to mcsm::Result
+511dae5810c424995bfb7a6e36921f44e63b1f79 8d78e3b58424669c8f91b052230464c4c491e71a dodoman8067 <dodoman8067@gmail.com> 1708314126 +0900	commit: Fix grammar issues
+8d78e3b58424669c8f91b052230464c4c491e71a 1bbdac443355fb520491e9499534219d399f65ab dodoman8067 <dodoman8067@gmail.com> 1708320121 +0900	commit: Use error handling in command
+1bbdac443355fb520491e9499534219d399f65ab b64dcd806b66cf7d33f9a464d20f6070b1415f2e dodoman8067 <dodoman8067@gmail.com> 1708320139 +0900	commit: Remove useless space
+b64dcd806b66cf7d33f9a464d20f6070b1415f2e 42dd34e0760b997716c88c741563bc1ec8a77a83 dodoman8067 <dodoman8067@gmail.com> 1708329623 +0900	commit: Use mcsm::Result to handle error system
+42dd34e0760b997716c88c741563bc1ec8a77a83 60d87af6d3c25d79e1e46e4b4f761af4b07e4a54 dodoman8067 <dodoman8067@gmail.com> 1708329745 +0900	commit: Fix grammar issues
+60d87af6d3c25d79e1e46e4b4f761af4b07e4a54 3ac3b3ada4b3f3aa8fd8836d4fa0c530886887c8 dodoman8067 <dodoman8067@gmail.com> 1708354800 +0900	commit: Use mcsm::Result on server option constructors
+3ac3b3ada4b3f3aa8fd8836d4fa0c530886887c8 03d7b16e7105e8134466561c59966f74e9fa1180 dodoman8067 <dodoman8067@gmail.com> 1708426012 +0900	commit: it -> this
+03d7b16e7105e8134466561c59966f74e9fa1180 05169c7e7fb3d640582e2f38f2396d22a170de3d dodoman8067 <dodoman8067@gmail.com> 1708438799 +0900	commit: Add mcsm::Result as a return value in server option classes
+05169c7e7fb3d640582e2f38f2396d22a170de3d a50bc02c4971e0020de28ae490f1d20577f18eef dodoman8067 <dodoman8067@gmail.com> 1708526890 +0900	commit: Add usage of mcsm::Result in start and create methods
+a50bc02c4971e0020de28ae490f1d20577f18eef dedaf01b6754034a2a139053569f67ca782976e2 dodoman8067 <dodoman8067@gmail.com> 1708526898 +0900	commit: Change messages
+dedaf01b6754034a2a139053569f67ca782976e2 c6488fed1dfe308f6c4b70acee08640ec2c22a33 dodoman8067 <dodoman8067@gmail.com> 1708601722 +0900	commit: Fix isDebug not working properly
+c6488fed1dfe308f6c4b70acee08640ec2c22a33 9ff53d00f0c66e9cc738113c23b7a72aec1dd890 dodoman8067 <dodoman8067@gmail.com> 1708613009 +0900	commit: Add usage of mcsm::Result in server generating methods
+9ff53d00f0c66e9cc738113c23b7a72aec1dd890 aec4fc6a36325c8189f441414d66ee5b1be892bd dodoman8067 <dodoman8067@gmail.com> 1708613659 +0900	commit: Fix grammar issues
+aec4fc6a36325c8189f441414d66ee5b1be892bd 1a9b1774f6035a04cbf950bbb9dd19b8077575d9 dodoman8067 <dodoman8067@gmail.com> 1708689731 +0900	commit: Add using mcsm::Result in getters for checking if server is configured
+1a9b1774f6035a04cbf950bbb9dd19b8077575d9 c3802908946aed8e9cd124b2c79ddcac502e271f dodoman8067 <dodoman8067@gmail.com> 1708741220 +0900	commit: Add mcsm::Result usage in getters
+c3802908946aed8e9cd124b2c79ddcac502e271f 8016766930552e902a77b583a3f4c6a62f30629c dodoman8067 <dodoman8067@gmail.com> 1708741236 +0900	commit: Fix some unhandled errors
+8016766930552e902a77b583a3f4c6a62f30629c b8a4c919734a0e3b06b3f2b9d18df7a8fbbcb996 dodoman8067 <dodoman8067@gmail.com> 1708741292 +0900	commit: Construct successful mcsm::Result
+b8a4c919734a0e3b06b3f2b9d18df7a8fbbcb996 e7c2b3762e84458b113033bb5bcb4c484ca247e1 dodoman8067 <dodoman8067@gmail.com> 1708741926 +0900	commit: Fix compiler issues
+e7c2b3762e84458b113033bb5bcb4c484ca247e1 ca0c9faf14110d19eaf0a0c1b4384ddaea64f6f4 dodoman8067 <dodoman8067@gmail.com> 1708742009 +0900	commit: Fix server not starting
+ca0c9faf14110d19eaf0a0c1b4384ddaea64f6f4 4d0a5ae3b0e24882c27e50ffd990eca00c4db3bf dodoman8067 <dodoman8067@gmail.com> 1708760724 +0900	commit: Change license comments
+4d0a5ae3b0e24882c27e50ffd990eca00c4db3bf 3c16f82d2cbd2d2759385017015dc0976c81efa7 dodoman8067 <dodoman8067@gmail.com> 1708788187 +0900	commit: Add comments
+3c16f82d2cbd2d2759385017015dc0976c81efa7 86c1b958e5fc83de285fed72a07024ad2e3fae51 dodoman8067 <dodoman8067@gmail.com> 1708788207 +0900	commit: Add some other error messages
