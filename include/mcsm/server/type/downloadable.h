@@ -23,8 +23,8 @@ SOFTWARE.
 #ifndef __MCSM_DOWNLOADABLE_H__
 #define __MCSM_DOWNLOADABLE_H__
 
-#include <vector>
 #include <memory>
+#include <mcsm/util/cli/result.h>
 
 namespace mcsm {
     /**
@@ -42,14 +42,14 @@ namespace mcsm {
          * Downloads the server jarfile in the current directory.
          * @param version version of the server
          */
-        virtual void download(const std::string& version) = 0;
+        virtual mcsm::Result download(const std::string& version) = 0;
 
         /**
          * Downloads the server jarfile in the specified directory.
          * @param version version of the server
          * @param path file's path
          */
-        virtual void download(const std::string& version, const std::string& path) = 0;
+        virtual mcsm::Result download(const std::string& version, const std::string& path) = 0;
 
         /**
          * Downloads the server jarfile in the specified directory with the following name.
@@ -57,7 +57,7 @@ namespace mcsm {
          * @param path file's path
          * @param name file's name
          */
-        virtual void download(const std::string& version, const std::string& path, const std::string& name) = 0;
+        virtual mcsm::Result download(const std::string& version, const std::string& path, const std::string& name) = 0;
 
         /**
          * Downloads the server jarfile in the specified directory with the following name.
@@ -66,7 +66,7 @@ namespace mcsm {
          * @param name file's name
          * @param optionPath server config to check in
          */
-        virtual void download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) = 0;
+        virtual mcsm::Result download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) = 0;
 
         /**
          * Returns if the following server has this version.

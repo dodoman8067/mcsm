@@ -87,20 +87,20 @@ std::string mcsm::PurpurServer::getGitHub() const {
     return "https://github.com/PurpurMC/Purpur";
 }
 
-void mcsm::PurpurServer::download(const std::string& version){
+mcsm::Result mcsm::PurpurServer::download(const std::string& version){
     std::string path = mcsm::getCurrentPath();
     download(version, path, getJarFile(), path);
 }
 
-void mcsm::PurpurServer::download(const std::string& version, const std::string& path){
+mcsm::Result mcsm::PurpurServer::download(const std::string& version, const std::string& path){
     download(version, path, getJarFile(), mcsm::getCurrentPath());
 }
 
-void mcsm::PurpurServer::download(const std::string& version, const std::string& path, const std::string& name){
+mcsm::Result mcsm::PurpurServer::download(const std::string& version, const std::string& path, const std::string& name){
     download(version, path, name, mcsm::getCurrentPath());
 }
 
-void mcsm::PurpurServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
+mcsm::Result mcsm::PurpurServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
     mcsm::Option opt(optionPath, "server");
     if(!opt.exists()){
         mcsm::error("File server.json cannot be found.");
@@ -156,7 +156,7 @@ void mcsm::PurpurServer::download(const std::string& version, const std::string&
     }
 }
 
-void mcsm::PurpurServer::start(mcsm::JvmOption& option){
+mcsm::Result mcsm::PurpurServer::start(mcsm::JvmOption& option){
     mcsm::ServerOption sOpt;
     if(!std::filesystem::exists(getJarFile())){
         mcsm::info("Downloading " + getJarFile() + "...");
@@ -167,7 +167,7 @@ void mcsm::PurpurServer::start(mcsm::JvmOption& option){
     Server::start(option);
 }
 
-void mcsm::PurpurServer::update(){
+mcsm::Result mcsm::PurpurServer::update(){
     // If you change the default build to specific build from latest build, it won't downgrade automatically. (You'll have to manually delete the server jarfile) This is an intented feature.
     mcsm::info("Checking updates...");
     mcsm::ServerDataOption sDataOpt;

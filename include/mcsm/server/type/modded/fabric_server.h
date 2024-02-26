@@ -49,14 +49,14 @@ namespace mcsm {
 
         std::string getGitHub() const override;
 
-        void start(mcsm::JvmOption& option) override;
+        mcsm::Result start(mcsm::JvmOption& option) override;
 
-        void download(const std::string& version) override;
-        void download(const std::string& version, const std::string& path) override;
-        void download(const std::string& version, const std::string& path, const std::string& name) override;
-        void download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
-        void download(const std::string& version, const std::string& loaderVersion, const std::string& installerVersion, const std::string& path, const std::string& name);
-        void download(const std::string& version, const std::string& loaderVersion, const std::string& installerVersion, const std::string& path, const std::string& name, const std::string& optionPath);
+        mcsm::Result download(const std::string& version) override;
+        mcsm::Result download(const std::string& version, const std::string& path) override;
+        mcsm::Result download(const std::string& version, const std::string& path, const std::string& name) override;
+        mcsm::Result download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
+        mcsm::Result download(const std::string& version, const std::string& loaderVersion, const std::string& installerVersion, const std::string& path, const std::string& name);
+        mcsm::Result download(const std::string& version, const std::string& loaderVersion, const std::string& installerVersion, const std::string& path, const std::string& name, const std::string& optionPath);
 
         bool hasVersion(const std::string& version) override;
 
@@ -64,7 +64,7 @@ namespace mcsm {
 
         mcsm::ServerType getType() const override;
         
-        void update();
+        mcsm::Result update();
     };
 }
 

@@ -93,7 +93,7 @@ namespace mcsm {
          * Starts a Minecraft server with following launch profile `option`
          * @param option JVM launch profile
         */
-        virtual void start(mcsm::JvmOption& option);
+        virtual mcsm::Result start(mcsm::JvmOption& option);
     };
 }
 

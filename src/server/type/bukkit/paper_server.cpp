@@ -87,20 +87,20 @@ std::string mcsm::PaperServer::getGitHub() const {
     return "https://github.com/PaperMC/Paper";
 }
 
-void mcsm::PaperServer::download(const std::string& version){
+mcsm::Result mcsm::PaperServer::download(const std::string& version){
     std::string path = mcsm::getCurrentPath();
     download(version, path, getJarFile(), path);
 }
 
-void mcsm::PaperServer::download(const std::string& version, const std::string& path){
+mcsm::Result mcsm::PaperServer::download(const std::string& version, const std::string& path){
     download(version, path, getJarFile(), mcsm::getCurrentPath());
 }
 
-void mcsm::PaperServer::download(const std::string& version, const std::string& path, const std::string& name){
+mcsm::Result mcsm::PaperServer::download(const std::string& version, const std::string& path, const std::string& name){
     download(version, path, name, mcsm::getCurrentPath());
 }
 
-void mcsm::PaperServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
+mcsm::Result mcsm::PaperServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
     mcsm::Option opt(optionPath, "server");
     if(!opt.exists()){
         mcsm::error("File server.json cannot be found.");
@@ -156,7 +156,7 @@ void mcsm::PaperServer::download(const std::string& version, const std::string& 
     }
 }
 
-void mcsm::PaperServer::start(mcsm::JvmOption& option){
+mcsm::Result mcsm::PaperServer::start(mcsm::JvmOption& option){
     mcsm::ServerOption sOpt;
     if(!std::filesystem::exists(getJarFile())){
         mcsm::info("Downloading " + getJarFile() + "...");
@@ -167,11 +167,11 @@ void mcsm::PaperServer::start(mcsm::JvmOption& option){
     Server::start(option);
 }
 
-void mcsm::PaperServer::update(){
+mcsm::Result mcsm::PaperServer::update(){
     update(mcsm::getCurrentPath());
 }
 
-void mcsm::PaperServer::update(const std::string& optionPath){
+mcsm::Result mcsm::PaperServer::update(const std::string& optionPath){
     // If you change the default build to specific build from latest build, it won't downgrade automatically. (You'll have to manually delete the server jarfile) This is an intented feature.
     mcsm::info("Checking updates...");
     mcsm::ServerDataOption sDataOpt(optionPath);

@@ -47,12 +47,12 @@ std::string mcsm::CustomServer::getFileLocation() const {
     return option.getValue("jar_location");
 }
 
-void mcsm::CustomServer::setFileLocation(const std::string& location) {
+mcsm::Result mcsm::CustomServer::setFileLocation(const std::string& location) {
     mcsm::Option option(".", "server");
     option.setValue("jar_location", location);
 }
 
-void mcsm::CustomServer::getFileFromLocation() {
+mcsm::Result mcsm::CustomServer::getFileFromLocation() {
     std::string location = getFileLocation();
     if(isFile(location) || isURL(location)){
         if(isURL(location)){

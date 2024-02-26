@@ -97,15 +97,15 @@ std::string mcsm::FabricServer::getGitHub() const {
     return "https://github.com/FabricMC/fabric";
 }
 
-void mcsm::FabricServer::download(const std::string& version){
+mcsm::Result mcsm::FabricServer::download(const std::string& version){
     download(version, mcsm::getCurrentPath(), getJarFile());
 }
 
-void mcsm::FabricServer::download(const std::string& version, const std::string& path){
+mcsm::Result mcsm::FabricServer::download(const std::string& version, const std::string& path){
     download(version, path, getJarFile());
 }
 
-void mcsm::FabricServer::download(const std::string& version, const std::string& path, const std::string& name){
+mcsm::Result mcsm::FabricServer::download(const std::string& version, const std::string& path, const std::string& name){
     mcsm::Option opt(mcsm::getCurrentPath(), "server");
     std::string loaderVer, installerVer;
     if(opt.hasValue("type") && opt.getValue("type") != "fabric"){
@@ -148,7 +148,7 @@ void mcsm::FabricServer::download(const std::string& version, const std::string&
     download(version, loaderVer, installerVer, path, name, mcsm::getCurrentPath());
 }
 
-void mcsm::FabricServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
+mcsm::Result mcsm::FabricServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
     mcsm::Option opt(optionPath, "server");
     std::string loaderVer, installerVer;
     if(opt.hasValue("type") && opt.getValue("type") != "fabric"){
@@ -191,11 +191,11 @@ void mcsm::FabricServer::download(const std::string& version, const std::string&
     download(version, loaderVer, installerVer, path, name, optionPath);
 }
 
-void mcsm::FabricServer::download(const std::string& version, const std::string& loaderVersion, const std::string& installerVersion, const std::string& path, const std::string& name){
+mcsm::Result mcsm::FabricServer::download(const std::string& version, const std::string& loaderVersion, const std::string& installerVersion, const std::string& path, const std::string& name){
     download(version, loaderVersion, installerVersion, path, name, mcsm::getCurrentPath());
 }
 
-void mcsm::FabricServer::download(const std::string& version, const std::string& loaderVersion, const std::string& installerVersion, const std::string& path, const std::string& name, const std::string& optionPath){
+mcsm::Result mcsm::FabricServer::download(const std::string& version, const std::string& loaderVersion, const std::string& installerVersion, const std::string& path, const std::string& name, const std::string& optionPath){
     //The reason why variable path and optionPath are separated is because of flexibility
     mcsm::Option opt(optionPath, "server");
     if(!opt.exists()){
@@ -292,7 +292,7 @@ void mcsm::FabricServer::download(const std::string& version, const std::string&
     sDataOpt.updateInstallerVersion(installerVersion);
 }
 
-void mcsm::FabricServer::start(mcsm::JvmOption& option){
+mcsm::Result mcsm::FabricServer::start(mcsm::JvmOption& option){
     mcsm::ServerOption sOpt;
     if(!std::filesystem::exists(getJarFile())){
         mcsm::info("Downloading " + getJarFile() + "...");
@@ -303,7 +303,7 @@ void mcsm::FabricServer::start(mcsm::JvmOption& option){
     Server::start(option);
 }
 
-void mcsm::FabricServer::update(){
+mcsm::Result mcsm::FabricServer::update(){
     mcsm::FabricServerDataOption sDataOpt;
     mcsm::Option opt(".", "server");
 

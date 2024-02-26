@@ -50,19 +50,19 @@ namespace mcsm {
         
         std::string getGitHub() const override;
 
-        void start(mcsm::JvmOption& option) override;
+        mcsm::Result start(mcsm::JvmOption& option) override;
 
-        void download(const std::string& version) override;
-        void download(const std::string& version, const std::string& path) override;
-        void download(const std::string& version, const std::string& path, const std::string& name) override;
-        void download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
+        mcsm::Result download(const std::string& version) override;
+        mcsm::Result download(const std::string& version, const std::string& path) override;
+        mcsm::Result download(const std::string& version, const std::string& path, const std::string& name) override;
+        mcsm::Result download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
 
         bool hasVersion(const std::string& version) override;
 
         std::string getTypeAsString() const override;
 
-        void update();
-        void update(const std::string& optionPath);
+        mcsm::Result update();
+        mcsm::Result update(const std::string& optionPath);
     };
 }
 

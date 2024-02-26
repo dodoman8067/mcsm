@@ -40,8 +40,8 @@ namespace mcsm {
         std::string getTypeAsString() const override;
 
         std::string getFileLocation() const;
-        void setFileLocation(const std::string& location);
-        void getFileFromLocation();
+        mcsm::Result setFileLocation(const std::string& location);
+        mcsm::Result getFileFromLocation();
 
         std::string getSupportedVersions() const override;
 

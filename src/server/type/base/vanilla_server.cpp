@@ -29,7 +29,7 @@ mcsm::VanillaServer::VanillaServer(){
 
 mcsm::VanillaServer::~VanillaServer(){}
 
-void mcsm::VanillaServer::init(){
+mcsm::Result mcsm::VanillaServer::init(){
     std::unique_ptr<std::unordered_map<const std::string, const std::string>>& map = this->versions;
     map->insert({"1.20.4", "https://piston-data.mojang.com/v1/objects/8dd1a28015f51b1803213892b50b7b4fc76e594d/server.jar"});
     map->insert({"1.20.3", "https://piston-data.mojang.com/v1/objects/4fb536bfd4a83d61cdbaf684b8d311e66e7d4c49/server.jar"});
@@ -72,15 +72,15 @@ std::vector<std::string> mcsm::VanillaServer::getAvailableVersions(){
     return vector;
 }
 
-void mcsm::VanillaServer::download(const std::string& version){
+mcsm::Result mcsm::VanillaServer::download(const std::string& version){
     download(version, mcsm::getCurrentPath(), getJarFile());
 }
 
-void mcsm::VanillaServer::download(const std::string& version, const std::string& path){
+mcsm::Result mcsm::VanillaServer::download(const std::string& version, const std::string& path){
     download(version, path, getJarFile());
 }
 
-void mcsm::VanillaServer::download(const std::string& version, const std::string& path, const std::string& name){
+mcsm::Result mcsm::VanillaServer::download(const std::string& version, const std::string& path, const std::string& name){
     if(!hasVersion(version)){
         mcsm::error("Unsupported version.");
         mcsm::error("Please try again with a different version.");
@@ -99,11 +99,11 @@ void mcsm::VanillaServer::download(const std::string& version, const std::string
     mcsm::download(name, url, path);
 }
 
-void mcsm::VanillaServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& /* optionPath */){
+mcsm::Result mcsm::VanillaServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& /* optionPath */){
     download(version, path, name);
 }
 
-void mcsm::VanillaServer::start(mcsm::JvmOption& option){
+mcsm::Result mcsm::VanillaServer::start(mcsm::JvmOption& option){
     mcsm::ServerOption sOpt;
     if(!std::filesystem::exists(getJarFile())){
         mcsm::info("Downloading " + getJarFile() + "...");

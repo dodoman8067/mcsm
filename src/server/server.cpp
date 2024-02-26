@@ -22,7 +22,7 @@ SOFTWARE.
 
 #include <mcsm/server/server.h>
 
-void mcsm::Server::start(mcsm::JvmOption& option){
+mcsm::Result mcsm::Server::start(mcsm::JvmOption& option){
     std::string jvmOpt = " ";
     for(auto& s : option.getJvmArguments()){
         jvmOpt = jvmOpt + s + " ";
