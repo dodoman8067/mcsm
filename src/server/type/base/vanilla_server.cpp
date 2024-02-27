@@ -61,8 +61,20 @@ mcsm::Result mcsm::VanillaServer::init(){
     map->insert({"1.14.1", "https://piston-data.mojang.com/v1/objects/ed76d597a44c5266be2a7fcd77a8270f1f0bc118/server.jar"});
     map->insert({"1.14", "https://piston-data.mojang.com/v1/objects/f1a0073671057f01aa843443fef34330281333ce/server.jar"});
     mcsm::GlobalOption option("/server/url", "vanilla_server");
-    if(!option.hasValue("versions")){
-        option.setValue("versions", *map);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    bool hasValue = option.hasValue("versions");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+    if(!hasValue){
+        return option.setValue("versions", *map);
     }
 }
 
@@ -73,43 +85,69 @@ std::vector<std::string> mcsm::VanillaServer::getAvailableVersions(){
 }
 
 mcsm::Result mcsm::VanillaServer::download(const std::string& version){
-    download(version, mcsm::getCurrentPath(), getJarFile());
+    return download(version, mcsm::getCurrentPath(), getJarFile());
 }
 
 mcsm::Result mcsm::VanillaServer::download(const std::string& version, const std::string& path){
-    download(version, path, getJarFile());
+    return download(version, path, getJarFile());
 }
 
 mcsm::Result mcsm::VanillaServer::download(const std::string& version, const std::string& path, const std::string& name){
     if(!hasVersion(version)){
-        mcsm::error("Unsupported version.");
-        mcsm::error("Please try again with a different version.");
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
+        return res;
     }
     std::string url;
     std::unordered_map<const std::string, const std::string>::iterator it = this->versions->find(version);
     if(it != this->versions->end()){
         url = it->second;
     }else{
-        mcsm::error("Unsupported version.");
-        mcsm::error("Please try again with a different version.");
-        std::exit(1);      
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
+        return res;     
     }
     mcsm::info("URL : " + url);
-    mcsm::download(name, url, path);
+    return mcsm::download(name, url, path);
 }
 
 mcsm::Result mcsm::VanillaServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& /* optionPath */){
-    download(version, path, name);
+    return download(version, path, name);
 }
 
 mcsm::Result mcsm::VanillaServer::start(mcsm::JvmOption& option){
     mcsm::ServerOption sOpt;
-    if(!std::filesystem::exists(getJarFile())){
-        mcsm::info("Downloading " + getJarFile() + "...");
-        download(sOpt.getServerVersion());
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
     }
-    Server::start(option);
+
+    std::string jar = getJarFile();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    bool fileExists = mcsm::fileExists(jar);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    if(!fileExists){
+        std::string ver = sOpt.getServerVersion();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
+
+        mcsm::info("Downloading " + jar + "...");
+        mcsm::Result res = download(ver);
+        if(!res.isSuccess()) return res;
+    }
+    return Server::start(option);
 }
 
 bool mcsm::VanillaServer::hasVersion(const std::string& version){
