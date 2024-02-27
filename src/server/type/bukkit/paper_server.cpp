@@ -93,11 +93,13 @@ mcsm::Result mcsm::PaperServer::download(const std::string& version){
 }
 
 mcsm::Result mcsm::PaperServer::download(const std::string& version, const std::string& path){
-    download(version, path, getJarFile(), mcsm::getCurrentPath());
+    std::string path1 = mcsm::getCurrentPath();
+    download(version, path, getJarFile(), path1);
 }
 
 mcsm::Result mcsm::PaperServer::download(const std::string& version, const std::string& path, const std::string& name){
-    download(version, path, name, mcsm::getCurrentPath());
+    std::string path1 = mcsm::getCurrentPath();
+    download(version, path, getJarFile(), path1);
 }
 
 mcsm::Result mcsm::PaperServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){

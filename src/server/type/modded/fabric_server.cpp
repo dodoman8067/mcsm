@@ -102,7 +102,8 @@ mcsm::Result mcsm::FabricServer::download(const std::string& version){
 }
 
 mcsm::Result mcsm::FabricServer::download(const std::string& version, const std::string& path){
-    download(version, path, getJarFile());
+    std::string path1 = mcsm::getCurrentPath();
+    download(version, path, getJarFile(), path1);
 }
 
 mcsm::Result mcsm::FabricServer::download(const std::string& version, const std::string& path, const std::string& name){
