@@ -33,12 +33,10 @@ const std::string mcsm::get(const std::string& url){
     CURL *curl = curl_easy_init();
 
     if(!curl){
-        mcsm::error("Unable to initialize curl");
-        mcsm::error("Please try re-running the program, reboot the PC or reinstall the program.");
-        mcsm::error("If none of it isn't working for you, please open a new issue in GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::curlInitFailed()});
         curl_easy_cleanup(curl);
         curl_global_cleanup();
-        std::exit(1);
+        return "";
     }
 
     std::string response;
@@ -47,18 +45,19 @@ const std::string mcsm::get(const std::string& url){
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl/8.5.0");
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl/8.6.0");
 
     CURLcode res = curl_easy_perform(curl);
 
     if(res != CURLE_OK){
-        mcsm::error("Failed to perform GET request in the following url : " + url + " with the following reason : " + curl_easy_strerror(res));
+        mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::getRequestFailed(url, curl_easy_strerror(res))});
         curl_easy_cleanup(curl);
         curl_global_cleanup();
-        std::exit(1);
+        return "";
     }
 
     curl_easy_cleanup(curl);
     curl_global_cleanup();
+    mcsm::Result result({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return response;
 }

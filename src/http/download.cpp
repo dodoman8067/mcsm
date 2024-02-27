@@ -23,7 +23,7 @@ SOFTWARE.
 
 #include <mcsm/http/download.h>
 
-static size_t writeFunction(void *ptr, size_t size, size_t nmemb, FILE *stream) {
+static size_t writeFunction(mcsm::Result *ptr, size_t size, size_t nmemb, FILE *stream) {
     size_t written;
     written = fwrite(ptr, size, nmemb, stream);
     return written;
@@ -53,24 +53,29 @@ static int xferinfoCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow,
     return progressCallback(clientp, dltotal, dlnow, ultotal, ulnow);
 }
 
-void mcsm::download(const std::string& name, const std::string& url){
-    download(name, url, mcsm::getCurrentPath());
+mcsm::Result mcsm::download(const std::string& name, const std::string& url){
+    std::string path = mcsm::getCurrentPath();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    return download(name, url, path);
 }
 
-void mcsm::download(const std::string& name, const std::string& url, const std::string& path){
-    download(name, url, path, false);
+mcsm::Result mcsm::download(const std::string& name, const std::string& url, const std::string& path){
+    return download(name, url, path, false);
 }
 
-void mcsm::download(const std::string& name, const std::string& url, const std::string& path, const bool& percentages){
+mcsm::Result mcsm::download(const std::string& name, const std::string& url, const std::string& path, const bool& percentages){
     curl_global_init(CURL_GLOBAL_DEFAULT);
     CURL* curl = curl_easy_init();
     if(!curl){
-        mcsm::error("Unable to initialize curl");
-        mcsm::error("Please try re-running the program, reboot the PC or reinstall the program.");
-        mcsm::error("If none of it isn't working for you, please open a new issue in GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::curlInitFailed()});
         curl_easy_cleanup(curl);
         curl_global_cleanup();
-        std::exit(1);
+        return result;
     }
     CURLcode res;
     std::FILE* file;
@@ -81,7 +86,7 @@ void mcsm::download(const std::string& name, const std::string& url, const std::
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl/8.5.0");
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl/8.6.0");
     
     if(percentages){
         curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
@@ -93,29 +98,31 @@ void mcsm::download(const std::string& name, const std::string& url, const std::
     if(percentages) std::cout << "\n";
 
     if(res != CURLE_OK){
-        mcsm::error("Failed to download the file in the following url : " + url + " with the following reason : " + curl_easy_strerror(res));
+        mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::downloadRequestFailed(url, curl_easy_strerror(res))});
         std::fclose(file);
         curl_easy_cleanup(curl);
         curl_global_cleanup();
-        std::exit(1);
+        return result;
     }
 
     std::fclose(file);
     curl_easy_cleanup(curl);
     curl_global_cleanup();
+    mcsm::Result result({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    return result;
 }
 
 bool mcsm::isText(const std::string& url){
+    curl_global_init(CURL_GLOBAL_DEFAULT);
     CURL* curl = curl_easy_init();
     char *contentType = nullptr;
     bool isText = false;
 
     if(!curl){
-        mcsm::error("Unable to initialize curl");
-        mcsm::error("Please try re-running the program, reboot the PC or reinstall the program.");
-        mcsm::error("If none of it isn't working for you, please open a new issue in GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::curlInitFailed()});
         curl_easy_cleanup(curl);
-        std::exit(1);
+        curl_global_cleanup();
+        return false;
     }
     CURLcode res;
 
@@ -126,9 +133,10 @@ bool mcsm::isText(const std::string& url){
     res = curl_easy_perform(curl);
 
     if(res != CURLE_OK){
-        mcsm::error("Failed to check if the following url : " + url + " returns a text with the following reason : " + curl_easy_strerror(res));
+        mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::downloadTargetIsNotText(url, curl_easy_strerror(res))});
         curl_easy_cleanup(curl);
-        std::exit(1);
+        curl_global_cleanup();
+        return false;
     }
 
     res = curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &contentType);
@@ -136,11 +144,14 @@ bool mcsm::isText(const std::string& url){
         std::string contentTypeStr(contentType);
         isText = contentTypeStr.find("text") == 0 || contentTypeStr.find("json") != std::string::npos;
     }else{
-        mcsm::error("Failed to check if the following url : " + url + " returns a text with the following reason : " + curl_easy_strerror(res));
+        mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::downloadTargetIsNotText(url, curl_easy_strerror(res))});
         curl_easy_cleanup(curl);
-        std::exit(1);
+        curl_global_cleanup();
+        return false;
     }
 
     curl_easy_cleanup(curl);
+    curl_global_cleanup();
+    mcsm::Result result({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return isText;
 }
