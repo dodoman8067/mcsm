@@ -62,6 +62,13 @@ namespace mcsm {
             };
         }
 
+        inline std::vector<std::string> jsonWrongTypePlusFix(const std::string& key, const std::string& name, const std::string& type, const std::string& changeInto){
+            return {
+                "Value " + key + " option in " + name + " must be a(n) " + type + ".",
+                "To fix, " + changeInto + "."
+            };
+        }
+
         inline std::vector<std::string> jsonNotFound(const std::string& key, const std::string& name){
             return {
                 "No "+ key +" value specified in file " + name,
@@ -74,7 +81,7 @@ namespace mcsm {
         inline std::vector<std::string> jsonNotFoundPlusFix(const std::string& key, const std::string& name, const std::string& changeInto){
             return {
                 "Missing " + key + " option in " + name,
-                "To fix, add " + changeInto + " to " + name + "."
+                "To fix, " + changeInto + "."
             };
         }
 

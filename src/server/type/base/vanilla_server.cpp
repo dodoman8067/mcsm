@@ -23,14 +23,14 @@ SOFTWARE.
 #include <mcsm/server/type/base/vanilla_server.h>
 
 mcsm::VanillaServer::VanillaServer(){
-    this->versions = std::make_unique<std::unordered_map<const std::string, const std::string>>();
+    this->versions = std::make_unique<std::map<const std::string, const std::string>>();
     this->init();
 }
 
 mcsm::VanillaServer::~VanillaServer(){}
 
 mcsm::Result mcsm::VanillaServer::init(){
-    std::unique_ptr<std::unordered_map<const std::string, const std::string>>& map = this->versions;
+    std::unique_ptr<std::map<const std::string, const std::string>>& map = this->versions;
     map->insert({"1.20.4", "https://piston-data.mojang.com/v1/objects/8dd1a28015f51b1803213892b50b7b4fc76e594d/server.jar"});
     map->insert({"1.20.3", "https://piston-data.mojang.com/v1/objects/4fb536bfd4a83d61cdbaf684b8d311e66e7d4c49/server.jar"});
     map->insert({"1.20.2", "https://piston-data.mojang.com/v1/objects/5b868151bd02b41319f54c8d4061b8cae84e665c/server.jar"});
@@ -76,6 +76,9 @@ mcsm::Result mcsm::VanillaServer::init(){
     if(!hasValue){
         return option.setValue("versions", *map);
     }
+
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    return res;
 }
 
 std::vector<std::string> mcsm::VanillaServer::getAvailableVersions(){
@@ -85,11 +88,39 @@ std::vector<std::string> mcsm::VanillaServer::getAvailableVersions(){
 }
 
 mcsm::Result mcsm::VanillaServer::download(const std::string& version){
-    return download(version, mcsm::getCurrentPath(), getJarFile());
+    std::string path = mcsm::getCurrentPath();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+    
+    std::string jar = getJarFile();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    return download(version, path, jar, path);
 }
 
 mcsm::Result mcsm::VanillaServer::download(const std::string& version, const std::string& path){
-    return download(version, path, getJarFile());
+    std::string path1 = mcsm::getCurrentPath();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    std::string jar = getJarFile();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    return download(version, path, jar, path1);
 }
 
 mcsm::Result mcsm::VanillaServer::download(const std::string& version, const std::string& path, const std::string& name){
@@ -98,7 +129,7 @@ mcsm::Result mcsm::VanillaServer::download(const std::string& version, const std
         return res;
     }
     std::string url;
-    std::unordered_map<const std::string, const std::string>::iterator it = this->versions->find(version);
+    std::map<const std::string, const std::string>::iterator it = this->versions->find(version);
     if(it != this->versions->end()){
         url = it->second;
     }else{
