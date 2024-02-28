@@ -28,12 +28,12 @@ SOFTWARE.
 #include <mcsm/data/global_option.h>
 #include <mcsm/data/options/server_option.h>
 #include <mcsm/http/download.h>
-#include <unordered_map>
+#include <map>
 
 namespace mcsm {
     class VanillaServer : public mcsm::Server, public mcsm::Downloadable {
     private:
-        std::unique_ptr<std::unordered_map<const std::string, const std::string>> versions;
+        std::unique_ptr<std::map<const std::string, const std::string>> versions;
         mcsm::Result init();
     public:
         VanillaServer();
