@@ -238,56 +238,116 @@ mcsm::Result mcsm::PaperServer::start(mcsm::JvmOption& option){
 }
 
 mcsm::Result mcsm::PaperServer::update(){
-    update(mcsm::getCurrentPath());
+    std::string path = mcsm::getCurrentPath();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    return update(path);
 }
 
 mcsm::Result mcsm::PaperServer::update(const std::string& optionPath){
     // If you change the default build to specific build from latest build, it won't downgrade automatically. (You'll have to manually delete the server jarfile) This is an intented feature.
     mcsm::info("Checking updates...");
     mcsm::ServerDataOption sDataOpt(optionPath);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
     mcsm::Option opt(optionPath, "server");
-    if(!opt.getValue("server_build").is_string()){
-        mcsm::error("Value \"server_build\" option in server.json must be a string type.");
-        mcsm::error("To fix, change it into \"server_build\": \"latest\" .");
-        std::exit(1);
+    nlohmann::json sBuild = opt.getValue("server_build");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
     }
-    std::string build = opt.getValue("server_build").get<std::string>();
+
+    if(sBuild == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"server_build\"", opt.getName())});
+        return res;
+    }
+    if(!sBuild.is_string()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongTypePlusFix("\"server_build\"", opt.getName(), "string", "change it into \"server_build\": \"latest\"")});
+        return res;
+    }
+    std::string build = sBuild.get<std::string>();
     if(build != "latest"){
-        mcsm::warning("This server won't update to the latest build.");
-        mcsm::warning("Change server.json into \"server_build\": \"latest\" for automatic download.");
-        return;
+        mcsm::Result res({mcsm::ResultType::MCSM_WARN_NOEXIT, {
+            "This server won't update to the latest build.",
+            "Change server.json into \"server_build\": \"latest\" for automatic download."
+        }});
+        return res;
     }
-    if(opt.getValue("version") == nullptr){
-        mcsm::error("No \"version\" value specified in file " + opt.getName());
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);
+
+    nlohmann::json sVer = opt.getValue("version");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
     }
-    if(!opt.getValue("version").is_string()){
-        mcsm::error("Value \"version\" has to be a string, but it's not.");
-        mcsm::error("Manually editing the launch profile might have caused this issue.");
-        mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm).");
-        std::exit(1);            
+
+    if(sVer == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"version\"", opt.getName())});
+        return res;
     }
-    std::string version = opt.getValue("version").get<std::string>();
+    if(!sVer.is_string()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"version\"", "string")});
+        return res;
+    }
+    
+    std::string version = sVer.get<std::string>();
     int ver = getVersion(version);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
     if(ver == -1){
-        mcsm::error("Unsupported version.");
-        mcsm::error("Please try again with a different version.");
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
+        return res;
     }
-    std::string strVer = std::to_string(ver);
-    if(sDataOpt.getLastDownloadedBuild() == strVer){
+    std::string lastBuild = sDataOpt.getLastDownloadedBuild();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    if(lastBuild == version){
         mcsm::success("Server is up to date.");
-        return;
+        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+        return res;
     }
-    mcsm::success("Update found : "  + strVer + ". Current build : " + sDataOpt.getLastDownloadedBuild());
-    if(std::filesystem::exists(getJarFile(optionPath))){
-        std::filesystem::remove(getJarFile(optionPath));
+    mcsm::success("Update found : "  + version + ". Current build : " + lastBuild);
+
+    std::string jar = getJarFile(optionPath);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
     }
-    download(version, optionPath, getJarFile(), optionPath);
+
+    bool fileExists = mcsm::fileExists(jar);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    if(fileExists){
+        mcsm::removeFile(jar);
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
+    }
+    return download(version, optionPath, jar, optionPath);
 }
 
 bool mcsm::PaperServer::hasVersion(const std::string& version){
