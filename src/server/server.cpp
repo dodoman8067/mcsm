@@ -39,9 +39,7 @@ mcsm::Result mcsm::Server::start(mcsm::JvmOption& option){
 }
 
 std::string mcsm::Server::getJarFile() const {
-    std::string path = mcsm::getCurrentPath();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-    return getJarFile(path);
+    return getJarFile(mcsm::getCurrentPath());
 }
 
 std::string mcsm::Server::getJarFile(const std::string& checkDir) const {
