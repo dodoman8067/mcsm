@@ -30,11 +30,8 @@ int mcsm::PaperServer::getVersion(const std::string& ver) const {
     std::string res = mcsm::get("https://api.papermc.io/v2/projects/paper/versions/" + ver);
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
     if(json.is_discarded()){
-        mcsm::error("Parse of json failed.");
-        mcsm::error("If you believe that this is a software issue, please report this to GitHub. (https://github.com/dodoman8067/mcsm)");
-        mcsm::error("Error informations : ");
-        mcsm::error("Called method : mcsm::PaperServer::getVersion() with arguments : " + ver);
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
+        return -1;
     }
     if(json["builds"].is_array()){
         nlohmann::json builds = json["builds"];
@@ -49,11 +46,8 @@ int mcsm::PaperServer::getVersion(const std::string& ver, const std::string& bui
     std::string res = mcsm::get("https://api.papermc.io/v2/projects/paper/versions/" + ver + "/builds/" + build);
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
     if(json.is_discarded()){
-        mcsm::error("Parse of json failed.");
-        mcsm::error("If you believe that this is a software issue, please report this to GitHub. (https://github.com/dodoman8067/mcsm)");
-        mcsm::error("Error informations : ");
-        mcsm::error("Called method : mcsm::PaperServer::getVersion() with arguments : " + ver + ", " + build);
-        std::exit(1);
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
+        return -1;
     }
 
     if(json["build"] == nullptr || !json["build"].is_number_integer()){
@@ -193,6 +187,12 @@ mcsm::Result mcsm::PaperServer::download(const std::string& version, const std::
     if(serverBuildValue != "latest"){
         std::string build = serverBuildValue.get<std::string>();
         int ver = getVersion(version, build);
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
+
         if(ver == -1){
             mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion(build)});
             return res;
@@ -206,6 +206,12 @@ mcsm::Result mcsm::PaperServer::download(const std::string& version, const std::
         return res;
     }else{
         int ver = getVersion(version);
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
+        
         if(ver == -1){
             mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
             return res;
