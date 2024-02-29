@@ -62,6 +62,7 @@ namespace mcsm {
         std::string getTypeAsString() const override;
         
         mcsm::Result update();
+        mcsm::Result update(const std::string& optionPath);
     };
 }
 
