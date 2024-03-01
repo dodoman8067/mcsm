@@ -36,6 +36,7 @@ int mcsm::PaperServer::getVersion(const std::string& ver) const {
     if(json["builds"].is_array()){
         nlohmann::json builds = json["builds"];
         if(builds[json["builds"].size() - 1] == nullptr || !builds[json["builds"].size() - 1].is_number_integer()) return -1;
+        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return builds[json["builds"].size() - 1];
     }else{
         return -1;
@@ -53,6 +54,7 @@ int mcsm::PaperServer::getVersion(const std::string& ver, const std::string& bui
     if(json["build"] == nullptr || !json["build"].is_number_integer()){
         return -1;
     }else{
+        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return json["build"];
     }
 }
@@ -228,13 +230,42 @@ mcsm::Result mcsm::PaperServer::download(const std::string& version, const std::
 
 mcsm::Result mcsm::PaperServer::start(mcsm::JvmOption& option){
     mcsm::ServerOption sOpt;
-    if(!std::filesystem::exists(getJarFile())){
-        mcsm::info("Downloading " + getJarFile() + "...");
-        download(sOpt.getServerVersion());
-    }else{
-        update();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
     }
-    Server::start(option);
+
+    std::string jar = getJarFile();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    bool fileExists = mcsm::fileExists(jar);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    if(!fileExists){
+        mcsm::info("Downloading " + jar + "...");
+        std::string sVer = sOpt.getServerVersion();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
+
+        mcsm::Result res = download(sVer);
+        if(!res.isSuccess()) return res;
+    }else{
+        mcsm::Result res = update();
+        if(!res.isSuccess()) return res;
+    }
+    return Server::start(option);
 }
 
 mcsm::Result mcsm::PaperServer::update(){
