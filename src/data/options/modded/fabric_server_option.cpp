@@ -305,7 +305,8 @@ mcsm::Result mcsm::FabricServerOption::start(std::unique_ptr<mcsm::JvmOption> op
     mcsm::info("Server JVM launch profile : " + profileName);
     mcsm::Result res = serverDataOpt.updateLastTimeLaunched();
     if(!res.isSuccess()) return res;
-    this->server->start(*option);
+    mcsm::Result res3 = this->server->start(*option);
+    if(!res3.isSuccess()) return res3;
     mcsm::info("Server stopped.\n");
 
     mcsm::Result res2({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
