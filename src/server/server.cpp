@@ -35,7 +35,17 @@ mcsm::Result mcsm::Server::start(mcsm::JvmOption& option){
 
     std::string command = option.getJvmPath() + jvmOpt + this->getJarFile() + svrOpt;
     mcsm::info("Running command : " + command);
-    mcsm::runCommand(command.c_str());
+    int result = mcsm::runCommand(command.c_str());
+    if(result != 0){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Server exited with error code : " + result
+        }});
+        return res;
+    }
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {
+        "Server exited with error code : 0"
+    }});
+    return res;
 }
 
 std::string mcsm::Server::getJarFile() const {
