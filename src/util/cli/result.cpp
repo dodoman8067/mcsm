@@ -22,7 +22,7 @@ SOFTWARE.
 
 #include <mcsm/util/cli/result.h>
 
-static std::pair<mcsm::ResultType, std::vector<std::string>> res = {mcsm::ResultType::MCSM_UNKNOWN, { "Not updated" }};
+static std::pair<mcsm::ResultType, std::vector<std::string>> res = {mcsm::ResultType::MCSM_SUCCESS, { "Not updated" }};
 
 mcsm::Result::Result(const mcsm::ResultType& type, const std::vector<std::string>& message){
     this->result = type;
