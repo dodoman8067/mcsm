@@ -40,6 +40,7 @@ inline bool mcsm::ViewServerCommand::isConfigured(){
 }
 
 inline void mcsm::ViewServerCommand::printServerInfo(){
+    //mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"a"}});
     mcsm::ServerOption sOpt;
     mcsm::info("Server information : ");
     mcsm::info("Server name : " + sOpt.getServerName());
@@ -47,6 +48,10 @@ inline void mcsm::ViewServerCommand::printServerInfo(){
     mcsm::info("Server type : "  + sOpt.getServerType());
 
     std::unique_ptr<mcsm::JvmOption> jvmOpt = sOpt.getDefaultOption();
+                if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            mcsm::printResultMessage();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+        }
     mcsm::info("Server default launch profile : " + jvmOpt->getProfileName());
 
     mcsm::ServerDataOption* sDataOpt;

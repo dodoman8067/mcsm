@@ -57,6 +57,10 @@ void mcsm::StartServerCommand::execute(const std::vector<std::string>& args){
     if(sOpt.getServerType() == "fabric"){
         mcsm::FabricServerOption fsOpt;
         fsOpt.start(std::move(jvmOpt));
+                if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            mcsm::printResultMessage();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+        }
     }else{
         sOpt.start(std::move(jvmOpt));
     }
