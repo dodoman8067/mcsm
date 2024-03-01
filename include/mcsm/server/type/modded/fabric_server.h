@@ -65,6 +65,7 @@ namespace mcsm {
         mcsm::ServerType getType() const override;
         
         mcsm::Result update();
+        mcsm::Result update(const std::string& optionPath);
     };
 }
 

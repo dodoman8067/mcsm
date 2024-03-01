@@ -587,8 +587,20 @@ mcsm::Result mcsm::FabricServer::start(mcsm::JvmOption& option){
 }
 
 mcsm::Result mcsm::FabricServer::update(){
-    mcsm::FabricServerDataOption sDataOpt;
-    mcsm::Option opt(".", "server");
+    std::string path = mcsm::getCurrentPath();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    return update(path);
+}
+
+mcsm::Result mcsm::FabricServer::update(const std::string& optionPath){
+    mcsm::FabricServerDataOption sDataOpt(optionPath);
+    mcsm::Option opt(optionPath, "server");
+    //TODO : check if server is configured
 
     mcsm::info("Checking updates...");
 
