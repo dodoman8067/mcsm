@@ -25,6 +25,7 @@ SOFTWARE.
 int mcsm::runCommandQuietly(const std::string& command){
     if(mcsm::getCurrentOS() == mcsm::OS::WINDOWS){
         std::string cmd = command + " > NUL 2>&1";
+        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return std::system(cmd.c_str());
     }else if(mcsm::getCurrentOS() == mcsm::OS::LINUX){
         std::string cmd = command + " > /dev/null 2>&1";
@@ -32,6 +33,7 @@ int mcsm::runCommandQuietly(const std::string& command){
             int code = std::system(cmd.c_str());
             if(WIFEXITED(code)){
                 int finalCode = WEXITSTATUS(code);
+                mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
                 return finalCode;
             }else{
                 return 1;
@@ -47,12 +49,14 @@ int mcsm::runCommandQuietly(const std::string& command){
 
 int mcsm::runCommand(const std::string& command){
     if(mcsm::getCurrentOS() == mcsm::OS::WINDOWS){
+        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return std::system(command.c_str());
     }else if(mcsm::getCurrentOS() == mcsm::OS::LINUX){
         #ifdef __linux__
             int code = std::system(command.c_str());
             if(WIFEXITED(code)){
                 int finalCode = WEXITSTATUS(code);
+                mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
                 return finalCode;
             }else{
                 return 1;
@@ -76,6 +80,7 @@ std::string mcsm::getCurrentPath(){
             }});
         return "";
     }
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return path;
 }
 
@@ -89,6 +94,7 @@ bool mcsm::fileExists(const std::string& path){
             }});
         return false;
     }
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return exists;
 }
 
@@ -103,6 +109,7 @@ bool mcsm::removeFile(const std::string& path){
             }});
         return false;
     }
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return success; 
 }
 
@@ -112,10 +119,12 @@ bool mcsm::mkdir(const std::string& dirName){
     if(!std::filesystem::create_directories(dirName, ec)){
         if(std::filesystem::exists(dirName)){
             ec.clear();
+            mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
             return true;
         }
         return false;
     }
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return true;
 }
 

@@ -64,22 +64,27 @@ std::vector<std::string> mcsm::PurpurServer::getAvailableVersions(){
     for(const std::string& s : mcsm::getMinecraftVersions()){
         versions.push_back(s);
     }
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return versions;
 }
 
 std::string mcsm::PurpurServer::getSupportedVersions() const {
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "1.14.1~";
 }
 
 std::string mcsm::PurpurServer::getBasedServer() const {
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "pufferfish";
 }
 
 std::string mcsm::PurpurServer::getWebSite() const {
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "https://purpurmc.org";
 }
 
 std::string mcsm::PurpurServer::getGitHub() const {
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "https://github.com/PurpurMC/Purpur";
 }
 
@@ -381,10 +386,12 @@ mcsm::Result mcsm::PurpurServer::update(const std::string& optionPath){
     return download(version, optionPath, jar, optionPath);
 }
 
+[[deprecated]]
 bool mcsm::PurpurServer::hasVersion(const std::string& version){
     return getVersion(version) != -1;
 }
 
 std::string mcsm::PurpurServer::getTypeAsString() const {
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "purpur";
 }

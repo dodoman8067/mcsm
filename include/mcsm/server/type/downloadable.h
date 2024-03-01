@@ -73,6 +73,7 @@ namespace mcsm {
          * @param version version of the server
          * @return true when version exists, otherwise false
          */
+        [[deprecated]]
         virtual bool hasVersion(const std::string& version) = 0;
     };
 }

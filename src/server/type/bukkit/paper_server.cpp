@@ -64,22 +64,27 @@ std::vector<std::string> mcsm::PaperServer::getAvailableVersions(){
     for(const std::string& s : mcsm::getMinecraftVersions()){
         versions.push_back(s);
     }
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return versions;
 }
 
 std::string mcsm::PaperServer::getSupportedVersions() const {
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "1.8~";
 }
 
 std::string mcsm::PaperServer::getBasedServer() const {
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "spigot";
 }
 
 std::string mcsm::PaperServer::getWebSite() const {
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "https://papermc.io";
 }
 
 std::string mcsm::PaperServer::getGitHub() const {
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "https://github.com/PaperMC/Paper";
 }
 
@@ -381,10 +386,12 @@ mcsm::Result mcsm::PaperServer::update(const std::string& optionPath){
     return download(version, optionPath, jar, optionPath);
 }
 
+[[deprecated]]
 bool mcsm::PaperServer::hasVersion(const std::string& version){
     return getVersion(version) != -1;
 }
 
 std::string mcsm::PaperServer::getTypeAsString() const {
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "paper";
 }

@@ -103,6 +103,7 @@ std::string mcsm::Server::getJarFile(const std::string& checkDir) const {
         mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return value;
     }
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return getTypeAsString() + ".jar";
 }
 

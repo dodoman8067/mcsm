@@ -55,7 +55,7 @@ namespace mcsm {
         mcsm::Result download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
 
         mcsm::Result start(mcsm::JvmOption& option) override;
-
+        
         bool hasVersion(const std::string& version) override;
 
         mcsm::ServerType getType() const override;

@@ -182,29 +182,36 @@ mcsm::Result mcsm::VanillaServer::start(mcsm::JvmOption& option){
 }
 
 bool mcsm::VanillaServer::hasVersion(const std::string& version){
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return this->versions->find(version) != this->versions->end();
 }
 
 mcsm::ServerType mcsm::VanillaServer::getType() const {
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return ServerType::VANILLA;
 }
 
 std::string mcsm::VanillaServer::getSupportedVersions() const {
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "1.14~";
 }
 
 std::string mcsm::VanillaServer::getBasedServer() const {
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "none";
 }
 
 std::string mcsm::VanillaServer::getTypeAsString() const {
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "vanilla";
 }
 
 std::string mcsm::VanillaServer::getWebSite() const {
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "https://minecraft.net";
 }
 
 std::string mcsm::VanillaServer::getGitHub() const {
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "none";
 }
