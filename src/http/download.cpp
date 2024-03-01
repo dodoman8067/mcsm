@@ -133,7 +133,7 @@ bool mcsm::isText(const std::string& url){
     res = curl_easy_perform(curl);
 
     if(res != CURLE_OK){
-        mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::downloadTargetIsNotText(url, curl_easy_strerror(res))});
+        mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::getRequestFailed(url, curl_easy_strerror(res))});
         curl_easy_cleanup(curl);
         curl_global_cleanup();
         return false;
@@ -144,7 +144,7 @@ bool mcsm::isText(const std::string& url){
         std::string contentTypeStr(contentType);
         isText = contentTypeStr.find("text") == 0 || contentTypeStr.find("json") != std::string::npos;
     }else{
-        mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::downloadTargetIsNotText(url, curl_easy_strerror(res))});
+        mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::getRequestFailed(url, curl_easy_strerror(res))});
         curl_easy_cleanup(curl);
         curl_global_cleanup();
         return false;
