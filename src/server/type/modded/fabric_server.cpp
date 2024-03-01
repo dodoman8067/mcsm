@@ -499,8 +499,20 @@ mcsm::Result mcsm::FabricServer::download(const std::string& version, const std:
     std::string url = "https://meta.fabricmc.net/v2/versions/loader/" + version + "/" + loaderVersion + "/" + installerVersion + "/server/jar";
     mcsm::info("URL : " + url);
 
-    if(mcsm::isText(url)){
+    bool text = mcsm::isText(url);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    if(text){
         std::string result = mcsm::get(url);
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
     
         if(result == "Unable to find valid version for loader_version" || result == "Fabric loader 0.12 or higher is required for unattended server installs. Please use a newer fabric loader version, or the full installer."){
             mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
@@ -663,7 +675,7 @@ mcsm::Result mcsm::FabricServer::update(){
         return;
     }
 
-    download(opt.getValue("version"), loaderVer, installerVer, std::filesystem::current_path().string(), getJarFile());
+    return download(opt.getValue("version"), loaderVer, installerVer, std::filesystem::current_path().string(), getJarFile());
 }
 
 bool mcsm::FabricServer::hasVersion(const std::string& version){
