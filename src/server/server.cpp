@@ -24,16 +24,44 @@ SOFTWARE.
 
 mcsm::Result mcsm::Server::start(mcsm::JvmOption& option){
     std::string jvmOpt = " ";
-    for(auto& s : option.getJvmArguments()){
+    auto jArgs = option.getJvmArguments();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    for(auto& s : jArgs){
         jvmOpt = jvmOpt + s + " ";
     }
 
     std::string svrOpt = " ";
-    for(auto& s : option.getServerArguments()){
+    auto sArgs = option.getServerArguments();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    for(auto& s : sArgs){
         svrOpt = svrOpt + s + " ";
     }
 
-    std::string command = option.getJvmPath() + jvmOpt + this->getJarFile() + svrOpt;
+    std::string jPath = option.getJvmPath();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    std::string jar = this->getJarFile();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    std::string command = jPath + jvmOpt + jar + svrOpt;
     mcsm::info("Running command : " + command);
     int result = mcsm::runCommand(command.c_str());
     if(result != 0){
@@ -63,7 +91,7 @@ std::string mcsm::Server::getJarFile(const std::string& checkDir) const {
         nlohmann::json value = opt.getValue("server_jar");
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
 
-        if(value != nullptr){
+        if(value == nullptr){
             mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"server_jar\"", opt.getName())});
             return "";
         }
