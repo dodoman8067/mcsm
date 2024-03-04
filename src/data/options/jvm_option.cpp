@@ -213,7 +213,7 @@ std::vector<std::string> mcsm::JvmOption::getJvmArguments(){
         for(auto& v : value){
             if(!v.is_string()){
                 mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"args\"", "array of string")});
-                return {};          
+                return {};
             }
         }
         mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
@@ -403,23 +403,28 @@ mcsm::Result mcsm::JvmOption::setServerArguments(const std::vector<std::string>&
 }
 
 std::string mcsm::JvmOption::getProfileName() const {
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return this->name;
 }
 
 std::string mcsm::JvmOption::getProfilePath() const {
     if(this->option->isGlobal()){
         mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
+        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return opt->getPath();
     }else{
         mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
+        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return opt2->getPath();
     }
 }
 
 mcsm::SearchTarget mcsm::JvmOption::getSearchTarget() const {
     if(this->option->isGlobal()){
+        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return mcsm::SearchTarget::GLOBAL;
     }else{
+        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return mcsm::SearchTarget::CURRENT;
     }
 }

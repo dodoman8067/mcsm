@@ -30,6 +30,7 @@ mcsm::Option::Option(const std::string& path, const std::string& name){
         name1 = name1.append(".json");
     }
     this->name = name1;
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
 }
 
 mcsm::Option::~Option(){
@@ -93,6 +94,7 @@ nlohmann::json mcsm::Option::getValue(const std::string& key) const {
 bool mcsm::Option::hasValue(const std::string& key) const {
     nlohmann::json data = load();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return false;
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return data.find(key) != data.end();
 }
 
@@ -102,6 +104,7 @@ bool mcsm::Option::exists() const {
 }
 
 bool mcsm::Option::isGlobal() const {
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return false;
 }
 
@@ -147,9 +150,11 @@ mcsm::Result mcsm::Option::reset() const {
 }
 
 std::string mcsm::Option::getName(){
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return this->name;
 }
 
 std::string mcsm::Option::getPath(){
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return this->path;
 }
