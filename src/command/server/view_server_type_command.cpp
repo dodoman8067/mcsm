@@ -58,7 +58,12 @@ inline std::shared_ptr<mcsm::Server> mcsm::ViewServerTypeCommand::getServer(cons
             if(!(arg == "-type" || arg == "--type" || arg == "-t" || arg == "--t" || arg == "-servertype" || arg == "--servertype" || arg == "-st" || "--st")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-'){
                 std::string server = args[i + 1];
-                return mcsm::server::detectServerType(server);
+                std::shared_ptr<mcsm::Server> type = mcsm::server::detectServerType(server);
+                if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                    mcsm::printResultMessage();
+                    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+                }
+                return type;
             }
         }
     }
