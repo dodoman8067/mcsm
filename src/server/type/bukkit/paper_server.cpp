@@ -386,7 +386,6 @@ mcsm::Result mcsm::PaperServer::update(const std::string& optionPath){
     return download(version, optionPath, jar, optionPath);
 }
 
-[[deprecated]]
 bool mcsm::PaperServer::hasVersion(const std::string& version){
     return getVersion(version) != -1;
 }

@@ -386,7 +386,6 @@ mcsm::Result mcsm::PurpurServer::update(const std::string& optionPath){
     return download(version, optionPath, jar, optionPath);
 }
 
-[[deprecated]]
 bool mcsm::PurpurServer::hasVersion(const std::string& version){
     return getVersion(version) != -1;
 }

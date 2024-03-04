@@ -754,7 +754,6 @@ mcsm::Result mcsm::FabricServer::update(const std::string& optionPath){
     return download(sVer, loaderVer, installerVer, cPath, jar, optionPath);
 }
 
-[[deprecated]]
 bool mcsm::FabricServer::hasVersion(const std::string& version){
     return !mcsm::isWhitespaceOrEmpty(getVersion(version));
 }
