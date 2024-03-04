@@ -36,33 +36,86 @@ void mcsm::ViewServerCommand::execute(const std::vector<std::string>& /* args */
 }
 
 inline bool mcsm::ViewServerCommand::isConfigured(){
-    return mcsm::fileExists(mcsm::getCurrentPath() + "/server.json");
+    std::string path = mcsm::getCurrentPath();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+    bool fileExists = mcsm::fileExists(path + "/server.json");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+    return fileExists;
 }
 
 inline void mcsm::ViewServerCommand::printServerInfo(){
-    //mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"a"}});
     mcsm::ServerOption sOpt;
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+
+    std::string name, version, type;
+    name = sOpt.getServerName();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+
+    version = sOpt.getServerVersion();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+
+    type = sOpt.getServerType();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+
     mcsm::info("Server information : ");
-    mcsm::info("Server name : " + sOpt.getServerName());
-    mcsm::info("Server version : " + sOpt.getServerVersion());
-    mcsm::info("Server type : "  + sOpt.getServerType());
+    mcsm::info("Server name : " + name);
+    mcsm::info("Server version : " + version);
+    mcsm::info("Server type : "  + type);
 
     std::unique_ptr<mcsm::JvmOption> jvmOpt = sOpt.getDefaultOption();
-                if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+    mcsm::info("Server default launch profile : " + jvmOpt->getProfileName());
+
+    mcsm::ServerDataOption* sDataOpt = nullptr;
+    if(type == "fabric"){
+        sDataOpt = new mcsm::FabricServerDataOption();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
             mcsm::printResultMessage();
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
         }
-    mcsm::info("Server default launch profile : " + jvmOpt->getProfileName());
-
-    mcsm::ServerDataOption* sDataOpt;
-    if(sOpt.getServerType() == "fabric"){
-        //if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK) { mcsm::printMessage(); std::exit(1); }
-        sDataOpt = new mcsm::FabricServerDataOption();
     }else{
         sDataOpt = new mcsm::ServerDataOption();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            mcsm::printResultMessage();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+        }
     }
-    mcsm::info("Server creation date : " + sDataOpt->getServerTimeCreated());
-    mcsm::info("Last server launch date : " + sDataOpt->getLastTimeLaunched());
+    std::string timeCreated, timeLaunched;
+    timeCreated = sDataOpt->getServerTimeCreated();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+
+    timeLaunched = sDataOpt->getLastTimeLaunched();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+
+    mcsm::info("Server creation date : " + timeCreated);
+    mcsm::info("Last server launch date : " + timeLaunched);
     delete sDataOpt;
     sDataOpt = nullptr;
 }
