@@ -57,6 +57,11 @@ void mcsm::Result::printMessage(){
 
 void mcsm::Result::printMessage(const mcsm::ResultType& type){
     switch (type){
+        case mcsm::ResultType::MCSM_SUCCESS:
+            for(const std::string& str : message){
+                mcsm::success(str);
+            }
+            break;          
         case mcsm::ResultType::MCSM_OK:
             for(const std::string& str : message){
                 mcsm::info(str);
