@@ -25,11 +25,6 @@ mcsm::Result mcsm::server::generateBukkit(const std::string& name, mcsm::JvmOpti
     switch(type){
         case mcsm::BukkitServerType::PAPER: {
             std::shared_ptr<mcsm::PaperServer> server = std::make_shared<mcsm::PaperServer>();
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-                mcsm::Result res(resp.first, resp.second);
-                return res;
-            }
             bool vExists = server->hasVersion(version);
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
                 std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -50,11 +45,6 @@ mcsm::Result mcsm::server::generateBukkit(const std::string& name, mcsm::JvmOpti
         }
         case mcsm::BukkitServerType::PURPUR: {
             std::shared_ptr<mcsm::PurpurServer> server = std::make_shared<mcsm::PurpurServer>();
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-                mcsm::Result res(resp.first, resp.second);
-                return res;
-            }
             bool vExists = server->hasVersion(version);
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
                 std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -110,11 +100,6 @@ mcsm::Result mcsm::server::generateForge(const std::string& /* name */, mcsm::Jv
 
 mcsm::Result mcsm::server::generateFabric(const std::string& name, mcsm::JvmOption& option, const std::string& version){
     std::shared_ptr<mcsm::FabricServer> server = std::make_shared<mcsm::FabricServer>();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
     bool vExists = server->hasVersion(version);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
