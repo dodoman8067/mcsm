@@ -205,7 +205,12 @@ mcsm::Result mcsm::FabricServerOption::create(const std::string& name, mcsm::Jvm
     mcsm::Result res4 = option.setValue("default_launch_profile", profileObj);
     if(!res4.isSuccess()) return res4;
     
-    mcsm::Result res5 = option.setValue("server_jar", this->server->getJarFile(this->path));
+    std::string jarFile = this->server->getJarFile(this->path);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        jarFile = "fabric.jar";
+    }
+
+    mcsm::Result res5 = option.setValue("server_jar", jarFile);
     if(!res5.isSuccess()) return res5;
     
     mcsm::Result res6 = option.setValue("server_build", "latest");

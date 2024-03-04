@@ -83,6 +83,7 @@ std::string mcsm::Server::getJarFile() const {
 }
 
 std::string mcsm::Server::getJarFile(const std::string& checkDir) const {
+    //this method is usually for getting the configured server's jarfile.
     mcsm::Option opt(checkDir, "server");
     bool exists = opt.exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
