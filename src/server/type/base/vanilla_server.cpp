@@ -24,7 +24,8 @@ SOFTWARE.
 
 mcsm::VanillaServer::VanillaServer(){
     this->versions = std::make_unique<std::map<const std::string, const std::string>>();
-    this->init();
+    mcsm::Result res = this->init();
+    if(!res.isSuccess()) return;
 }
 
 mcsm::VanillaServer::~VanillaServer(){}
