@@ -66,7 +66,7 @@ mcsm::Result mcsm::Server::start(mcsm::JvmOption& option){
     int result = mcsm::runCommand(command.c_str());
     if(result != 0){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Server exited with error code : " + result
+            "Server exited with error code : " + std::to_string(result)
         }});
         return res;
     }
