@@ -24,7 +24,7 @@ SOFTWARE.
 
 #include <mcsm/init.h>
 
-const std::string version = "0.1.0.0";
+const std::string version = "0.1.1.0";
 
 int main(int argc, char *argv[]){
     //libssh2 : cmake -B ./build -DBUILD_SHARED_LIBS=OFF -DOPENSSL_USE_STATIC_LIBS=ON -DZLIB_USE_STATIC_LIBS=ON -DENABLE_ZLIB_COMPRESSION=ON -DCRYPTO_BACKEND=OpenSSL
@@ -36,9 +36,6 @@ int main(int argc, char *argv[]){
 
     mcsm::init init;
     init.initMCSM(version);
-    std::cout << "Before start : Currently almost every error handling code is being rewritted." 
-    << "\nIt is very unstable and I am NOT responsible for any kinds of damage cause by this."
-    << "\nIf you find an issue that only occurs from beta branch please let me know on Github. (https://github.com/dodoman8067/mcsm)\n\n";
 
     if(!init.isInitialized()){
         std::cerr << "Program initialization failed.\n";
