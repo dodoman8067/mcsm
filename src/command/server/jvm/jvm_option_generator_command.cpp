@@ -229,6 +229,12 @@ inline void mcsm::JvmOptionGeneratorCommand::createProfile(const std::vector<std
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
     }
 
+    auto path = option.getProfilePath();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+
     auto jArgs = option.getJvmArguments();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         mcsm::printResultMessage();
@@ -243,6 +249,7 @@ inline void mcsm::JvmOptionGeneratorCommand::createProfile(const std::vector<std
 
     mcsm::info("Java Virtual Machine launch profile generated : ");
     mcsm::info("Profile name : " + name);
+    mcsm::info("Profile location : " + path);
     mcsm::info("JVM path : " + jvm);
     
     if(!jArgs.empty()){
