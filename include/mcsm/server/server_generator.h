@@ -43,7 +43,7 @@ namespace mcsm {
          * @param version Minecraft version for the server
          * @param type Bukkit-API server implementation (e.g., CRAFTBUKKIT, SPIGOT, PAPER, PURPUR, PUFFERFISH, FOLIA)
         */
-        void generateBukkit(const std::string& name, mcsm::JvmOption& option, const std::string& version, const mcsm::BukkitServerType& type);
+        mcsm::Result generateBukkit(const std::string& name, mcsm::JvmOption& option, const std::string& version, const mcsm::BukkitServerType& type);
 
         /**
          * Generates a Forge server.
@@ -51,7 +51,7 @@ namespace mcsm {
          * @param option server's default JVM launch profile
          * @param version Minecraft version for the server
         */
-        void generateForge(const std::string& name, mcsm::JvmOption& option, const std::string& version);
+        mcsm::Result generateForge(const std::string& name, mcsm::JvmOption& option, const std::string& version);
 
         /**
          * Generates a Fabric server.
@@ -59,7 +59,7 @@ namespace mcsm {
          * @param option server's default JVM launch profile
          * @param version Minecraft version for the server
         */
-        void generateFabric(const std::string& name, mcsm::JvmOption& option, const std::string& version);
+        mcsm::Result generateFabric(const std::string& name, mcsm::JvmOption& option, const std::string& version);
 
         /**
          * Generates a SpongeVanilla server.
@@ -67,7 +67,7 @@ namespace mcsm {
          * @param option server's default JVM launch profile
          * @param version Minecraft version for the server
         */
-        void generateSponge(const std::string& name, mcsm::JvmOption& option, const std::string& version);
+        mcsm::Result generateSponge(const std::string& name, mcsm::JvmOption& option, const std::string& version);
 
         /**
          * Generates a custom server.
@@ -76,7 +76,7 @@ namespace mcsm {
          * @param filePath jarfile's location (path)
          * @param version Minecraft version for the server
         */
-        void generateCustom(const std::string& name, mcsm::JvmOption& option, const std::string& filePath, const std::string& version);
+        mcsm::Result generateCustom(const std::string& name, mcsm::JvmOption& option, const std::string& filePath, const std::string& version);
 
         /**
          * Generates a Vanilla server.
@@ -84,7 +84,7 @@ namespace mcsm {
          * @param option server's default JVM launch profile
          * @param version Minecraft version for the server
         */
-        void generateVanilla(const std::string& name, mcsm::JvmOption& option, const std::string& version);
+        mcsm::Result generateVanilla(const std::string& name, mcsm::JvmOption& option, const std::string& version);
 
         /**
          * Configures a server.
@@ -92,7 +92,7 @@ namespace mcsm {
          * @param name server's name
          * @param option server's default JVM launch profile
         */
-        void configure(std::unique_ptr<mcsm::ServerOption> serverOption, const std::string& name, mcsm::JvmOption& option);
+        mcsm::Result configure(std::unique_ptr<mcsm::ServerOption> serverOption, const std::string& name, mcsm::JvmOption& option);
 
         /**
          * Returns a pointer of server instance based on `server`.

@@ -24,9 +24,11 @@ SOFTWARE.
 #define __MCSM_CLI_UTILS_H__
 
 #include <string>
+#include <filesystem>
 #include <cstdlib>
 #include <iostream>
 #include <mcsm/util/os/os_detection.h>
+#include <mcsm/util/cli/result.h>
 #include <mcsm/util/cli/logging.h>
 #ifdef __linux__
     #include <sys/wait.h>
@@ -44,6 +46,13 @@ namespace mcsm {
      * @param command string to run as a command
     */
     int runCommand(const std::string& command);
+
+    std::string getCurrentPath();
+    bool fileExists(const std::string& path);
+    bool removeFile(const std::string& path);
+    bool mkdir(const std::string& dirName);
+
+    bool isDebug();
 }
 
 #endif // __MCSM_CLI_UTILS_H__

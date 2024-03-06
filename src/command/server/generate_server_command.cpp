@@ -130,11 +130,21 @@ std::string mcsm::GenerateServerCommand::getServerVersion(const std::vector<std:
 std::unique_ptr<mcsm::JvmOption> mcsm::GenerateServerCommand::searchOption(const mcsm::SearchTarget& target, const std::string& name){
     if(target == mcsm::SearchTarget::GLOBAL || target == mcsm::SearchTarget::ALL){
         std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(name, mcsm::SearchTarget::GLOBAL);
-        if(opt->exists()) return opt;
+        bool profileExists = opt->exists();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            mcsm::printResultMessage();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+        }
+        if(profileExists) return opt;
     }
     if(target == mcsm::SearchTarget::CURRENT || target == mcsm::SearchTarget::ALL){
         std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(name, mcsm::SearchTarget::CURRENT);
-        if(opt->exists()) return opt;
+        bool profileExists = opt->exists();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            mcsm::printResultMessage();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+        }
+        if(profileExists) return opt;
     }
     return nullptr;
 }
@@ -178,27 +188,51 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& a
     }
 
     if(type == "bukkit" || type == "craftbukkit"){
-        mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::CRAFTBUKKIT);
+        mcsm::Result res = mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::CRAFTBUKKIT);
+        if(!res.isSuccess()){
+            res.printMessage();
+            if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+        }
         return;
     }
     if(type == "spigot"){
-        mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::SPIGOT);
+        mcsm::Result res = mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::SPIGOT);
+        if(!res.isSuccess()){
+            res.printMessage();
+            if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+        }
         return;
     }
     if(type == "paper" || type == "paperspigot"){
-        mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::PAPER);
+        mcsm::Result res = mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::PAPER);
+        if(!res.isSuccess()){
+            res.printMessage();
+            if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+        }
         return;
     }
     if(type == "purpur"){
-        mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::PURPUR);
+        mcsm::Result res = mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::PURPUR);
+        if(!res.isSuccess()){
+            res.printMessage();
+            if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+        }
         return;
     }
     if(type == "fabric"){
-        mcsm::server::generateFabric(name, *option, version);
+        mcsm::Result res = mcsm::server::generateFabric(name, *option, version);
+        if(!res.isSuccess()){
+            res.printMessage();
+            if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+        }
         return;
     }
     if(type == "vanilla"){
-        mcsm::server::generateVanilla(name, *option, version);
+        mcsm::Result res = mcsm::server::generateVanilla(name, *option, version);
+        if(!res.isSuccess()){
+            res.printMessage();
+            if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+        }
         return;
     }
     mcsm::error("Server type not supported : " + type);

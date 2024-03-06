@@ -44,20 +44,29 @@ namespace mcsm {
         JvmOption(const std::string& name);
         JvmOption(const std::string& name, const SearchTarget& target);
         ~JvmOption();
-        void create();
-        void create(const std::string& jvmPath, const SearchTarget& target);
-        void create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions, const SearchTarget& target);
-        void create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions, const std::vector<std::string>& serverOptions, const SearchTarget& target);
-        void reset();
+
+        mcsm::Result create();
+        mcsm::Result create(const std::string& jvmPath, const SearchTarget& target);
+        mcsm::Result create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions, const SearchTarget& target);
+        mcsm::Result create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions, const std::vector<std::string>& serverOptions, const SearchTarget& target);
+
+        mcsm::Result reset();
+
         bool exists();
+
         std::string getJvmPath();
-        void setJvmPath(const std::string& jvmPath);
+        mcsm::Result setJvmPath(const std::string& jvmPath);
+
         std::vector<std::string> getJvmArguments();
-        void setJvmArguments(const std::vector<std::string>& jvmArgs);
+        mcsm::Result setJvmArguments(const std::vector<std::string>& jvmArgs);
+
         std::vector<std::string> getServerArguments();
-        void setServerArguments(const std::vector<std::string>& serverArgs);
+        mcsm::Result setServerArguments(const std::vector<std::string>& serverArgs);
+
         std::string getProfileName() const;
+
         std::string getProfilePath() const;
+        
         mcsm::SearchTarget getSearchTarget() const;
     };
 }

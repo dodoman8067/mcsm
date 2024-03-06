@@ -26,6 +26,7 @@ SOFTWARE.
 
 #include <curl/curl.h>
 #include <mcsm/util/cli/logging.h>
+#include <mcsm/util/cli/cli_utils.h>
 #include <cstdio>
 #include <filesystem>
 
@@ -35,7 +36,7 @@ namespace mcsm {
      * @param name file's name
      * @param url link to perform GET request
     */
-    void download(const std::string& name, const std::string& url);
+    mcsm::Result download(const std::string& name, const std::string& url);
 
     /**
      * Downloads a file in `url` named as `name`.
@@ -43,7 +44,7 @@ namespace mcsm {
      * @param url link to perform GET request
      * @param path file's stored location
     */
-    void download(const std::string& name, const std::string& url, const std::string& path);
+    mcsm::Result download(const std::string& name, const std::string& url, const std::string& path);
 
     /**
      * Downloads a file in `url` named as `name` while printing percentages.
@@ -52,7 +53,7 @@ namespace mcsm {
      * @param path file's stored location
      * @param percentages progress of downloading the file
     */
-    void download(const std::string& name, const std::string& url, const std::string& path, const bool& percentages);
+    mcsm::Result download(const std::string& name, const std::string& url, const std::string& path, const bool& percentages);
 
     /**
      * Checks if the following `url` returns a text.

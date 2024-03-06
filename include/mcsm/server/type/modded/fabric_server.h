@@ -35,22 +35,37 @@ namespace mcsm {
     public:
         FabricServer();
         ~FabricServer();
+
         std::string getVersion(const std::string& ver) const;
         std::string getVersion() const;
+
         std::vector<std::string> getAvailableVersions() override;
+
         std::string getSupportedVersions() const override;
+
         std::string getBasedServer() const override;
+
         std::string getWebSite() const override;
+
         std::string getGitHub() const override;
-        void start(mcsm::JvmOption& option) override;
-        void download(const std::string& version) override;
-        void download(const std::string& version, const std::string& path) override;
-        void download(const std::string& version, const std::string& path, const std::string& name) override;
-        void download(const std::string& version, const std::string& loaderVersion, const std::string& installerVersion, const std::string& path, const std::string& name);
+
+        mcsm::Result start(mcsm::JvmOption& option) override;
+
+        mcsm::Result download(const std::string& version) override;
+        mcsm::Result download(const std::string& version, const std::string& path) override;
+        mcsm::Result download(const std::string& version, const std::string& path, const std::string& name) override;
+        mcsm::Result download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
+        mcsm::Result download(const std::string& version, const std::string& loaderVersion, const std::string& installerVersion, const std::string& path, const std::string& name);
+        mcsm::Result download(const std::string& version, const std::string& loaderVersion, const std::string& installerVersion, const std::string& path, const std::string& name, const std::string& optionPath);
+
         bool hasVersion(const std::string& version) override;
+
         std::string getTypeAsString() const override;
+
         mcsm::ServerType getType() const override;
-        void update();
+        
+        mcsm::Result update();
+        mcsm::Result update(const std::string& optionPath);
     };
 }
 

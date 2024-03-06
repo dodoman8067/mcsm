@@ -51,13 +51,20 @@ void mcsm::StartServerCommand::execute(const std::vector<std::string>& args){
         mcsm::warning("Task aborted.");
         std::exit(1);
     }
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     std::unique_ptr<mcsm::JvmOption> jvmOpt = searchOption(args);
-    mcsm::ServerOption sOpt;
+    mcsm::ServerOption sOpt(mcsm::getCurrentPath());
     if(sOpt.getServerType() == "fabric"){
         mcsm::FabricServerOption fsOpt;
-        fsOpt.start(std::move(jvmOpt));
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            mcsm::printResultMessage();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+        }
+        mcsm::Result res = fsOpt.start(std::move(jvmOpt));
+        res.printMessage();
     }else{
-        sOpt.start(std::move(jvmOpt));
+        mcsm::Result res = sOpt.start(std::move(jvmOpt));
+        res.printMessage();
     }
 }
 
@@ -88,7 +95,16 @@ std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const st
     }
     mcsm::info("No JVM launch profile specified; Using default JVM launch profile.");
     mcsm::ServerOption option;
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+    
     std::unique_ptr<mcsm::JvmOption> jvmOpt = option.getDefaultOption();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
     return jvmOpt;
 }
 
@@ -120,5 +136,15 @@ mcsm::SearchTarget mcsm::StartServerCommand::getSearchTarget(const std::vector<s
 
 
 inline bool mcsm::StartServerCommand::isConfigured(){
-    return std::filesystem::exists("server.json");
+    std::string path = mcsm::getCurrentPath();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+    bool fileExists = mcsm::fileExists(path + "/server.json");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+    return fileExists;
 }

@@ -44,12 +44,12 @@ std::string mcsm::Command::getDescription() const {
     return this->description;
 }
 
-void mcsm::Command::addAliases(const std::string& value){
-    if(mcsm::CommandManager::hasAliasesInGlobal(value)) return;
+void mcsm::Command::addAlias(const std::string& value){
+    if(mcsm::CommandManager::hasAliasInGlobal(value)) return;
     this->aliases->push_back(value);
 }
 
-bool mcsm::Command::hasAliases(const std::string& value) const{
+bool mcsm::Command::hasAlias(const std::string& value) const{
     for(std::string& aliases : *this->aliases){
         if(aliases != value) continue;;
         return true;

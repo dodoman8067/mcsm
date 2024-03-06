@@ -10,30 +10,45 @@ namespace mcsm {
     private:
         std::shared_ptr<mcsm::Server> server;
         std::string version;
+        std::string path;
     public:
         FabricServerOption();
-        FabricServerOption(const std::string& version);
+        FabricServerOption(const std::string& path);
+        FabricServerOption(const std::string& version, const std::string& path);
         FabricServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server);
+        FabricServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server, const std::string& path);
         ~FabricServerOption();
+
         bool exists();
-        void create(const std::string& name, mcsm::JvmOption& defaultOption);
-        void start();
-        void start(std::unique_ptr<mcsm::JvmOption> option);
+
+        mcsm::Result create(const std::string& name, mcsm::JvmOption& defaultOption);
+
+        mcsm::Result start();
+        mcsm::Result start(std::unique_ptr<mcsm::JvmOption> option);
+
         std::string getServerJarBuild() const;
-        void setServerJarBuild(const std::string& build);
+        mcsm::Result setServerJarBuild(const std::string& build);
+
         std::string getLoaderVersion() const;
-        void setLoaderVersion(const std::string& version);
+        mcsm::Result setLoaderVersion(const std::string& version);
+
         std::string getInstallerVersion() const;
-        void setInstallerVersion(const std::string& version);
+        mcsm::Result setInstallerVersion(const std::string& version);
+
         std::string getServerName() const;
-        void setServerName(const std::string& name);
+        mcsm::Result setServerName(const std::string& name);
+
         std::string getServerVersion() const;
-        void setServerVersion(const std::string& version);
+        mcsm::Result setServerVersion(const std::string& version);
+
         std::unique_ptr<mcsm::JvmOption> getDefaultOption() const;
-        void setDefaultOption(std::unique_ptr<mcsm::JvmOption> jvmOption);
+        mcsm::Result setDefaultOption(std::unique_ptr<mcsm::JvmOption> jvmOption);
+
         std::string getServerType() const;
+
         std::string getServerJarFile() const;
-        void setServerJarFile(const std::string& name);
+        mcsm::Result setServerJarFile(const std::string& name);
+        
         std::shared_ptr<mcsm::Server> getServer() const;
     };
 }

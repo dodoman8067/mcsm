@@ -20,46 +20,24 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __MCSM_OPTION_H__
-#define __MCSM_OPTION_H__
+#ifndef __MCSM_ARGS_DESCRIPTION_H__
+#define __MCSM_ARGS_DESCRIPTION_H__
 
-#include <nlohmann/json.hpp>
-#include <filesystem>
-#include <fstream>
-#include <mcsm/util/cli/logging.h>
-#include <mcsm/data/configurable.h>
-#include <mcsm/util/string_utils.h>
-#include <mcsm/util/cli/cli_utils.h>
+#include <mcsm/command/base/command.h>
+#include <map>
+#include <memory>
 
 namespace mcsm {
-    class Option : public mcsm::Configurable {
+    class ArgumentsDescription {
     private:
-        std::string path;
-        std::string name;
-
-        bool createDirectories(std::string const &dirName, std::error_code &err) const;
+        std::unique_ptr<std::map<const std::string, const std::string>> argsMap;
     public:
-        Option(const std::string& path, const std::string& name);
-        ~Option();
-
-        nlohmann::json load() const;
-
-        std::string getPath();
-
-        std::string getName();
-
-        nlohmann::json getValue(const std::string& key) const;
-        mcsm::Result setValue(const std::string& key, const nlohmann::json& value) const;
-        bool hasValue(const std::string& key) const;
-
-        bool exists() const override;
-
-        bool isGlobal() const override;
-
-        mcsm::Result save(const nlohmann::json& jsonData) const;
-        
-        mcsm::Result reset() const;
+        ArgumentsDescription(std::unique_ptr<std::map<const std::string, const std::string>> argsMap);
+        ~ArgumentsDescription();
+        void printAll() const;
+        std::string getDescription(const std::string& arg) const;
+        bool argExists(const std::string& arg) const;
     };
 }
 
-#endif
+#endif // __MCSM_ARGS_DESCRIPTION_H__

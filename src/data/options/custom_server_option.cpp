@@ -19,24 +19,3 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
-#ifndef __MCSM_JAVA_DETECTION_H__
-#define __MCSM_JAVA_DETECTION_H__
-
-#include <cstdlib>
-#include <filesystem>
-#include <mcsm/util/cli/logging.h>
-#include <mcsm/util/string_utils.h>
-#include <mcsm/util/cli/cli_utils.h>
-#include <mcsm/util/os/os_detection.h>
-
-namespace mcsm {
-    std::string getJavaFromHome();
-    std::string getJavaFromPath();
-
-    std::string detectJava();
-
-    bool isValidJava(const std::string& path);
-}
-
-#endif

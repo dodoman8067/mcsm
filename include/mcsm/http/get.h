@@ -24,9 +24,7 @@ SOFTWARE.
 #define __MCSM_GET_H__
 
 
-#include <string>
-#include <curl/curl.h>
-#include <mcsm/util/cli/logging.h>
+#include <mcsm/util/cli/result.h>
 
 namespace mcsm {
     /**

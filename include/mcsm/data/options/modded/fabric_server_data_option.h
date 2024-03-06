@@ -7,11 +7,14 @@ namespace mcsm {
     class FabricServerDataOption : public mcsm::ServerDataOption {
     public:
         FabricServerDataOption();
+        FabricServerDataOption(const std::string& path);
         ~FabricServerDataOption();
+
         std::string getLoaderVersion() const;
-        void updateLoaderVersion(const std::string& version);
+        mcsm::Result updateLoaderVersion(const std::string& version);
+        
         std::string getInstallerVersion() const;
-        void updateInstallerVersion(const std::string& version);
+        mcsm::Result updateInstallerVersion(const std::string& version);
     };
 }
 

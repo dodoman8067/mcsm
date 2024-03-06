@@ -1,6 +1,11 @@
 cmake_minimum_required(VERSION 3.24)
 project(mcsm)
 
+# Detect OS
+if(NOT LINUX AND NOT WIN32)
+    message(FATAL_ERROR "This platform is not supported")
+endif()
+
 # Add options
 option(BUILD_STATIC_EXE "Build static executable" OFF)
 
@@ -43,15 +48,19 @@ endif()
 # Set compiler options
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
-    set(CMAKE_CXX_FLAGS_DEBUG "-g")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -DMCSM_DEBUG")
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -flto")
 endif()
 
-if(CMAKE_BUILD_TYPE MATCHES Release AND BUILD_STATIC_EXE)
+if(BUILD_STATIC_EXE)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
         message("-- Detected compiler " ${CMAKE_CXX_COMPILER_ID} ". Using -static flags")
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -static")
     endif()
+endif()
+
+if(CMAKE_BUILD_TYPE MATCHES Debug)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -DMCSM_DEBUG")
 endif()
 
 if(CMAKE_BUILD_TYPE MATCHES Release)
@@ -69,7 +78,15 @@ endif()
 target_link_libraries(mcsm PRIVATE CURL::libcurl)
 target_link_libraries(mcsm PRIVATE nlohmann_json::nlohmann_json)
 target_link_libraries(mcsm PRIVATE termcolor::termcolor)
+
+# Some dependencies for libgit2 in Windows
+if(WIN32)
+    target_link_libraries(mcsm PRIVATE Winhttp)
+    target_link_libraries(mcsm PRIVATE Rpcrt4)
+endif()
+
 target_link_libraries(mcsm PRIVATE ${LIBGIT2_LIBRARIES})
+
 if(LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
     target_link_libraries(mcsm PRIVATE Backward::Backward)
 endif()

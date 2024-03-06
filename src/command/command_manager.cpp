@@ -57,21 +57,21 @@ std::vector<std::unique_ptr<mcsm::Command>>& mcsm::CommandManager::getCommands()
 
 bool mcsm::CommandManager::hasCommand(const std::string& name){
     for(auto& command : *commands){
-        if(command->getName() != name && !command->hasAliases(name)) continue;
+        if(command->getName() != name && !command->hasAlias(name)) continue;
         return true;
     }
     return false;
 }
 
-bool mcsm::CommandManager::hasAliases(const std::string& command, const std::string& value){
+bool mcsm::CommandManager::hasAlias(const std::string& command, const std::string& value){
     if(!hasCommand(command)) return false;
     std::unique_ptr<mcsm::Command> commandInstance = getCommand(command);
-    return commandInstance->hasAliases(value);
+    return commandInstance->hasAlias(value);
 }
 
-bool mcsm::CommandManager::hasAliasesInGlobal(const std::string& value){
+bool mcsm::CommandManager::hasAliasInGlobal(const std::string& value){
     for(std::unique_ptr<mcsm::Command>& command : mcsm::CommandManager::getCommands()){
-        if(command->hasAliases(value)){
+        if(command->hasAlias(value)){
             return true;
         }
     }
@@ -80,7 +80,7 @@ bool mcsm::CommandManager::hasAliasesInGlobal(const std::string& value){
 
 std::unique_ptr<mcsm::Command> mcsm::CommandManager::getCommand(const std::string& name){
     for(auto& command : *commands){
-        if(command->getName() != name && !command->hasAliases(name)) continue;
+        if(command->getName() != name && !command->hasAlias(name)) continue;
         return std::move(command);
     }
     return nullptr;

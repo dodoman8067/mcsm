@@ -1,4 +1,6 @@
 /*
+MIT License
+
 Copyright (c) 2023 dodoman8067
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -22,7 +24,7 @@ SOFTWARE.
 
 #include <mcsm/init.h>
 
-const std::string version = "0.0.2.0";
+const std::string version = "0.1.1.0";
 
 int main(int argc, char *argv[]){
     //libssh2 : cmake -B ./build -DBUILD_SHARED_LIBS=OFF -DOPENSSL_USE_STATIC_LIBS=ON -DZLIB_USE_STATIC_LIBS=ON -DENABLE_ZLIB_COMPRESSION=ON -DCRYPTO_BACKEND=OpenSSL
@@ -30,23 +32,29 @@ int main(int argc, char *argv[]){
     //libcurl-linux : cmake -B ./build -DBUILD_SHARED_LIBS=OFF -DOPENSSL_USE_STATIC_LIBS=ON -DZLIB_USE_STATIC_LIBS=ON
     //libcurl : cmake command : cmake -B ./build -G "MinGW Makefiles" -DBUILD_SHARED_LIBS=OFF -DZLIB_USE_STATIC_LIBS=ON -DCURL_USE_SCHANNEL=ON
 
-    //TODO : Default op in server config, spiget.org
-
-    bool commandFound = false;
+    //TODO : Make server class' methods return mcsm::Result
 
     mcsm::init init;
     init.initMCSM(version);
 
+    if(!init.isInitialized()){
+        std::cerr << "Program initialization failed.\n";
+        std::cerr << "High chance to be a software issue. Please report it to GitHub (https://github.com/dodoman8067/mcsm).\n";
+        std::exit(1);
+    }
+
+    bool commandFound = false;
+
     //Prints default message when no arguments
     if(argc < 2){
         std::cout << "Welcome to MCSM (Minecraft Server Manager).\n";
-        std::cout << "Type \'mcsm help\' for list of commands.\n";
+        std::cout << "Type \"mcsm help\" for a list of commands.\n";
         return 0;
     }
 
     //If arguments exist, iterates through CommandManager::getCommands()
     for(auto& v : mcsm::CommandManager::getCommands()){
-        if(argv[1] == v->getName() || v->hasAliases(argv[1])){
+        if(argv[1] == v->getName() || v->hasAlias(argv[1])){
             std::vector<std::string> args;
             for(int i = 2; i < argc; i++){
                 args.push_back(argv[i]);

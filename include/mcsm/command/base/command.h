@@ -37,8 +37,8 @@ namespace mcsm {
         ~Command();
         std::string getName() const;
         std::string getDescription() const;
-        void addAliases(const std::string& value);
-        bool hasAliases(const std::string& value) const;
+        void addAlias(const std::string& value);
+        bool hasAlias(const std::string& value) const;
         const std::vector<std::string>& getAliases() const;
         virtual void execute(const std::vector<std::string>& args) = 0;
     };

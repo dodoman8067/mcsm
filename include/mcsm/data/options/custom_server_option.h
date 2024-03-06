@@ -21,28 +21,26 @@ SOFTWARE.
 */
 
 
-#ifndef __MCSM_SERVER_OPTION_H__
-#define __MCSM_SERVER_OPTION_H__
+#ifndef __MCSM_CUSTOM_SERVER_OPTION_H__
+#define __MCSM_CUSTOM_SERVER_OPTION_H__
 
 #include <mcsm/data/option.h>
 #include <mcsm/server/server.h>
 #include <mcsm/server/type/downloadable.h>
 #include <mcsm/data/options/server_data_option.h>
-#include <memory>
 
 namespace mcsm {
-    class ServerOption {
+    class CustomServerOption {
     private:
         std::shared_ptr<mcsm::Server> server;
         std::string version;
-        std::string path;
     public:
-        ServerOption();
-        ServerOption(const std::string& path);
-        ServerOption(const std::string& version, const std::string& path);
-        ServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server);
-        ServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server, const std::string& path);
-        ~ServerOption();
+        CustomServerOption();
+        CustomServerOption(const std::string& path);
+        CustomServerOption(const std::string& version, const std::string& path);
+        CustomServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server);
+        CustomServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server, const std::string& path);
+        ~CustomServerOption();
 
         mcsm::Result create(const std::string& name, mcsm::JvmOption& defaultOption);
         
@@ -54,19 +52,16 @@ namespace mcsm {
         std::string getServerName() const;
         mcsm::Result setServerName(const std::string& name);
 
-        std::string getServerVersion() const;
-        mcsm::Result setServerVersion(const std::string& version);
-
         std::unique_ptr<mcsm::JvmOption> getDefaultOption() const;
         mcsm::Result setDefaultOption(std::unique_ptr<mcsm::JvmOption> jvmOption);
 
         std::string getServerType() const;
 
+        std::string getServerJarLocation() const;
+        mcsm::Result setServerJarLocation(const std::string& location);
+
         std::string getServerJarFile() const;
         mcsm::Result setServerJarFile(const std::string& name);
-
-        std::string getServerJarBuild() const;
-        mcsm::Result setServerJarBuild(const std::string& build);
 
         std::shared_ptr<mcsm::Server> getServer() const;
     };
@@ -74,4 +69,4 @@ namespace mcsm {
 
 #include <mcsm/server/server_generator.h>
 
-#endif // __MCSM_SERVER_OPTION_H__
+#endif // __MCSM_CUSOM_SERVER_OPTION_H__

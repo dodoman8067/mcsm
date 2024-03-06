@@ -20,46 +20,37 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#ifndef __MCSM_OPTION_H__
-#define __MCSM_OPTION_H__
+#ifndef __MCSM_CUSTOM_SERVER_H__
+#define __MCSM_CUSTOM_SERVER_H__
 
-#include <nlohmann/json.hpp>
-#include <filesystem>
-#include <fstream>
-#include <mcsm/util/cli/logging.h>
-#include <mcsm/data/configurable.h>
-#include <mcsm/util/string_utils.h>
-#include <mcsm/util/cli/cli_utils.h>
+#include <mcsm/server/server.h>
+#include <mcsm/http/download.h>
+#include <regex>
 
 namespace mcsm {
-    class Option : public mcsm::Configurable {
+    class CustomServer : public mcsm::Server {
     private:
-        std::string path;
-        std::string name;
-
-        bool createDirectories(std::string const &dirName, std::error_code &err) const;
+        bool isFile(const std::string& location) const;
+        bool isURL(const std::string& location) const;
     public:
-        Option(const std::string& path, const std::string& name);
-        ~Option();
+        CustomServer();
+        ~CustomServer();
 
-        nlohmann::json load() const;
+        mcsm::ServerType getType() const override;
+        std::string getTypeAsString() const override;
 
-        std::string getPath();
+        std::string getFileLocation() const;
+        mcsm::Result setFileLocation(const std::string& location);
+        mcsm::Result getFileFromLocation();
 
-        std::string getName();
+        std::string getSupportedVersions() const override;
 
-        nlohmann::json getValue(const std::string& key) const;
-        mcsm::Result setValue(const std::string& key, const nlohmann::json& value) const;
-        bool hasValue(const std::string& key) const;
+        std::string getBasedServer() const override;
+        bool isBasedAs(const std::string& input) const override;
 
-        bool exists() const override;
-
-        bool isGlobal() const override;
-
-        mcsm::Result save(const nlohmann::json& jsonData) const;
-        
-        mcsm::Result reset() const;
+        std::string getWebSite() const override;
+        std::string getGitHub() const override;
     };
 }
 
-#endif
+#endif // __MCSM_CUSTOM_SERVER_H__

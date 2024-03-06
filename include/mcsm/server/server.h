@@ -40,16 +40,23 @@ namespace mcsm {
         virtual mcsm::ServerType getType() const = 0;
 
         /**
-         * Returns server type as a string
+         * Returns server's type as a string
          * @return server type as a string
         */
         virtual std::string getTypeAsString() const = 0;
 
         /**
-         * Returns server jarfile name.
+         * Returns the name of the server's jarfile.
          * @return jarfile name
         */
         virtual std::string getJarFile() const;
+
+        /**
+         * Returns the name of the server's jarfile.
+         * @param checkDir checking directory
+         * @return jarfile name
+        */
+        virtual std::string getJarFile(const std::string& checkDir) const;
 
         /**
          * Returns the earliest Minecraft version supported by this server.
@@ -64,6 +71,13 @@ namespace mcsm {
         virtual std::string getBasedServer() const = 0;
 
         /**
+         * Returns if this server is based as server `input`.
+         * @param input string to check against
+         * @return true if this server is based as `input`, otherwise false
+        */
+        virtual bool isBasedAs(const std::string& input) const;
+
+        /**
          * Returns the official website link for this server.
          * @return link for official website
         */
@@ -76,17 +90,10 @@ namespace mcsm {
         virtual std::string getGitHub() const = 0;
 
         /**
-         * Returns if this server is based as server `input`.
-         * @param input string to check against
-         * @return true if this server is based as `input`, otherwise false
-        */
-        virtual bool isBasedAs(const std::string& input) const;
-
-        /**
          * Starts a Minecraft server with following launch profile `option`
          * @param option JVM launch profile
         */
-        virtual void start(mcsm::JvmOption& option);
+        virtual mcsm::Result start(mcsm::JvmOption& option);
     };
 }
 
