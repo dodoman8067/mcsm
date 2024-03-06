@@ -28,6 +28,7 @@ mcsm::PurpurServer::~PurpurServer() {}
 
 int mcsm::PurpurServer::getVersion(const std::string& ver) const {
     std::string res = mcsm::get("https://api.purpurmc.org/v2/purpur/" + ver);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
     if(json.is_discarded()){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
@@ -45,6 +46,7 @@ int mcsm::PurpurServer::getVersion(const std::string& ver) const {
 
 int mcsm::PurpurServer::getVersion(const std::string& ver, const std::string& build) const {
     std::string res = mcsm::get("https://api.purpurmc.org/v2/purpur/" + ver + "/" +  build);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
     if(json.is_discarded()){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});

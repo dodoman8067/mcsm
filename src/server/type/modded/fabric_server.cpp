@@ -32,6 +32,7 @@ mcsm::FabricServer::~FabricServer() {}
  */
 std::string mcsm::FabricServer::getVersion(const std::string& ver) const {
     std::string res = mcsm::get("https://meta.fabricmc.net/v2/versions/loader/" + ver);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
     if(json.is_discarded()){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
@@ -53,6 +54,7 @@ std::string mcsm::FabricServer::getVersion(const std::string& ver) const {
  */
 std::string mcsm::FabricServer::getVersion() const {
     std::string res = mcsm::get("https://meta.fabricmc.net/v2/versions/installer");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
     if(json.is_discarded()){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
