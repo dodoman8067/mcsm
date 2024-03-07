@@ -70,6 +70,11 @@ void mcsm::GenerateServerCommand::execute(const std::vector<std::string>& args){
         mcsm::warning("Name not provided; To continue, specify a name with --name option.");
         std::exit(1);
     }
+    if(isConfigured()){
+        mcsm::warning("Server is already configured in this directory.");
+        mcsm::warning("Please try again in other directories.");
+        std::exit(1);
+    }
     detectServer(args);
 }
 
@@ -245,4 +250,18 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& a
     }
     mcsm::error("Server type not supported : " + type);
     std::exit(1);
+}
+
+inline bool mcsm::GenerateServerCommand::isConfigured(){
+    std::string path = mcsm::getCurrentPath();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+    bool fileExists = mcsm::fileExists(path + "/server.json");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+    return fileExists;
 }
