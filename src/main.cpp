@@ -59,7 +59,7 @@ int main(int argc, char *argv[]){
             for(int i = 2; i < argc; i++){
                 args.push_back(argv[i]);
             }
-            v->execute(std::move(args));
+            v->execute(args);
             commandFound = true;
             break;
         }
