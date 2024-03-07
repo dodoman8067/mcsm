@@ -24,7 +24,7 @@ SOFTWARE.
 
 #include <mcsm/init.h>
 
-const std::string version = "0.1.1.0";
+const std::string version = "0.1.1.1";
 
 int main(int argc, char *argv[]){
     //libssh2 : cmake -B ./build -DBUILD_SHARED_LIBS=OFF -DOPENSSL_USE_STATIC_LIBS=ON -DZLIB_USE_STATIC_LIBS=ON -DENABLE_ZLIB_COMPRESSION=ON -DCRYPTO_BACKEND=OpenSSL
