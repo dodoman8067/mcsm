@@ -91,7 +91,7 @@ void mcsm::init::initCommands(const std::string& version){
     viewServerCommand->addAlias("viewserver");
     mcsm::CommandManager::addCommand(std::move(viewServerCommand));
 
-    std::unique_ptr<mcsm::ViewServerTypeCommand> viewServerTypeCommand = std::make_unique<mcsm::ViewServerTypeCommand>("info", "Provides basic information about the specified server implementation.");
+    std::unique_ptr<mcsm::ViewServerTypeCommand> viewServerTypeCommand = std::make_unique<mcsm::ViewServerTypeCommand>("info", "Provides a basic information about the specified server implementation.");
     viewServerTypeCommand->addAlias("information");
     viewServerTypeCommand->addAlias("informationServer");
     viewServerTypeCommand->addAlias("informationserver");
