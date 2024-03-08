@@ -236,6 +236,7 @@ mcsm::Result mcsm::PurpurServer::download(const std::string& version, const std:
 }
 
 mcsm::Result mcsm::PurpurServer::start(mcsm::JvmOption& option){
+    // ServerOption class handles the data file stuff
     mcsm::ServerOption sOpt;
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
