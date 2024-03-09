@@ -30,7 +30,7 @@ SOFTWARE.
 #include <memory>
 
 namespace mcsm {
-    enum SearchTarget {
+    enum class SearchTarget {
         GLOBAL,
         CURRENT,
         ALL
