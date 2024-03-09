@@ -53,7 +53,10 @@ mcsm::Result mcsm::ServerDataOption::create(const std::string& lastTimeLaunched)
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverAlreadyConfigured()});
         return res;
     }
-    return this->option->setValue("last_time_launched", lastTimeLaunched);
+    mcsm::Result res1 = this->option->setValue("last_time_launched", lastTimeLaunched);
+    if(!res1.isSuccess()) return res1;
+    mcsm::Result res2 = this->option->setValue("last_downloaded_build", "0");
+    return res2;
 }
 
 mcsm::Result mcsm::ServerDataOption::reset(){

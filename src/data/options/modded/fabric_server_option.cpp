@@ -137,7 +137,10 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& version, std::sh
 }
 
 mcsm::FabricServerOption::FabricServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server, const std::string& path){
-    if(!mcsm::fileExists(path)){
+    bool fileExists = mcsm::fileExists(path);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+
+    if(!fileExists){
         if(!mcsm::mkdir(path)){
             mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
                 "Path mkdir failed : " + path,
@@ -234,18 +237,22 @@ mcsm::Result mcsm::FabricServerOption::create(const std::string& name, mcsm::Jvm
 
 mcsm::Result mcsm::FabricServerOption::start(){
     std::unique_ptr<mcsm::JvmOption> jvmOpt = getDefaultOption();
-    return start(std::move(jvmOpt));
+    return start(std::move(jvmOpt), this->path, this->path);
 }
 
 mcsm::Result mcsm::FabricServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
-    mcsm::FabricServerDataOption serverDataOpt;
+    return start(std::move(option), this->path, this->path);
+}
+
+mcsm::Result mcsm::FabricServerOption::start(std::unique_ptr<mcsm::JvmOption> option, const std::string& path, const std::string& optionPath){
+    mcsm::FabricServerDataOption serverDataOpt(optionPath);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    bool fileExists = mcsm::fileExists(this->path + "/server.json");
+    bool fileExists = mcsm::fileExists(optionPath + "/server.json");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -310,7 +317,7 @@ mcsm::Result mcsm::FabricServerOption::start(std::unique_ptr<mcsm::JvmOption> op
     mcsm::info("Server JVM launch profile : " + profileName);
     mcsm::Result res = serverDataOpt.updateLastTimeLaunched();
     if(!res.isSuccess()) return res;
-    mcsm::Result res2 = this->server->start(*option);
+    mcsm::Result res2 = this->server->start(*option, path, optionPath);
     return res2;
 }
 

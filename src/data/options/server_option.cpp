@@ -70,6 +70,7 @@ mcsm::ServerOption::ServerOption(const std::string& version, const std::string& 
 }
 
 mcsm::ServerOption::ServerOption(const std::string& path){
+    //checks if the path exists(not file)
     bool fileExists = mcsm::fileExists(path);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
 
@@ -225,18 +226,22 @@ mcsm::Result mcsm::ServerOption::create(const std::string& name, mcsm::JvmOption
 
 mcsm::Result mcsm::ServerOption::start(){
     std::unique_ptr<mcsm::JvmOption> jvmOpt = getDefaultOption();
-    return start(std::move(jvmOpt));
+    return start(std::move(jvmOpt), this->path, this->path);
 }
 
 mcsm::Result mcsm::ServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
-    mcsm::ServerDataOption serverDataOpt;
+    return start(std::move(option), this->path, this->path);
+}
+
+mcsm::Result mcsm::ServerOption::start(std::unique_ptr<mcsm::JvmOption> option, const std::string& path, const std::string& optionPath){
+    mcsm::ServerDataOption serverDataOpt(optionPath);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    bool fileExists = mcsm::fileExists(this->path + "/server.json");
+    bool fileExists = mcsm::fileExists(optionPath + "/server.json");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -286,7 +291,7 @@ mcsm::Result mcsm::ServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
     mcsm::info("Server JVM launch profile : " + profileName);
     mcsm::Result res = serverDataOpt.updateLastTimeLaunched();
     if(!res.isSuccess()) return res;
-    mcsm::Result res2 = this->server->start(*option);
+    mcsm::Result res2 = this->server->start(*option, path, optionPath);
     return res2;
 }
 
