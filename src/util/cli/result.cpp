@@ -72,6 +72,11 @@ void mcsm::Result::printMessage(const mcsm::ResultType& type){
                 mcsm::warning(str);
             }
             break;
+        case mcsm::ResultType::MCSM_WARN_NOEXIT:
+            for(const std::string& str : message){
+                mcsm::warning(str);
+            }
+            break;
         case mcsm::ResultType::MCSM_FAIL:
             for(const std::string& str : message){
                 mcsm::error(str);
