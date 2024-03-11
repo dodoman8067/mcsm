@@ -22,7 +22,6 @@ SOFTWARE.
 
 #include <mcsm/jvm/java_detection.h>
 
-
 #ifdef _WIN32
     const std::string javaExecutable = "java.exe";
 #else
