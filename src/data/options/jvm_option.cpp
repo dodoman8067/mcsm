@@ -62,6 +62,12 @@ mcsm::JvmOption::JvmOption(const std::string& name, const mcsm::SearchTarget& ta
 
 mcsm::Result mcsm::JvmOption::create(){
     std::string jvm = mcsm::detectJava();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+    
     std::vector<std::string> jvmArgs = {
         "-Xms2G",
         "-Xmx2G",

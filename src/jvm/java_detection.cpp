@@ -52,8 +52,20 @@ std::string mcsm::getJavaFromPath(){
             while(found != std::string::npos){
                 std::string directory = pathStr.substr(0, found);
                 std::filesystem::path javaPath = std::filesystem::path(directory) / javaExecutable;
-                if(std::filesystem::exists(javaPath)){
-                    return std::move(javaPath.string());
+                
+                std::error_code ec;
+                bool exists = std::filesystem::exists(javaPath, ec);
+                if(ec){
+                    mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+                        "Checking if directory " + javaPath.string() + "operation failed : " + ec.message(), 
+                        "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+                    }});
+                    return "";
+                }
+
+                if(exists){
+                    mcsm::Result res({mcsm::ResultType::MCSM_OK, {"Success"}});
+                    return javaPath.string();
                 }
 
                 pathStr = pathStr.substr(found + 1);
@@ -67,8 +79,20 @@ std::string mcsm::getJavaFromPath(){
             while(found != std::string::npos){
                 std::string directory = pathStr.substr(0, found);
                 std::filesystem::path javaPath = std::filesystem::path(directory) / javaExecutable;
-                if(std::filesystem::exists(javaPath)){
-                    return std::move(javaPath.string());
+
+                std::error_code ec;
+                bool exists = std::filesystem::exists(javaPath, ec);
+                if(ec){
+                    mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+                        "Checking if directory " + javaPath.string() + "operation failed : " + ec.message(), 
+                        "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+                    }});
+                    return "";
+                }
+
+                if(exists){
+                    mcsm::Result res({mcsm::ResultType::MCSM_OK, {"Success"}});
+                    return javaPath.string();
                 }
 
                 pathStr = pathStr.substr(found + 1);
@@ -76,6 +100,7 @@ std::string mcsm::getJavaFromPath(){
             }
         }
     }
+    mcsm::Result res({mcsm::ResultType::MCSM_OK, {"Success"}});
     return "";
 }
 
@@ -85,8 +110,8 @@ std::string mcsm::detectJava(){
     if(!mcsm::isWhitespaceOrEmpty(str)){
         mcsm::replaceAll(str, "\\", "/");
         if(!isValidJava(str)){
-            mcsm::info("Detected java was not valid java.");
-            std::exit(1);
+            mcsm::Result res({mcsm::ResultType::MCSM_WARN, {"Detected java was not a valid java."}});
+            return "";
         }
         mcsm::info("Detected java from JAVA_HOME : " + str);
         if(!mcsm::startsWith(str, "\"")){
@@ -95,15 +120,18 @@ std::string mcsm::detectJava(){
         if(!mcsm::endsWith(str, "\"")){
             str = str + "\"";
         }
+        mcsm::Result res({mcsm::ResultType::MCSM_OK, {"Success"}});
         return str;
     }
     mcsm::info("Failed to detect java from JAVA_HOME; Looking from PATH.");
     std::string pathStr = getJavaFromPath();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    
     if(!mcsm::isWhitespaceOrEmpty(pathStr)){
         mcsm::replaceAll(pathStr, "\\", "/");
         if(!isValidJava(pathStr)){
-            mcsm::info("Detected java was not valid java.");
-            std::exit(1);
+            mcsm::Result res({mcsm::ResultType::MCSM_WARN, {"Detected java was not a valid java."}});
+            return "";
         }
         mcsm::info("Detected java from PATH : " + pathStr + ".");
         if(!mcsm::startsWith(pathStr, "\"")){
@@ -112,11 +140,15 @@ std::string mcsm::detectJava(){
         if(!mcsm::endsWith(pathStr, "\"")){
             pathStr = pathStr + "\"";
         }
+        mcsm::Result res({mcsm::ResultType::MCSM_OK, {"Success"}});
         return pathStr;
     }
-    mcsm::error("Failed to detect java from PATH.");
-    mcsm::error("But you may specify jvm path manually.");
-    std::exit(1);
+
+    mcsm::Result res({mcsm::ResultType::MCSM_WARN, {
+        "Failed to detect java from PATH.",
+        "But you may specify the jvm path manually."
+    }});
+    return "";
 }
 
 bool mcsm::isValidJava(const std::string& path){
@@ -134,6 +166,6 @@ bool mcsm::isValidJava(const std::string& path){
     }
     
     int code = mcsm::runCommand(command.c_str());
-    
+    mcsm::Result res({mcsm::ResultType::MCSM_OK, {"Success"}});
     return code == 0;
 }
