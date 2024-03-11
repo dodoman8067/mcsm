@@ -37,8 +37,7 @@ std::string mcsm::getJavaFromHome(){
     }
     std::string strPath = path;
     if(!std::filesystem::exists(strPath + "/bin")) return "";
-    if(std::filesystem::exists(strPath + "/bin/java")) return strPath + "/bin/" + javaExecutable;
-    if(std::filesystem::exists(strPath + "/bin/java.exe")) return strPath + "/bin/" + javaExecutable;
+    if(std::filesystem::exists(strPath + "/bin/" + javaExecutable)) return strPath + "/bin/" + javaExecutable;
     return "";
 }
 
