@@ -24,34 +24,32 @@ SOFTWARE.
 
 #include <mcsm/util/string_utils.h>
 
-namespace mcsm {
-    bool startsWith(const std::string& str, const std::string& value){
-        return str.rfind(value, 0) == 0;
-    }
+bool mcsm::startsWith(const std::string& str, const std::string& value){
+    return str.rfind(value, 0) == 0;
+}
 
-    bool endsWith(const std::string& str, const std::string& value){
-        // Ensure that `value` is not longer than `str` to avoid out-of-bounds comparisons
-        if (str.length() < value.length()) {
-            return false;
-        }
-        return str.compare(str.length() - value.length(), value.length(), value) == 0;
+bool mcsm::endsWith(const std::string& str, const std::string& value){
+    // Ensure that `value` is not longer than `str` to avoid out-of-bounds comparisons
+    if (str.length() < value.length()) {
+        return false;
     }
+    return str.compare(str.length() - value.length(), value.length(), value) == 0;
+}
 
-    bool isWhitespaceOrEmpty(const std::string& str){
-        // If the string is empty, consider it whitespace
-        if (str.empty()) {
-            return true;
-        }
-        // Check if the string has only whitespace characters
-        return str.find_first_not_of(" \t\n\v\f\r") == std::string::npos;
+bool mcsm::isWhitespaceOrEmpty(const std::string& str){
+    // If the string is empty, consider it whitespace
+    if (str.empty()) {
+        return true;
     }
+    // Check if the string has only whitespace characters
+    return str.find_first_not_of(" \t\n\v\f\r") == std::string::npos;
+}
 
-    void replaceAll(std::string& str, const std::string& value, const std::string& replacement){
-        std::string::size_type pos = 0;
-        // Iterate through the string and replace all occurrences of `value`
-        while ((pos = str.find(value, pos)) != std::string::npos) {
-            str.replace(pos, value.length(), replacement);
-            pos += replacement.length();
-        }
+void mcsm::replaceAll(std::string& str, const std::string& value, const std::string& replacement){
+    std::string::size_type pos = 0;
+    // Iterate through the string and replace all occurrences of `value`
+    while ((pos = str.find(value, pos)) != std::string::npos) {
+        str.replace(pos, value.length(), replacement);
+        pos += replacement.length();
     }
 }
