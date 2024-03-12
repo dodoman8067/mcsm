@@ -1,8 +1,10 @@
 #include <mcsm/data/options/modded/fabric_server_option.h>
 
+// You might be wondering why server option crating class would fail due to file non existent; It's because the first three constructors are for loading the existing config.
 mcsm::FabricServerOption::FabricServerOption() : FabricServerOption(mcsm::getCurrentPath()){}
 
 mcsm::FabricServerOption::FabricServerOption(const std::string& version, const std::string& path){
+    // Result handle
     bool fileExists = mcsm::fileExists(path);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
 
@@ -25,6 +27,7 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& version, const s
         return;
     }
 
+    // Gets the server type from json file.
     nlohmann::json type = option.getValue("type");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
 
@@ -37,17 +40,22 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& version, const s
         return; 
     }
 
+    // Creates a server instance with the string obtained from from option.getValue("type"). It has to be a Fabric server.
     std::shared_ptr<mcsm::Server> sPtr = mcsm::server::detectServerType(type);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+
+    // Checks if the server json file is for fabric servers
     std::string sType = sPtr->getTypeAsString();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
     if(sType != "fabric"){
+        // Returns an error result and call "return" so without error handling using this class would lead to undefined behaviour.
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "Class mcsm::FabricServerOption was constructed while non Fabric server pointer was passed as a parameter.",
             "This has a very high chance to be a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
         }});
         return;
     }
+
     this->path = path;
     this->version = version;
     this->server = sPtr;
@@ -55,6 +63,7 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& version, const s
 }
 
 mcsm::FabricServerOption::FabricServerOption(const std::string& path){
+    // Checks if the path exists(not file)
     bool fileExists = mcsm::fileExists(path);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
 

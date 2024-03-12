@@ -23,14 +23,18 @@ SOFTWARE.
 
 #include <mcsm/data/options/server_option.h>
 
-// You might be wondering why server option crating class would fail due to no file; It's because first three constructors are for loading existing config.
+// See mcsm::FabricServerOption class if you want to see how Fabric server option works.
+
+// You might be wondering why server option crating class would fail due to file non existent; It's because the first three constructors are for loading the existing config.
 mcsm::ServerOption::ServerOption() : ServerOption(mcsm::getCurrentPath()){}
 
 mcsm::ServerOption::ServerOption(const std::string& version, const std::string& path){
+    // Result handle
     bool fileExists = mcsm::fileExists(path);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
 
     if(!fileExists){
+        // Create folders
         if(!mcsm::mkdir(path)){
             mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
                 "Path mkdir failed : " + path,
@@ -49,6 +53,7 @@ mcsm::ServerOption::ServerOption(const std::string& version, const std::string& 
         return;
     }
 
+    // Gets the server type from json file.
     nlohmann::json type = option.getValue("type");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
 
@@ -61,8 +66,10 @@ mcsm::ServerOption::ServerOption(const std::string& version, const std::string& 
         return; 
     }
 
+    // Creates a server instance with the string obtained from from option.getValue("type").
     std::shared_ptr<mcsm::Server> sPtr = mcsm::server::detectServerType(type);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+
     this->path = path;
     this->version = version;
     this->server = sPtr;
@@ -70,7 +77,7 @@ mcsm::ServerOption::ServerOption(const std::string& version, const std::string& 
 }
 
 mcsm::ServerOption::ServerOption(const std::string& path){
-    //checks if the path exists(not file)
+    // Checks if the path exists. (not file)
     bool fileExists = mcsm::fileExists(path);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
 
