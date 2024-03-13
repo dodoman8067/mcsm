@@ -97,7 +97,13 @@ std::string mcsm::JvmOptionGeneratorCommand::getJvmPath(const std::vector<std::s
         }
     }
     mcsm::info("Java detection from -jp command arguments failed; Automatically detecting java..");
-    return mcsm::detectJava();
+    std::string java =  mcsm::detectJava();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+
+    return java;
 }
 
 std::string mcsm::JvmOptionGeneratorCommand::getProfileName(const std::vector<std::string>& args, const mcsm::SearchTarget& target) const {

@@ -236,21 +236,33 @@ mcsm::Result mcsm::PurpurServer::download(const std::string& version, const std:
 }
 
 mcsm::Result mcsm::PurpurServer::start(mcsm::JvmOption& option){
-    mcsm::ServerOption sOpt;
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
-    
-    std::string jar = getJarFile();
+    std::string cPath = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    bool fileExists = mcsm::fileExists(jar);
+    return start(option, cPath, cPath);
+}
+
+mcsm::Result mcsm::PurpurServer::start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
+    // ServerOption class handles the data file stuff
+    mcsm::ServerOption sOpt(optionPath);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+    
+    std::string jar = getJarFile(optionPath);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    bool fileExists = mcsm::fileExists(path + "/" + jar);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -266,13 +278,13 @@ mcsm::Result mcsm::PurpurServer::start(mcsm::JvmOption& option){
             return res;
         }
 
-        mcsm::Result res = download(sVer);
+        mcsm::Result res = download(sVer, path, jar, optionPath);
         if(!res.isSuccess()) return res;
     }else{
-        mcsm::Result res = update();
+        mcsm::Result res = update(optionPath);
         if(!res.isSuccess()) return res;
     }
-    return Server::start(option);
+    return Server::start(option, path, optionPath);
 }
 
 mcsm::Result mcsm::PurpurServer::update(){
@@ -314,9 +326,10 @@ mcsm::Result mcsm::PurpurServer::update(const std::string& optionPath){
     }
     std::string build = sBuild.get<std::string>();
     if(build != "latest"){
-        mcsm::Result res({mcsm::ResultType::MCSM_WARN_NOEXIT, {
-            "This server won't update to the latest build.",
-            "Change server.json into \"server_build\": \"latest\" for automatic download."
+        mcsm::warning("This server won't update to the latest build.");
+        mcsm::warning("Change server.json into \"server_build\": \"latest\" for automatic download.");
+        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {
+            "Update passed"
         }});
         return res;
     }
@@ -356,12 +369,12 @@ mcsm::Result mcsm::PurpurServer::update(const std::string& optionPath){
         return res;
     }
 
-    if(lastBuild == version){
+    if(lastBuild == std::to_string(ver)){
         mcsm::success("Server is up to date.");
         mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return res;
     }
-    mcsm::success("Update found : "  + version + ". Current build : " + lastBuild);
+    mcsm::success("Update found : "  + std::to_string(ver) + ". Current build : " + lastBuild);
 
     std::string jar = getJarFile(optionPath);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -370,7 +383,7 @@ mcsm::Result mcsm::PurpurServer::update(const std::string& optionPath){
         return res;
     }
 
-    bool fileExists = mcsm::fileExists(jar);
+    bool fileExists = mcsm::fileExists(optionPath + "/" + jar);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -378,7 +391,7 @@ mcsm::Result mcsm::PurpurServer::update(const std::string& optionPath){
     }
 
     if(fileExists){
-        mcsm::removeFile(jar);
+        mcsm::removeFile(optionPath + "/" + jar);
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
             std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
             mcsm::Result res(resp.first, resp.second);

@@ -1,5 +1,7 @@
 #include <mcsm/server/type/custom_server.h>
 
+// Currently unmaintained file.
+
 mcsm::CustomServer::CustomServer(){
 
 }
@@ -30,14 +32,14 @@ std::string mcsm::CustomServer::getFileLocation() const {
         mcsm::error("No \"jar_location\" value specified in file " + option.getName());
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue.");
         std::exit(1);
     }
     if(!option.getValue("jar_location").is_string()){
         mcsm::error("Value \"jar_location\" has to be a string, but it's not.");
         mcsm::error("Manually editing the launch profile might have caused this issue.");
         mcsm::error("If you know what you're doing, I believe you that you know how to handle this issue.");
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue.");
         std::exit(1);
     }
     std::string value = option.getValue("jar_location");
@@ -60,7 +62,7 @@ mcsm::Result mcsm::CustomServer::getFileFromLocation() {
         }
     }else{
         mcsm::error("The following server jarfile location wasn't a vaild location : " + location);
-        mcsm::error("If you believe that this is a software issue, please report it to GitHub (https://github.com/dodoman8067/mcsm).");
+        mcsm::error("Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue.");
     }
 }
 

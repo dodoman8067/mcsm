@@ -23,14 +23,18 @@ SOFTWARE.
 
 #include <mcsm/data/options/server_option.h>
 
-// You might be wondering why server option crating class would fail due to no file; It's because first three constructors are for loading existing config.
+// See mcsm::FabricServerOption class if you want to see how Fabric server option works.
+
+// You might be wondering why server option crating class would fail due to file non existent; It's because the first three constructors are for loading the existing config.
 mcsm::ServerOption::ServerOption() : ServerOption(mcsm::getCurrentPath()){}
 
 mcsm::ServerOption::ServerOption(const std::string& version, const std::string& path){
+    // Result handle
     bool fileExists = mcsm::fileExists(path);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
 
     if(!fileExists){
+        // Create folders
         if(!mcsm::mkdir(path)){
             mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
                 "Path mkdir failed : " + path,
@@ -49,6 +53,7 @@ mcsm::ServerOption::ServerOption(const std::string& version, const std::string& 
         return;
     }
 
+    // Gets the server type from json file.
     nlohmann::json type = option.getValue("type");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
 
@@ -61,8 +66,10 @@ mcsm::ServerOption::ServerOption(const std::string& version, const std::string& 
         return; 
     }
 
+    // Creates a server instance with the string obtained from from option.getValue("type").
     std::shared_ptr<mcsm::Server> sPtr = mcsm::server::detectServerType(type);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+
     this->path = path;
     this->version = version;
     this->server = sPtr;
@@ -70,6 +77,7 @@ mcsm::ServerOption::ServerOption(const std::string& version, const std::string& 
 }
 
 mcsm::ServerOption::ServerOption(const std::string& path){
+    // Checks if the path exists. (not file)
     bool fileExists = mcsm::fileExists(path);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
 
@@ -225,18 +233,22 @@ mcsm::Result mcsm::ServerOption::create(const std::string& name, mcsm::JvmOption
 
 mcsm::Result mcsm::ServerOption::start(){
     std::unique_ptr<mcsm::JvmOption> jvmOpt = getDefaultOption();
-    return start(std::move(jvmOpt));
+    return start(std::move(jvmOpt), this->path, this->path);
 }
 
 mcsm::Result mcsm::ServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
-    mcsm::ServerDataOption serverDataOpt;
+    return start(std::move(option), this->path, this->path);
+}
+
+mcsm::Result mcsm::ServerOption::start(std::unique_ptr<mcsm::JvmOption> option, const std::string& path, const std::string& optionPath){
+    mcsm::ServerDataOption serverDataOpt(optionPath);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    bool fileExists = mcsm::fileExists(this->path + "/server.json");
+    bool fileExists = mcsm::fileExists(optionPath + "/server.json");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -286,7 +298,7 @@ mcsm::Result mcsm::ServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
     mcsm::info("Server JVM launch profile : " + profileName);
     mcsm::Result res = serverDataOpt.updateLastTimeLaunched();
     if(!res.isSuccess()) return res;
-    mcsm::Result res2 = this->server->start(*option);
+    mcsm::Result res2 = this->server->start(*option, path, optionPath);
     return res2;
 }
 
@@ -318,7 +330,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const {
             "No default launch profile name specified in file " + option.getName(),
             "Manually editing the launch profile might have caused this issue.",
             "If you know what you're doing, I believe you that you know how to handle this issue.",
-            "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
         }});
         return nullptr;      
     }
@@ -328,7 +340,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const {
             "Value \"name\" in \"default_launch_profile\" has to be a string, but it's not.",
             "Manually editing the launch profile might have caused this issue.",
             "If you know what you're doing, I believe you that you know how to handle this issue.",
-            "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
         }});
         return nullptr;
     }
@@ -337,7 +349,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const {
             "No default launch profile location specified in file " + option.getName(),
             "Manually editing the launch profile might have caused this issue.",
             "If you know what you're doing, I believe you that you know how to handle this issue.",
-            "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
         }});
         return nullptr;    
     }
@@ -347,7 +359,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const {
             "Value \"location\" in \"default_launch_profile\" has to be a string, but it's not.",
             "Manually editing the launch profile might have caused this issue.",
             "If you know what you're doing, I believe you that you know how to handle this issue.",
-            "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
         }});
         return nullptr;
     }
@@ -362,7 +374,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const {
             "Value \"location\" in \"default_launch_profile\" has to be \"global\" or \"current\", but it's not.",
             "Manually editing the launch profile might have caused this issue.",
             "If you know what you're doing, I believe you that you know how to handle this issue.",
-            "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
         }});
         return nullptr;
     }

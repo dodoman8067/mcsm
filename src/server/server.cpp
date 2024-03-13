@@ -23,6 +23,10 @@ SOFTWARE.
 #include <mcsm/server/server.h>
 
 mcsm::Result mcsm::Server::start(mcsm::JvmOption& option){
+    return start(option);
+}
+
+mcsm::Result mcsm::Server::start(mcsm::JvmOption& option, const std::string& /* path */, const std::string& optionPath){
     std::string jvmOpt = " ";
     auto jArgs = option.getJvmArguments();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -54,14 +58,14 @@ mcsm::Result mcsm::Server::start(mcsm::JvmOption& option){
         return res;
     }
 
-    std::string jar = this->getJarFile();
+    std::string jar = getJarFile(optionPath);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    std::string command = jPath + jvmOpt + jar + svrOpt;
+    std::string command = jPath + jvmOpt + optionPath + "/" + jar + svrOpt;
     mcsm::info("Running command : " + command);
     int result = mcsm::runCommand(command.c_str());
     if(result != 0){

@@ -24,15 +24,13 @@ SOFTWARE.
 
 #include <mcsm/init.h>
 
-const std::string version = "0.1.1.0";
+const std::string version = "0.1.1.1";
 
 int main(int argc, char *argv[]){
     //libssh2 : cmake -B ./build -DBUILD_SHARED_LIBS=OFF -DOPENSSL_USE_STATIC_LIBS=ON -DZLIB_USE_STATIC_LIBS=ON -DENABLE_ZLIB_COMPRESSION=ON -DCRYPTO_BACKEND=OpenSSL
     //libgit2 : cmake -B ./build -DBUILD_SHARED_LIBS=OFF -DOPENSSL_USE_STATIC_LIBS=ON -DZLIB_USE_STATIC_LIBS=ON
     //libcurl-linux : cmake -B ./build -DBUILD_SHARED_LIBS=OFF -DOPENSSL_USE_STATIC_LIBS=ON -DZLIB_USE_STATIC_LIBS=ON
     //libcurl : cmake command : cmake -B ./build -G "MinGW Makefiles" -DBUILD_SHARED_LIBS=OFF -DZLIB_USE_STATIC_LIBS=ON -DCURL_USE_SCHANNEL=ON
-
-    //TODO : Make server class' methods return mcsm::Result
 
     mcsm::init init;
     init.initMCSM(version);
@@ -59,7 +57,7 @@ int main(int argc, char *argv[]){
             for(int i = 2; i < argc; i++){
                 args.push_back(argv[i]);
             }
-            v->execute(std::move(args));
+            v->execute(args);
             commandFound = true;
             break;
         }

@@ -45,6 +45,14 @@ const std::vector<std::string> availableOptions = {
     "-jarpath",
     "--jp",
     "-jp",
+    "--serverversion",
+    "-serverversion",
+    "--sversion",
+    "-sversion",
+    "--sver",
+    "-sver",
+    "--sv",
+    "-sv",
     "--version",
     "-version",
     "--ver",
@@ -60,6 +68,11 @@ mcsm::GenerateServerCommand::~GenerateServerCommand(){}
 void mcsm::GenerateServerCommand::execute(const std::vector<std::string>& args){
     if(args.empty()){
         mcsm::warning("Name not provided; To continue, specify a name with --name option.");
+        std::exit(1);
+    }
+    if(isConfigured()){
+        mcsm::warning("Server is already configured in this directory.");
+        mcsm::warning("Please try again in other directories.");
         std::exit(1);
     }
     detectServer(args);
@@ -116,7 +129,7 @@ std::string mcsm::GenerateServerCommand::getServerVersion(const std::vector<std:
     for(size_t i = 0; i < args.size(); ++i){
         const std::string& arg = args[i];
         if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
-            if(!(arg == "-version" || arg == "--version" || arg == "-ver" || arg == "--ver" || arg == "-v" || arg == "--v")) continue;
+            if(!(arg == "-version" || arg == "--version" || arg == "-ver" || arg == "--ver" || arg == "-v" || arg == "--v" || arg == "-serverversion" || arg == "--serverversion" || arg == "-sversion" || arg == "--sversion" || arg == "-sver" || arg == "--sver" || arg == "-sv" || arg == "--sv")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
                 ver = args[i + 1];
                 return ver;
@@ -237,4 +250,18 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& a
     }
     mcsm::error("Server type not supported : " + type);
     std::exit(1);
+}
+
+inline bool mcsm::GenerateServerCommand::isConfigured(){
+    std::string path = mcsm::getCurrentPath();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+    bool fileExists = mcsm::fileExists(path + "/server.json");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+    return fileExists;
 }

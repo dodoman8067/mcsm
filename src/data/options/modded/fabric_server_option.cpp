@@ -1,8 +1,10 @@
 #include <mcsm/data/options/modded/fabric_server_option.h>
 
+// You might be wondering why server option crating class would fail due to file non existent; It's because the first three constructors are for loading the existing config.
 mcsm::FabricServerOption::FabricServerOption() : FabricServerOption(mcsm::getCurrentPath()){}
 
 mcsm::FabricServerOption::FabricServerOption(const std::string& version, const std::string& path){
+    // Result handle
     bool fileExists = mcsm::fileExists(path);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
 
@@ -25,6 +27,7 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& version, const s
         return;
     }
 
+    // Gets the server type from json file.
     nlohmann::json type = option.getValue("type");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
 
@@ -37,17 +40,22 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& version, const s
         return; 
     }
 
+    // Creates a server instance with the string obtained from from option.getValue("type"). It has to be a Fabric server.
     std::shared_ptr<mcsm::Server> sPtr = mcsm::server::detectServerType(type);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+
+    // Checks if the server json file is for fabric servers
     std::string sType = sPtr->getTypeAsString();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
     if(sType != "fabric"){
+        // Returns an error result and call "return" so without error handling using this class would lead to undefined behaviour.
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "Class mcsm::FabricServerOption was constructed while non Fabric server pointer was passed as a parameter.",
             "This has a very high chance to be a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
         }});
         return;
     }
+
     this->path = path;
     this->version = version;
     this->server = sPtr;
@@ -55,6 +63,7 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& version, const s
 }
 
 mcsm::FabricServerOption::FabricServerOption(const std::string& path){
+    // Checks if the path exists(not file)
     bool fileExists = mcsm::fileExists(path);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
 
@@ -137,7 +146,10 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& version, std::sh
 }
 
 mcsm::FabricServerOption::FabricServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server, const std::string& path){
-    if(!mcsm::fileExists(path)){
+    bool fileExists = mcsm::fileExists(path);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+
+    if(!fileExists){
         if(!mcsm::mkdir(path)){
             mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
                 "Path mkdir failed : " + path,
@@ -234,18 +246,22 @@ mcsm::Result mcsm::FabricServerOption::create(const std::string& name, mcsm::Jvm
 
 mcsm::Result mcsm::FabricServerOption::start(){
     std::unique_ptr<mcsm::JvmOption> jvmOpt = getDefaultOption();
-    return start(std::move(jvmOpt));
+    return start(std::move(jvmOpt), this->path, this->path);
 }
 
 mcsm::Result mcsm::FabricServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
-    mcsm::FabricServerDataOption serverDataOpt;
+    return start(std::move(option), this->path, this->path);
+}
+
+mcsm::Result mcsm::FabricServerOption::start(std::unique_ptr<mcsm::JvmOption> option, const std::string& path, const std::string& optionPath){
+    mcsm::FabricServerDataOption serverDataOpt(optionPath);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    bool fileExists = mcsm::fileExists(this->path + "/server.json");
+    bool fileExists = mcsm::fileExists(optionPath + "/server.json");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -310,7 +326,7 @@ mcsm::Result mcsm::FabricServerOption::start(std::unique_ptr<mcsm::JvmOption> op
     mcsm::info("Server JVM launch profile : " + profileName);
     mcsm::Result res = serverDataOpt.updateLastTimeLaunched();
     if(!res.isSuccess()) return res;
-    mcsm::Result res2 = this->server->start(*option);
+    mcsm::Result res2 = this->server->start(*option, path, optionPath);
     return res2;
 }
 
@@ -407,7 +423,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::FabricServerOption::getDefaultOption() co
             "No default launch profile name specified in file " + option.getName(),
             "Manually editing the launch profile might have caused this issue.",
             "If you know what you're doing, I believe you that you know how to handle this issue.",
-            "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
         }});
         return nullptr;
     }
@@ -417,7 +433,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::FabricServerOption::getDefaultOption() co
             "Value \"name\" in \"default_launch_profile\" has to be a string, but it's not.",
             "Manually editing the launch profile might have caused this issue.",
             "If you know what you're doing, I believe you that you know how to handle this issue.",
-            "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
         }});
         return nullptr;
     }
@@ -426,7 +442,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::FabricServerOption::getDefaultOption() co
             "No default launch profile location specified in file " + option.getName(),
             "Manually editing the launch profile might have caused this issue.",
             "If you know what you're doing, I believe you that you know how to handle this issue.",
-            "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
         }});
         return nullptr;
     }
@@ -436,7 +452,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::FabricServerOption::getDefaultOption() co
             "Value \"location\" in \"default_launch_profile\" has to be a string, but it's not.",
             "Manually editing the launch profile might have caused this issue.",
             "If you know what you're doing, I believe you that you know how to handle this issue.",
-            "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
         }});
         return nullptr;
     }
@@ -451,7 +467,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::FabricServerOption::getDefaultOption() co
             "Value \"location\" in \"default_launch_profile\" has to be \"global\" or \"current\", but it's not.",
             "Manually editing the launch profile might have caused this issue.",
             "If you know what you're doing, I believe you that you know how to handle this issue.",
-            "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
         }});
         return nullptr;
     }

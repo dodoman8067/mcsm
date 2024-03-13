@@ -146,21 +146,33 @@ mcsm::Result mcsm::VanillaServer::download(const std::string& version, const std
 }
 
 mcsm::Result mcsm::VanillaServer::start(mcsm::JvmOption& option){
-    mcsm::ServerOption sOpt;
+    std::string cPath = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    std::string jar = getJarFile();
+    return start(option, cPath, cPath);
+}
+
+mcsm::Result mcsm::VanillaServer::start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
+    // ServerOption class handles the data file stuff
+    mcsm::ServerOption sOpt(optionPath);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    bool fileExists = mcsm::fileExists(jar);
+    std::string jar = getJarFile(optionPath);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    bool fileExists = mcsm::fileExists(path + "/" + jar);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -176,10 +188,10 @@ mcsm::Result mcsm::VanillaServer::start(mcsm::JvmOption& option){
         }
 
         mcsm::info("Downloading " + jar + "...");
-        mcsm::Result res = download(ver);
+        mcsm::Result res = download(ver, path, jar, optionPath);
         if(!res.isSuccess()) return res;
     }
-    return Server::start(option);
+    return Server::start(option, path, optionPath);
 }
 
 bool mcsm::VanillaServer::hasVersion(const std::string& version){

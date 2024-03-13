@@ -90,10 +90,17 @@ namespace mcsm {
         virtual std::string getGitHub() const = 0;
 
         /**
-         * Starts a Minecraft server with following launch profile `option`
+         * Starts the configured server with following launch profile `option`
          * @param option JVM launch profile
         */
         virtual mcsm::Result start(mcsm::JvmOption& option);
+
+        /**
+         * Starts the configured server in `optionPath` with following launch profile `option`
+         * @param option JVM launch profile
+         * @param optionPath server.json path
+        */
+        virtual mcsm::Result start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath);
     };
 }
 
