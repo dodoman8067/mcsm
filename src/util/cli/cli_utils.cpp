@@ -76,7 +76,7 @@ std::string mcsm::getCurrentPath(){
     if(ec){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "Getting current path operation failed : " + ec.message(), 
-            "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
             }});
         return "";
     }
@@ -90,7 +90,7 @@ bool mcsm::fileExists(const std::string& path){
     if(ec){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "Checking if file/directory " + path + "operation failed : " + ec.message(), 
-            "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
             }});
         return false;
     }
@@ -105,7 +105,7 @@ bool mcsm::removeFile(const std::string& path){
     if(ec){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "Removing file " + path + "operation failed : " + ec.message(), 
-            "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
             }});
         return false;
     }

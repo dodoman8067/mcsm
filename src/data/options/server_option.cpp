@@ -330,7 +330,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const {
             "No default launch profile name specified in file " + option.getName(),
             "Manually editing the launch profile might have caused this issue.",
             "If you know what you're doing, I believe you that you know how to handle this issue.",
-            "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
         }});
         return nullptr;      
     }
@@ -340,7 +340,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const {
             "Value \"name\" in \"default_launch_profile\" has to be a string, but it's not.",
             "Manually editing the launch profile might have caused this issue.",
             "If you know what you're doing, I believe you that you know how to handle this issue.",
-            "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
         }});
         return nullptr;
     }
@@ -349,7 +349,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const {
             "No default launch profile location specified in file " + option.getName(),
             "Manually editing the launch profile might have caused this issue.",
             "If you know what you're doing, I believe you that you know how to handle this issue.",
-            "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
         }});
         return nullptr;    
     }
@@ -359,7 +359,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const {
             "Value \"location\" in \"default_launch_profile\" has to be a string, but it's not.",
             "Manually editing the launch profile might have caused this issue.",
             "If you know what you're doing, I believe you that you know how to handle this issue.",
-            "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
         }});
         return nullptr;
     }
@@ -374,7 +374,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const {
             "Value \"location\" in \"default_launch_profile\" has to be \"global\" or \"current\", but it's not.",
             "Manually editing the launch profile might have caused this issue.",
             "If you know what you're doing, I believe you that you know how to handle this issue.",
-            "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
         }});
         return nullptr;
     }

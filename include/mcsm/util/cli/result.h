@@ -88,7 +88,7 @@ namespace mcsm {
                 "Value " + key + " has to be a(n) " + type + ", but it's not.",
                 "Manually editing the launch profile might have caused this issue.",
                 "If you know what you're doing, I believe you that you know how to handle this issue.",
-                "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+                "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
             };
         }
 
@@ -104,7 +104,7 @@ namespace mcsm {
                 "No "+ key +" value specified in file " + name,
                 "Manually editing the launch profile might have caused this issue.",
                 "If you know what you're doing, I believe you that you know how to handle this issue.",
-                "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+                "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
             };
         }
 
@@ -183,7 +183,7 @@ namespace mcsm {
                 "No default launch profile specified in file " + name,
                 "Manually editing the launch profile might have caused this issue.",
                 "If you know what you're doing, I believe you that you know how to handle this issue.",
-                "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+                "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
             };
         }
 
@@ -192,7 +192,7 @@ namespace mcsm {
                 "No default launch profile name specified in file " + name,
                 "Manually editing the launch profile might have caused this issue.",
                 "If you know what you're doing, I believe you that you know how to handle this issue.",
-                "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+                "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
             };
         }
 
@@ -221,7 +221,7 @@ namespace mcsm {
             return {
                 "Cannot create directory/file " + name,
                 "This might have caused because of permissions or file name problems.",
-                "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+                "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
             };
         }
 
@@ -229,7 +229,7 @@ namespace mcsm {
             return {
                 "Cannot save file " + name,
                 "This might have caused because of permissions or file name problems.",
-                "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+                "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
             };
         }
 
@@ -237,14 +237,14 @@ namespace mcsm {
             return {
                 "Cannot open file " + name,
                 "This might have caused because of permissions or file name problems.",
-                "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+                "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
             };
         }
 
         inline std::vector<std::string> fileNotFound(const std::string& name){
             return {
                 "File " + name + " cannot be found.",
-                "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+                "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
             };
         }
 
@@ -277,7 +277,7 @@ namespace mcsm {
         inline std::vector<std::string> platformNotSupported(){
             return {
                 "Current operating system is not supported.",
-                "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+                "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
             };
         }
     }

@@ -56,7 +56,7 @@ std::string mcsm::getJavaFromPath(){
                 if(ec){
                     mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
                         "Checking if directory " + javaPath.string() + "operation failed : " + ec.message(), 
-                        "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+                        "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
                     }});
                     return "";
                 }
@@ -83,7 +83,7 @@ std::string mcsm::getJavaFromPath(){
                 if(ec){
                     mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
                         "Checking if directory " + javaPath.string() + "operation failed : " + ec.message(), 
-                        "If you believe that this is a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."
+                        "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
                     }});
                     return "";
                 }
