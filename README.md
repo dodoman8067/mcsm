@@ -26,7 +26,7 @@ This project requires the following dependencies :
 * [nlohmann/json](https://github.com/nlohmann/json)
 * [termcolor](https://github.com/ikalnytskyi/termcolor)
 
-Before building, you must build them and install it with CMake.
+Before building, you must build them and install them with CMake.
 
 ## Usage
 
@@ -50,5 +50,3 @@ This project is under [MIT](LICENSE) license.
 * [libgit2](https://github.com/libgit2/libgit2/blob/main/COPYING)
 * [nlohmann/json](https://github.com/nlohmann/json/blob/develop/LICENSE.MIT)
 * [termcolor](https://github.com/ikalnytskyi/termcolor/LICENSE)
-
-Special thanks to the creators of the program's dependencies.
