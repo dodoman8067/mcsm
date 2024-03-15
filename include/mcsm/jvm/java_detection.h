@@ -31,6 +31,9 @@ SOFTWARE.
 #include <mcsm/util/os/os_detection.h>
 
 namespace mcsm {
+    /**
+     * @brief No mcsm::Result needed
+     */
     std::string getJavaFromHome();
     std::string getJavaFromPath();
 
