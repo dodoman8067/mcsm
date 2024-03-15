@@ -217,13 +217,16 @@ mcsm::Result mcsm::ServerOption::create(const std::string& name, mcsm::JvmOption
 
     mcsm::Result res5 = option.setValue("server_jar", jarFile);
     if(!res5.isSuccess()) return res5;
-    
+
     mcsm::Result res6 = option.setValue("server_build", "latest");
     if(!res6.isSuccess()) return res6;
-    
+
+    mcsm::Result res10 = option.setValue("auto_update", true);
+    if(!res10.isSuccess()) return res10;
+
     mcsm::Result res7 = option.setValue("type", this->server->getTypeAsString());
     if(!res7.isSuccess()) return res7;
-    
+
     mcsm::Result res8 = serverDataOpt.updateServerTimeCreated();
     if(!res8.isSuccess()) return res8;
 
@@ -300,6 +303,33 @@ mcsm::Result mcsm::ServerOption::start(std::unique_ptr<mcsm::JvmOption> option, 
     if(!res.isSuccess()) return res;
     mcsm::Result res2 = this->server->start(*option, path, optionPath);
     return res2;
+}
+
+mcsm::Result mcsm::ServerOption::update(const std::string& path, const std::string& optionPath){
+    bool fileExists = mcsm::fileExists(optionPath + "/server.json");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    if(!fileExists){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        return res;
+    }
+
+    if(this->server == nullptr){
+        this->server.reset();
+        this->server = mcsm::server::detectServerType(getServerType());
+        
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
+    }
+    
+    
 }
 
 bool mcsm::ServerOption::exists(){
@@ -547,6 +577,36 @@ std::string mcsm::ServerOption::getServerJarBuild() const {
 mcsm::Result mcsm::ServerOption::setServerJarBuild(const std::string& build){
     mcsm::Option option(this->path, "server");
     return option.setValue("server_build", build);
+}
+
+bool mcsm::ServerOption::doesAutoUpdate() const {
+    mcsm::Option option(this->path, "server");
+    bool optExists = option.exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    if(!optExists){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        return "";
+    }
+
+    nlohmann::json value = option.getValue("auto_update");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+
+    if(value == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"auto_update\"", option.getName())});
+        return "";
+    }
+    if(!value.is_boolean()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"auto_update\"", "boolean")});
+        return "";
+    }
+
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    return value;
+}
+
+mcsm::Result mcsm::ServerOption::setAutoUpdate(const bool& update){
+    mcsm::Option option(this->path, "server");
+    return option.setValue("auto_update", update);
 }
 
 std::shared_ptr<mcsm::Server> mcsm::ServerOption::getServer() const {

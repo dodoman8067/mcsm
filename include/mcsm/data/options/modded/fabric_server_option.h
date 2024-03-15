@@ -27,6 +27,8 @@ namespace mcsm {
         mcsm::Result start(std::unique_ptr<mcsm::JvmOption> option);
         mcsm::Result start(std::unique_ptr<mcsm::JvmOption> option, const std::string& path, const std::string& optionPath);
 
+        mcsm::Result update();
+
         std::string getServerJarBuild() const;
         mcsm::Result setServerJarBuild(const std::string& build);
 
@@ -49,6 +51,9 @@ namespace mcsm {
 
         std::string getServerJarFile() const;
         mcsm::Result setServerJarFile(const std::string& name);
+
+        bool doesAutoUpdate() const;
+        mcsm::Result setAutoUpdate(const bool& update);
         
         std::shared_ptr<mcsm::Server> getServer() const;
     };
