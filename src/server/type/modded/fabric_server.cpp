@@ -599,8 +599,17 @@ mcsm::Result mcsm::FabricServer::start(mcsm::JvmOption& option, const std::strin
         mcsm::Result res = download(sVer, path, jar, optionPath);
         if(!res.isSuccess()) return res;
     }else{
-        mcsm::Result res = update(optionPath);
-        if(!res.isSuccess()) return res;
+        bool doesUpdate = sOpt.doesAutoUpdate();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
+        
+        if(doesUpdate){
+            mcsm::Result res = update(optionPath);
+            if(!res.isSuccess()) return res;
+        }
     }
     return Server::start(option, path, optionPath);
 }
