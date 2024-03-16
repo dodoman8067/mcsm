@@ -607,7 +607,7 @@ mcsm::Result mcsm::FabricServer::start(mcsm::JvmOption& option, const std::strin
         }
         
         if(doesUpdate){
-            mcsm::Result res = update(optionPath);
+            mcsm::Result res = update(path, optionPath);
             if(!res.isSuccess()) return res;
         }
     }
@@ -622,10 +622,21 @@ mcsm::Result mcsm::FabricServer::update(){
         return res;
     }
 
-    return update(path);
+    return update(path, path);
 }
 
 mcsm::Result mcsm::FabricServer::update(const std::string& optionPath){
+    std::string path = mcsm::getCurrentPath();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    return update(path, optionPath);
+}
+
+mcsm::Result mcsm::FabricServer::update(const std::string& path, const std::string& optionPath){
     mcsm::FabricServerDataOption sDataOpt(optionPath);
     mcsm::Option opt(optionPath, "server");
     bool exists = opt.exists();
@@ -767,7 +778,7 @@ mcsm::Result mcsm::FabricServer::update(const std::string& optionPath){
         return res;
     }
 
-    bool fileExists = mcsm::fileExists(optionPath + "/" + jar);
+    bool fileExists = mcsm::fileExists(path + "/" + jar);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -775,7 +786,7 @@ mcsm::Result mcsm::FabricServer::update(const std::string& optionPath){
     }
 
     if(fileExists){
-        mcsm::removeFile(optionPath + "/" + jar);
+        mcsm::removeFile(path + "/" + jar);
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
             std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
             mcsm::Result res(resp.first, resp.second);
@@ -783,7 +794,7 @@ mcsm::Result mcsm::FabricServer::update(const std::string& optionPath){
         }
     }
 
-    return download(sVer, loaderVer, installerVer, optionPath, jar, optionPath);
+    return download(sVer, loaderVer, installerVer, path, jar, optionPath);
 }
 
 bool mcsm::FabricServer::hasVersion(const std::string& version){
