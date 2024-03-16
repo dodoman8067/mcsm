@@ -305,7 +305,8 @@ mcsm::Result mcsm::ServerOption::start(std::unique_ptr<mcsm::JvmOption> option, 
     return res2;
 }
 
-mcsm::Result mcsm::ServerOption::update(const std::string& path, const std::string& optionPath){
+//WIP
+mcsm::Result mcsm::ServerOption::update(const std::string& /* path */, const std::string& optionPath){
     bool fileExists = mcsm::fileExists(optionPath + "/server.json");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -329,7 +330,8 @@ mcsm::Result mcsm::ServerOption::update(const std::string& path, const std::stri
         }
     }
     
-    
+    mcsm::Result res1({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    return res1;
 }
 
 bool mcsm::ServerOption::exists(){
