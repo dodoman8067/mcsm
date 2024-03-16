@@ -51,7 +51,7 @@ std::string mcsm::CustomServer::getFileLocation() const {
 
 mcsm::Result mcsm::CustomServer::setFileLocation(const std::string& location) {
     mcsm::Option option(".", "server");
-    option.setValue("jar_location", location);
+    return option.setValue("jar_location", location);
 }
 
 mcsm::Result mcsm::CustomServer::getFileFromLocation() {
@@ -64,6 +64,9 @@ mcsm::Result mcsm::CustomServer::getFileFromLocation() {
         mcsm::error("The following server jarfile location wasn't a vaild location : " + location);
         mcsm::error("Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue.");
     }
+
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    return res;
 }
 
 bool mcsm::CustomServer::isFile(const std::string& location) const {
