@@ -61,7 +61,9 @@ std::vector<std::string> mcsm::getMinecraftVersions(){
         "1.19.4",
         "1.20",
         "1.20.1",
-        "1.20.2"
+        "1.20.2",
+        "1.20.3",
+        "1.20.4"
     };
     return versions;
 }
