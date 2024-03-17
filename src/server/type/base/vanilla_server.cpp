@@ -87,7 +87,6 @@ std::string mcsm::VanillaServer::getVersionURL(const std::string& ver) const {
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     
     nlohmann::json data = nlohmann::json::parse(jsonData);
-    
     if(data.is_discarded()){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "Parse of json failed. (Vanilla version manifest)",
@@ -95,6 +94,7 @@ std::string mcsm::VanillaServer::getVersionURL(const std::string& ver) const {
         }});
         return "";  
     }
+
     // Check if "versions" array exists
     if(!data.contains("versions")){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
