@@ -35,6 +35,7 @@ namespace mcsm {
     private:
         std::unique_ptr<std::map<const std::string, const std::string>> versions;
         mcsm::Result init();
+        std::string getVersionURL(const std::string& ver) const;
     public:
         VanillaServer();
         ~VanillaServer();
