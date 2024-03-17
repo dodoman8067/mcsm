@@ -45,7 +45,7 @@ void mcsm::init::initCommands(const std::string& version){
     mcsm::CommandManager::init();
 
     // Register commands to CommandManager
-    std::unique_ptr<mcsm::VersionCommand> versionCommand = std::make_unique<mcsm::VersionCommand>("version", "Returns version information about this program.", version);
+    std::unique_ptr<mcsm::VersionCommand> versionCommand = std::make_unique<mcsm::VersionCommand>("version", "Returns the version information about this program.", version);
     versionCommand->addAlias("ver");
     mcsm::CommandManager::addCommand(std::move(versionCommand));
 
@@ -81,7 +81,7 @@ void mcsm::init::initCommands(const std::string& version){
     jvmOptionEditCommand->addAlias("editjvmprofile");
     mcsm::CommandManager::addCommand(std::move(jvmOptionEditCommand));
 
-    std::unique_ptr<mcsm::StartServerCommand> startServerCommand = std::make_unique<mcsm::StartServerCommand>("start", "Starts a configured server.");
+    std::unique_ptr<mcsm::StartServerCommand> startServerCommand = std::make_unique<mcsm::StartServerCommand>("start", "Starts the configured server.");
     startServerCommand->addAlias("startServer");
     startServerCommand->addAlias("startserver");
     mcsm::CommandManager::addCommand(std::move(startServerCommand));
