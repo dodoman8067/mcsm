@@ -264,7 +264,7 @@ mcsm::Result mcsm::VanillaServer::start(mcsm::JvmOption& option, const std::stri
 }
 
 bool mcsm::VanillaServer::hasVersion(const std::string& version){
-    std::string ver = getVersionURL(version);
+    std::string ver = getVersionObject(version);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return false;
     return !mcsm::isWhitespaceOrEmpty(ver);
 }
