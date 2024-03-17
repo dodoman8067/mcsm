@@ -34,6 +34,7 @@ int mcsm::PaperServer::getVersion(const std::string& ver) const {
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
         return -1;
     }
+    if(json["builds"] == nullptr) return -1;
     if(json["builds"].is_array()){
         nlohmann::json builds = json["builds"];
         if(builds[json["builds"].size() - 1] == nullptr || !builds[json["builds"].size() - 1].is_number_integer()) return -1;
@@ -66,27 +67,22 @@ std::vector<std::string> mcsm::PaperServer::getAvailableVersions(){
     for(const std::string& s : mcsm::getMinecraftVersions()){
         versions.push_back(s);
     }
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return versions;
 }
 
 std::string mcsm::PaperServer::getSupportedVersions() const {
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "1.8~";
 }
 
 std::string mcsm::PaperServer::getBasedServer() const {
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "spigot";
 }
 
 std::string mcsm::PaperServer::getWebSite() const {
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "https://papermc.io";
 }
 
 std::string mcsm::PaperServer::getGitHub() const {
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "https://github.com/PaperMC/Paper";
 }
 

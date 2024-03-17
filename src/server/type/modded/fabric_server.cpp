@@ -76,27 +76,22 @@ std::vector<std::string> mcsm::FabricServer::getAvailableVersions(){
     for(const std::string& s : mcsm::getMinecraftVersions()){
         versions.push_back(s);
     }
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return versions;
 }
 
 std::string mcsm::FabricServer::getSupportedVersions() const {
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "1.14~";
 }
 
 std::string mcsm::FabricServer::getBasedServer() const {
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "vanilla";
 }
 
 std::string mcsm::FabricServer::getWebSite() const {
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "https://fabricmc.net";
 }
 
 std::string mcsm::FabricServer::getGitHub() const {
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "https://github.com/FabricMC/fabric";
 }
 
