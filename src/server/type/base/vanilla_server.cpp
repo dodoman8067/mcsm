@@ -82,7 +82,7 @@ mcsm::Result mcsm::VanillaServer::init(){
     return res;
 }
 
-std::string mcsm::VanillaServer::getVersionURL(const std::string& ver) const {
+std::string mcsm::VanillaServer::getVersionObject(const std::string& ver) const {
     std::string jsonData = mcsm::get("https://launchermeta.mojang.com/mc/game/version_manifest.json");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     
