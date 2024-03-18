@@ -151,6 +151,63 @@ std::string mcsm::VanillaServer::getVersionObject(const std::string& ver) const 
     return "";
 }
 
+std::string mcsm::VanillaServer::getServerJarURL(const std::string& ver) const {
+    std::string versionJson = getVersionObject(ver);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    if(mcsm::isWhitespaceOrEmpty(versionJson)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion(ver)});
+        return "";
+    }
+    nlohmann::json version = nlohmann::json::parse(versionJson, nullptr, false);
+    if(version.is_discarded()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Parse of json failed. (Vanilla version object)",
+            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
+        }});
+        return "";
+    }
+    if(version["type"] == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Value \"type\" not found. (Vanilla version object)",
+            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
+        }});
+        return "";
+    }
+    if(version["url"] == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Value \"url\" not found. (Vanilla version object)",
+            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
+        }});
+        return "";
+    }
+    if(!version["type"].is_string()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Value \"type\" is not string. (Vanilla version object)",
+            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
+        }});
+        return "";
+    }
+    if(!version["url"].is_string()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Value \"url\" is not string. (Vanilla version object)",
+            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
+        }});
+        return "";
+    }
+
+    if(version["type"] == "old_beta" || version["type"] == "old_alpha"){
+        mcsm::Result res({mcsm::ResultType::MCSM_WARN, {
+            "No plans to support beta and alpha versions.",
+            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue."
+        }});
+        return "";
+    }
+
+    std::string url = version["url"];
+    std::string serverJson = mcsm::get(url);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+}
+
 std::vector<std::string> mcsm::VanillaServer::getAvailableVersions(){
     std::vector<std::string> vector;
     vector.reserve(this->versions->size());
