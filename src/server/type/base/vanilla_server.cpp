@@ -204,8 +204,72 @@ std::string mcsm::VanillaServer::getServerJarURL(const std::string& ver) const {
     }
 
     std::string url = version["url"];
+    //mcsm::info(url); //debug
     std::string serverJson = mcsm::get(url);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    if(mcsm::isWhitespaceOrEmpty(versionJson)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion(ver)});
+        return "";
+    }
+
+    nlohmann::json serverData = nlohmann::json::parse(serverJson);
+    if(serverData.is_discarded()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Parse of json failed. (Vanilla version.json file).",
+            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
+        }});
+        return "";  
+    }
+    nlohmann::json downloadsValue = serverData["downloads"];
+    if(downloadsValue == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Value \"downloads\" not found. (Vanilla version.json file)",
+            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
+        }});
+        return "";
+    }
+    if(!downloadsValue.is_object()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Value \"downloads\" not a json object. (Vanilla version.json file)",
+            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
+        }});
+        return "";
+    }
+
+    nlohmann::json serverValue = downloadsValue["server"];
+    if(serverValue == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Value \"server\" not found. (Vanilla version.json file)",
+            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
+        }});
+        return "";
+    }
+    if(!serverValue.is_object()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Value \"server\" not a json object. (Vanilla version.json file)",
+            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
+        }});
+        return "";
+    }
+
+    nlohmann::json serverJarURL = serverValue["url"];
+    if(serverJarURL == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Value \"url\" not found. (Vanilla version.json file)",
+            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
+        }});
+        return "";
+    }
+    if(!serverJarURL.is_string()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Value \"url\" not a string. (Vanilla version.json file)",
+            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
+        }});
+        return "";
+    }
+
+    std::string finalReturnValue = serverJarURL;
+    return finalReturnValue;
 }
 
 std::vector<std::string> mcsm::VanillaServer::getAvailableVersions(){
