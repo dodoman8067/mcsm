@@ -22,11 +22,7 @@ SOFTWARE.
 
 #include <mcsm/server/type/base/vanilla_server.h>
 
-mcsm::VanillaServer::VanillaServer(){
-    this->versions = std::make_unique<std::map<const std::string, const std::string>>();
-    mcsm::Result res = this->init();
-    if(!res.isSuccess()) return;
-}
+mcsm::VanillaServer::VanillaServer(){}
 
 mcsm::VanillaServer::~VanillaServer(){}
 
@@ -204,7 +200,6 @@ std::string mcsm::VanillaServer::getServerJarURL(const std::string& ver) const {
     }
 
     std::string url = version["url"];
-    //mcsm::info(url); //debug
     std::string serverJson = mcsm::get(url);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     if(mcsm::isWhitespaceOrEmpty(versionJson)){
@@ -315,18 +310,28 @@ mcsm::Result mcsm::VanillaServer::download(const std::string& version, const std
 }
 
 mcsm::Result mcsm::VanillaServer::download(const std::string& version, const std::string& path, const std::string& name){
-    if(!hasVersion(version)){
+    bool hasVer = hasVersion(version);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    if(!hasVer){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
         return res;
     }
-    std::string url;
-    std::map<const std::string, const std::string>::iterator it = this->versions->find(version);
-    if(it != this->versions->end()){
-        url = it->second;
-    }else{
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
-        return res;     
+    std::string url = getServerJarURL(version);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
     }
+    if(mcsm::isWhitespaceOrEmpty(url)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
+        return res;
+    }
+
     mcsm::info("URL : " + url);
     return mcsm::download(name, url, path);
 }
@@ -395,7 +400,7 @@ mcsm::ServerType mcsm::VanillaServer::getType() const {
 }
 
 std::string mcsm::VanillaServer::getSupportedVersions() const {
-    return "1.14~";
+    return "1.0~";
 }
 
 std::string mcsm::VanillaServer::getBasedServer() const {

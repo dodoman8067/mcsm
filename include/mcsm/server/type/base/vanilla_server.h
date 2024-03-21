@@ -34,6 +34,7 @@ namespace mcsm {
     class VanillaServer : public mcsm::Server, public mcsm::Downloadable {
     private:
         std::unique_ptr<std::map<const std::string, const std::string>> versions;
+        [[deprecated]]
         mcsm::Result init();
         std::string getVersionObject(const std::string& ver) const;
         std::string getServerJarURL(const std::string& ver) const;
