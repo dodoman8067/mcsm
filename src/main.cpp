@@ -29,8 +29,7 @@ const std::string version = "0.1.1.2";
 int main(int argc, char *argv[]){
     /**
      * TODO
-     * Implement mcsm update command and "auto_update" option in server config.
-     * Implement different path and option path in server classes' update method
+     * Implement mcsm update command.
      */
 
     //libssh2 : cmake -B ./build -DBUILD_SHARED_LIBS=OFF -DOPENSSL_USE_STATIC_LIBS=ON -DZLIB_USE_STATIC_LIBS=ON -DENABLE_ZLIB_COMPRESSION=ON -DCRYPTO_BACKEND=OpenSSL
