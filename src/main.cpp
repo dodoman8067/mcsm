@@ -27,6 +27,11 @@ SOFTWARE.
 const std::string version = "0.1.1.2";
 
 int main(int argc, char *argv[]){
+    /**
+     * TODO
+     * Implement mcsm update command.
+     */
+
     //libssh2 : cmake -B ./build -DBUILD_SHARED_LIBS=OFF -DOPENSSL_USE_STATIC_LIBS=ON -DZLIB_USE_STATIC_LIBS=ON -DENABLE_ZLIB_COMPRESSION=ON -DCRYPTO_BACKEND=OpenSSL
     //libgit2 : cmake -B ./build -DBUILD_SHARED_LIBS=OFF -DOPENSSL_USE_STATIC_LIBS=ON -DZLIB_USE_STATIC_LIBS=ON
     //libcurl-linux : cmake -B ./build -DBUILD_SHARED_LIBS=OFF -DOPENSSL_USE_STATIC_LIBS=ON -DZLIB_USE_STATIC_LIBS=ON
@@ -65,7 +70,7 @@ int main(int argc, char *argv[]){
 
     //If arguments exist but command is not found, prints message and exits
     if(!commandFound){
-        std::cerr << "Unknown command \"" << argv[1] << "\". " << "Type \'mcsm help\' for list of commands.\n";
+        std::cerr << "Unknown command \"" << argv[1] << "\". " << "Type \'mcsm help\' for a list of commands.\n";
         return 1;
     }
     

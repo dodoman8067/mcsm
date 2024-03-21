@@ -66,27 +66,22 @@ std::vector<std::string> mcsm::PurpurServer::getAvailableVersions(){
     for(const std::string& s : mcsm::getMinecraftVersions()){
         versions.push_back(s);
     }
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return versions;
 }
 
 std::string mcsm::PurpurServer::getSupportedVersions() const {
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "1.14.1~";
 }
 
 std::string mcsm::PurpurServer::getBasedServer() const {
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "pufferfish";
 }
 
 std::string mcsm::PurpurServer::getWebSite() const {
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "https://purpurmc.org";
 }
 
 std::string mcsm::PurpurServer::getGitHub() const {
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "https://github.com/PurpurMC/Purpur";
 }
 
@@ -281,8 +276,17 @@ mcsm::Result mcsm::PurpurServer::start(mcsm::JvmOption& option, const std::strin
         mcsm::Result res = download(sVer, path, jar, optionPath);
         if(!res.isSuccess()) return res;
     }else{
-        mcsm::Result res = update(optionPath);
-        if(!res.isSuccess()) return res;
+        bool doesUpdate = sOpt.doesAutoUpdate();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
+        
+        if(doesUpdate){
+            mcsm::Result res = update(path, optionPath);
+            if(!res.isSuccess()) return res;
+        }
     }
     return Server::start(option, path, optionPath);
 }
@@ -295,10 +299,21 @@ mcsm::Result mcsm::PurpurServer::update(){
         return res;
     }
 
-    return update(path);
+    return update(path, path);
 }
 
 mcsm::Result mcsm::PurpurServer::update(const std::string& optionPath){
+    std::string path = mcsm::getCurrentPath();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    return update(path, optionPath);
+}
+
+mcsm::Result mcsm::PurpurServer::update(const std::string& path, const std::string& optionPath){
     // If you change the default build to specific build from latest build, it won't downgrade automatically. (You'll have to manually delete the server jarfile) This is an intented feature.
     mcsm::info("Checking updates...");
     mcsm::ServerDataOption sDataOpt(optionPath);
@@ -383,7 +398,7 @@ mcsm::Result mcsm::PurpurServer::update(const std::string& optionPath){
         return res;
     }
 
-    bool fileExists = mcsm::fileExists(optionPath + "/" + jar);
+    bool fileExists = mcsm::fileExists(path + "/" + jar);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -391,14 +406,14 @@ mcsm::Result mcsm::PurpurServer::update(const std::string& optionPath){
     }
 
     if(fileExists){
-        mcsm::removeFile(optionPath + "/" + jar);
+        mcsm::removeFile(path + "/" + jar);
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
             std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
             mcsm::Result res(resp.first, resp.second);
             return res;
         }
     }
-    return download(version, optionPath, jar, optionPath);
+    return download(version, path, jar, optionPath);
 }
 
 bool mcsm::PurpurServer::hasVersion(const std::string& version){

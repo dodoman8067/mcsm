@@ -227,6 +227,9 @@ mcsm::Result mcsm::FabricServerOption::create(const std::string& name, mcsm::Jvm
     
     mcsm::Result res6 = option.setValue("server_build", "latest");
     if(!res6.isSuccess()) return res6;
+
+    mcsm::Result res12 = option.setValue("auto_update", true);
+    if(!res12.isSuccess()) return res12;
     
     mcsm::Result res7 = option.setValue("type", this->server->getTypeAsString());
     if(!res7.isSuccess()) return res7;
@@ -610,6 +613,36 @@ std::string mcsm::FabricServerOption::getServerJarFile() const{
 mcsm::Result mcsm::FabricServerOption::setServerJarFile(const std::string& name){
     mcsm::Option option(this->path, "server");
     return option.setValue("server_jar", name);
+}
+
+bool mcsm::FabricServerOption::doesAutoUpdate() const {
+    mcsm::Option option(this->path, "server");
+    bool optExists = option.exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    if(!optExists){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        return "";
+    }
+
+    nlohmann::json value = option.getValue("auto_update");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+
+    if(value == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"auto_update\"", option.getName())});
+        return "";
+    }
+    if(!value.is_boolean()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"auto_update\"", "boolean")});
+        return "";
+    }
+
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    return value;
+}
+
+mcsm::Result mcsm::FabricServerOption::setAutoUpdate(const bool& update){
+    mcsm::Option option(this->path, "server");
+    return option.setValue("auto_update", update);
 }
 
 std::shared_ptr<mcsm::Server> mcsm::FabricServerOption::getServer() const {

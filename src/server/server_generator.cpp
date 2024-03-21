@@ -234,11 +234,11 @@ std::shared_ptr<mcsm::Server> mcsm::server::detectServerType(const std::string& 
 
     if(server == "paper" || server == "papermc"){
         sPtr = std::make_shared<mcsm::PaperServer>();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return nullptr;
+        //if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return nullptr;
     }
     if(server == "purpur" || server == "purpurmc"){
         sPtr = std::make_shared<mcsm::PurpurServer>();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return nullptr;
+        //if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return nullptr;
     }
     if(server == "vanilla"){
         sPtr = std::make_shared<mcsm::VanillaServer>();
@@ -246,7 +246,7 @@ std::shared_ptr<mcsm::Server> mcsm::server::detectServerType(const std::string& 
     }
     if(server == "fabric" || server == "fabricmc"){
         sPtr = std::make_shared<mcsm::FabricServer>();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return nullptr;
+        //if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return nullptr;
     }
     if(sPtr == nullptr){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {

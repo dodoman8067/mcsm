@@ -43,12 +43,21 @@ namespace mcsm {
         std::string getDataPathPerOS();
     public:
         GlobalOption(const std::string& path, const std::string& name);
+        /**
+         * @brief No mcsm::Result needed
+        */
         ~GlobalOption();
 
         nlohmann::json load() const;
 
+        /**
+         * @brief No mcsm::Result needed
+        */
         std::string getPath();
 
+        /**
+         * @brief No mcsm::Result needed
+        */
         std::string getName();
 
         nlohmann::json getValue(const std::string& key) const;
@@ -57,6 +66,9 @@ namespace mcsm {
 
         bool exists() const override;
 
+        /**
+         * @brief No mcsm::Result needed
+        */
         bool isGlobal() const override;
 
         mcsm::Result save(const nlohmann::json& jsonData) const;

@@ -34,6 +34,7 @@ int mcsm::PaperServer::getVersion(const std::string& ver) const {
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
         return -1;
     }
+    if(json["builds"] == nullptr) return -1;
     if(json["builds"].is_array()){
         nlohmann::json builds = json["builds"];
         if(builds[json["builds"].size() - 1] == nullptr || !builds[json["builds"].size() - 1].is_number_integer()) return -1;
@@ -66,27 +67,22 @@ std::vector<std::string> mcsm::PaperServer::getAvailableVersions(){
     for(const std::string& s : mcsm::getMinecraftVersions()){
         versions.push_back(s);
     }
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return versions;
 }
 
 std::string mcsm::PaperServer::getSupportedVersions() const {
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "1.8~";
 }
 
 std::string mcsm::PaperServer::getBasedServer() const {
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "spigot";
 }
 
 std::string mcsm::PaperServer::getWebSite() const {
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "https://papermc.io";
 }
 
 std::string mcsm::PaperServer::getGitHub() const {
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "https://github.com/PaperMC/Paper";
 }
 
@@ -282,8 +278,17 @@ mcsm::Result mcsm::PaperServer::start(mcsm::JvmOption& option, const std::string
         mcsm::Result res = download(sVer, path, jar, optionPath);
         if(!res.isSuccess()) return res;
     }else{
-        mcsm::Result res = update(optionPath);
-        if(!res.isSuccess()) return res;
+        bool doesUpdate = sOpt.doesAutoUpdate();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
+        
+        if(doesUpdate){
+            mcsm::Result res = update(path, optionPath);
+            if(!res.isSuccess()) return res;
+        }
     }
     return Server::start(option, path, optionPath);
 }
@@ -296,10 +301,21 @@ mcsm::Result mcsm::PaperServer::update(){
         return res;
     }
 
-    return update(path);
+    return update(path, path);
 }
 
 mcsm::Result mcsm::PaperServer::update(const std::string& optionPath){
+    std::string path = mcsm::getCurrentPath();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    return update(path, optionPath);
+}
+
+mcsm::Result mcsm::PaperServer::update(const std::string& path, const std::string& optionPath){
     // If you change the default build to specific build from latest build, it won't downgrade automatically. (You'll have to manually delete the server jarfile) This is an intented feature.
     mcsm::info("Checking updates...");
     mcsm::ServerDataOption sDataOpt(optionPath);
@@ -384,7 +400,7 @@ mcsm::Result mcsm::PaperServer::update(const std::string& optionPath){
         return res;
     }
 
-    bool fileExists = mcsm::fileExists(optionPath + "/" + jar);
+    bool fileExists = mcsm::fileExists(path + "/" + jar);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -392,14 +408,14 @@ mcsm::Result mcsm::PaperServer::update(const std::string& optionPath){
     }
 
     if(fileExists){
-        mcsm::removeFile(optionPath + "/" + jar);
+        mcsm::removeFile(path + "/" + jar);
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
             std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
             mcsm::Result res(resp.first, resp.second);
             return res;
         }
     }
-    return download(version, optionPath, jar, optionPath);
+    return download(version, path, jar, optionPath);
 }
 
 bool mcsm::PaperServer::hasVersion(const std::string& version){

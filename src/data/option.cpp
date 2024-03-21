@@ -104,7 +104,6 @@ bool mcsm::Option::exists() const {
 }
 
 bool mcsm::Option::isGlobal() const {
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return false;
 }
 
@@ -150,11 +149,9 @@ mcsm::Result mcsm::Option::reset() const {
 }
 
 std::string mcsm::Option::getName(){
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return this->name;
 }
 
 std::string mcsm::Option::getPath(){
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return this->path;
 }

@@ -67,6 +67,7 @@ namespace mcsm {
         
         mcsm::Result update();
         mcsm::Result update(const std::string& optionPath);
+        mcsm::Result update(const std::string& path, const std::string& optionPath);
     };
 }
 
