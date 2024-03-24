@@ -45,6 +45,7 @@ namespace mcsm {
         ~ServerOption();
 
         mcsm::Result create(const std::string& name, mcsm::JvmOption& defaultOption);
+        mcsm::Result create(const std::string& name, mcsm::JvmOption& defaultOption, const bool& update);
         
         mcsm::Result start();
         mcsm::Result start(std::unique_ptr<mcsm::JvmOption> option);

@@ -170,6 +170,10 @@ mcsm::FabricServerOption::~FabricServerOption(){
 }
 
 mcsm::Result mcsm::FabricServerOption::create(const std::string& name, mcsm::JvmOption& defaultOption){
+    return create(name, defaultOption, true);
+}
+
+mcsm::Result mcsm::FabricServerOption::create(const std::string& name, mcsm::JvmOption& defaultOption, const bool& update){
     mcsm::Option option(this->path, "server");
     
     bool optExists = option.exists();
@@ -228,7 +232,7 @@ mcsm::Result mcsm::FabricServerOption::create(const std::string& name, mcsm::Jvm
     mcsm::Result res6 = option.setValue("server_build", "latest");
     if(!res6.isSuccess()) return res6;
 
-    mcsm::Result res12 = option.setValue("auto_update", true);
+    mcsm::Result res12 = option.setValue("auto_update", update);
     if(!res12.isSuccess()) return res12;
     
     mcsm::Result res7 = option.setValue("type", this->server->getTypeAsString());

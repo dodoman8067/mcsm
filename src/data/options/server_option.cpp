@@ -163,6 +163,10 @@ mcsm::ServerOption::~ServerOption(){
 }
 
 mcsm::Result mcsm::ServerOption::create(const std::string& name, mcsm::JvmOption& defaultOption){
+    return create(name, defaultOption, true);
+}
+
+mcsm::Result mcsm::ServerOption::create(const std::string& name, mcsm::JvmOption& defaultOption, const bool& update){
     mcsm::Option option(this->path, "server");
     
     bool optExists = option.exists();
@@ -221,7 +225,7 @@ mcsm::Result mcsm::ServerOption::create(const std::string& name, mcsm::JvmOption
     mcsm::Result res6 = option.setValue("server_build", "latest");
     if(!res6.isSuccess()) return res6;
 
-    mcsm::Result res10 = option.setValue("auto_update", true);
+    mcsm::Result res10 = option.setValue("auto_update", update);
     if(!res10.isSuccess()) return res10;
 
     mcsm::Result res7 = option.setValue("type", this->server->getTypeAsString());
