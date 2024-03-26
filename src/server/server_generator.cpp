@@ -74,11 +74,6 @@ mcsm::Result mcsm::server::generateBukkit(const std::string& name, mcsm::JvmOpti
 
 mcsm::Result mcsm::server::generateVanilla(const std::string& name, mcsm::JvmOption& option, const std::string& version){
     std::shared_ptr<mcsm::VanillaServer> server = std::make_shared<mcsm::VanillaServer>();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
     bool vExists = server->hasVersion(version);
     if(!vExists){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
