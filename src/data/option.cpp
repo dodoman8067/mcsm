@@ -26,6 +26,8 @@ mcsm::Option::Option(const std::string& path, const std::string& name){
     this->path = path;
 
     std::string name1 = name;
+    mcsm::replaceAll(name1, "..", "__");
+    mcsm::replaceAll(name1, "/", "_");
     if(!mcsm::endsWith(name1, ".json")){
         name1 = name1.append(".json");
     }
