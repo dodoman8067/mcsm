@@ -26,6 +26,10 @@ mcsm::JvmOption::JvmOption(const std::string& name) : JvmOption(name, mcsm::Sear
 
 mcsm::JvmOption::JvmOption(const std::string& name, const mcsm::SearchTarget& target){
     this->name = name;
+    std::string name1 = name;
+    mcsm::replaceAll(name1, ".", "_");
+    mcsm::replaceAll(name1, "/", "_");
+    this->name = name1;
     switch (target){
         case mcsm::SearchTarget::ALL: {
             mcsm::GlobalOption globalOption("/jvm/profiles", name);
@@ -125,7 +129,6 @@ mcsm::Result mcsm::JvmOption::create(const std::string& jvmPath, const std::vect
         filePath = globalOption.getPath();
         optionName = globalOption.getName();
     }
-
     bool fileExists = mcsm::fileExists(filePath + "/" + optionName);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -133,12 +136,10 @@ mcsm::Result mcsm::JvmOption::create(const std::string& jvmPath, const std::vect
         return res;
     }
     if(fileExists){
-        mcsm::removeFile(filePath + "/" + optionName);
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-            mcsm::Result res(resp.first, resp.second);
-            return res;
-        }
+        mcsm::Result res({mcsm::ResultType::MCSM_WARN, {
+            "JVM lanuch profile " + this->name + " already exists."
+        }});
+        return res;
     }
 
     mcsm::Result invaildPath({mcsm::ResultType::MCSM_SUCCESS, {"Invaild jvm path.", "High chance to be a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."}});
