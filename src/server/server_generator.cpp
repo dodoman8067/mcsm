@@ -157,6 +157,7 @@ mcsm::Result mcsm::server::generateFabric(const std::string& name, mcsm::JvmOpti
     mcsm::info("Server type : " + type);
     mcsm::info("Server version : " + sVersion);
     mcsm::info("Server JVM launch profile : " + profile);
+    if(!autoUpdate) mcsm::info("Automatic updates : disabled");
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return res;
@@ -219,6 +220,7 @@ mcsm::Result mcsm::server::configure(std::unique_ptr<mcsm::ServerOption> serverO
     mcsm::info("Server type : " + type);
     mcsm::info("Server version : " + sVersion);
     mcsm::info("Server JVM launch profile : " + profile);
+    if(!autoUpdate) mcsm::info("Automatic updates : disabled");
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return res;

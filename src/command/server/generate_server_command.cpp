@@ -213,6 +213,7 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& a
     std::string version = getServerVersion(args);
     std::string name = getServerName(args);
     std::string type = getServerType(args);
+    bool shouldSkipUpdate = !shouldSkipAutoUpdate(args);
 
     if(option == nullptr){
         mcsm::warning("JVM launch profile " + getProfileName(args) + " not found.");
@@ -221,7 +222,7 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& a
     }
 
     if(type == "bukkit" || type == "craftbukkit"){
-        mcsm::Result res = mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::CRAFTBUKKIT, true);
+        mcsm::Result res = mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::CRAFTBUKKIT, shouldSkipUpdate);
         if(!res.isSuccess()){
             res.printMessage();
             if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
@@ -229,7 +230,7 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& a
         return;
     }
     if(type == "spigot"){
-        mcsm::Result res = mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::SPIGOT, true);
+        mcsm::Result res = mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::SPIGOT, shouldSkipUpdate);
         if(!res.isSuccess()){
             res.printMessage();
             if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
@@ -237,7 +238,7 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& a
         return;
     }
     if(type == "paper" || type == "paperspigot"){
-        mcsm::Result res = mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::PAPER, true);
+        mcsm::Result res = mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::PAPER, shouldSkipUpdate);
         if(!res.isSuccess()){
             res.printMessage();
             if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
@@ -245,7 +246,7 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& a
         return;
     }
     if(type == "purpur"){
-        mcsm::Result res = mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::PURPUR, true);
+        mcsm::Result res = mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::PURPUR, shouldSkipUpdate);
         if(!res.isSuccess()){
             res.printMessage();
             if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
@@ -253,7 +254,7 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& a
         return;
     }
     if(type == "fabric"){
-        mcsm::Result res = mcsm::server::generateFabric(name, *option, version, true);
+        mcsm::Result res = mcsm::server::generateFabric(name, *option, version, shouldSkipUpdate);
         if(!res.isSuccess()){
             res.printMessage();
             if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
@@ -261,7 +262,7 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& a
         return;
     }
     if(type == "vanilla"){
-        mcsm::Result res = mcsm::server::generateVanilla(name, *option, version, true);
+        mcsm::Result res = mcsm::server::generateVanilla(name, *option, version, shouldSkipUpdate);
         if(!res.isSuccess()){
             res.printMessage();
             if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
