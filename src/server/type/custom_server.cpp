@@ -1,9 +1,16 @@
 #include <mcsm/server/type/custom_server.h>
 
-// Currently unmaintained file.
-
-mcsm::CustomServer::CustomServer(){
-
+mcsm::CustomServer::CustomServer(const std::string& dir){
+    bool exists = mcsm::fileExists(dir);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
+    if(!exists){
+        mcsm::Result res({
+            mcsm::ResultType::MCSM_WARN,
+            { "Working directory not found.", "Report this to Github (https://github.com/dodoman8067/mcsm) if you believe that this is an issue." }  
+        });
+        return;
+    }
+    this->directory = dir;
 }
 
 mcsm::CustomServer::~CustomServer(){
