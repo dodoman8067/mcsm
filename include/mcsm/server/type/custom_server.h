@@ -32,17 +32,16 @@ namespace mcsm {
     private:
         bool isFile(const std::string& location) const;
         bool isURL(const std::string& location) const;
-        std::string directory;
     public:
-        CustomServer(const std::string& dir);
+        CustomServer();
         ~CustomServer();
 
         mcsm::ServerType getType() const override;
         std::string getTypeAsString() const override;
 
-        std::string getFileLocation() const;
-        mcsm::Result setFileLocation(const std::string& location);
-        mcsm::Result getFileFromLocation();
+        std::string getFileLocation(const std::string& optionPath) const;
+        mcsm::Result setFileLocation(const std::string& optionPath, const std::string& location);
+        mcsm::Result getFileFromLocation(const std::string& optionPath);
 
         std::string getSupportedVersions() const override;
 
