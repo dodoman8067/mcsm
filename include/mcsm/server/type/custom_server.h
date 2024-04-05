@@ -41,7 +41,7 @@ namespace mcsm {
 
         std::string getFileLocation(const std::string& optionPath) const;
         mcsm::Result setFileLocation(const std::string& optionPath, const std::string& location);
-        mcsm::Result getFileFromLocation(const std::string& optionPath);
+        mcsm::Result setupServerJarFile(const std::string& optionPath);
 
         std::string getSupportedVersions() const override;
 
