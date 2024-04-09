@@ -93,7 +93,7 @@ mcsm::Result mcsm::CustomServer::setupServerJarFile(const std::string& optionPat
             "The following server jarfile wasn't located in the vaild location : " + location,
             "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
         }});
-        return res;   
+        return res;
     }
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
