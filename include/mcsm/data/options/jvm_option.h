@@ -40,9 +40,11 @@ namespace mcsm {
     private:
         std::unique_ptr<mcsm::Configurable> option;
         std::string name;
+        std::string workingDir;
     public:
         JvmOption(const std::string& name);
         JvmOption(const std::string& name, const SearchTarget& target);
+        JvmOption(const std::string& name, const SearchTarget& target, const std::string& workingPath);
         ~JvmOption();
 
         mcsm::Result create();
