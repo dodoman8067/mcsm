@@ -67,6 +67,17 @@ mcsm::Result mcsm::Server::start(mcsm::JvmOption& option, const std::string& /* 
 
     std::string command = jPath + jvmOpt + optionPath + "/" + jar + svrOpt;
     mcsm::info("Running command : " + command);
+    
+    std::error_code ec;
+    std::filesystem::current_path(optionPath, ec);
+    if(ec){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Server starting failed : " + ec.message(),
+            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you believe that this is a software issue."
+        }});
+        return res;
+    }
+
     int result = mcsm::runCommand(command.c_str());
     if(result != 0){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
