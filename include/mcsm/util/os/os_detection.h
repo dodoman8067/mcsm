@@ -27,7 +27,7 @@ namespace mcsm {
     /**
      * Enum of supported operating systems.
     */
-    enum OS {
+    enum class OS {
         /**
          * Represents Microsoft Windows operating system.
         */
