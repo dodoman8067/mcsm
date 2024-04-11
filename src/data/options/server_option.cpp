@@ -345,6 +345,10 @@ bool mcsm::ServerOption::exists(){
     return rt;
 }
 
+std::string mcsm::ServerOption::getOptionPath() const {
+    return this->path;
+}
+
 std::unique_ptr<mcsm::JvmOption> mcsm::ServerOption::getDefaultOption() const {
     mcsm::Option option(this->path, "server");
     bool optExists = option.exists();

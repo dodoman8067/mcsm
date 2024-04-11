@@ -55,6 +55,8 @@ namespace mcsm {
 
         bool exists();
 
+        std::string getOptionPath() const;
+
         std::string getServerName() const;
         mcsm::Result setServerName(const std::string& name);
 

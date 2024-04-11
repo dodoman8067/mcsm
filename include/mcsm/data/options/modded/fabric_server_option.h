@@ -30,6 +30,8 @@ namespace mcsm {
 
         mcsm::Result update();
 
+        std::string getOptionPath() const;
+
         std::string getServerJarBuild() const;
         mcsm::Result setServerJarBuild(const std::string& build);
 

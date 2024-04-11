@@ -412,6 +412,10 @@ bool mcsm::FabricServerOption::exists(){
     return rt;
 }
 
+std::string mcsm::FabricServerOption::getOptionPath() const {
+    return this->path;
+}
+
 std::unique_ptr<mcsm::JvmOption> mcsm::FabricServerOption::getDefaultOption() const{
     mcsm::Option option(this->path, "server");
     bool optExists = option.exists();
