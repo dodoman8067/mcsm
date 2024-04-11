@@ -30,16 +30,20 @@ SOFTWARE.
 namespace mcsm {
     class MultiServerOption {
     private:
+        std::string name;
         std::vector<std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>> servers;
+        std::unique_ptr<mcsm::Option> option;
+
+        bool canBeTaken(const std::string& serverName) const;
         mcsm::Result createProcesses() const;
     public:
-        MultiServerOption(const std::string& path);
+        MultiServerOption(const std::string& path, const std::string& name);
         ~MultiServerOption();
         
         mcsm::Result create() const;
 
-        mcsm::Result addServer(std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>) const;
-        mcsm::Result removeServer(std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>) const;
+        mcsm::Result addServer(std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>> server) const;
+        mcsm::Result removeServer(std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>> server) const;
 
         std::vector<std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>> getServers() const;
 
