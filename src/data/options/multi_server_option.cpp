@@ -26,12 +26,18 @@ SOFTWARE.
 
 mcsm::MultiServerOption::MultiServerOption(const std::string& path, const std::string& name){
     this->name = mcsm::safeString(name);
-    mcsm::fileExists(path);
+    bool pathExists = mcsm::fileExists(path);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return;
     }
+    
+    if(!pathExists){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        return;
+    }
+
     std::error_code ec;
     bool isPath = std::filesystem::is_directory(path, ec);
     if(ec){
