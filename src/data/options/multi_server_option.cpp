@@ -73,6 +73,36 @@ mcsm::Result mcsm::MultiServerOption::create() const {
     return res3;
 }
 
+bool mcsm::MultiServerOption::canBeTaken(const std::string& serverName) const {
+    std::string name;
+    for(auto& v : this->servers){
+        if(mcsm::ServerOption* sPtr = std::get_if<mcsm::ServerOption>(&*v)){
+            bool exists = sPtr->exists();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return false;
+
+            name = sPtr->getServerName();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return false;
+
+            if(name == serverName) return false;
+        }else if (mcsm::FabricServerOption* fsPtr = std::get_if<mcsm::FabricServerOption>(&*v)){
+            bool exists = fsPtr->exists();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return false;
+
+            name = fsPtr->getServerName();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return false;
+
+            if(name == serverName) return false;
+        }else{
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+                "std::variant<mcsm::ServerOption, mcsm::FabricServerOption> test didn't pass.",
+                "Open an issue in GitHub (https://github.com/dodoman8067/mcsm) and tell us how did you got this message."
+            }});
+            return false;
+        }
+    }
+    return true;
+}
+
 mcsm::Result mcsm::MultiServerOption::addServer(std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>> server) const {
     std::string name, path;
     if(mcsm::ServerOption* sPtr = std::get_if<mcsm::ServerOption>(&*server)){
@@ -111,7 +141,7 @@ mcsm::Result mcsm::MultiServerOption::addServer(std::unique_ptr<std::variant<mcs
     }else{
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "std::variant<mcsm::ServerOption, mcsm::FabricServerOption> test didn't pass.",
-            "Open an issue in GitHub (https://github.com/dodoman8067/mcsm) and tell how you got this message."
+            "Open an issue in GitHub (https://github.com/dodoman8067/mcsm) and tell us how did you get this message."
         }});
         return res;
     }
