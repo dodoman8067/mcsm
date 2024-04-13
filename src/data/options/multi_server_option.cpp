@@ -25,16 +25,10 @@ SOFTWARE.
 #include <mcsm/data/options/multi_server_option.h>
 
 mcsm::MultiServerOption::MultiServerOption(const std::string& path, const std::string& name){
-    this->name = mcsm::safeString(name);
-    bool pathExists = mcsm::fileExists(path);
+    this->name = mcsm::safeString(name); 
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
-        return;
-    }
-    
-    if(!pathExists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
         return;
     }
 
@@ -109,7 +103,7 @@ bool mcsm::MultiServerOption::canBeTaken(const std::string& serverName) const {
     return true;
 }
 
-mcsm::Result mcsm::MultiServerOption::addServer(std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>> server) const {
+mcsm::Result mcsm::MultiServerOption::addServer(std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>> server){
     std::string name, path;
     if(mcsm::ServerOption* sPtr = std::get_if<mcsm::ServerOption>(&*server)){
         bool exists = sPtr->exists();
@@ -127,7 +121,7 @@ mcsm::Result mcsm::MultiServerOption::addServer(std::unique_ptr<std::variant<mcs
         }
 
         path = sPtr->getOptionPath();
-
+        
     }else if (mcsm::FabricServerOption* fsPtr = std::get_if<mcsm::FabricServerOption>(&*server)){
         bool exists = fsPtr->exists();
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -153,6 +147,21 @@ mcsm::Result mcsm::MultiServerOption::addServer(std::unique_ptr<std::variant<mcs
     }
 
     //TODO : Check if the server option's name matches with other linked servers and add the server option instance 
+    bool validName = canBeTaken(name);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    if(!validName){
+        mcsm::Result res({mcsm::ResultType::MCSM_WARN, {
+            "Current server name \"" + name + "\" is already taken in this multiserver configuration."
+        }});
+        return res;
+    }
+    
+    this->servers.push_back(std::move(server));
 }
 
 mcsm::MultiServerOption::~MultiServerOption(){

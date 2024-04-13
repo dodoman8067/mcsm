@@ -35,6 +35,7 @@ namespace mcsm {
         std::unique_ptr<mcsm::Option> option;
 
         mcsm::Result load() const;
+        mcsm::Result save() const;
         bool canBeTaken(const std::string& serverName) const;
         mcsm::Result createProcesses() const;
     public:
@@ -43,8 +44,8 @@ namespace mcsm {
         
         mcsm::Result create() const;
 
-        mcsm::Result addServer(std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>> server) const;
-        mcsm::Result removeServer(std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>> server) const;
+        mcsm::Result addServer(std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>> server);
+        mcsm::Result removeServer(std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>> server);
 
         std::vector<std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>> getServers() const;
 
