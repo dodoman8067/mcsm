@@ -36,7 +36,7 @@ mcsm::MultiServerOption::MultiServerOption(const std::string& path, const std::s
     bool isPath = std::filesystem::is_directory(path, ec);
     if(ec){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Checking if path " + path + "is a path operation failed : " + ec.message(), 
+            "Checking if " + path + " is a path operation failed : " + ec.message(), 
             "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
         }});
         return;
@@ -49,6 +49,18 @@ mcsm::MultiServerOption::MultiServerOption(const std::string& path, const std::s
         return;
     }
     this->option = std::make_unique<mcsm::Option>(path, "multi_server_" + this->name);
+
+    bool exists = this->option->exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return;
+    }
+
+    if(exists){
+        mcsm::Result res = load();
+        if(!res.isSuccess()) return;
+    }
 }
 
 mcsm::Result mcsm::MultiServerOption::create() const {
@@ -162,6 +174,16 @@ mcsm::Result mcsm::MultiServerOption::addServer(std::unique_ptr<std::variant<mcs
     }
     
     this->servers.push_back(std::move(server));
+
+    return save();
+}
+
+mcsm::Result mcsm::MultiServerOption::removeServer(std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>> server){
+
+}
+
+std::vector<std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>> mcsm::MultiServerOption::getServers() const {
+    return this->servers;
 }
 
 mcsm::MultiServerOption::~MultiServerOption(){
