@@ -153,7 +153,7 @@ mcsm::Result mcsm::MultiServerOption::load(){
 
         if(path == this->option->getPath()){
             mcsm::Result res({mcsm::ResultType::MCSM_WARN, {
-                "Multi server configuration file and its linked server configuration file cannot exist in the same path." 
+                "Multi server configuration file and its linked server configuration file cannot exist in the same path.",
                 "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you believe that this is a software issue."
             }});
             return res;
@@ -170,7 +170,7 @@ mcsm::Result mcsm::MultiServerOption::load(){
         
         if(!optExists){
             mcsm::Result res({mcsm::ResultType::MCSM_WARN, {
-                "Cannot link a server configuration file that doesn't exist." 
+                "Cannot link a server configuration file that doesn't exist.",
                 "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you believe that this is a software issue."
             }});
             return res;
@@ -201,6 +201,9 @@ mcsm::Result mcsm::MultiServerOption::load(){
             this->servers.push_back(std::make_unique<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>(std::move(*base)));
         }
     }
+
+    mcsm::Result successfulRes({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    return successfulRes;
 }
 
 bool mcsm::MultiServerOption::canBeTaken(const std::string& serverName) const {
@@ -209,6 +212,13 @@ bool mcsm::MultiServerOption::canBeTaken(const std::string& serverName) const {
         if(mcsm::ServerOption* sPtr = std::get_if<mcsm::ServerOption>(&*v)){
             bool exists = sPtr->exists();
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return false;
+            if(!exists){
+                mcsm::Result res({mcsm::ResultType::MCSM_WARN, {
+                    "Program tried to check a server configuration file that doesn't exist.",
+                    "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you believe that this is a software issue."
+                }});
+                return false;
+            }
 
             name = sPtr->getServerName();
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return false;
@@ -217,6 +227,13 @@ bool mcsm::MultiServerOption::canBeTaken(const std::string& serverName) const {
         }else if (mcsm::FabricServerOption* fsPtr = std::get_if<mcsm::FabricServerOption>(&*v)){
             bool exists = fsPtr->exists();
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return false;
+            if(!exists){
+                mcsm::Result res({mcsm::ResultType::MCSM_WARN, {
+                    "Cannot link a server configuration file that doesn't exist.",
+                    "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you believe that this is a software issue."
+                }});
+                return false;
+            }
 
             name = fsPtr->getServerName();
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return false;
@@ -242,6 +259,13 @@ mcsm::Result mcsm::MultiServerOption::addServer(std::unique_ptr<std::variant<mcs
             mcsm::Result res(resp.first, resp.second);
             return res;
         }
+        if(!exists){
+            mcsm::Result res({mcsm::ResultType::MCSM_WARN, {
+                "Cannot link a server configuration file that doesn't exist.",
+                "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you believe that this is a software issue."
+            }});
+            return res;
+        }
 
         name = sPtr->getServerName();
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -257,6 +281,13 @@ mcsm::Result mcsm::MultiServerOption::addServer(std::unique_ptr<std::variant<mcs
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
             std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
             mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
+        if(!exists){
+            mcsm::Result res({mcsm::ResultType::MCSM_WARN, {
+                "Cannot link a server configuration file that doesn't exist.",
+                "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you believe that this is a software issue."
+            }});
             return res;
         }
 
@@ -293,14 +324,15 @@ mcsm::Result mcsm::MultiServerOption::addServer(std::unique_ptr<std::variant<mcs
     
     this->servers.push_back(std::move(server));
 
-    return save();
+    mcsm::Result successfulRes({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    return successfulRes;
 }
 
-mcsm::Result mcsm::MultiServerOption::removeServer(std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>> server){
+mcsm::Result mcsm::MultiServerOption::removeServer(std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>> /* server */){
 
 }
 
-std::vector<std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>> mcsm::MultiServerOption::getServers() const {
+const std::vector<std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>>& mcsm::MultiServerOption::getServers() const {
     return this->servers;
 }
 
