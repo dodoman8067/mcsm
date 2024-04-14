@@ -239,7 +239,7 @@ std::shared_ptr<mcsm::Server> mcsm::server::detectServerType(const std::string& 
     }
     if(server == "vanilla"){
         sPtr = std::make_shared<mcsm::VanillaServer>();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return nullptr;
+        //if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return nullptr;
     }
     if(server == "fabric" || server == "fabricmc"){
         sPtr = std::make_shared<mcsm::FabricServer>();
