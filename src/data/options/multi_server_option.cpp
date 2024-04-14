@@ -63,6 +63,12 @@ mcsm::MultiServerOption::MultiServerOption(const std::string& path, const std::s
     }
 }
 
+bool mcsm::MultiServerOption::exists() const {
+    bool rt = this->option->exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return false;
+    return rt;
+}
+
 mcsm::Result mcsm::MultiServerOption::create() const {
     bool exists = this->option->exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){

@@ -42,6 +42,8 @@ namespace mcsm {
         MultiServerOption(const std::string& path, const std::string& name);
         ~MultiServerOption();
         
+        bool exists() const;
+
         mcsm::Result create() const;
 
         mcsm::Result addServer(std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>> server);
