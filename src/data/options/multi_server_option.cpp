@@ -85,6 +85,124 @@ mcsm::Result mcsm::MultiServerOption::create() const {
     return res3;
 }
 
+mcsm::Result mcsm::MultiServerOption::load(){
+    bool exists = this->option->exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    if(!exists){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        return res;
+    }
+
+    nlohmann::json serverArray = this->option->getValue("servers");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    if(serverArray == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"servers\"", this->option->getName())});
+        return res;
+    }
+    if(!serverArray.is_array()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"servers\"", "array of json object")});
+        return res;
+    }
+    
+    for(nlohmann::json serverObj : serverArray){
+        if(serverObj == nullptr){
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("json object inside \"servers\"", this->option->getName())});
+            return res;
+        }
+        if(!serverObj.is_object()){
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("json object inside \"servers\"", "array of json object")});
+            return res;
+        }
+        if(serverObj["path"] == nullptr){
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("json object's \"path\"", this->option->getName())});
+            return res;
+        }
+        if(!serverObj["path"].is_string()){
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("json object's \"path\"", "string")});
+            return res;
+        }
+
+        std::string path = serverObj["path"];
+
+        std::error_code ec;
+        bool isPath = std::filesystem::is_directory(path, ec);
+        if(ec){
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+                "Checking if " + path + " is a path operation failed : " + ec.message(), 
+                "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
+            }});
+            return res;
+        }
+        if(!isPath){
+            mcsm::Result res({mcsm::ResultType::MCSM_WARN, {
+                "Non-directory path was passed : " + path, 
+                "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
+            }});
+            return res;
+        }
+
+        if(path == this->option->getPath()){
+            mcsm::Result res({mcsm::ResultType::MCSM_WARN, {
+                "Multi server configuration file and its linked server configuration file cannot exist in the same path." 
+                "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you believe that this is a software issue."
+            }});
+            return res;
+        }
+
+        mcsm::Option opt(path, "server");
+
+        bool optExists = opt.exists();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
+        
+        if(!optExists){
+            mcsm::Result res({mcsm::ResultType::MCSM_WARN, {
+                "Cannot link a server configuration file that doesn't exist." 
+                "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you believe that this is a software issue."
+            }});
+            return res;
+        }
+        
+        nlohmann::json optServ = opt.getValue("type");
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
+
+        if(optServ == nullptr){
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"type\"", opt.getName())});
+            return res;
+        }
+        if(!optServ.is_string()){
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"type\"", "string")});
+            return res;
+        }
+
+        std::string type = opt.getValue("type");
+        if(type == "fabric"){
+            std::unique_ptr<mcsm::FabricServerOption> fabric = std::make_unique<mcsm::FabricServerOption>(path);
+            this->servers.push_back(std::make_unique<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>(std::move(*fabric)));
+        }else{
+            std::unique_ptr<mcsm::ServerOption> base = std::make_unique<mcsm::ServerOption>(path);
+            this->servers.push_back(std::make_unique<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>(std::move(*base)));
+        }
+    }
+}
+
 bool mcsm::MultiServerOption::canBeTaken(const std::string& serverName) const {
     std::string name;
     for(auto& v : this->servers){

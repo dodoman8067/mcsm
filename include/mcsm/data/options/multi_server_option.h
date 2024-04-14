@@ -34,8 +34,8 @@ namespace mcsm {
         std::vector<std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>> servers;
         std::unique_ptr<mcsm::Option> option;
 
-        mcsm::Result load() const;
-        mcsm::Result save() const;
+        mcsm::Result load();
+        mcsm::Result save();
         bool canBeTaken(const std::string& serverName) const;
         mcsm::Result createProcesses() const;
     public:
