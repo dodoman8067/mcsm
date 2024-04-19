@@ -292,8 +292,40 @@ mcsm::Result mcsm::MultiServerOption::load(){
     return successfulRes;
 }
 
-mcsm::Result mcsm::MultiServerOption::save() const {
+mcsm::Result mcsm::MultiServerOption::save(){
+    bool exists = this->option->exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
 
+    if(!exists){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        return res;
+    }
+
+    nlohmann::json optName = this->option->getValue("name");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    if(optName == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"name\"", this->option->getName())});
+        return res;
+    }
+    if(!optName.is_string()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"name\"", "string")});
+        return res;
+    }
+
+    std::string finalName = mcsm::safeString(std::string(optName));
+
+    if(finalName != this->name){
+        this->name = finalName;
+    }
 }
 
 bool mcsm::MultiServerOption::canBeTaken(const std::string& serverName) const {

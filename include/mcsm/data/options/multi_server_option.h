@@ -35,7 +35,7 @@ namespace mcsm {
         std::unique_ptr<mcsm::Option> option;
 
         mcsm::Result load();
-        mcsm::Result save() const;
+        mcsm::Result save();
         bool canBeTaken(const std::string& serverName) const;
         mcsm::Result createProcesses() const;
     public:
