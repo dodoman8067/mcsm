@@ -24,6 +24,38 @@ SOFTWARE.
 
 #include <mcsm/data/options/multi_server_option.h>
 
+mcsm::MultiServerOption::MultiServerOption(const std::string& path){
+    std::error_code ec;
+    bool isPath = std::filesystem::is_directory(path, ec);
+    if(ec){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Checking if " + path + " is a path operation failed : " + ec.message(), 
+            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
+        }});
+        return;
+    }
+    if(!isPath){
+        mcsm::Result res({mcsm::ResultType::MCSM_WARN, {
+            "Non-directory path was passed : " + path, 
+            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
+        }});
+        return;
+    }
+    this->option = std::make_unique<mcsm::Option>(path, "multi_server_" + this->name);
+
+    bool exists = this->option->exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return;
+    }
+
+    if(exists){
+        mcsm::Result res = load();
+        if(!res.isSuccess()) return;
+    }
+}
+
 mcsm::MultiServerOption::MultiServerOption(const std::string& path, const std::string& name){
     this->name = mcsm::safeString(name); 
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -48,7 +80,7 @@ mcsm::MultiServerOption::MultiServerOption(const std::string& path, const std::s
         }});
         return;
     }
-    this->option = std::make_unique<mcsm::Option>(path, "multi_server_" + this->name);
+    this->option = std::make_unique<mcsm::Option>(path, "multi_server");
 
     bool exists = this->option->exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -103,6 +135,24 @@ mcsm::Result mcsm::MultiServerOption::load(){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
         return res;
     }
+
+    nlohmann::json optName = this->option->getValue("name");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    if(optName == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"name\"", this->option->getName())});
+        return res;
+    }
+    if(!optName.is_string()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"name\"", "string")});
+        return res;
+    }
+
+    this->name = std::string(optName);
 
     nlohmann::json serverArray = this->option->getValue("servers");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -201,15 +251,49 @@ mcsm::Result mcsm::MultiServerOption::load(){
         std::string type = opt.getValue("type");
         if(type == "fabric"){
             std::unique_ptr<mcsm::FabricServerOption> fabric = std::make_unique<mcsm::FabricServerOption>(path);
-            this->servers.push_back(std::make_unique<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>(std::move(*fabric)));
+
+            std::string name = fabric->getServerName();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
+
+            bool taked = canBeTaken(name);
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
+
+            if(!taked) this->servers.push_back(std::make_unique<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>(std::move(*fabric)));
         }else{
             std::unique_ptr<mcsm::ServerOption> base = std::make_unique<mcsm::ServerOption>(path);
-            this->servers.push_back(std::make_unique<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>(std::move(*base)));
+
+            std::string name = base->getServerName();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
+
+            bool taked = canBeTaken(name);
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
+
+            if(!taked) this->servers.push_back(std::make_unique<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>(std::move(*base)));
         }
     }
 
     mcsm::Result successfulRes({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return successfulRes;
+}
+
+mcsm::Result mcsm::MultiServerOption::save() const {
+
 }
 
 bool mcsm::MultiServerOption::canBeTaken(const std::string& serverName) const {

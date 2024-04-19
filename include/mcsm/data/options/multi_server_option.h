@@ -35,10 +35,11 @@ namespace mcsm {
         std::unique_ptr<mcsm::Option> option;
 
         mcsm::Result load();
-        mcsm::Result save();
+        mcsm::Result save() const;
         bool canBeTaken(const std::string& serverName) const;
         mcsm::Result createProcesses() const;
     public:
+        MultiServerOption(const std::string& path);
         MultiServerOption(const std::string& path, const std::string& name);
         ~MultiServerOption();
         
