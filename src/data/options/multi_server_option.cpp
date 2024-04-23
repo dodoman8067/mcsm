@@ -293,7 +293,7 @@ mcsm::Result mcsm::MultiServerOption::load(){
 }
 
 mcsm::Result mcsm::MultiServerOption::save(){
-    std::string sName;
+    std::string sName, sPath;
 
     bool exists = this->option->exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -353,6 +353,24 @@ mcsm::Result mcsm::MultiServerOption::save(){
                 return res;
             }
 
+            sPath = sPtr->getOptionPath();
+
+            nlohmann::json sArr = this->option->getValue("servers");
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
+
+            if(sArr == nullptr){
+                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"servers\"", this->option->getName())});
+                return res;
+            }
+            if(!sArr.is_array()){
+                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"servers\"", "array of json object")});
+                return res;
+            }
+
         }else if (mcsm::FabricServerOption* fsPtr = std::get_if<mcsm::FabricServerOption>(&*v)){
             bool exists = fsPtr->exists();
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -373,6 +391,24 @@ mcsm::Result mcsm::MultiServerOption::save(){
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
                 std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
                 mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
+
+            sPath = sPtr->getOptionPath();
+
+            nlohmann::json sArr = this->option->getValue("servers");
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
+
+            if(sArr == nullptr){
+                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"servers\"", this->option->getName())});
+                return res;
+            }
+            if(!sArr.is_array()){
+                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"servers\"", "array of json object")});
                 return res;
             }
         }else{
