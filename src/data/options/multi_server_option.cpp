@@ -329,6 +329,8 @@ mcsm::Result mcsm::MultiServerOption::save(){
         this->name = finalName;
     }
 
+    std::vector<nlohmann::json> objArr;
+
     for(auto& v : this->servers){
         if(mcsm::ServerOption* sPtr = std::get_if<mcsm::ServerOption>(&*v)){
             bool exists = sPtr->exists();
@@ -355,22 +357,19 @@ mcsm::Result mcsm::MultiServerOption::save(){
 
             sPath = sPtr->getOptionPath();
 
-            nlohmann::json sArr = this->option->getValue("servers");
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-                mcsm::Result res(resp.first, resp.second);
+            if(sPath == this->option->getPath()){
+                mcsm::Result res({mcsm::ResultType::MCSM_WARN, {
+                    "Multi server configuration file and its linked server configuration file cannot exist in the same path.",
+                    "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you believe that this is a software issue."
+                }});
                 return res;
             }
 
-            if(sArr == nullptr){
-                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"servers\"", this->option->getName())});
-                return res;
-            }
-            if(!sArr.is_array()){
-                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"servers\"", "array of json object")});
-                return res;
-            }
+            nlohmann::json jObj;
+            jObj["name"] = sName;
+            jObj["path"] = sPath;
 
+            objArr.push_back(jObj);
         }else if (mcsm::FabricServerOption* fsPtr = std::get_if<mcsm::FabricServerOption>(&*v)){
             bool exists = fsPtr->exists();
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -396,21 +395,19 @@ mcsm::Result mcsm::MultiServerOption::save(){
 
             sPath = sPtr->getOptionPath();
 
-            nlohmann::json sArr = this->option->getValue("servers");
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-                mcsm::Result res(resp.first, resp.second);
+            if(sPath == this->option->getPath()){
+                mcsm::Result res({mcsm::ResultType::MCSM_WARN, {
+                    "Multi server configuration file and its linked server configuration file cannot exist in the same path.",
+                    "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you believe that this is a software issue."
+                }});
                 return res;
             }
 
-            if(sArr == nullptr){
-                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"servers\"", this->option->getName())});
-                return res;
-            }
-            if(!sArr.is_array()){
-                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"servers\"", "array of json object")});
-                return res;
-            }
+            nlohmann::json jObj;
+            jObj["name"] = sName;
+            jObj["path"] = sPath;
+
+            objArr.push_back(jObj);
         }else{
             mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
                 "std::variant<mcsm::ServerOption, mcsm::FabricServerOption> test didn't pass.",
@@ -419,6 +416,8 @@ mcsm::Result mcsm::MultiServerOption::save(){
             return res;
         }
     }
+
+    return this->option->setValue("servers", objArr);
 }
 
 bool mcsm::MultiServerOption::canBeTaken(const std::string& serverName) const {
@@ -532,7 +531,7 @@ mcsm::Result mcsm::MultiServerOption::addServer(std::unique_ptr<std::variant<mcs
 
     if(!validName){
         mcsm::Result res({mcsm::ResultType::MCSM_WARN, {
-            "Current server name \"" + name + "\" is already taken on this multiserver configuration."
+            "Current server name \"" + name + "\" is already taken."
         }});
         return res;
     }
