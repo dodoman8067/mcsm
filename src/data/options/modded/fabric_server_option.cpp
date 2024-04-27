@@ -253,14 +253,19 @@ mcsm::Result mcsm::FabricServerOption::create(const std::string& name, mcsm::Jvm
 
 mcsm::Result mcsm::FabricServerOption::start(){
     std::unique_ptr<mcsm::JvmOption> jvmOpt = getDefaultOption();
-    return start(std::move(jvmOpt), this->path, this->path);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+    return start(*jvmOpt, this->path, this->path);
 }
 
-mcsm::Result mcsm::FabricServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
-    return start(std::move(option), this->path, this->path);
+mcsm::Result mcsm::FabricServerOption::start(mcsm::JvmOption& option){
+    return start(option, this->path, this->path);
 }
 
-mcsm::Result mcsm::FabricServerOption::start(std::unique_ptr<mcsm::JvmOption> option, const std::string& path, const std::string& optionPath){
+mcsm::Result mcsm::FabricServerOption::start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
     mcsm::FabricServerDataOption serverDataOpt(optionPath);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -320,7 +325,7 @@ mcsm::Result mcsm::FabricServerOption::start(std::unique_ptr<mcsm::JvmOption> op
         return res;
     }
 
-    std::string profileName = option->getProfileName();
+    std::string profileName = option.getProfileName();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -333,7 +338,7 @@ mcsm::Result mcsm::FabricServerOption::start(std::unique_ptr<mcsm::JvmOption> op
     mcsm::info("Server JVM launch profile : " + profileName);
     mcsm::Result res = serverDataOpt.updateLastTimeLaunched();
     if(!res.isSuccess()) return res;
-    mcsm::Result res2 = this->server->start(*option, path, optionPath);
+    mcsm::Result res2 = this->server->start(option, path, optionPath);
     return res2;
 }
 
@@ -496,11 +501,11 @@ std::unique_ptr<mcsm::JvmOption> mcsm::FabricServerOption::getDefaultOption() co
     return jvmOption;
 }
 
-mcsm::Result mcsm::FabricServerOption::setDefaultOption(std::unique_ptr<mcsm::JvmOption> jvmOption){
+mcsm::Result mcsm::FabricServerOption::setDefaultOption(mcsm::JvmOption& jvmOption){
     mcsm::Option option(this->path, "server");
     nlohmann::json profileObj;
-    profileObj["name"] = jvmOption->getProfileName();
-    if(jvmOption->getSearchTarget() == mcsm::SearchTarget::GLOBAL){
+    profileObj["name"] = jvmOption.getProfileName();
+    if(jvmOption.getSearchTarget() == mcsm::SearchTarget::GLOBAL){
         profileObj["location"] = "global";
     }else{
         profileObj["location"] = "current";
