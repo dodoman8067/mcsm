@@ -50,7 +50,7 @@ mcsm::Result mcsm::ServerDataOption::create(const std::string& lastTimeLaunched)
         return res;
     }
     if(optExists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverAlreadyConfigured()});
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverAlreadyConfigured(this->option->getPath())});
         return res;
     }
     mcsm::Result res1 = this->option->setValue("last_time_launched", lastTimeLaunched);

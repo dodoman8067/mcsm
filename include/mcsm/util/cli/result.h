@@ -143,9 +143,23 @@ namespace mcsm {
             };
         }
 
+        inline std::vector<std::string> serverAlreadyConfigured(const std::string& dir){
+            return {
+                "Server already configured in " + dir + ".",
+                "Please try again in other directories."
+            };
+        }
+
         inline std::vector<std::string> serverNotConfigured(){
             return {
                 "Server isn't configured in this directory",
+                "Run \"mcsm init\" to configure a server."
+            };
+        }
+
+        inline std::vector<std::string> serverNotConfigured(const std::string& dir){
+            return {
+                "Server not configured in " + dir + ".",
                 "Run \"mcsm init\" to configure a server."
             };
         }
