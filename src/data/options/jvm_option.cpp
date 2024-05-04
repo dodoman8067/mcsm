@@ -38,9 +38,8 @@ mcsm::JvmOption::JvmOption(const std::string& name, const mcsm::SearchTarget& ta
             mcsm::GlobalOption globalOption("/jvm/profiles", name);
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
             if(globalOption.exists()){
-                auto optPtr = new mcsm::GlobalOption("/jvm/profiles", name);
                 if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
-                this->option.reset(optPtr);
+                this->option.reset(new mcsm::GlobalOption(globalOption));
             }else{
                 this->option.reset(new mcsm::Option(mcsm::getCurrentPath() + "/.mcsm/jvm/profiles", name));
             }
@@ -50,16 +49,15 @@ mcsm::JvmOption::JvmOption(const std::string& name, const mcsm::SearchTarget& ta
             mcsm::GlobalOption globalOption("/jvm/profiles", name);
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
             if(globalOption.exists()){
-                auto optPtr = new mcsm::GlobalOption("/jvm/profiles", name);
                 if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
-                this->option.reset(optPtr);
+                this->option.reset(new mcsm::GlobalOption(globalOption));
             }
             break;
         }
         case mcsm::SearchTarget::CURRENT: {
-            mcsm::Option option(workingPath + "/.mcsm/jvm/profiles", name);
-            if(option.exists()){
-                this->option.reset(new mcsm::Option(workingPath + "/.mcsm/jvm/profiles", name));
+            mcsm::Option option1(workingPath + "/.mcsm/jvm/profiles", name);
+            if(option1.exists()){
+                this->option.reset(new mcsm::Option(option1));
             }
             break;
         }
