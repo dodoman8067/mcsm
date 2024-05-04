@@ -24,6 +24,7 @@ SOFTWARE.
 #define __MCSM_RESULT_H__
 
 #include <vector>
+#include <mutex>
 #include <mcsm/util/cli/logging.h>
 
 namespace mcsm {

@@ -22,6 +22,7 @@ SOFTWARE.
 
 #include <mcsm/util/cli/result.h>
 
+static std::mutex res_mutex;
 static std::pair<mcsm::ResultType, std::vector<std::string>> res = {mcsm::ResultType::MCSM_SUCCESS, { "Not updated" }};
 
 mcsm::Result::Result(const mcsm::ResultType& type, const std::vector<std::string>& message){
@@ -56,52 +57,40 @@ void mcsm::Result::printMessage(){
 }
 
 void mcsm::Result::printMessage(const mcsm::ResultType& type){
-    switch (type){
-        case mcsm::ResultType::MCSM_SUCCESS:
-            for(const std::string& str : message){
-                mcsm::success(str);
-            }
-            break;          
-        case mcsm::ResultType::MCSM_OK:
-            for(const std::string& str : message){
+    std::vector<std::string> message = this->message;
+
+    for(const auto& str : message){
+        switch (type){
+            case mcsm::ResultType::MCSM_SUCCESS:
+            case mcsm::ResultType::MCSM_OK:
                 mcsm::info(str);
-            }
-            break;
-        case mcsm::ResultType::MCSM_WARN:
-            for(const std::string& str : message){
+                break;
+            case mcsm::ResultType::MCSM_WARN:
+            case mcsm::ResultType::MCSM_WARN_NOEXIT:
                 mcsm::warning(str);
-            }
-            break;
-        case mcsm::ResultType::MCSM_WARN_NOEXIT:
-            for(const std::string& str : message){
-                mcsm::warning(str);
-            }
-            break;
-        case mcsm::ResultType::MCSM_FAIL:
-            for(const std::string& str : message){
+                break;
+            case mcsm::ResultType::MCSM_FAIL:
                 mcsm::error(str);
-            }
-            break;
-        case mcsm::ResultType::MCSM_UNKNOWN:
-            for(const std::string& str : message){
-                mcsm::warning(str);
-            }
-            break;
-        default:
-            for(const std::string& str : message){
+                break;
+            case mcsm::ResultType::MCSM_UNKNOWN:
+            default:
                 mcsm::error(str);
-            }
-            mcsm::error("FATAL : Unknown usage of mcsm::ResultType detected. Please report this to GitHub. (https://github.com/dodoman8067/mcsm)");
-            break;    
+                mcsm::error("FATAL : Unknown usage of mcsm::ResultType detected. Please report this to GitHub. (https://github.com/dodoman8067/mcsm)");
+                break;
+        }
     }
 }
 
 std::pair<mcsm::ResultType, std::vector<std::string>> mcsm::getLastResult(){
+    std::lock_guard<std::mutex> lock(res_mutex);
     return res;
 }
 
 void mcsm::updateLastResult(const std::pair<mcsm::ResultType, std::vector<std::string>> newRes){
-    res = newRes;
+    std::lock_guard<std::mutex> lock(res_mutex);
+    if(res != newRes){
+        res = newRes;
+    }
 }
 
 void mcsm::printResultMessage(){
@@ -111,42 +100,25 @@ void mcsm::printResultMessage(){
 void mcsm::printResultMessage(const std::pair<mcsm::ResultType, std::vector<std::string>> res){
     mcsm::ResultType type = res.first;
     std::vector<std::string> message = res.second;
-    switch (type){
-        case mcsm::ResultType::MCSM_SUCCESS:
-            for(const std::string& str : message){
-                mcsm::success(str);
-            }
-            break;            
-        case mcsm::ResultType::MCSM_OK:
-            for(const std::string& str : message){
+
+    for(const auto& str : message){
+        switch (type){
+            case mcsm::ResultType::MCSM_SUCCESS:
+            case mcsm::ResultType::MCSM_OK:
                 mcsm::info(str);
-            }
-            break;
-        case mcsm::ResultType::MCSM_WARN:
-            for(const std::string& str : message){
+                break;
+            case mcsm::ResultType::MCSM_WARN:
+            case mcsm::ResultType::MCSM_WARN_NOEXIT:
                 mcsm::warning(str);
-            }
-            break;
-        case mcsm::ResultType::MCSM_WARN_NOEXIT:
-            for(const std::string& str : message){
-                mcsm::warning(str);
-            }
-            break;
-        case mcsm::ResultType::MCSM_FAIL:
-            for(const std::string& str : message){
+                break;
+            case mcsm::ResultType::MCSM_FAIL:
                 mcsm::error(str);
-            }
-            break;
-        case mcsm::ResultType::MCSM_UNKNOWN:
-            for(const std::string& str : message){
-                mcsm::warning(str);
-            }
-            break;
-        default:
-            for(const std::string& str : message){
+                break;
+            case mcsm::ResultType::MCSM_UNKNOWN:
+            default:
                 mcsm::error(str);
-            }
-            mcsm::error("FATAL : Unknown usage of mcsm::ResultType detected. Please report this to GitHub. (https://github.com/dodoman8067/mcsm)");
-            break;    
+                mcsm::error("FATAL : Unknown usage of mcsm::ResultType detected. Please report this to GitHub. (https://github.com/dodoman8067/mcsm)");
+                break;
+        }
     }
 }
