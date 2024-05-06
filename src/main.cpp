@@ -24,7 +24,7 @@ SOFTWARE.
 
 #include <mcsm/init.h>
 
-const std::string version = "0.1.1.2";
+const std::string version = "0.1.1.3";
 
 int main(int argc, char *argv[]){
     /**
@@ -55,7 +55,7 @@ int main(int argc, char *argv[]){
         return 0;
     }
 
-    //If arguments exist, iterates through CommandManager::getCommands()
+    //Iterates through CommandManager::getCommands() only if argc is more than 1
     for(auto& v : mcsm::CommandManager::getCommands()){
         if(argv[1] == v->getName() || v->hasAlias(argv[1])){
             std::vector<std::string> args;
@@ -68,7 +68,7 @@ int main(int argc, char *argv[]){
         }
     }
 
-    //If arguments exist but command is not found, prints message and exits
+    //Exit if unknown command detected.
     if(!commandFound){
         std::cerr << "Unknown command \"" << argv[1] << "\". " << "Type \'mcsm help\' for a list of commands.\n";
         return 1;

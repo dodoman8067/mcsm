@@ -42,32 +42,36 @@ namespace mcsm {
          * @param option server's default JVM launch profile
          * @param version Minecraft version for the server
          * @param type Bukkit-API server implementation (e.g., CRAFTBUKKIT, SPIGOT, PAPER, PURPUR, PUFFERFISH, FOLIA)
+         * @param autoUpdate sets if the server should automatically update upon starting
         */
-        mcsm::Result generateBukkit(const std::string& name, mcsm::JvmOption& option, const std::string& version, const mcsm::BukkitServerType& type);
+        mcsm::Result generateBukkit(const std::string& name, mcsm::JvmOption& option, const std::string& version, const mcsm::BukkitServerType& type, const bool& autoUpdate);
 
         /**
          * Generates a Forge server.
          * @param name server's name
          * @param option server's default JVM launch profile
          * @param version Minecraft version for the server
+         * @param autoUpdate sets if the server should automatically update upon starting
         */
-        mcsm::Result generateForge(const std::string& name, mcsm::JvmOption& option, const std::string& version);
+        mcsm::Result generateForge(const std::string& name, mcsm::JvmOption& option, const std::string& version, const bool& autoUpdate);
 
         /**
          * Generates a Fabric server.
          * @param name server's name
          * @param option server's default JVM launch profile
          * @param version Minecraft version for the server
+         * @param autoUpdate sets if the server should automatically update upon starting
         */
-        mcsm::Result generateFabric(const std::string& name, mcsm::JvmOption& option, const std::string& version);
+        mcsm::Result generateFabric(const std::string& name, mcsm::JvmOption& option, const std::string& version, const bool& autoUpdate);
 
         /**
          * Generates a SpongeVanilla server.
          * @param name server's name
          * @param option server's default JVM launch profile
          * @param version Minecraft version for the server
+         * @param autoUpdate sets if the server should automatically update upon starting
         */
-        mcsm::Result generateSponge(const std::string& name, mcsm::JvmOption& option, const std::string& version);
+        mcsm::Result generateSponge(const std::string& name, mcsm::JvmOption& option, const std::string& version, const bool& autoUpdate);
 
         /**
          * Generates a custom server.
@@ -76,23 +80,25 @@ namespace mcsm {
          * @param filePath jarfile's location (path)
          * @param version Minecraft version for the server
         */
-        mcsm::Result generateCustom(const std::string& name, mcsm::JvmOption& option, const std::string& filePath, const std::string& version);
+        mcsm::Result generateCustom(const std::string& name, mcsm::JvmOption& option, const std::string& filePath, const std::string& version, const bool& autoUpdate);
 
         /**
          * Generates a Vanilla server.
          * @param name server's name
          * @param option server's default JVM launch profile
          * @param version Minecraft version for the server
+         * @param autoUpdate sets if the server should automatically update upon starting
         */
-        mcsm::Result generateVanilla(const std::string& name, mcsm::JvmOption& option, const std::string& version);
+        mcsm::Result generateVanilla(const std::string& name, mcsm::JvmOption& option, const std::string& version, const bool& autoUpdate);
 
         /**
          * Configures a server.
          * @param serverOption pointer of mcsm::ServerOption
          * @param name server's name
          * @param option server's default JVM launch profile
+         * @param autoUpdate sets if the server should automatically update upon starting
         */
-        mcsm::Result configure(std::unique_ptr<mcsm::ServerOption> serverOption, const std::string& name, mcsm::JvmOption& option);
+        mcsm::Result configure(std::unique_ptr<mcsm::ServerOption> serverOption, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate);
 
         /**
          * Returns a pointer of server instance based on `server`.

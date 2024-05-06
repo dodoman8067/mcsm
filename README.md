@@ -2,7 +2,7 @@
 
 ## Description
 
-MCSM (MineCraft Server Manager) is a command-line program designed to manage Minecraft servers. Note that this project is still work in progress and it's not ready for production.
+MCSM (MineCraft Server Manager) is a command-line program designed to manage Minecraft servers. Note that there's a better option called Docker and I wouldn't recommend using this right now because this project is mostly for me leaning C++.
 
 ## Supported platforms
 

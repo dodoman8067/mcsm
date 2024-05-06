@@ -22,18 +22,24 @@ SOFTWARE.
 
 #include <mcsm/data/options/jvm_option.h>
 
-mcsm::JvmOption::JvmOption(const std::string& name) : JvmOption(name, mcsm::SearchTarget::ALL) {}
+mcsm::JvmOption::JvmOption(const std::string& name) : JvmOption(name, mcsm::SearchTarget::ALL, mcsm::getCurrentPath()) {}
 
-mcsm::JvmOption::JvmOption(const std::string& name, const mcsm::SearchTarget& target){
+mcsm::JvmOption::JvmOption(const std::string& name, const mcsm::SearchTarget& target) : JvmOption(name, target, mcsm::getCurrentPath()) {}
+
+mcsm::JvmOption::JvmOption(const std::string& name, const mcsm::SearchTarget& target, const std::string& workingPath){
     this->name = name;
+    std::string name1 = name;
+    mcsm::replaceAll(name1, ".", "_");
+    mcsm::replaceAll(name1, "/", "_");
+    this->name = name1;
+    this->workingDir = workingPath;
     switch (target){
         case mcsm::SearchTarget::ALL: {
             mcsm::GlobalOption globalOption("/jvm/profiles", name);
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
             if(globalOption.exists()){
-                auto optPtr = new mcsm::GlobalOption("/jvm/profiles", name);
                 if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
-                this->option.reset(optPtr);
+                this->option.reset(new mcsm::GlobalOption(globalOption));
             }else{
                 this->option.reset(new mcsm::Option(mcsm::getCurrentPath() + "/.mcsm/jvm/profiles", name));
             }
@@ -43,16 +49,15 @@ mcsm::JvmOption::JvmOption(const std::string& name, const mcsm::SearchTarget& ta
             mcsm::GlobalOption globalOption("/jvm/profiles", name);
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
             if(globalOption.exists()){
-                auto optPtr = new mcsm::GlobalOption("/jvm/profiles", name);
                 if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
-                this->option.reset(optPtr);
+                this->option.reset(new mcsm::GlobalOption(globalOption));
             }
             break;
         }
         case mcsm::SearchTarget::CURRENT: {
-            mcsm::Option option(mcsm::getCurrentPath() + "/.mcsm/jvm/profiles", name);
-            if(option.exists()){
-                this->option.reset(new mcsm::Option(mcsm::getCurrentPath() + "/.mcsm/jvm/profiles", name));
+            mcsm::Option option1(workingPath + "/.mcsm/jvm/profiles", name);
+            if(option1.exists()){
+                this->option.reset(new mcsm::Option(option1));
             }
             break;
         }
@@ -83,6 +88,8 @@ mcsm::Result mcsm::JvmOption::create(){
     return create(jvm, jvmArgs, serverArgs, mcsm::SearchTarget::GLOBAL);
 }
 
+// Reason why the program takes SearchTarget as a parameter (was taken in the constructor) is because there's chance that constructor's specified SearchTarget might be ALL.
+
 mcsm::Result mcsm::JvmOption::create(const std::string& jvmPath, const mcsm::SearchTarget& target){
     std::vector<std::string> jvmArgs = {
         "-Xms2G",
@@ -107,7 +114,7 @@ mcsm::Result mcsm::JvmOption::create(const std::string& jvmPath, const std::vect
     std::string optionName;
 
     if(target == mcsm::SearchTarget::CURRENT){
-        mcsm::Option option(mcsm::getCurrentPath() + "/.mcsm/jvm/profiles", this->name);
+        mcsm::Option option(this->workingDir + "/.mcsm/jvm/profiles", this->name);
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
             std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
             mcsm::Result res(resp.first, resp.second);
@@ -125,7 +132,6 @@ mcsm::Result mcsm::JvmOption::create(const std::string& jvmPath, const std::vect
         filePath = globalOption.getPath();
         optionName = globalOption.getName();
     }
-
     bool fileExists = mcsm::fileExists(filePath + "/" + optionName);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -133,18 +139,16 @@ mcsm::Result mcsm::JvmOption::create(const std::string& jvmPath, const std::vect
         return res;
     }
     if(fileExists){
-        mcsm::removeFile(filePath + "/" + optionName);
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-            mcsm::Result res(resp.first, resp.second);
-            return res;
-        }
+        mcsm::Result res({mcsm::ResultType::MCSM_WARN, {
+            "JVM lanuch profile " + this->name + " already exists."
+        }});
+        return res;
     }
 
     mcsm::Result invaildPath({mcsm::ResultType::MCSM_SUCCESS, {"Invaild jvm path.", "High chance to be a software issue, please report this to GitHub (https://github.com/dodoman8067/mcsm)."}});
     if(target == mcsm::SearchTarget::ALL) return invaildPath;
     if(target == mcsm::SearchTarget::CURRENT){
-        mcsm::Option* cOpt = new mcsm::Option(mcsm::getCurrentPath() + "/.mcsm/jvm/profiles", optionName);
+        mcsm::Option* cOpt = new mcsm::Option(this->workingDir + "/.mcsm/jvm/profiles", optionName);
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
             std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
             mcsm::Result res(resp.first, resp.second);

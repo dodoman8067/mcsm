@@ -60,10 +60,10 @@ void mcsm::StartServerCommand::execute(const std::vector<std::string>& args){
             mcsm::printResultMessage();
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
         }
-        mcsm::Result res = fsOpt.start(std::move(jvmOpt));
+        mcsm::Result res = fsOpt.start(*jvmOpt);
         res.printMessage();
     }else{
-        mcsm::Result res = sOpt.start(std::move(jvmOpt));
+        mcsm::Result res = sOpt.start(*jvmOpt);
         res.printMessage();
     }
 }

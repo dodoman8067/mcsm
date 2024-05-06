@@ -27,6 +27,8 @@ mcsm::GlobalOption::GlobalOption(const std::string& path, const std::string& nam
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
 
     std::string name1 = name;
+    mcsm::replaceAll(name1, "..", "__");
+    mcsm::replaceAll(name1, "/", "_");
     if(!mcsm::endsWith(name1, ".json")){
         name1 = name1.append(".json");
     }

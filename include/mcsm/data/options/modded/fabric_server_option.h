@@ -22,12 +22,15 @@ namespace mcsm {
         bool exists();
 
         mcsm::Result create(const std::string& name, mcsm::JvmOption& defaultOption);
+        mcsm::Result create(const std::string& name, mcsm::JvmOption& defaultOption, const bool& update);
 
         mcsm::Result start();
-        mcsm::Result start(std::unique_ptr<mcsm::JvmOption> option);
-        mcsm::Result start(std::unique_ptr<mcsm::JvmOption> option, const std::string& path, const std::string& optionPath);
+        mcsm::Result start(mcsm::JvmOption& option);
+        mcsm::Result start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath);
 
         mcsm::Result update();
+
+        std::string getOptionPath() const;
 
         std::string getServerJarBuild() const;
         mcsm::Result setServerJarBuild(const std::string& build);
@@ -45,7 +48,7 @@ namespace mcsm {
         mcsm::Result setServerVersion(const std::string& version);
 
         std::unique_ptr<mcsm::JvmOption> getDefaultOption() const;
-        mcsm::Result setDefaultOption(std::unique_ptr<mcsm::JvmOption> jvmOption);
+        mcsm::Result setDefaultOption(mcsm::JvmOption& jvmOption);
 
         std::string getServerType() const;
 

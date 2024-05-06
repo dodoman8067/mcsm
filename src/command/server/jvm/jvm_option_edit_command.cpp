@@ -71,6 +71,7 @@ mcsm::SearchTarget mcsm::JvmOptionEditCommand::getSearchTarget(const std::vector
 
 std::string mcsm::JvmOptionEditCommand::getJvmPath(const std::vector<std::string>& args) const {
     std::string jvmPath;
+    bool valid = false;
     for(size_t i = 0; i < args.size(); ++i){
         const std::string& arg = args[i];
         if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
@@ -83,13 +84,16 @@ std::string mcsm::JvmOptionEditCommand::getJvmPath(const std::vector<std::string
                 if(!mcsm::endsWith(jvmPath, "\"") && !mcsm::endsWith(jvmPath, "\'")){
                     jvmPath += "\"";
                 }
-                if (!mcsm::isValidJava(jvmPath)) continue;
-                mcsm::success("Detected java from specified path : " + jvmPath);
+                if(!mcsm::isValidJava(jvmPath)){
+                    valid = false;
+                    continue;
+                }
+                valid = true;
                 return jvmPath;
             }
         }
     }
-    mcsm::info("JVM not detected or not a valid JVM. Ignoring..");
+    if(!mcsm::isWhitespaceOrEmpty(jvmPath) && !valid) mcsm::info("Not a valid JVM path. Ignoring..");
     return "";
 }
 

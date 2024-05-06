@@ -23,7 +23,7 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& version, const s
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
 
     if(!exists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured(path)});
         return;
     }
 
@@ -82,7 +82,7 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& path){
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
 
     if(!exists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured(path)});
         return;
     }
 
@@ -170,6 +170,10 @@ mcsm::FabricServerOption::~FabricServerOption(){
 }
 
 mcsm::Result mcsm::FabricServerOption::create(const std::string& name, mcsm::JvmOption& defaultOption){
+    return create(name, defaultOption, true);
+}
+
+mcsm::Result mcsm::FabricServerOption::create(const std::string& name, mcsm::JvmOption& defaultOption, const bool& update){
     mcsm::Option option(this->path, "server");
     
     bool optExists = option.exists();
@@ -180,7 +184,7 @@ mcsm::Result mcsm::FabricServerOption::create(const std::string& name, mcsm::Jvm
     }
 
     if(optExists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverAlreadyConfigured()});
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverAlreadyConfigured(this->path)});
         return res;
     }
 
@@ -228,7 +232,7 @@ mcsm::Result mcsm::FabricServerOption::create(const std::string& name, mcsm::Jvm
     mcsm::Result res6 = option.setValue("server_build", "latest");
     if(!res6.isSuccess()) return res6;
 
-    mcsm::Result res12 = option.setValue("auto_update", true);
+    mcsm::Result res12 = option.setValue("auto_update", update);
     if(!res12.isSuccess()) return res12;
     
     mcsm::Result res7 = option.setValue("type", this->server->getTypeAsString());
@@ -249,14 +253,19 @@ mcsm::Result mcsm::FabricServerOption::create(const std::string& name, mcsm::Jvm
 
 mcsm::Result mcsm::FabricServerOption::start(){
     std::unique_ptr<mcsm::JvmOption> jvmOpt = getDefaultOption();
-    return start(std::move(jvmOpt), this->path, this->path);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+    return start(*jvmOpt, this->path, this->path);
 }
 
-mcsm::Result mcsm::FabricServerOption::start(std::unique_ptr<mcsm::JvmOption> option){
-    return start(std::move(option), this->path, this->path);
+mcsm::Result mcsm::FabricServerOption::start(mcsm::JvmOption& option){
+    return start(option, this->path, this->path);
 }
 
-mcsm::Result mcsm::FabricServerOption::start(std::unique_ptr<mcsm::JvmOption> option, const std::string& path, const std::string& optionPath){
+mcsm::Result mcsm::FabricServerOption::start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
     mcsm::FabricServerDataOption serverDataOpt(optionPath);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -272,7 +281,7 @@ mcsm::Result mcsm::FabricServerOption::start(std::unique_ptr<mcsm::JvmOption> op
     }
 
     if(!fileExists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured(optionPath)});
         return res;
     }
 
@@ -316,7 +325,7 @@ mcsm::Result mcsm::FabricServerOption::start(std::unique_ptr<mcsm::JvmOption> op
         return res;
     }
 
-    std::string profileName = option->getProfileName();
+    std::string profileName = option.getProfileName();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -329,7 +338,7 @@ mcsm::Result mcsm::FabricServerOption::start(std::unique_ptr<mcsm::JvmOption> op
     mcsm::info("Server JVM launch profile : " + profileName);
     mcsm::Result res = serverDataOpt.updateLastTimeLaunched();
     if(!res.isSuccess()) return res;
-    mcsm::Result res2 = this->server->start(*option, path, optionPath);
+    mcsm::Result res2 = this->server->start(option, path, optionPath);
     return res2;
 }
 
@@ -346,7 +355,7 @@ std::string mcsm::FabricServerOption::getLoaderVersion() const {
     bool optExists = option.exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     if(!optExists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured(this->path)});
         return "";
     }
 
@@ -376,7 +385,7 @@ std::string mcsm::FabricServerOption::getInstallerVersion() const{
     bool optExists = option.exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     if(!optExists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured(this->path)});
         return "";
     }
 
@@ -408,12 +417,16 @@ bool mcsm::FabricServerOption::exists(){
     return rt;
 }
 
+std::string mcsm::FabricServerOption::getOptionPath() const {
+    return this->path;
+}
+
 std::unique_ptr<mcsm::JvmOption> mcsm::FabricServerOption::getDefaultOption() const{
     mcsm::Option option(this->path, "server");
     bool optExists = option.exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return nullptr;
     if(!optExists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured(this->path)});
         return nullptr;
     }
     nlohmann::json profileObj = option.getValue("default_launch_profile");
@@ -488,11 +501,11 @@ std::unique_ptr<mcsm::JvmOption> mcsm::FabricServerOption::getDefaultOption() co
     return jvmOption;
 }
 
-mcsm::Result mcsm::FabricServerOption::setDefaultOption(std::unique_ptr<mcsm::JvmOption> jvmOption){
+mcsm::Result mcsm::FabricServerOption::setDefaultOption(mcsm::JvmOption& jvmOption){
     mcsm::Option option(this->path, "server");
     nlohmann::json profileObj;
-    profileObj["name"] = jvmOption->getProfileName();
-    if(jvmOption->getSearchTarget() == mcsm::SearchTarget::GLOBAL){
+    profileObj["name"] = jvmOption.getProfileName();
+    if(jvmOption.getSearchTarget() == mcsm::SearchTarget::GLOBAL){
         profileObj["location"] = "global";
     }else{
         profileObj["location"] = "current";
@@ -505,7 +518,7 @@ std::string mcsm::FabricServerOption::getServerName() const {
     bool optExists = option.exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     if(!optExists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured(this->path)});
         return "";
     }
 
@@ -535,7 +548,7 @@ std::string mcsm::FabricServerOption::getServerVersion() const {
     bool optExists = option.exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     if(!optExists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured(this->path)});
         return "";
     }
 
@@ -565,7 +578,7 @@ std::string mcsm::FabricServerOption::getServerType() const {
     bool optExists = option.exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     if(!optExists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured(this->path)});
         return "";
     }
 
@@ -590,7 +603,7 @@ std::string mcsm::FabricServerOption::getServerJarFile() const{
     bool optExists = option.exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     if(!optExists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured(this->path)});
         return "";
     }
 
@@ -620,7 +633,7 @@ bool mcsm::FabricServerOption::doesAutoUpdate() const {
     bool optExists = option.exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     if(!optExists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured(this->path)});
         return "";
     }
 
