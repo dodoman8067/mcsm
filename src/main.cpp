@@ -24,7 +24,7 @@ SOFTWARE.
 
 #include <mcsm/init.h>
 
-const std::string version = "0.1.1.3";
+const std::string version = "0.2";
 
 int main(int argc, char *argv[]){
     /**
