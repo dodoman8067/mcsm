@@ -58,6 +58,7 @@ namespace mcsm {
         bool isActivate() const;
 
         void send(const std::string& input);
+        void stop();
     };
 
     class ServerProcessManager {
