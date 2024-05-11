@@ -42,23 +42,23 @@ SOFTWARE.
 namespace mcsm {
     class ServerProcess {
     private:
-        std::string command;
+        std::string command, workingPath;
         int inputFd = -1;
         int pid = -1;
         bool active = false;
     public:
-        ServerProcess();
+        ServerProcess(const std::string& command, const std::string& workingPath);
         ~ServerProcess();
 
-        void startServer(const std::string& command, const std::string& workingPath);
+        mcsm::Result start();
 
         int getPID() const;
         int getInputFd() const;
 
         bool isActivate() const;
 
-        void send(const std::string& input);
-        void stop();
+        mcsm::Result send(const std::string& input);
+        mcsm::Result stop();
     };
 
     class ServerProcessManager {
