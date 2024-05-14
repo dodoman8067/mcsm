@@ -32,7 +32,7 @@ mcsm::ServerProcess::ServerProcess(const std::string& command, const std::string
 mcsm::ServerProcess::~ServerProcess(){}
 
 #ifdef _WIN32
-mcsm::Result mcsm::ServerProcess::start() {
+mcsm::Result mcsm::ServerProcess::start(){
     STARTUPINFOW si;
     PROCESS_INFORMATION pi;
     HANDLE hInputWrite, hInputReadTmp, hInputRead;
@@ -43,13 +43,13 @@ mcsm::Result mcsm::ServerProcess::start() {
 
     // Create a pipe for the child process's input.
     if(!CreatePipe(&hInputReadTmp, &hInputWrite, NULL, 0)){
-        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, "Pipe failed."});
+        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Pipe failed."}});
     }
     if(!DuplicateHandle(GetCurrentProcess(), hInputReadTmp, GetCurrentProcess(),
                          &hInputRead, 0, FALSE, DUPLICATE_SAME_ACCESS)){
         CloseHandle(hInputReadTmp);
         CloseHandle(hInputWrite);
-        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, "DuplicateHandle failed."});
+        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"DuplicateHandle failed."}});
     }
     CloseHandle(hInputReadTmp);
 
@@ -69,7 +69,7 @@ mcsm::Result mcsm::ServerProcess::start() {
         CloseHandle(hInputRead);
         CloseHandle(hInputWrite);
         free(cmd);
-        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, "CreateProcess failed. Error code: " + std::to_string(errorCode)});
+        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"CreateProcess failed. Error code: " + std::to_string(errorCode)}});
     }
 
     this->pid = pi.dwProcessId;
@@ -79,32 +79,32 @@ mcsm::Result mcsm::ServerProcess::start() {
     CloseHandle(hInputRead); // The readable end is now embedded in the child process, close our copy.
     free(cmd);
 
-    return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, "Starting process with pid " + std::to_string(pid)});
+    return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Starting process with pid " + std::to_string(pid)}});
 }
 #else
-mcsm::Result mcsm::ServerProcess::start() {
+mcsm::Result mcsm::ServerProcess::start(){
     int pipefd[2];
-    if (pipe(pipefd) == -1) {
+    if(pipe(pipefd) == -1){
         return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Pipe failed."}});
     }
 
     pid_t pid = fork();
-    if (pid == -1) {
+    if(pid == -1){
         close(pipefd[0]);
         close(pipefd[1]);
         return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Fork failed."}});
-    } else if (pid > 0) {
+    }else if (pid > 0){
         close(pipefd[0]); // Close the read end in the parent
         this->pid = pid;
         this->inputFd = pipefd[1];
         this->active = true;
         return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Starting process with pid " + std::to_string(pid)}});
-    } else {
+    }else{
         close(pipefd[1]); // Close the write end in the child
         dup2(pipefd[0], STDIN_FILENO); // Redirect standard input to the read end of the pipe
         close(pipefd[0]);
 
-        if (!workingPath.empty() && chdir(workingPath.c_str()) != 0) {
+        if(!workingPath.empty() && chdir(workingPath.c_str()) != 0){
             exit(2);
         }
 
@@ -113,6 +113,56 @@ mcsm::Result mcsm::ServerProcess::start() {
     }
 }
 #endif
+
+#ifdef _WIN32
+mcsm::Result mcsm::ServerProcess::waitForCompletion(){
+    DWORD result = WaitForSingleObject(pi.hProcess, INFINITE);
+    if(result == WAIT_FAILED){
+        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Waiting for process failed."}});
+    }
+    DWORD exitCode;
+    if(!GetExitCodeProcess(pi.hProcess, &exitCode)){
+        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Failed to get process exit code."}});
+    }
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+    this->active = false;
+
+    std::string strEc = std::to_string(exitCode);
+    if(strEc == "0"){
+        return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Process completed with exit code 0"}});
+    }else{
+        return mcsm::Result({mcsm::ResultType::MCSM_WARN_NOEXIT, {"Process terminated with exit code "  + strEc}});
+    }
+}
+#else
+mcsm::Result mcsm::ServerProcess::waitForCompletion(){
+    int status;
+    pid_t result = waitpid(pid, &status, 0);
+    if(result == -1){
+        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Waiting for process failed."}});
+    }
+
+    if(WIFEXITED(status)){
+        int exitStatus = WEXITSTATUS(status);
+        this->active = false;
+        switch (exitStatus){
+            case 0:
+                return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Process completed successfully with exit code 0."}});
+            case 2:
+                return mcsm::Result({mcsm::ResultType::MCSM_WARN, {"Process terminated with exit code 2: Failed to change working path."}});
+            case 3:
+                return mcsm::Result({mcsm::ResultType::MCSM_WARN, {"Process terminated with exit code 3: Failed to execute shell command."}});
+            default:
+                return mcsm::Result({mcsm::ResultType::MCSM_WARN, {"Process terminated with unusual exit code " + std::to_string(exitStatus) + "."}});
+        }
+    }else{
+        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Process terminated abnormally."}});
+    }
+}
+#endif
+
+
 int mcsm::ServerProcess::getPID() const {
     return this->pid;
 }
@@ -125,10 +175,45 @@ bool mcsm::ServerProcess::isActivate() const {
     return this->active;
 }
 
+void mcsm::ServerProcess::setAcvtive(const bool& newActive){
+    this->active = newActive;
+}
+
+#ifdef _WIN32
+mcsm::Result mcsm::ServerProcess::send(const std::string& input) {
+    DWORD written;
+    BOOL result = WriteFile(inputHandle, input.c_str(), static_cast<DWORD>(input.length()), &written, NULL);
+    if (!result || written != input.length()) {
+        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Failed to send data to child process."}});
+    }
+    return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Data sent successfully."}});
+}
+#else
 mcsm::Result mcsm::ServerProcess::send(const std::string& input){
-
+    ssize_t bytes_written = write(inputFd, input.c_str(), input.size());
+    if(bytes_written == -1){
+        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Failed to send data to child process."}});
+    }
+    return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Data sent successfully."}});
 }
+#endif
 
-mcsm::Result mcsm::ServerProcess::stop(){
-
+#ifdef _WIN32
+mcsm::Result mcsm::ServerProcess::stop() {
+    if(!TerminateProcess(pi.hProcess, 0)){
+        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Failed to send data to child process."}});
+    }
+    CloseHandle(pi.hProcess);
+    CloseHandle(pi.hThread);
+    this->active = false;
+    return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Process stopped successfully."}});
 }
+#else
+mcsm::Result mcsm::ServerProcess::stop() {
+    if(kill(pid, SIGTERM) == -1){
+        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Failed to send data to child process."}});
+    }
+    this->active = false;
+    return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Data sent successfully."}});
+}
+#endif

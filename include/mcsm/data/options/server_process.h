@@ -55,10 +55,13 @@ namespace mcsm {
 
         mcsm::Result start();
 
+        mcsm::Result waitForCompletion();
+
         int getPID() const;
         int getInputFd() const;
 
         bool isActivate() const;
+        void setAcvtive(const bool& newActive);
 
         mcsm::Result send(const std::string& input);
         mcsm::Result stop();
