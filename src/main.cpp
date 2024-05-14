@@ -23,8 +23,30 @@ SOFTWARE.
 */
 
 #include <mcsm/init.h>
+#include <mcsm/data/options/server_process.h>
 
 const std::string version = "0.2";
+
+void runServerProcess(int id, const std::string& workingPath) {
+    int sleepTime = std::rand() % 10 + 1;  // Random sleep time between 1 and 10 seconds
+    std::string command = "sleep " + std::to_string(sleepTime);
+    
+    mcsm::ServerProcess myProcess(command, workingPath);
+    std::cout << "Starting process " << id << " with sleep time " << sleepTime << " seconds.\n";
+    
+    auto startResult = myProcess.start();
+    if (startResult.getResult() != mcsm::ResultType::MCSM_SUCCESS) {
+        std::cerr << "Process " << id << " failed to start: " << std::endl;
+        return;
+    }
+
+    auto waitResult = myProcess.waitForCompletion();
+    if (waitResult.getResult() != mcsm::ResultType::MCSM_SUCCESS) {
+        std::cerr << "Process " << id << " error waiting" << std::endl;
+    } else {
+        std::cout << "Process " << id << " completed " << std::endl;
+    }
+}
 
 int main(int argc, char *argv[]){
     /**
@@ -52,6 +74,21 @@ int main(int argc, char *argv[]){
     if(argc < 2){
         std::cout << "Welcome to MCSM (Minecraft Server Manager).\n";
         std::cout << "Type \"mcsm help\" for a list of commands.\n";
+            const int numberOfProcesses = 5; // Number of server processes to start
+    std::vector<std::thread> threads; // Vector to hold threads
+    std::string workingPath = "/"; // Set to appropriate directory
+
+    // Start multiple server processes
+    for (int i = 1; i <= numberOfProcesses; i++) {
+        threads.emplace_back(runServerProcess, i, workingPath);
+    }
+
+    // Wait for all processes to complete
+    for (auto& thread : threads) {
+        thread.join();
+    }
+
+    std::cout << "All processes completed." << std::endl;
         return 0;
     }
 
