@@ -23,8 +23,6 @@ SOFTWARE.
 */
 
 #include <mcsm/data/options/server_process.h>
-#include <fcntl.h> // For _O_WRONLY and other flags
-#include <io.h>
 
 mcsm::ServerProcess::ServerProcess(const std::string& command, const std::string& workingPath){
     this->command = command;
