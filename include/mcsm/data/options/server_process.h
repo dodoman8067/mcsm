@@ -48,6 +48,7 @@ namespace mcsm {
         bool active = false;
     #ifdef _WIN32
         PROCESS_INFORMATION pi;
+        HANDLE inputHandle;
     #endif
     public:
         ServerProcess(const std::string& command, const std::string& workingPath);

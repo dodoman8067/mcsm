@@ -182,7 +182,7 @@ void mcsm::ServerProcess::setAcvtive(const bool& newActive){
 #ifdef _WIN32
 mcsm::Result mcsm::ServerProcess::send(const std::string& input) {
     DWORD written;
-    BOOL result = WriteFile(inputHandle, input.c_str(), static_cast<DWORD>(input.length()), &written, NULL);
+    BOOL result = WriteFile(this->inputHandle, input.c_str(), static_cast<DWORD>(input.length()), &written, NULL);
     if (!result || written != input.length()) {
         return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Failed to send data to child process."}});
     }
