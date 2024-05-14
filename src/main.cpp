@@ -24,27 +24,40 @@ SOFTWARE.
 
 #include <mcsm/init.h>
 #include <mcsm/data/options/server_process.h>
+#include <random>
 
 const std::string version = "0.2";
 
+std::mutex coutMutex;
+
 void runServerProcess(int id, const std::string& workingPath) {
-    int sleepTime = std::rand() % 10 + 1;  // Random sleep time between 1 and 10 seconds
-    std::string command = "sleep " + std::to_string(sleepTime);
+std::random_device rd; 
+    std::mt19937 mt(rd()); 
+    std::uniform_int_distribution<int> dist(0, 99);
+    int a = dist(mt);
+    std::string command = "PowerShell -Command \"Start-Sleep -Seconds " + std::to_string(a);
     
     mcsm::ServerProcess myProcess(command, workingPath);
-    std::cout << "Starting process " << id << " with sleep time " << sleepTime << " seconds.\n";
+    {
+        std::lock_guard<std::mutex> lock(coutMutex);
+        std::cout << "Starting process " << id << " with sleep time " << a << " seconds.\n";
+    }
     
     auto startResult = myProcess.start();
     if (startResult.getResult() != mcsm::ResultType::MCSM_SUCCESS) {
+        std::lock_guard<std::mutex> lock(coutMutex);
         std::cerr << "Process " << id << " failed to start: " << std::endl;
         return;
     }
 
     auto waitResult = myProcess.waitForCompletion();
+    {
+        std::lock_guard<std::mutex> lock(coutMutex);
     if (waitResult.getResult() != mcsm::ResultType::MCSM_SUCCESS) {
         std::cerr << "Process " << id << " error waiting" << std::endl;
     } else {
         std::cout << "Process " << id << " completed " << std::endl;
+    }
     }
 }
 
@@ -74,6 +87,7 @@ int main(int argc, char *argv[]){
     if(argc < 2){
         std::cout << "Welcome to MCSM (Minecraft Server Manager).\n";
         std::cout << "Type \"mcsm help\" for a list of commands.\n";
+
             const int numberOfProcesses = 5; // Number of server processes to start
     std::vector<std::thread> threads; // Vector to hold threads
     std::string workingPath = "/"; // Set to appropriate directory
