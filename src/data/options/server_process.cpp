@@ -23,6 +23,8 @@ SOFTWARE.
 */
 
 #include <mcsm/data/options/server_process.h>
+#include <fcntl.h> // For _O_WRONLY and other flags
+#include <io.h>
 
 mcsm::ServerProcess::ServerProcess(const std::string& command, const std::string& workingPath){
     this->command = command;
@@ -32,8 +34,8 @@ mcsm::ServerProcess::ServerProcess(const std::string& command, const std::string
 mcsm::ServerProcess::~ServerProcess(){}
 
 #ifdef _WIN32
-mcsm::Result mcsm::ServerProcess::start(){
-    STARTUPINFO si;
+mcsm::Result mcsm::ServerProcess::start() {
+    STARTUPINFOW si; // Notice the 'W' for wide characters
     PROCESS_INFORMATION pi;
     HANDLE hInputWrite, hInputReadTmp, hInputRead, hInputWriteTmp;
 
@@ -42,11 +44,11 @@ mcsm::Result mcsm::ServerProcess::start(){
     ZeroMemory(&pi, sizeof(pi));
 
     // Create a pipe for the child process's input.
-    if(!CreatePipe(&hInputReadTmp, &hInputWrite, NULL, 0)){
+    if (!CreatePipe(&hInputReadTmp, &hInputWrite, NULL, 0)) {
         return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Pipe failed."}});
     }
-    if(!DuplicateHandle(GetCurrentProcess(), hInputReadTmp, GetCurrentProcess(),
-                         &hInputRead, 0, FALSE, DUPLICATE_SAME_ACCESS)){
+    if (!DuplicateHandle(GetCurrentProcess(), hInputReadTmp, GetCurrentProcess(),
+                         &hInputRead, 0, FALSE, DUPLICATE_SAME_ACCESS)) {
         CloseHandle(hInputReadTmp);
         CloseHandle(hInputWrite);
         return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"DuplicateHandle failed."}});
@@ -58,16 +60,18 @@ mcsm::Result mcsm::ServerProcess::start(){
     si.hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
     si.hStdError = GetStdHandle(STD_ERROR_HANDLE);
 
-    // Convert command to a modifiable array for CreateProcess
-    char *cmd = _strdup(command.c_str());
+    // Convert command to a modifiable array for CreateProcessW
+    std::wstring wCommand = std::wstring(command.begin(), command.end());
+    wchar_t *cmd = _wcsdup(wCommand.c_str());
 
     // Start the child process.
-    if(!CreateProcess(NULL, cmd, NULL, NULL, TRUE, 0, NULL,
-                       workingPath.empty() ? NULL : workingPath.c_str(), &si, &pi)){
+    if (!CreateProcessW(NULL, cmd, NULL, NULL, TRUE, 0, NULL,
+                        workingPath.empty() ? NULL : std::wstring(workingPath.begin(), workingPath.end()).c_str(), &si, &pi)) {
+        DWORD errorCode = GetLastError();
         CloseHandle(hInputRead);
         CloseHandle(hInputWrite);
         free(cmd);
-        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"CreateProces failed."}});
+        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"CreateProcess failed. Error code: " + std::to_string(errorCode)}});
     }
 
     this->pid = pi.dwProcessId;
