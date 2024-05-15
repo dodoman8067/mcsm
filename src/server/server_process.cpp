@@ -22,7 +22,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
-#include <mcsm/data/options/server_process.h>
+#include <mcsm/server/server_process.h>
 
 mcsm::ServerProcess::ServerProcess(const std::string& command, const std::string& workingPath){
     this->command = command;
@@ -190,7 +190,7 @@ mcsm::Result mcsm::ServerProcess::start(){
     }
 
     this->pid = pi.dwProcessId;
-    this->inputHandle = hInputWrite; // Store the writable end of the pipe directly as a HANDLE.
+    this->inputHandle = hInputWrite;
     this->active = true;
     this->pi = pi;
     this->errorHandle = hErrorRead;
@@ -238,7 +238,7 @@ mcsm::Result mcsm::ServerProcess::start(){
         std::string modifiedCommmand = command + " 1>/dev/null";
 
         execl("/bin/sh", "sh", "-c", modifiedCommmand.c_str(), (char *) NULL);
-        exit(3); // execl only returns on failure
+        exit(3);
     }
 }
 #endif
