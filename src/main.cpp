@@ -28,14 +28,16 @@ SOFTWARE.
 
 const std::string version = "0.2";
 
+// TODO : Redirect output
+
 std::mutex coutMutex;
 
 void runServerProcess(int id, const std::string& workingPath) {
 std::random_device rd; 
     std::mt19937 mt(rd()); 
-    std::uniform_int_distribution<int> dist(0, 99);
+    std::uniform_int_distribution<int> dist(0, 11);
     int a = dist(mt);
-    std::string command = "PowerShell -Command \"Start-Sleep -Seconds " + std::to_string(a);
+    std::string command = "sleep " + std::to_string(a);
     
     mcsm::ServerProcess myProcess(command, workingPath);
     {
@@ -46,17 +48,20 @@ std::random_device rd;
     auto startResult = myProcess.start();
     if (startResult.getResult() != mcsm::ResultType::MCSM_SUCCESS) {
         std::lock_guard<std::mutex> lock(coutMutex);
-        std::cerr << "Process " << id << " failed to start: " << std::endl;
+        startResult.printMessage();
         return;
     }
+    startResult.printMessage();
 
     auto waitResult = myProcess.waitForCompletion();
     {
-        std::lock_guard<std::mutex> lock(coutMutex);
     if (waitResult.getResult() != mcsm::ResultType::MCSM_SUCCESS) {
-        std::cerr << "Process " << id << " error waiting" << std::endl;
+        std::lock_guard<std::mutex> lock(coutMutex);
+        waitResult.printMessage();
     } else {
+        std::lock_guard<std::mutex> lock(coutMutex);
         std::cout << "Process " << id << " completed " << std::endl;
+        waitResult.printMessage();
     }
     }
 }
