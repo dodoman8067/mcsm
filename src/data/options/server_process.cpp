@@ -331,6 +331,10 @@ void mcsm::ServerProcess::setAcvtive(const bool& newActive){
     this->active = newActive;
 }
 
+std::string mcsm::ServerProcess::getCommand() const {
+    return this->command;
+}
+
 #ifdef _WIN32
 mcsm::Result mcsm::ServerProcess::send(const std::string& input) {
     DWORD written;

@@ -69,6 +69,8 @@ namespace mcsm {
         int getPID() const;
         int getInputFd() const;
 
+        std::string getCommand() const;
+
         bool isActivate() const;
         void setAcvtive(const bool& newActive);
 
