@@ -23,17 +23,25 @@ SOFTWARE.
 #include <mcsm/util/cli/logging.h>
 
 void mcsm::info(const std::string& message){
-    std::cout << "[mcsm/INFO] " << message << "\n";
+    std::string msg = message;
+    if(!mcsm::endsWith(msg, "\n")) msg += "\n";
+    std::cout << "[mcsm/INFO] " << msg;
 }
 
 void mcsm::success(const std::string& message){
-    std::cout << termcolor::bright_green << "[mcsm/INFO] " << message << termcolor::reset << "\n";
+    std::string msg = message;
+    if(!mcsm::endsWith(msg, "\n")) msg += "\n";
+    std::cout << termcolor::bright_green << "[mcsm/INFO] " << msg << termcolor::reset;
 }
 
 void mcsm::warning(const std::string& message){
-    std::cerr << termcolor::bright_yellow << "[mcsm/WARN] " << message << termcolor::reset << "\n";
+    std::string msg = message;
+    if(!mcsm::endsWith(msg, "\n")) msg += "\n";
+    std::cerr << termcolor::bright_yellow << "[mcsm/WARN] " << msg << termcolor::reset;
 }
 
 void mcsm::error(const std::string& message){
-    std::cerr << termcolor::bright_red << "[mcsm/ERROR] " << message << termcolor::reset << "\n";
+    std::string msg = message;
+    if(!mcsm::endsWith(msg, "\n")) msg += "\n";
+    std::cerr << termcolor::bright_red << "[mcsm/ERROR] " << msg << termcolor::reset;
 }
