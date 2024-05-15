@@ -117,35 +117,65 @@ mcsm::ServerProcess& mcsm::ServerProcess::operator=(mcsm::ServerProcess&& other)
 #endif
 
 #ifdef _WIN32
+std::string mcsm::ServerProcess::getLastErrorMessage(DWORD errorCode) const {
+    LPVOID lpMsgBuf;
+    DWORD bufLen = FormatMessage(
+        FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
+        NULL, errorCode, MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), (LPTSTR)&lpMsgBuf, 0, NULL);
+    if(bufLen){
+        LPCSTR lpMsgStr = (LPCSTR)lpMsgBuf;
+        std::string result(lpMsgStr, lpMsgStr + bufLen);
+        LocalFree(lpMsgBuf);
+        return result;
+    }
+    return "";
+}
+#endif
+
+#ifdef _WIN32
 mcsm::Result mcsm::ServerProcess::start(){
     STARTUPINFOW si;
     PROCESS_INFORMATION pi;
-    HANDLE hInputWrite, hInputReadTmp, hInputRead;
+    HANDLE hInputWrite, hInputReadTmp, hInputRead, hErrorWrite, hErrorReadTmp, hErrorRead;
 
     ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
 
-    // Create a pipe for the child process's input.
     if(!CreatePipe(&hInputReadTmp, &hInputWrite, NULL, 0)){
-        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Pipe failed."}});
+        return mcsm::Result({ResultType::MCSM_FAIL, {"Pipe failed."}});
     }
     if(!DuplicateHandle(GetCurrentProcess(), hInputReadTmp, GetCurrentProcess(),
                          &hInputRead, 0, FALSE, DUPLICATE_SAME_ACCESS)){
         CloseHandle(hInputReadTmp);
         CloseHandle(hInputWrite);
-        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"DuplicateHandle failed."}});
+        return mcsm::Result({ResultType::MCSM_FAIL, {"DuplicateHandle failed."}});
     }
     CloseHandle(hInputReadTmp);
+
+    if(!CreatePipe(&hErrorReadTmp, &hErrorWrite, NULL, 0)){
+        CloseHandle(hInputRead);
+        CloseHandle(hInputWrite);
+        return mcsm::Result({ResultType::MCSM_FAIL, {"Error pipe failed."}});
+    }
+    if(!DuplicateHandle(GetCurrentProcess(), hErrorReadTmp, GetCurrentProcess(),
+                         &hErrorRead, 0, FALSE, DUPLICATE_SAME_ACCESS)){
+        CloseHandle(hInputRead);
+        CloseHandle(hInputWrite);
+        CloseHandle(hErrorReadTmp);
+        CloseHandle(hErrorWrite);
+        return mcsm::Result({ResultType::MCSM_FAIL, {"Error DuplicateHandle failed."}});
+    }
+    CloseHandle(hErrorReadTmp);
 
     si.dwFlags = STARTF_USESTDHANDLES;
     si.hStdInput = hInputRead;
     si.hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
-    si.hStdError = GetStdHandle(STD_ERROR_HANDLE);
+    si.hStdError = hErrorWrite;
 
     // Convert command to a modifiable array for CreateProcessW
     std::wstring wCommand = std::wstring(command.begin(), command.end());
-    wchar_t *cmd = _wcsdup(wCommand.c_str());
+    wchar_t* cmd = _wcsdup(wCommand.c_str());
 
     // Start the child process.
     if(!CreateProcessW(NULL, cmd, NULL, NULL, TRUE, 0, NULL,
@@ -153,18 +183,22 @@ mcsm::Result mcsm::ServerProcess::start(){
         DWORD errorCode = GetLastError();
         CloseHandle(hInputRead);
         CloseHandle(hInputWrite);
+        CloseHandle(hErrorRead);
+        CloseHandle(hErrorWrite);
         free(cmd);
-        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"CreateProcess failed. Error code: " + std::to_string(errorCode)}});
+        return mcsm::Result({ResultType::MCSM_FAIL, {"CreateProcess failed. Error code: " + std::to_string(errorCode) + " Error message: " + getLastErrorMessage(errorCode)}});
     }
 
     this->pid = pi.dwProcessId;
     this->inputHandle = hInputWrite; // Store the writable end of the pipe directly as a HANDLE.
     this->active = true;
     this->pi = pi;
+    this->errorHandle = hErrorRead;
     CloseHandle(hInputRead); // The readable end is now embedded in the child process, close our copy.
+    CloseHandle(hErrorWrite); // Close the write end of the error pipe in the parent.
     free(cmd);
 
-    return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Starting process with pid " + std::to_string(pid)}});
+    return mcsm::Result({ResultType::MCSM_SUCCESS, {"Starting process with pid " + std::to_string(pid)}});
 }
 #else
 mcsm::Result mcsm::ServerProcess::start(){
@@ -210,14 +244,25 @@ mcsm::Result mcsm::ServerProcess::start(){
 #endif
 
 #ifdef _WIN32
-mcsm::Result mcsm::ServerProcess::waitForCompletion(){
+mcsm::Result mcsm::ServerProcess::waitForCompletion() {
+    char buffer[128];
+    std::string errorOutput;
+    DWORD bytesRead;
+
+    while (ReadFile(errorHandle, buffer, sizeof(buffer) - 1, &bytesRead, NULL) && bytesRead > 0){
+        buffer[bytesRead] = '\0';
+        errorOutput += buffer;
+    }
+
+    CloseHandle(errorHandle);
+
     DWORD result = WaitForSingleObject(pi.hProcess, INFINITE);
     if(result == WAIT_FAILED){
-        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Waiting for process failed."}});
+        return mcsm::Result({ResultType::MCSM_FAIL, {"Waiting for process failed. Possible reason: " + errorOutput}});
     }
     DWORD exitCode;
     if(!GetExitCodeProcess(pi.hProcess, &exitCode)){
-        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Failed to get process exit code."}});
+        return mcsm::Result({ResultType::MCSM_FAIL, {"Failed to get process exit code."}});
     }
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
@@ -225,9 +270,9 @@ mcsm::Result mcsm::ServerProcess::waitForCompletion(){
 
     std::string strEc = std::to_string(exitCode);
     if(strEc == "0"){
-        return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Process completed with exit code 0"}});
+        return mcsm::Result({ResultType::MCSM_SUCCESS, {"Process completed with exit code 0"}});
     }else{
-        return mcsm::Result({mcsm::ResultType::MCSM_WARN_NOEXIT, {"Process terminated with exit code "  + strEc}});
+        return mcsm::Result({ResultType::MCSM_WARN_NOEXIT, {"Process terminated with exit code " + strEc + ". Possible reason: " + errorOutput}});
     }
 }
 #else

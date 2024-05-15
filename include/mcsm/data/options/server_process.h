@@ -48,7 +48,7 @@ namespace mcsm {
         bool active = false;
     #ifdef _WIN32
         PROCESS_INFORMATION pi;
-        HANDLE inputHandle;
+        HANDLE inputHandle, errorHandle;
     #else
         int errorFd = -1;
         std::mutex outputMutex;
@@ -74,6 +74,10 @@ namespace mcsm {
 
         mcsm::Result send(const std::string& input);
         mcsm::Result stop();
+
+    #ifdef _WIN32
+        std::string getLastErrorMessage(DWORD errorCode) const;
+    #endif
     };
 
     class ServerProcessManager {
