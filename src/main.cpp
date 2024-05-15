@@ -29,43 +29,17 @@ SOFTWARE.
 const std::string version = "0.2";
 
 // TODO : Redirect output
-
 std::mutex coutMutex;
-
-void runServerProcess(int id, const std::string& workingPath) {
-std::random_device rd; 
-    std::mt19937 mt(rd()); 
-    std::uniform_int_distribution<int> dist(0, 11);
-    int a = dist(mt);
-    std::string command = "sleep " + std::to_string(a);
-    
-    mcsm::ServerProcess myProcess(command, workingPath);
-    {
-        std::lock_guard<std::mutex> lock(coutMutex);
-        std::cout << "Starting process " << id << " with sleep time " << a << " seconds.\n";
-    }
-    
-    auto startResult = myProcess.start();
-    if (startResult.getResult() != mcsm::ResultType::MCSM_SUCCESS) {
-        std::lock_guard<std::mutex> lock(coutMutex);
-        startResult.printMessage();
-        return;
-    }
-    startResult.printMessage();
-
-    auto waitResult = myProcess.waitForCompletion();
-    {
-    if (waitResult.getResult() != mcsm::ResultType::MCSM_SUCCESS) {
-        std::lock_guard<std::mutex> lock(coutMutex);
-        waitResult.printMessage();
+void waitForProcessCompletion(mcsm::ServerProcess& process) {
+    mcsm::Result completionResult = process.waitForCompletion();
+    std::lock_guard<std::mutex> lock(coutMutex); // Ensure thread-safe printing
+    if (completionResult.isSuccess()) {
+        std::cout << "Process with PID " << process.getPID() << " completed successfully." << std::endl;
     } else {
-        std::lock_guard<std::mutex> lock(coutMutex);
-        std::cout << "Process " << id << " completed " << std::endl;
-        waitResult.printMessage();
-    }
+        std::cerr << "Process with PID " << process.getPID() << " failed to complete: ";
+        completionResult.printMessage();
     }
 }
-
 int main(int argc, char *argv[]){
     /**
      * TODO
@@ -93,18 +67,36 @@ int main(int argc, char *argv[]){
         std::cout << "Welcome to MCSM (Minecraft Server Manager).\n";
         std::cout << "Type \"mcsm help\" for a list of commands.\n";
 
-            const int numberOfProcesses = 5; // Number of server processes to start
-    std::vector<std::thread> threads; // Vector to hold threads
-    std::string workingPath = "/"; // Set to appropriate directory
+    std::vector<mcsm::ServerProcess> processes;
+    std::vector<std::pair<std::string, int>> commands = {{"sleepp 3", 3}, {"sleepp 5", 5}, {"sleepp 2", 2}};
+    std::string workingPath = "/tmp";
 
-    // Start multiple server processes
-    for (int i = 1; i <= numberOfProcesses; i++) {
-        threads.emplace_back(runServerProcess, i, workingPath);
+    // Start the server processes
+    for (const auto& cmd : commands) {
+        processes.emplace_back(cmd.first, workingPath);
+        auto& process = processes.back();
+        mcsm::Result startResult = process.start();
+        if (startResult.isSuccess()) {
+            std::cout << "Started process with PID " << process.getPID() << " With command " << cmd.first << std::endl;
+        } else {
+            std::cerr << "Failed to start process: ";
+            startResult.printMessage();
+        }
     }
 
-    // Wait for all processes to complete
+    // Create a thread for each process to wait for its completion
+    std::vector<std::thread> threads;
+    for (auto& process : processes) {
+        if (process.isActivate()) {
+            threads.emplace_back(waitForProcessCompletion, std::ref(process));
+        }
+    }
+
+    // Join all threads
     for (auto& thread : threads) {
-        thread.join();
+        if (thread.joinable()) {
+            thread.join();
+        }
     }
 
     std::cout << "All processes completed." << std::endl;
