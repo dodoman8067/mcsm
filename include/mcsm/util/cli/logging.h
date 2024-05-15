@@ -23,8 +23,7 @@ SOFTWARE.
 #ifndef __MCSM_LOGGING_H__
 #define __MCSM_LOGGING_H__
 
-#include <string>
-#include <iostream>
+#include <mcsm/util/string_utils.h>
 /*
  I know this file does not use libcurl functions.
  But the files that include this header does, and that causes windows header issue(winsock2.h included before windows.h)
