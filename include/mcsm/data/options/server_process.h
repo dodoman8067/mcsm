@@ -49,6 +49,9 @@ namespace mcsm {
     #ifdef _WIN32
         PROCESS_INFORMATION pi;
         HANDLE inputHandle;
+    #else
+        int errorFd = -1;
+        std::mutex outputMutex;
     #endif
     public:
         ServerProcess(const std::string& command, const std::string& workingPath);

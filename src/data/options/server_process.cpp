@@ -84,7 +84,8 @@ mcsm::Result mcsm::ServerProcess::start(){
 #else
 mcsm::Result mcsm::ServerProcess::start(){
     int pipefd[2];
-    if(pipe(pipefd) == -1){
+    int errorPipe[2];
+    if(pipe(pipefd) == -1 || pipe(errorPipe) == -1){
         return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Pipe failed."}});
     }
 
@@ -92,23 +93,32 @@ mcsm::Result mcsm::ServerProcess::start(){
     if(pid == -1){
         close(pipefd[0]);
         close(pipefd[1]);
+        close(errorPipe[0]);
+        close(errorPipe[1]);
         return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Fork failed."}});
     }else if (pid > 0){
         close(pipefd[0]); // Close the read end in the parent
+        close(errorPipe[1]); // Close the write end in the parent
         this->pid = pid;
         this->inputFd = pipefd[1];
+        this->errorFd = errorPipe[0];
         this->active = true;
         return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Starting process with pid " + std::to_string(pid)}});
     }else{
         close(pipefd[1]); // Close the write end in the child
         dup2(pipefd[0], STDIN_FILENO); // Redirect standard input to the read end of the pipe
         close(pipefd[0]);
+        close(pipefd[0]);
+        dup2(errorPipe[1], STDERR_FILENO); // Redirect stderr to the write end of the error pipe
+        close(errorPipe[1]);
 
         if(!workingPath.empty() && chdir(workingPath.c_str()) != 0){
             exit(2);
         }
 
-        execl("/bin/sh", "sh", "-c", command.c_str(), (char *) NULL);
+        std::string modifiedCommmand = command + " 1>/dev/null";
+
+        execl("/bin/sh", "sh", "-c", modifiedCommmand.c_str(), (char *) NULL);
         exit(3); // execl only returns on failure
     }
 }
@@ -137,10 +147,22 @@ mcsm::Result mcsm::ServerProcess::waitForCompletion(){
 }
 #else
 mcsm::Result mcsm::ServerProcess::waitForCompletion(){
+    std::lock_guard<std::mutex> lock(outputMutex);
+    char buffer[128];
+    std::string errorOutput;
+    ssize_t bytesRead;
+    
+    while ((bytesRead = read(errorFd, buffer, sizeof(buffer) - 1)) > 0) {
+        buffer[bytesRead] = '\0';
+        errorOutput += buffer;
+    }
+
+    close(errorFd);
+
     int status;
     pid_t result = waitpid(pid, &status, 0);
     if(result == -1){
-        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Waiting for process failed."}});
+        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Waiting for process failed. Possible reason : " + errorOutput}});
     }
 
     if(WIFEXITED(status)){
@@ -154,7 +176,7 @@ mcsm::Result mcsm::ServerProcess::waitForCompletion(){
             case 3:
                 return mcsm::Result({mcsm::ResultType::MCSM_WARN, {"Process terminated with exit code 3: Failed to execute shell command."}});
             default:
-                return mcsm::Result({mcsm::ResultType::MCSM_WARN, {"Process terminated with unusual exit code " + std::to_string(exitStatus) + "."}});
+                return mcsm::Result({mcsm::ResultType::MCSM_WARN, {"Process terminated with unusual exit code " + std::to_string(exitStatus) + ". Possible reason : " + errorOutput}});
         }
     }else{
         return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Process terminated abnormally."}});
@@ -182,7 +204,7 @@ void mcsm::ServerProcess::setAcvtive(const bool& newActive){
 #ifdef _WIN32
 mcsm::Result mcsm::ServerProcess::send(const std::string& input) {
     DWORD written;
-    BOOL result = WriteFile(this->inputHandle, input.c_str(), static_cast<DWORD>(input.length()), &written, NULL);
+    BOOL result = WriteFile(inputHandle, input.c_str(), static_cast<DWORD>(input.length()), &written, NULL);
     if (!result || written != input.length()) {
         return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Failed to send data to child process."}});
     }
