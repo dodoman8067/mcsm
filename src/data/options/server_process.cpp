@@ -29,7 +29,92 @@ mcsm::ServerProcess::ServerProcess(const std::string& command, const std::string
     this->workingPath = workingPath;
 }
 
-mcsm::ServerProcess::~ServerProcess(){}
+mcsm::ServerProcess::~ServerProcess(){
+#ifdef _WIN32
+    if(inputHandle != INVALID_HANDLE_VALUE){
+        CloseHandle(inputHandle);
+    }
+#else
+    if(inputFd != -1){
+        close(inputFd);
+    }
+    if(errorFd != -1){
+        close(errorFd);
+    }
+#endif
+}
+
+// Move constructor
+
+
+#ifdef _WIN32
+mcsm::ServerProcess::ServerProcess(mcsm::ServerProcess&& other) noexcept
+    : command(std::move(other.command)), 
+      workingPath(std::move(other.workingPath)),
+      inputFd(other.inputFd),
+      pid(other.pid),
+      active(other.active),
+      pi(other.pi),
+      inputHandle(other.inputHandle){
+
+    other.inputHandle = INVALID_HANDLE_VALUE;
+
+    other.pid = -1;
+    other.active = false;
+}
+#else
+mcsm::ServerProcess::ServerProcess(mcsm::ServerProcess&& other) noexcept
+    : command(std::move(other.command)), 
+      workingPath(std::move(other.workingPath)),
+      inputFd(other.inputFd),
+      pid(other.pid),
+      active(other.active),
+      errorFd(other.errorFd){
+    
+    other.inputFd = -1;
+    other.errorFd = -1;
+    other.pid = -1;
+    other.active = false;
+}
+#endif
+
+#ifdef _WIN32
+mcsm::ServerProcess& mcsm::ServerProcess::operator=(mcsm::ServerProcess&& other) noexcept {
+    if(this != &other){
+        command = std::move(other.command);
+        workingPath = std::move(other.workingPath);
+        inputFd = other.inputFd;
+        pid = other.pid;
+        active = other.active;
+
+        pi = other.pi;
+        inputHandle = other.inputHandle;
+        other.inputHandle = INVALID_HANDLE_VALUE;
+
+        other.pid = -1;
+        other.active = false;
+    }
+    return *this;
+}
+#else
+mcsm::ServerProcess& mcsm::ServerProcess::operator=(mcsm::ServerProcess&& other) noexcept {
+    if(this != &other){
+        command = std::move(other.command);
+        workingPath = std::move(other.workingPath);
+        inputFd = other.inputFd;
+        pid = other.pid;
+        active = other.active;
+
+        errorFd = other.errorFd;
+        other.inputFd = -1;
+        other.errorFd = -1;
+
+        other.pid = -1;
+        other.active = false;
+    }
+    return *this;
+}
+#endif
 
 #ifdef _WIN32
 mcsm::Result mcsm::ServerProcess::start(){

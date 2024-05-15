@@ -57,6 +57,11 @@ namespace mcsm {
         ServerProcess(const std::string& command, const std::string& workingPath);
         ~ServerProcess();
 
+        ServerProcess(const ServerProcess&) = delete;
+        ServerProcess& operator=(const ServerProcess&) = delete;
+        ServerProcess(ServerProcess&&) noexcept;
+        ServerProcess& operator=(ServerProcess&&) noexcept;
+
         mcsm::Result start();
 
         mcsm::Result waitForCompletion();
