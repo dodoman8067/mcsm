@@ -23,23 +23,9 @@ SOFTWARE.
 */
 
 #include <mcsm/init.h>
-#include <mcsm/data/options/server_process.h>
-#include <random>
 
 const std::string version = "0.2";
 
-// TODO : Redirect output
-std::mutex coutMutex;
-void waitForProcessCompletion(mcsm::ServerProcess& process) {
-    mcsm::Result completionResult = process.waitForCompletion();
-    std::lock_guard<std::mutex> lock(coutMutex); // Ensure thread-safe printing
-    if (completionResult.isSuccess()) {
-        std::cout << "Process with PID " << process.getPID() << " completed successfully." << std::endl;
-    } else {
-        std::cerr << "Process with PID " << process.getPID() << " failed to complete: ";
-        completionResult.printMessage();
-    }
-}
 int main(int argc, char *argv[]){
     /**
      * TODO
@@ -66,40 +52,6 @@ int main(int argc, char *argv[]){
     if(argc < 2){
         std::cout << "Welcome to MCSM (Minecraft Server Manager).\n";
         std::cout << "Type \"mcsm help\" for a list of commands.\n";
-
-    std::vector<mcsm::ServerProcess> processes;
-    std::vector<std::pair<std::string, int>> commands = {{"sleepp 3", 3}, {"sleepp 5", 5}, {"sleepp 2", 2}};
-    std::string workingPath = "/tmp";
-
-    // Start the server processes
-    for (const auto& cmd : commands) {
-        processes.emplace_back(cmd.first, workingPath);
-        auto& process = processes.back();
-        mcsm::Result startResult = process.start();
-        if (startResult.isSuccess()) {
-            std::cout << "Started process with PID " << process.getPID() << " With command " << cmd.first << std::endl;
-        } else {
-            std::cerr << "Failed to start process: ";
-            startResult.printMessage();
-        }
-    }
-
-    // Create a thread for each process to wait for its completion
-    std::vector<std::thread> threads;
-    for (auto& process : processes) {
-        if (process.isActivate()) {
-            threads.emplace_back(waitForProcessCompletion, std::ref(process));
-        }
-    }
-
-    // Join all threads
-    for (auto& thread : threads) {
-        if (thread.joinable()) {
-            thread.join();
-        }
-    }
-
-    std::cout << "All processes completed." << std::endl;
         return 0;
     }
 
