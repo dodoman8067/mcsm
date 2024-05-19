@@ -309,6 +309,7 @@ mcsm::Result mcsm::ServerProcess::waitForCompletion(){
                 return mcsm::Result({mcsm::ResultType::MCSM_WARN, {"Process terminated with unusual exit code " + std::to_string(exitStatus) + ". Possible reason : " + errorOutput}});
         }
     }else{
+        this->active = false;
         return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Process terminated abnormally."}});
     }
 }
