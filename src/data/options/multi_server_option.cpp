@@ -56,6 +56,25 @@ mcsm::MultiServerOption::MultiServerOption(const std::string& path){
     }
 }
 
+const std::vector<mcsm::ServerOption*> mcsm::MultiServerOption::getServerOptions() const {
+    std::vector<mcsm::ServerOption*> sOpts;
+    for(auto &v : this->servers){
+        if(mcsm::ServerOption* sPtr = std::get_if<mcsm::ServerOption>(&*v)){
+            sOpts.push_back(sPtr);
+        }
+    }
+    return sOpts;
+}
+
+const std::vector<mcsm::FabricServerOption*> mcsm::MultiServerOption::getFabricServerOptions() const {
+    std::vector<mcsm::FabricServerOption*> sOpts;
+    for(auto &v : this->servers){
+        if(mcsm::FabricServerOption* sPtr = std::get_if<mcsm::FabricServerOption>(&*v)){
+            sOpts.push_back(sPtr);
+        }
+    }
+}
+
 bool mcsm::MultiServerOption::exists() const {
     bool rt = this->option->exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return false;

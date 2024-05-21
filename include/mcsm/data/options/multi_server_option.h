@@ -49,6 +49,9 @@ namespace mcsm {
         mcsm::Result removeServer(std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>& server);
 
         const std::vector<std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>>& getServers() const;
+        
+        const std::vector<mcsm::ServerOption*> getServerOptions() const;
+        const std::vector<mcsm::FabricServerOption*> getFabricServerOptions() const;
 
         mcsm::Result start() const;
     };
