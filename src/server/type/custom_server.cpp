@@ -67,7 +67,7 @@ std::string mcsm::CustomServer::getFileLocation(const std::string& optionPath) c
 }
 
 mcsm::Result mcsm::CustomServer::setFileLocation(const std::string& optionPath, const std::string& location) {
-    mcsm::Option option(".", "server");
+    mcsm::Option option(".", optionPath);
     return option.setValue("jar_location", location);
 }
 
