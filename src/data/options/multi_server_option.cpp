@@ -73,6 +73,7 @@ const std::vector<mcsm::FabricServerOption*> mcsm::MultiServerOption::getFabricS
             sOpts.push_back(sPtr);
         }
     }
+    return sOpts;
 }
 
 bool mcsm::MultiServerOption::exists() const {
