@@ -603,6 +603,106 @@ const std::vector<std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricS
     return this->servers;
 }
 
+std::string mcsm::MultiServerOption::getServerStartCommand(std::variant<mcsm::ServerOption, mcsm::FabricServerOption>& server) const {
+    std::string jvmPath, jvmArgs, sArgs, file;
+    if(mcsm::ServerOption* sPtr = std::get_if<mcsm::ServerOption>(&server)){
+        auto opt = sPtr->getDefaultOption();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+
+        jvmPath = opt->getJvmPath();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+
+        auto tempJvmArgs = opt->getJvmArguments();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+        for(auto& s : tempJvmArgs){
+            jvmArgs = jvmArgs + s + " ";
+        }
+
+        auto tempServerArgs = opt->getServerArguments();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+        for(auto& s1 : tempServerArgs){
+            sArgs = sArgs + s1 + " ";
+        }
+
+        file = sPtr->getOptionPath() + "/" + sPtr->getServerJarFile();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+
+        
+    }else if (mcsm::FabricServerOption* fsPtr = std::get_if<mcsm::FabricServerOption>(&server)){
+        auto opt = fsPtr->getDefaultOption();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+
+        jvmPath = opt->getJvmPath();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+
+        auto tempJvmArgs = opt->getJvmArguments();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+        for(auto& s : tempJvmArgs){
+            jvmArgs = jvmArgs + s + " ";
+        }
+
+        auto tempServerArgs = opt->getServerArguments();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+        for(auto& s1 : tempServerArgs){
+            sArgs = sArgs + s1 + " ";
+        }
+
+        file = fsPtr->getOptionPath() + "/" + fsPtr->getServerJarFile();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    }else{
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "std::variant<mcsm::ServerOption, mcsm::FabricServerOption> test didn't pass.",
+            "Open an issue in GitHub (https://github.com/dodoman8067/mcsm) and tell us how did you get this message."
+        }});
+        return "";
+    }
+
+    return jvmPath + " " + jvmArgs + file + " " + sArgs;
+}
+
+mcsm::Result mcsm::MultiServerOption::addProcesses() const {
+    for(auto &v : this->servers){
+        if(mcsm::ServerOption* sPtr = std::get_if<mcsm::ServerOption>(&*v)){
+            bool exists = sPtr->exists();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
+            if(!exists){
+                mcsm::Result res({mcsm::ResultType::MCSM_WARN, {
+                    "Cannot load a server configuration file that doesn't exist.",
+                    "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you believe that this is a software issue."
+                }});
+                return res;
+            }
+
+            
+        }else if (mcsm::FabricServerOption* fsPtr = std::get_if<mcsm::FabricServerOption>(&*v)){
+            bool exists = fsPtr->exists();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
+            if(!exists){
+                mcsm::Result res({mcsm::ResultType::MCSM_WARN, {
+                    "Cannot load a server configuration file that doesn't exist.",
+                    "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you believe that this is a software issue."
+                }});
+                return res;
+            }
+
+        }else{
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+                "std::variant<mcsm::ServerOption, mcsm::FabricServerOption> test didn't pass.",
+                "Open an issue in GitHub (https://github.com/dodoman8067/mcsm) and tell us how did you get this message."
+            }});
+            return res;
+        }
+    }
+}
+
 mcsm::MultiServerOption::~MultiServerOption(){
 
 }

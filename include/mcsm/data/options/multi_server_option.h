@@ -24,6 +24,7 @@ SOFTWARE.
 #define __MCSM_MULTI_SERVER_OPTION_H__
 
 #include <mcsm/data/options/server_option.h>
+#include <mcsm/server/server_process.h>
 #include <mcsm/data/options/modded/fabric_server_option.h>
 #include <variant>
 
@@ -31,12 +32,17 @@ namespace mcsm {
     class MultiServerOption {
     private:
         std::vector<std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>> servers;
+        std::vector<std::thread> threads;
         std::unique_ptr<mcsm::Option> option;
 
         mcsm::Result load();
         mcsm::Result save();
+        
         bool canBeTaken(const std::string& serverName) const;
-        mcsm::Result createProcesses() const;
+        
+        mcsm::Result addProcesses() const;
+        
+        std::string getServerStartCommand(std::variant<mcsm::ServerOption, mcsm::FabricServerOption>& server) const;
     public:
         MultiServerOption(const std::string& path);
         ~MultiServerOption();
