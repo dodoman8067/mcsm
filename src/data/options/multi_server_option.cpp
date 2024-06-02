@@ -400,6 +400,7 @@ bool mcsm::MultiServerOption::canBeTaken(const std::string& serverName) const {
             return false;
         }
     }
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return true;
 }
 
@@ -657,10 +658,12 @@ std::string mcsm::MultiServerOption::getServerStartCommand(std::variant<mcsm::Se
         return "";
     }
 
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return jvmPath + " " + jvmArgs + file + " " + sArgs;
 }
 
 mcsm::Result mcsm::MultiServerOption::addProcesses() const {
+    std::string command, path;
     for(auto &v : this->servers){
         if(mcsm::ServerOption* sPtr = std::get_if<mcsm::ServerOption>(&*v)){
             bool exists = sPtr->exists();
@@ -677,7 +680,19 @@ mcsm::Result mcsm::MultiServerOption::addProcesses() const {
                 return res;
             }
 
-            
+            path = sPtr->getOptionPath();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
+
+            command = getServerStartCommand(*v);
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
         }else if (mcsm::FabricServerOption* fsPtr = std::get_if<mcsm::FabricServerOption>(&*v)){
             bool exists = fsPtr->exists();
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -693,6 +708,19 @@ mcsm::Result mcsm::MultiServerOption::addProcesses() const {
                 return res;
             }
 
+            path = fsPtr->getOptionPath();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
+
+            command = getServerStartCommand(*v);
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
         }else{
             mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
                 "std::variant<mcsm::ServerOption, mcsm::FabricServerOption> test didn't pass.",
