@@ -22,6 +22,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+// My plan for downloading different server files per different server configurations : 
+// use detectServerType per server configs and use the server class's download method and thread-ize the entire task then add it to a vector.
+
 #include <mcsm/data/options/multi_server_option.h>
 
 mcsm::MultiServerOption::MultiServerOption(const std::string& path){
@@ -693,6 +696,8 @@ mcsm::Result mcsm::MultiServerOption::addProcesses() const {
                 mcsm::Result res(resp.first, resp.second);
                 return res;
             }
+
+            sPtr->start();
         }else if (mcsm::FabricServerOption* fsPtr = std::get_if<mcsm::FabricServerOption>(&*v)){
             bool exists = fsPtr->exists();
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -728,6 +733,7 @@ mcsm::Result mcsm::MultiServerOption::addProcesses() const {
             }});
             return res;
         }
+        processes.emplace_back(command, path);
     }
 }
 
