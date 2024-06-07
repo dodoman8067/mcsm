@@ -29,19 +29,20 @@ SOFTWARE.
 #include <mcsm/server/type/downloadable.h>
 #include <mcsm/data/options/server_data_option.h>
 #include <memory>
+#include <optional>
 
 namespace mcsm {
     class ServerOption {
     private:
-        std::shared_ptr<mcsm::Server> server;
+        std::unique_ptr<mcsm::Server> server;
         std::string version;
         std::string path;
     public:
         ServerOption();
         ServerOption(const std::string& path);
         ServerOption(const std::string& version, const std::string& path);
-        ServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server);
-        ServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server, const std::string& path);
+        ServerOption(const std::string& version, std::unique_ptr<mcsm::Server> server);
+        ServerOption(const std::string& version, std::unique_ptr<mcsm::Server> server, const std::string& path);
         ~ServerOption();
 
         mcsm::Result create(const std::string& name, mcsm::JvmOption& defaultOption);
@@ -77,7 +78,7 @@ namespace mcsm {
         bool doesAutoUpdate() const;
         mcsm::Result setAutoUpdate(const bool& update);
 
-        std::shared_ptr<mcsm::Server> getServer() const;
+        std::optional<std::reference_wrapper<mcsm::Server>> getServer() const;
     };
 }
 

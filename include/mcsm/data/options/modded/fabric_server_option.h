@@ -8,15 +8,15 @@
 namespace mcsm {
     class FabricServerOption {
     private:
-        std::shared_ptr<mcsm::Server> server;
+        std::unique_ptr<mcsm::Server> server;
         std::string version;
         std::string path;
     public:
         FabricServerOption();
         FabricServerOption(const std::string& path);
         FabricServerOption(const std::string& version, const std::string& path);
-        FabricServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server);
-        FabricServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server, const std::string& path);
+        FabricServerOption(const std::string& version, std::unique_ptr<mcsm::Server> server);
+        FabricServerOption(const std::string& version, std::unique_ptr<mcsm::Server> server, const std::string& path);
         ~FabricServerOption();
 
         bool exists();
@@ -58,7 +58,7 @@ namespace mcsm {
         bool doesAutoUpdate() const;
         mcsm::Result setAutoUpdate(const bool& update);
         
-        std::shared_ptr<mcsm::Server> getServer() const;
+        std::optional<std::reference_wrapper<mcsm::Server>> getServer() const;
     };
 }
 

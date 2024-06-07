@@ -24,7 +24,7 @@ SOFTWARE.
 mcsm::Result mcsm::server::generateBukkit(const std::string& name, mcsm::JvmOption& option, const std::string& version, const mcsm::BukkitServerType& type, const bool& autoUpdate){
     switch(type){
         case mcsm::BukkitServerType::PAPER: {
-            std::shared_ptr<mcsm::PaperServer> server = std::make_shared<mcsm::PaperServer>();
+            std::unique_ptr<mcsm::PaperServer> server = std::make_unique<mcsm::PaperServer>();
             bool vExists = server->hasVersion(version);
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
                 std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -35,16 +35,16 @@ mcsm::Result mcsm::server::generateBukkit(const std::string& name, mcsm::JvmOpti
                 mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
                 return res;
             }
-            std::unique_ptr<mcsm::ServerOption> serverOption = std::make_unique<mcsm::ServerOption>(version, server);
+            mcsm::ServerOption serverOption(version, std::move(server));
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
                 std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
                 mcsm::Result res(resp.first, resp.second);
                 return res;
             }
-            return configure(std::move(serverOption), name, option, autoUpdate);
+            return configure(serverOption, name, option, autoUpdate);
         }
         case mcsm::BukkitServerType::PURPUR: {
-            std::shared_ptr<mcsm::PurpurServer> server = std::make_shared<mcsm::PurpurServer>();
+            std::unique_ptr<mcsm::PurpurServer> server = std::make_unique<mcsm::PurpurServer>();
             bool vExists = server->hasVersion(version);
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
                 std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -55,13 +55,13 @@ mcsm::Result mcsm::server::generateBukkit(const std::string& name, mcsm::JvmOpti
                 mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
                 return res;
             }
-            std::unique_ptr<mcsm::ServerOption> serverOption = std::make_unique<mcsm::ServerOption>(version, server);
+            mcsm::ServerOption serverOption(version, std::move(server));
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
                 std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
                 mcsm::Result res(resp.first, resp.second);
                 return res;
             }
-            return configure(std::move(serverOption), name, option, autoUpdate);
+            return configure(serverOption, name, option, autoUpdate);
         }
         default: {
             mcsm::Result res({mcsm::ResultType::MCSM_WARN, {"This kind of Bukkit-API based server implementation is not supported right now."}});
@@ -73,19 +73,19 @@ mcsm::Result mcsm::server::generateBukkit(const std::string& name, mcsm::JvmOpti
 }
 
 mcsm::Result mcsm::server::generateVanilla(const std::string& name, mcsm::JvmOption& option, const std::string& version, const bool& autoUpdate){
-    std::shared_ptr<mcsm::VanillaServer> server = std::make_shared<mcsm::VanillaServer>();
+    std::unique_ptr<mcsm::VanillaServer> server = std::make_unique<mcsm::VanillaServer>();
     bool vExists = server->hasVersion(version);
     if(!vExists){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
         return res;
     }
-    std::unique_ptr<mcsm::ServerOption> serverOption = std::make_unique<mcsm::ServerOption>(version, server);
+    mcsm::ServerOption serverOption(version, std::move(server));
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
-    return configure(std::move(serverOption), name, option, autoUpdate);
+    return configure(serverOption, name, option, autoUpdate);
 }
 
 mcsm::Result mcsm::server::generateForge(const std::string& /* name */, mcsm::JvmOption& /* option */, const std::string& /* version */, const bool& /* autoUpdate */){
@@ -94,7 +94,7 @@ mcsm::Result mcsm::server::generateForge(const std::string& /* name */, mcsm::Jv
 }
 
 mcsm::Result mcsm::server::generateFabric(const std::string& name, mcsm::JvmOption& option, const std::string& version, const bool& autoUpdate){
-    std::shared_ptr<mcsm::FabricServer> server = std::make_shared<mcsm::FabricServer>();
+    std::unique_ptr<mcsm::FabricServer> server = std::make_unique<mcsm::FabricServer>();
     bool vExists = server->hasVersion(version);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -105,13 +105,13 @@ mcsm::Result mcsm::server::generateFabric(const std::string& name, mcsm::JvmOpti
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
         return res;
     }
-    std::unique_ptr<mcsm::FabricServerOption> serverOption = std::make_unique<mcsm::FabricServerOption>(version, server);
+    mcsm::FabricServerOption serverOption(version, std::move(server));
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
-    bool sExists = serverOption->exists();
+    bool sExists = serverOption.exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -121,31 +121,31 @@ mcsm::Result mcsm::server::generateFabric(const std::string& name, mcsm::JvmOpti
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverAlreadyConfigured()});
         return res;
     }
-    mcsm::Result sRes = serverOption->create(name, option, autoUpdate);
+    mcsm::Result sRes = serverOption.create(name, option, autoUpdate);
     if(!sRes.isSuccess()) return sRes;
 
-    std::string sName = serverOption->getServerName();
+    std::string sName = serverOption.getServerName();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    std::string type = serverOption->getServerType();
+    std::string type = serverOption.getServerType();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    std::string sVersion = serverOption->getServerVersion();
+    std::string sVersion = serverOption.getServerVersion();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    std::string profile = serverOption->getDefaultOption()->getProfileName();
+    std::string profile = serverOption.getDefaultOption()->getProfileName();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -173,8 +173,8 @@ mcsm::Result mcsm::server::generateCustom(const std::string& /* name */, mcsm::J
     return res;
 }
 
-mcsm::Result mcsm::server::configure(std::unique_ptr<mcsm::ServerOption> serverOption, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate){
-    bool sExists = serverOption->exists();
+mcsm::Result mcsm::server::configure(mcsm::ServerOption& serverOption, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate){
+    bool sExists = serverOption.exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -184,31 +184,31 @@ mcsm::Result mcsm::server::configure(std::unique_ptr<mcsm::ServerOption> serverO
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverAlreadyConfigured()});
         return res;
     }
-    mcsm::Result sRes = serverOption->create(name, option, autoUpdate);
+    mcsm::Result sRes = serverOption.create(name, option, autoUpdate);
     if(!sRes.isSuccess()) return sRes;
 
-    std::string sName = serverOption->getServerName();
+    std::string sName = serverOption.getServerName();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    std::string type = serverOption->getServerType();
+    std::string type = serverOption.getServerType();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    std::string sVersion = serverOption->getServerVersion();
+    std::string sVersion = serverOption.getServerVersion();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    std::string profile = serverOption->getDefaultOption()->getProfileName();
+    std::string profile = serverOption.getDefaultOption()->getProfileName();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -226,23 +226,23 @@ mcsm::Result mcsm::server::configure(std::unique_ptr<mcsm::ServerOption> serverO
     return res;
 }
 
-std::shared_ptr<mcsm::Server> mcsm::server::detectServerType(const std::string& server){
-    std::shared_ptr<mcsm::Server> sPtr;
+std::unique_ptr<mcsm::Server> mcsm::server::detectServerType(const std::string& server){
+    std::unique_ptr<mcsm::Server> sPtr;
 
     if(server == "paper" || server == "papermc"){
-        sPtr = std::make_shared<mcsm::PaperServer>();
+        sPtr = std::make_unique<mcsm::PaperServer>();
         //if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return nullptr;
     }
     if(server == "purpur" || server == "purpurmc"){
-        sPtr = std::make_shared<mcsm::PurpurServer>();
+        sPtr = std::make_unique<mcsm::PurpurServer>();
         //if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return nullptr;
     }
     if(server == "vanilla"){
-        sPtr = std::make_shared<mcsm::VanillaServer>();
+        sPtr = std::make_unique<mcsm::VanillaServer>();
         //if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return nullptr;
     }
     if(server == "fabric" || server == "fabricmc"){
-        sPtr = std::make_shared<mcsm::FabricServer>();
+        sPtr = std::make_unique<mcsm::FabricServer>();
         //if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return nullptr;
     }
     if(sPtr == nullptr){

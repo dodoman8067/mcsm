@@ -67,12 +67,12 @@ mcsm::ServerOption::ServerOption(const std::string& version, const std::string& 
     }
 
     // Creates a server instance with the string obtained from from option.getValue("type").
-    std::shared_ptr<mcsm::Server> sPtr = mcsm::server::detectServerType(type);
+    std::unique_ptr<mcsm::Server> sPtr = mcsm::server::detectServerType(type);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
 
     this->path = path;
     this->version = version;
-    this->server = sPtr;
+    this->server = std::move(sPtr);
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
 }
 
@@ -124,24 +124,24 @@ mcsm::ServerOption::ServerOption(const std::string& path){
         return; 
     }
 
-    std::shared_ptr<mcsm::Server> sPtr = mcsm::server::detectServerType(type);
+    std::unique_ptr<mcsm::Server> sPtr = mcsm::server::detectServerType(type);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
     this->path = path;
-    this->server = sPtr;
+    this->server = std::move(sPtr);
     this->version = version;
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
 }
 
-mcsm::ServerOption::ServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server){
+mcsm::ServerOption::ServerOption(const std::string& version, std::unique_ptr<mcsm::Server> server){
     this->version = version;
-    this->server = server;
+    this->server = std::move(server);
     std::string path1 = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
     this->path = path1;
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
 }
 
-mcsm::ServerOption::ServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server, const std::string& path){
+mcsm::ServerOption::ServerOption(const std::string& version, std::unique_ptr<mcsm::Server> server, const std::string& path){
     if(!mcsm::fileExists(path)){
         if(!mcsm::mkdir(path)){
             mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
@@ -153,7 +153,7 @@ mcsm::ServerOption::ServerOption(const std::string& version, std::shared_ptr<mcs
     }
 
     this->version = version;
-    this->server = server;
+    this->server = std::move(server);
     this->path = path;
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
 }
@@ -624,11 +624,11 @@ mcsm::Result mcsm::ServerOption::setAutoUpdate(const bool& update){
     return option.setValue("auto_update", update);
 }
 
-std::shared_ptr<mcsm::Server> mcsm::ServerOption::getServer() const {
-    if(this->server != nullptr){ mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}}); return this->server; }
+std::optional<std::reference_wrapper<mcsm::Server>> mcsm::ServerOption::getServer() const {
+    if(this->server != nullptr){ mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}}); return *this->server; }
     mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
         "Server instance null.",
         "There's a high chance to be a software issue. please report this to GitHub (https://github.com/dodoman8067/mcsm)."
     }});
-    return nullptr;
+    return std::nullopt;
 }
