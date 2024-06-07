@@ -735,6 +735,8 @@ mcsm::Result mcsm::MultiServerOption::addProcesses() const {
         }
         processes.emplace_back(command, path);
     }
+
+    return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
 }
 
 mcsm::Result mcsm::MultiServerOption::downloadPerServer(){
@@ -777,6 +779,7 @@ mcsm::Result mcsm::MultiServerOption::downloadPerServer(){
             return res;
         }
     }
+    return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
 }
 
 mcsm::MultiServerOption::~MultiServerOption(){
