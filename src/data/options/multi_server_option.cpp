@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 // My plan for downloading different server files per different server configurations : 
-// use detectServerType per server configs and use the server class's download method and thread-ize the entire task then add it to a vector.
+// create a method that uses detectServerType per server configs and use the server class's download method. there's going to be a threaded download system and one thread will contain 3~4 processes.
 
 #include <mcsm/data/options/multi_server_option.h>
 
