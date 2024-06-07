@@ -70,6 +70,7 @@ namespace mcsm {
         int getInputFd() const;
 
         std::string getCommand() const;
+        std::string getWorkingPath() const;
 
         bool isActivate() const;
         void setAcvtive(const bool& newActive);
