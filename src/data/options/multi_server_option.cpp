@@ -737,6 +737,48 @@ mcsm::Result mcsm::MultiServerOption::addProcesses() const {
     }
 }
 
+mcsm::Result mcsm::MultiServerOption::downloadPerServer(){
+    for(auto &v : this->servers){
+        if(mcsm::ServerOption* sPtr = std::get_if<mcsm::ServerOption>(&*v)){
+            bool exists = sPtr->exists();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
+            if(!exists){
+                mcsm::Result res({mcsm::ResultType::MCSM_WARN, {
+                    "Cannot load a server configuration file that doesn't exist.",
+                    "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you believe that this is a software issue."
+                }});
+                return res;
+            }
+
+        }else if (mcsm::FabricServerOption* fsPtr = std::get_if<mcsm::FabricServerOption>(&*v)){
+            bool exists = fsPtr->exists();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
+            if(!exists){
+                mcsm::Result res({mcsm::ResultType::MCSM_WARN, {
+                    "Cannot load a server configuration file that doesn't exist.",
+                    "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you believe that this is a software issue."
+                }});
+                return res;
+            }
+
+        }else{
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+                "std::variant<mcsm::ServerOption, mcsm::FabricServerOption> test didn't pass.",
+                "Open an issue in GitHub (https://github.com/dodoman8067/mcsm) and tell us how did you get this message."
+            }});
+            return res;
+        }
+    }
+}
+
 mcsm::MultiServerOption::~MultiServerOption(){
 
 }
