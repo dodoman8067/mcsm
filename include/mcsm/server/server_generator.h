@@ -98,14 +98,14 @@ namespace mcsm {
          * @param option server's default JVM launch profile
          * @param autoUpdate sets if the server should automatically update upon starting
         */
-        mcsm::Result configure(mcsm::ServerOption& serverOption, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate);
+        mcsm::Result configure(std::unique_ptr<mcsm::ServerOption> serverOption, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate);
 
         /**
          * Returns a pointer of server instance based on `server`.
          * @param server server's type
          * @return pointer of server instance based on `server`
         */
-        std::unique_ptr<mcsm::Server> detectServerType(const std::string& server);
+        std::shared_ptr<mcsm::Server> detectServerType(const std::string& server);
     };
 }
 

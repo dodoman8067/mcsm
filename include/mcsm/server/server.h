@@ -29,7 +29,7 @@ SOFTWARE.
 
 namespace mcsm {
     /**
-     * Represents a basic server.
+     * Represents base of server.
      */
     class Server {
     public:
