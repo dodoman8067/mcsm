@@ -15,8 +15,6 @@ MCSM (MineCraft Server Manager) is a command-line program designed to manage Min
   * GCC
   * Clang
 
-MSVC is not supported right now. It might lead to unexpected behaviour if you try it.
-
 ### Dependencies
 
 This project requires the following dependencies :
