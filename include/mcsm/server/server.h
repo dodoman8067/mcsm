@@ -24,7 +24,7 @@ SOFTWARE.
 #define __MCSM_SERVER_H__
 
 #include <mcsm/server/server_type.h>
-#include <mcsm/data/options/jvm_option.h>
+#include <mcsm/jvm/jvm_option.h>
 #include <mcsm/util/cli/cli_utils.h>
 
 namespace mcsm {

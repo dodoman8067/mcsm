@@ -24,7 +24,6 @@ SOFTWARE.
 #ifndef __MCSM_SERVER_OPTION_H__
 #define __MCSM_SERVER_OPTION_H__
 
-#include <mcsm/data/option.h>
 #include <mcsm/server/server.h>
 #include <mcsm/server/type/downloadable.h>
 #include <mcsm/data/options/server_data_option.h>

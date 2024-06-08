@@ -24,7 +24,7 @@ SOFTWARE.
 #define __MCSM_JVM_OPTION_SEARCH_COMMAND_H__
 
 #include <mcsm/command/base/command.h>
-#include <mcsm/data/options/jvm_option.h>
+#include <mcsm/jvm/jvm_option.h>
 
 namespace mcsm {
     class JvmOptionSearchCommand : public mcsm::Command {
