@@ -93,12 +93,12 @@ namespace mcsm {
 
         /**
          * Configures a server.
-         * @param serverOption pointer of mcsm::ServerOption
+         * @param serverOption reference of mcsm::ServerOption
          * @param name server's name
          * @param option server's default JVM launch profile
          * @param autoUpdate sets if the server should automatically update upon starting
         */
-        mcsm::Result configure(std::unique_ptr<mcsm::ServerOption> serverOption, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate);
+        mcsm::Result configure(mcsm::ServerOption& serverOption, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate);
 
         /**
          * Returns a pointer of server instance based on `server`.
