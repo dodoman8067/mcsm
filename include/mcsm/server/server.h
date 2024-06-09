@@ -101,6 +101,18 @@ namespace mcsm {
          * @param optionPath server.json path
         */
         virtual mcsm::Result start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath);
+
+        /**
+         * Obtains jar file. (Will compile the server jarfile or download if downloadable server)
+         * 
+         */
+        virtual mcsm::Result obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath);
+
+        /**
+         * Obtains jar file. (Will compile the server jarfile or download if downloadable server)
+         * 
+         */
+        virtual mcsm::Result obtainJarFile(const std::string version, const std::string workingPath, const std::string outputPath);
     };
 }
 
