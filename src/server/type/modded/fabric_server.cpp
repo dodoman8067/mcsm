@@ -548,6 +548,10 @@ mcsm::Result mcsm::FabricServer::download(const std::string& version, const std:
     return res4;
 }
 
+mcsm::Result mcsm::FabricServer::obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
+    return download(version, path, name, optionPath);
+}
+
 mcsm::Result mcsm::FabricServer::start(mcsm::JvmOption& option){
     std::string cPath = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){

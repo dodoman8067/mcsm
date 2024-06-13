@@ -59,6 +59,8 @@ namespace mcsm {
         mcsm::Result download(const std::string& version, const std::string& loaderVersion, const std::string& installerVersion, const std::string& path, const std::string& name);
         mcsm::Result download(const std::string& version, const std::string& loaderVersion, const std::string& installerVersion, const std::string& path, const std::string& name, const std::string& optionPath);
 
+        mcsm::Result obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
+
         bool hasVersion(const std::string& version) override;
 
         std::string getTypeAsString() const override;

@@ -231,6 +231,10 @@ mcsm::Result mcsm::PaperServer::download(const std::string& version, const std::
     }
 }
 
+mcsm::Result mcsm::PaperServer::obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
+    return download(version, path, name, optionPath);
+}
+
 mcsm::Result mcsm::PaperServer::start(mcsm::JvmOption& option){
     // ServerOption class handles the data file stuff
     std::string cPath = mcsm::getCurrentPath();

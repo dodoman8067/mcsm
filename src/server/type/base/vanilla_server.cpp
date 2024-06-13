@@ -288,6 +288,10 @@ mcsm::Result mcsm::VanillaServer::download(const std::string& version, const std
     return download(version, path, name);
 }
 
+mcsm::Result mcsm::VanillaServer::obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& /* optionPath */){
+    return download(version, path, name);
+}
+
 mcsm::Result mcsm::VanillaServer::start(mcsm::JvmOption& option){
     std::string cPath = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
