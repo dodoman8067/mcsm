@@ -740,6 +740,8 @@ mcsm::Result mcsm::MultiServerOption::addProcesses() const {
 }
 
 mcsm::Result mcsm::MultiServerOption::downloadPerServer(){
+    std::string version, path, name;
+
     for(auto &v : this->servers){
         if(mcsm::ServerOption* sPtr = std::get_if<mcsm::ServerOption>(&*v)){
             bool exists = sPtr->exists();
@@ -756,6 +758,31 @@ mcsm::Result mcsm::MultiServerOption::downloadPerServer(){
                 return res;
             }
 
+            version = sPtr->getServerVersion();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
+
+            path = sPtr->getOptionPath();
+            
+            name = sPtr->getServerType() + ".jar";
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
+
+            auto sIPtr = sPtr->getServer();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
+
+            mcsm::Result jarRes = sIPtr->obtainJarFile(version, path, name);
+            if(!jarRes.isSuccess()) return jarRes;
         }else if (mcsm::FabricServerOption* fsPtr = std::get_if<mcsm::FabricServerOption>(&*v)){
             bool exists = fsPtr->exists();
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -770,7 +797,32 @@ mcsm::Result mcsm::MultiServerOption::downloadPerServer(){
                 }});
                 return res;
             }
+            
+            version = fsPtr->getServerVersion();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
 
+            path = fsPtr->getOptionPath();
+            
+            name = fsPtr->getServerType() + ".jar";
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
+
+            auto fsIPtr = fsPtr->getServer();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
+
+            mcsm::Result jarRes = fsIPtr->obtainJarFile(version, path, name);
+            if(!jarRes.isSuccess()) return jarRes;
         }else{
             mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
                 "std::variant<mcsm::ServerOption, mcsm::FabricServerOption> test didn't pass.",
