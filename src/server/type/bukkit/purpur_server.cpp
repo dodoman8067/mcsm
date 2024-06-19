@@ -318,7 +318,7 @@ mcsm::Result mcsm::PurpurServer::update(const std::string& optionPath){
 }
 
 mcsm::Result mcsm::PurpurServer::update(const std::string& path, const std::string& optionPath){
-    // If you change the default build to specific build from latest build, it won't downgrade automatically. (You'll have to manually delete the server jarfile) This is an intented feature.
+    // Program won't downgrade server jarfiles automatically. This is an intented feature.
     mcsm::info("Checking updates...");
     mcsm::ServerDataOption sDataOpt(optionPath);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
