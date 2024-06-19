@@ -152,7 +152,7 @@ mcsm::Result mcsm::server::generateFabric(const std::string& name, mcsm::JvmOpti
         return res;
     }
 
-    mcsm::success("Configured server information : ");
+    mcsm::success("Configured server's information : ");
     mcsm::info("Server name : " + sName);
     mcsm::info("Server type : " + type);
     mcsm::info("Server version : " + sVersion);
@@ -215,7 +215,7 @@ mcsm::Result mcsm::server::configure(mcsm::ServerOption& serverOption, const std
         return res;
     }
 
-    mcsm::success("Configured server information : ");
+    mcsm::success("Configured server's information : ");
     mcsm::info("Server name : " + sName);
     mcsm::info("Server type : " + type);
     mcsm::info("Server version : " + sVersion);
