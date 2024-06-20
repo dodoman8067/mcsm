@@ -106,13 +106,13 @@ namespace mcsm {
          * Obtains jar file. (Will compile the server jarfile or download if downloadable server)
          * 
          */
-        virtual mcsm::Result obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath);
+        virtual mcsm::Result obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) = 0;
 
         /**
          * Obtains jar file. (Will compile the server jarfile or download if downloadable server)
          * 
          */
-        virtual mcsm::Result obtainJarFile(const std::string version, const std::string workingPath, const std::string outputPath);
+        //virtual mcsm::Result obtainJarFile(const std::string version, const std::string workingPath, const std::string outputPath);
     };
 }
 

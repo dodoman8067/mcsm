@@ -50,6 +50,8 @@ namespace mcsm {
 
         std::string getWebSite() const override;
         std::string getGitHub() const override;
+
+        mcsm::Result obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override = 0;
     };
 }
 

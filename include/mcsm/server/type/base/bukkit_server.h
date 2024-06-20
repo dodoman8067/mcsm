@@ -39,6 +39,8 @@ namespace mcsm {
          * @return mcsm::ServerType 
          */
         mcsm::ServerType getType() const override;
+
+        mcsm::Result obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override = 0;
     };
 }
 
