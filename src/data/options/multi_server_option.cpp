@@ -787,7 +787,7 @@ mcsm::Result mcsm::MultiServerOption::downloadPerServer(){
                 mcsm::Result res(resp.first, resp.second);
                 return res;
             }
-            mcsm::info("Downloading server " + sName + "'s " + path + "/" + name);
+            mcsm::info("Obtaining server " + sName + "'s " + path + "/" + name);
 
             mcsm::Result jarRes = sIPtr->obtainJarFile(version, path, name, path);
             if(!jarRes.isSuccess()) return jarRes;
@@ -835,7 +835,7 @@ mcsm::Result mcsm::MultiServerOption::downloadPerServer(){
                 mcsm::Result res(resp.first, resp.second);
                 return res;
             }
-            mcsm::info("Downloading server " + sName + "'s " + path + "/" + name);
+            mcsm::info("Obtaining server " + sName + "'s " + path + "/" + name);
 
             mcsm::Result jarRes = fsIPtr->obtainJarFile(version, path, name, path);
             if(!jarRes.isSuccess()) return jarRes;
