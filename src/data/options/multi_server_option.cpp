@@ -774,6 +774,15 @@ mcsm::Result mcsm::MultiServerOption::downloadPerServer(){
                 return res;
             }
 
+            bool fileExists = mcsm::fileExists(path + "/" + name);
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
+
+            if(fileExists) continue;
+
             auto sIPtr = sPtr->getServer();
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
                 std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -821,6 +830,15 @@ mcsm::Result mcsm::MultiServerOption::downloadPerServer(){
                 mcsm::Result res(resp.first, resp.second);
                 return res;
             }
+
+            bool fileExists = mcsm::fileExists(path + "/" + name);
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
+
+            if(fileExists) continue;
 
             auto fsIPtr = fsPtr->getServer();
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
