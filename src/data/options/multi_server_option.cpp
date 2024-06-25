@@ -666,7 +666,7 @@ std::string mcsm::MultiServerOption::getServerStartCommand(std::variant<mcsm::Se
 }
 
 mcsm::Result mcsm::MultiServerOption::addProcesses() const {
-    std::string command, path;
+    std::string command, path, name;
     for(auto &v : this->servers){
         if(mcsm::ServerOption* sPtr = std::get_if<mcsm::ServerOption>(&*v)){
             bool exists = sPtr->exists();
@@ -680,6 +680,13 @@ mcsm::Result mcsm::MultiServerOption::addProcesses() const {
                     "Cannot load a server configuration file that doesn't exist.",
                     "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you believe that this is a software issue."
                 }});
+                return res;
+            }
+
+            name = sPtr->getServerName();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
                 return res;
             }
 
@@ -711,6 +718,13 @@ mcsm::Result mcsm::MultiServerOption::addProcesses() const {
                 return res;
             }
 
+            name = fsPtr->getServerName();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
+
             path = fsPtr->getOptionPath();
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
                 std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -731,7 +745,8 @@ mcsm::Result mcsm::MultiServerOption::addProcesses() const {
             }});
             return res;
         }
-        processes.emplace_back(command, path);
+        std::unique_ptr<mcsm::ServerProcess> sp = std::make_unique<mcsm::ServerProcess>(command, path);
+        processes.push_back({name, std::move(sp)});
     }
 
     return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
@@ -864,6 +879,23 @@ mcsm::Result mcsm::MultiServerOption::downloadPerServer(){
         }
     }
     return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+}
+
+mcsm::Result mcsm::MultiServerOption::start() const {
+    mcsm::Result addPRes = addProcesses();
+    if(this->processes.empty()){
+        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {
+            "Processes vector is empty.",
+            "Open an issue in Github and tell us to check addProcesses() in mcsm::MultiServerOption."
+        }});
+    }
+    
+    for(auto& pair : this->processes){
+        //TODO : add std::thread code
+        std::string serverName = pair.first;
+        std::unique_ptr<mcsm::ServerProcess>& process = pair.second;
+    }
+    this->processes.clear();
 }
 
 mcsm::MultiServerOption::~MultiServerOption(){

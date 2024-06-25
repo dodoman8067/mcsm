@@ -32,7 +32,7 @@ namespace mcsm {
     class MultiServerOption {
     private:
         std::vector<std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>> servers;
-        mutable std::vector<mcsm::ServerProcess> processes;
+        mutable std::vector<std::pair<std::string, std::unique_ptr<mcsm::ServerProcess>>> processes;
         std::unique_ptr<mcsm::Option> option;
 
         mcsm::Result load();
