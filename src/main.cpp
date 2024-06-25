@@ -43,7 +43,7 @@ int main(int argc, char *argv[]){
 
     if(!init.isInitialized()){
         std::cerr << "Program initialization failed.\n";
-        std::cerr << "High chance to be a software issue. Please report it to GitHub (https://github.com/dodoman8067/mcsm).\n";
+        std::cerr << "High chance to be a software issue. Please report this to GitHub (https://github.com/dodoman8067/mcsm).\n";
         std::exit(1);
     }
 
