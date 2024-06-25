@@ -696,8 +696,6 @@ mcsm::Result mcsm::MultiServerOption::addProcesses() const {
                 mcsm::Result res(resp.first, resp.second);
                 return res;
             }
-
-            sPtr->start();
         }else if (mcsm::FabricServerOption* fsPtr = std::get_if<mcsm::FabricServerOption>(&*v)){
             bool exists = fsPtr->exists();
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
