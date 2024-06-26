@@ -30,7 +30,7 @@ int main(int argc, char *argv[]){
     /**
      * TODO
      * Implement mcsm update command.
-     * Add multicurl task and make an internal method for CURL handle on Server class (obtainJarFile)
+     * Add multicurl task and make an internal method that returns CURL handle on Server class (obtainJarFile)
      */
 
     //libssh2 : cmake -B ./build -DBUILD_SHARED_LIBS=OFF -DOPENSSL_USE_STATIC_LIBS=ON -DZLIB_USE_STATIC_LIBS=ON -DENABLE_ZLIB_COMPRESSION=ON -DCRYPTO_BACKEND=OpenSSL
