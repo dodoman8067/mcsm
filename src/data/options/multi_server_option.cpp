@@ -897,7 +897,7 @@ mcsm::Result mcsm::MultiServerOption::start() const {
     
     for(auto& pair : this->processes){
         std::string serverName = pair.first;
-        std::unique_ptr<ServerProcess>& process = pair.second;
+        std::unique_ptr<mcsm::ServerProcess>& process = pair.second;
 
         monitorThreads.emplace_back([process = std::move(process)]() mutable {
             process->start();
@@ -910,7 +910,7 @@ mcsm::Result mcsm::MultiServerOption::start() const {
 
     std::thread input = inputThread();
     this->processes.clear();
-    
+
     return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
 }
 
