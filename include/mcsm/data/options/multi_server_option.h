@@ -39,6 +39,7 @@ namespace mcsm {
         mcsm::Result save();
         
         bool canBeTaken(const std::string& serverName) const;
+        bool anyRunning() const;
         
         mcsm::Result addProcesses() const;
         
@@ -46,7 +47,7 @@ namespace mcsm {
 
         mcsm::Result downloadPerServer();
 
-        std::thread inputThread() const;
+        void inputThread() const;
     public:
         MultiServerOption(const std::string& path);
         ~MultiServerOption();

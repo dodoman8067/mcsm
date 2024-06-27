@@ -902,47 +902,49 @@ mcsm::Result mcsm::MultiServerOption::start() const {
         monitorThreads.emplace_back([process = std::move(process)]() mutable {
             process->start();
         });
+
+        mcsm::info("Starting server " + serverName);
     }
 
     for(auto& t : monitorThreads){
         t.detach();
     }
 
-    std::thread input = inputThread();
-    this->processes.clear();
+    std::thread inputThread = std::thread(&mcsm::MultiServerOption::inputThread, this);
+    inputThread.detach();
 
     return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
 }
 
-std::thread mcsm::MultiServerOption::inputThread() const {
-    return std::thread([this]() {
-        std::string input;
-        while (true){
-            std::this_thread::sleep_for(std::chrono::milliseconds(1));
+bool mcsm::MultiServerOption::anyRunning() const {
+    for(const auto& pair : this->processes){
+        if(pair.second->isActivate()){
+            return true;
+        }
+    }
+    return false;
+}
 
-            bool anyRunning = false;
-            for(const auto& pair : this->processes){
-                if(pair.second->isActivate()){
-                    anyRunning = true;
-                    break;
-                }
-            }
+void mcsm::MultiServerOption::inputThread() const {
+    std::string input;
+    while (!stopFlag.load()) {
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
-            if(!anyRunning){
-                stopFlag.store(true);
-                fclose(stdin);
-                break;
-            }
+        if (!anyRunning()) {
+            stopFlag.store(true);
+            break;
+        }
 
-            std::cout << ">> ";
-            if(!std::getline(std::cin, input)){
-                break;
-            }
+        std::cout << ">> ";
+        if (!std::getline(std::cin, input)) {
+            break;
+        }
 
-            if(input == "stopall"){
-                std::cout << "Stopping all servers..." << std::endl;
-                stopFlag.store(true);
-                for(const auto& pair : this->processes){
+        if (input == "stopall") {
+            std::cout << "Stopping all servers..." << std::endl;
+            stopFlag.store(true);
+            // Stop all servers
+            for (auto& pair : this->processes) {
                     mcsm::Result stop1Res = pair.second->send("stop");
                     if(!stop1Res.isSuccess()){
                         std::cout << "Stop failed for reason : " << stop1Res.getMessage()[0] << ".\n";
@@ -952,15 +954,16 @@ std::thread mcsm::MultiServerOption::inputThread() const {
                             // print kill the process urself i dont care now
                         }
                     }
-                }
-                break;
-            }else{
-                if(!input.empty()){
-                    std::cout << "Unknown command \"" << input << "\"." << std::endl;
-                }
+            }
+            break;
+        } else {
+            if (!input.empty()) {
+                std::cout << "Unknown command \"" << input << "\"." << std::endl;
             }
         }
-    });
+    }
+
+    std::cout << "All server processes have either exited or been instructed to stop." << std::endl;
 }
 
 
