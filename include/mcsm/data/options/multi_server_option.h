@@ -45,6 +45,8 @@ namespace mcsm {
         std::string getServerStartCommand(std::variant<mcsm::ServerOption, mcsm::FabricServerOption>& server) const;
 
         mcsm::Result downloadPerServer();
+
+        std::thread inputThread() const;
     public:
         MultiServerOption(const std::string& path);
         ~MultiServerOption();
