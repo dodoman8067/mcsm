@@ -27,6 +27,7 @@ SOFTWARE.
 mcsm::ServerProcess::ServerProcess(const std::string& command, const std::string& workingPath){
     this->command = command;
     this->workingPath = workingPath;
+    this->active = false;
 }
 
 mcsm::ServerProcess::~ServerProcess(){

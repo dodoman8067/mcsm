@@ -895,30 +895,33 @@ mcsm::Result mcsm::MultiServerOption::start() const {
 
     std::vector<std::thread> monitorThreads;
     
-    for(auto& pair : this->processes){
+    for (auto& pair : this->processes) {
         std::string serverName = pair.first;
         std::unique_ptr<mcsm::ServerProcess>& process = pair.second;
-
-        monitorThreads.emplace_back([process = std::move(process)]() mutable {
-            process->start();
-        });
-
-        mcsm::info("Starting server " + serverName);
+        mcsm::Result startResult = process->start();
+        if(startResult.isSuccess()){
+            mcsm::info("Starting server " + serverName + " with pid " + std::to_string(process->getPID()));
+                monitorThreads.emplace_back([this, process = std::move(process), serverName]() mutable {    
+                    mcsm::Result res = process->waitForCompletion();
+                    if(!res.isSuccess()) res.printMessage();
+                });
+        }else{
+            mcsm::error("Failed to start server " + serverName + ": " + startResult.getMessage()[0]);
+        }
     }
 
     for(auto& t : monitorThreads){
-        t.detach();
+        t.join();
     }
 
-    std::thread inputThread = std::thread(&mcsm::MultiServerOption::inputThread, this);
-    inputThread.detach();
+    inputThread();
 
     return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
 }
 
 bool mcsm::MultiServerOption::anyRunning() const {
     for(const auto& pair : this->processes){
-        if(pair.second->isActivate()){
+        if(pair.second && pair.second->isActivate()){
             return true;
         }
     }
@@ -927,38 +930,39 @@ bool mcsm::MultiServerOption::anyRunning() const {
 
 void mcsm::MultiServerOption::inputThread() const {
     std::string input;
-    while (!stopFlag.load()) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
 
+    while (!stopFlag.load()) {
+        // Print messages for stopped processes
         if (!anyRunning()) {
             stopFlag.store(true);
             break;
         }
 
-        std::cout << ">> ";
-        if (!std::getline(std::cin, input)) {
-            break;
-        }
+        std::cout << ">> " << std::flush; // Print the prompt
+        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Sleep for a short duration to allow for input
 
-        if (input == "stopall") {
-            std::cout << "Stopping all servers..." << std::endl;
-            stopFlag.store(true);
-            // Stop all servers
-            for (auto& pair : this->processes) {
+        // Check for user input without blocking
+        if (std::getline(std::cin, input)) {
+            if (input == "stopall") {
+                std::cout << "Stopping all servers..." << std::endl;
+                stopFlag.store(true);
+                // Stop all servers
+                for (auto& pair : this->processes) {
                     mcsm::Result stop1Res = pair.second->send("stop");
-                    if(!stop1Res.isSuccess()){
-                        std::cout << "Stop failed for reason : " << stop1Res.getMessage()[0] << ".\n";
-                        std::cout << "Force stopping : this might lead to data loss.\n";
+                    if (!stop1Res.isSuccess()) {
+                        std::cout << "Stop failed for reason: " << stop1Res.getMessage()[0] << ".\n";
+                        std::cout << "Force stopping: this might lead to data loss.\n";
                         mcsm::Result stop2Res = pair.second->stop();
-                        if(!stop2Res.isSuccess()){ 
-                            // print kill the process urself i dont care now
+                        if (!stop2Res.isSuccess()) {
+                            std::cout << "Failed to force stop the server.\n";
                         }
                     }
-            }
-            break;
-        } else {
-            if (!input.empty()) {
-                std::cout << "Unknown command \"" << input << "\"." << std::endl;
+                }
+                break;
+            } else {
+                if (!input.empty()) {
+                    std::cout << "Unknown command \"" << input << "\"." << std::endl;
+                }
             }
         }
     }
