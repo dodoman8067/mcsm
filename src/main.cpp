@@ -56,10 +56,9 @@ int main(int argc, char *argv[]){
         std::cout << "Type \"mcsm help\" for a list of commands.\n";
 
         mcsm::MultiServerOption a(mcsm::getCurrentPath());
-        a.create().printMessage();
         std::unique_ptr<mcsm::ServerOption> asd = std::make_unique<mcsm::ServerOption>("./test1");
         auto asdf = std::make_unique<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>(std::move(*asd));
-        std::unique_ptr<mcsm::ServerOption> asf = std::make_unique<mcsm::ServerOption>("./test1");
+        std::unique_ptr<mcsm::ServerOption> asf = std::make_unique<mcsm::ServerOption>("./test2");
         auto asdg = std::make_unique<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>(std::move(*asf));
         a.addServer(asdf).printMessage();
         a.addServer(asdg).printMessage();
