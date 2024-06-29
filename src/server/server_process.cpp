@@ -368,14 +368,28 @@ mcsm::Result mcsm::ServerProcess::stop() {
     CloseHandle(pi.hProcess);
     CloseHandle(pi.hThread);
     this->active = false;
+    closeInputFd();
     return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Process stopped successfully."}});
 }
 #else
-mcsm::Result mcsm::ServerProcess::stop() {
+mcsm::Result mcsm::ServerProcess::stop(){
+    closeInputFd();
     if(kill(pid, SIGTERM) == -1){
         return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Failed to send data to child process."}});
     }
     this->active = false;
     return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Data sent successfully."}});
+}
+#endif
+
+#ifdef _WIN32
+void mcsm::ServerProcess::closeInputFd() const {
+    CloseHandle(this->inputHandle);
+    CloseHandle(this->errorHandle);
+}
+#else
+void mcsm::ServerProcess::closeInputFd() const {
+    close(this->inputFd);
+    close(this->errorFd);
 }
 #endif

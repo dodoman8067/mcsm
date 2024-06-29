@@ -78,6 +78,7 @@ namespace mcsm {
         mcsm::Result send(const std::string& input);
         mcsm::Result stop();
 
+        void closeInputFd() const;
     #ifdef _WIN32
         std::string getLastErrorMessage(DWORD errorCode) const;
     #endif
