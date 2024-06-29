@@ -27,13 +27,16 @@ SOFTWARE.
 #include <mcsm/server/server_process.h>
 #include <mcsm/data/options/modded/fabric_server_option.h>
 #include <variant>
+#include <atomic>
 
 namespace mcsm {
     class MultiServerOption {
     private:
         std::vector<std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>> servers;
-        mutable std::vector<std::pair<std::string, std::unique_ptr<mcsm::ServerProcess>>> processes;
+        mutable std::vector<std::pair<std::string, std::shared_ptr<mcsm::ServerProcess>>> processes;
         std::unique_ptr<mcsm::Option> option;
+
+        mutable std::mutex mtx;
 
         mcsm::Result load();
         mcsm::Result save();
@@ -47,7 +50,8 @@ namespace mcsm {
 
         mcsm::Result downloadPerServer();
 
-        void inputThread() const;
+        void inputHandler(std::atomic_bool& stopFlag) const;
+        void processMonitor(std::atomic_bool& stopFlag) const;
     public:
         MultiServerOption(const std::string& path);
         ~MultiServerOption();
