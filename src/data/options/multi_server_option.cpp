@@ -939,73 +939,148 @@ bool mcsm::MultiServerOption::anyRunning() const {
     return false;
 }
 
+#ifdef _WIN32
 void mcsm::MultiServerOption::inputHandler(std::atomic_bool& stopFlag) const {
     std::string input;
-    while (!stopFlag.load()) {
-        {
-            std::lock_guard<std::mutex> lock(mtx); // Lock the mutex
+    HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
+    DWORD mode = 0;
+    GetConsoleMode(hStdin, &mode);
+    SetConsoleMode(hStdin, mode & (~ENABLE_LINE_INPUT));
+
+    bool promptPrinted = false;
+
+    while (!stopFlag.load()){
+        if(!promptPrinted && anyRunning()){
             std::cerr << ">> " << std::flush;
+            promptPrinted = true;
         }
 
-        if (std::getline(std::cin, input)) {
-            if (input == "stopall") {
-                {
-                    std::lock_guard<std::mutex> lock(mtx); // Lock the mutex
-                    std::cerr << "Stopping all servers..." << std::endl << std::flush;
-                }
-                for (auto& pair : this->processes) {
-                    mcsm::Result stop1Res = pair.second->send("stop");
-                    if (!stop1Res.isSuccess()) {
-                        std::cerr << "Stop failed for reason: " << stop1Res.getMessage()[0] << ".\n";
-                        std::cerr << "Force stopping: this might lead to data loss.\n";
-                        mcsm::Result stop2Res = pair.second->stop();
-                        if (!stop2Res.isSuccess()) {
-                            std::cerr << "Failed to force stop the server.\n";
-                        }
-                    } else {
-                        pair.second->closeInputFd();
-                    }
-                }
-                stopFlag.store(true);
+        DWORD bytesAvailable = 0;
+        INPUT_RECORD record;
+        DWORD eventsRead = 0;
+        PeekConsoleInput(hStdin, &record, 1, &eventsRead);
+        if(eventsRead > 0 && record.EventType == KEY_EVENT && record.Event.KeyEvent.bKeyDown){
+            if(std::getline(std::cin, input)){
+                processInput(input, stopFlag);
+                promptPrinted = false;
+            }else{
                 break;
-            } else {
-                if (!input.empty()) {
-                    {
-                        std::lock_guard<std::mutex> lock(mtx); // Lock the mutex
-                        std::cerr << "Unknown command \"" << input << "\"." << std::endl << std::flush;
-                    }
-                }
             }
-        } else {
-            break; // Handle end of input (e.g., EOF or error)
+        }else{
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        }
+
+        {
+            std::lock_guard<std::mutex> lock(mtx);
+            if(stopFlag.load() || !anyRunning()){
+                break;
+            }
         }
     }
+
+    if(!anyRunning()){
+        std::cerr << "All server processes have either exited or been instructed to stop." << std::endl << std::flush;
+    }
+
+    SetConsoleMode(hStdin, mode);
+}
+#else
+void mcsm::MultiServerOption::inputHandler(std::atomic_bool& stopFlag) const {
+    std::string input;
+    fd_set readfds;
+    int stdin_fd = fileno(stdin);
+
+    bool promptPrinted = false;
+
+    while (!stopFlag.load()){
+        if(!promptPrinted && anyRunning()){
+            std::cerr << ">> " << std::flush;
+            promptPrinted = true;
+        }
+
+        FD_ZERO(&readfds);
+        FD_SET(stdin_fd, &readfds);
+
+        struct timeval timeout;
+        timeout.tv_sec = 0;
+        timeout.tv_usec = 100000;
+
+        int ret = select(stdin_fd + 1, &readfds, NULL, NULL, &timeout);
+        if(ret > 0 && FD_ISSET(stdin_fd, &readfds)){
+            if(std::getline(std::cin, input)){
+                processInput(input, stopFlag);
+                promptPrinted = false;
+            }else{
+                break;
+            }
+        }
+
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+
+        {
+            std::lock_guard<std::mutex> lock(mtx);
+            if(stopFlag.load() || !anyRunning()){
+                break;
+            }
+        }
+    }
+
     if(!anyRunning()){
         std::cerr << "All server processes have either exited or been instructed to stop." << std::endl << std::flush;
     }
 }
+#endif
 
+void mcsm::MultiServerOption::processInput(const std::string& input, std::atomic_bool& stopFlag) const {
+    if(input == "stopall"){
+        {
+            std::lock_guard<std::mutex> lock(mtx);
+            std::cerr << "Stopping all servers..." << std::endl << std::flush;
+            fclose(stdin);
+        }
+        for(auto& pair : this->processes){
+            mcsm::Result stop1Res = pair.second->send("stop");
+            if(!stop1Res.isSuccess()){
+                std::cerr << "Stop failed for reason: " << stop1Res.getMessage()[0] << ".\n";
+                std::cerr << "Force stopping: this might lead to data loss.\n";
+                mcsm::Result stop2Res = pair.second->stop();
+                if(!stop2Res.isSuccess()){
+                    std::cerr << "Failed to force stop the server.\n";
+                }
+            }else{
+                pair.second->closeInputFd();
+            }
+        }
+        stopFlag.store(true);
+        fclose(stdin);
+    }else{
+        if(!input.empty()){
+            std::lock_guard<std::mutex> lock(mtx);
+            std::cerr << "Unknown command \"" << input << "\"." << std::endl << std::flush;
+        }
+    }
+}
 
 void mcsm::MultiServerOption::processMonitor(std::atomic_bool& stopFlag) const {
-    while (!stopFlag.load()) {
+    while (!stopFlag.load()){
         {
-            std::lock_guard<std::mutex> lock(mtx); // Lock the mutex
-            for (auto it = this->processes.begin(); it != this->processes.end(); ) {
-                if (it->second && !it->second->isActivate()) {
+            std::lock_guard<std::mutex> lock(mtx);
+            for(auto it = this->processes.begin(); it != this->processes.end(); ){
+                if(it->second && !it->second->isActivate()){
                     std::cerr << "[mcsm/INFO] Server " << it->first << " (pid " << it->second->getPID() << ") stopped." << std::endl << std::flush;
-                    it = this->processes.erase(it); // Erase and advance the iterator
-                } else {
-                    ++it; // Move to the next element
+                    it = this->processes.erase(it);
+                }else{
+                    ++it;
                 }
             }
 
-            if (!anyRunning()) {
+            if(!anyRunning()){
                 stopFlag.store(true);
+                fclose(stdin);
                 break;
             }
         }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Sleep for a short duration to allow for process status checks
+        std::this_thread::sleep_for(std::chrono::milliseconds(100));
     }
 }
 

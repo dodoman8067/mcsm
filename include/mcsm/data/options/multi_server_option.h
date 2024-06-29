@@ -52,6 +52,7 @@ namespace mcsm {
 
         void inputHandler(std::atomic_bool& stopFlag) const;
         void processMonitor(std::atomic_bool& stopFlag) const;
+        void processInput(const std::string& input, std::atomic_bool& stopFlag) const;
     public:
         MultiServerOption(const std::string& path);
         ~MultiServerOption();
