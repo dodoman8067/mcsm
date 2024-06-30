@@ -970,10 +970,11 @@ void mcsm::MultiServerOption::inputHandler(std::atomic_bool& stopFlag) const {
                         char ch = inputBuffer[i].Event.KeyEvent.uChar.AsciiChar;
                         if (ch == '\r' || ch == '\n') {
                             if (!input.empty()) {
+                                std::cerr << "\n";
                                 processInput(input, stopFlag);
                                 input.clear();
-                            }
-                            std::cerr << ">> " << std::flush;
+                                std::cerr << ">> " << std::flush;
+                            }else std::cerr << "\n>> " << std::flush;
                         } else if (ch == '\b') {
                             if (!input.empty()) {
                                 input.pop_back();
@@ -1059,7 +1060,8 @@ void mcsm::MultiServerOption::processInput(const std::string& input, std::atomic
             fclose(stdin);
         }
         for(auto& pair : this->processes){
-            mcsm::Result stop1Res = pair.second->send("stop");
+            if(!pair.second || !pair.second->isActivate()) continue;
+            mcsm::Result stop1Res = pair.second->send("stop\n");
             if(!stop1Res.isSuccess()){
                 std::cerr << "Stop failed for reason: " << stop1Res.getMessage()[0] << ".\n";
                 std::cerr << "Force stopping: this might lead to data loss.\n";

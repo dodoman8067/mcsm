@@ -371,7 +371,11 @@ mcsm::Result mcsm::ServerProcess::send(const std::string& input) {
     DWORD written;
     BOOL result = WriteFile(inputHandle, input.c_str(), static_cast<DWORD>(input.length()), &written, NULL);
     if (!result || written != input.length()) {
-        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Failed to send data to child process."}});
+        DWORD errorCode = GetLastError();
+        if (errorCode == ERROR_NO_DATA || errorCode == ERROR_BROKEN_PIPE) {
+            return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Failed to send data to child process. Pipe is closed."}});
+        }
+        return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {"Failed to send data to child process. Error code: " + std::to_string(errorCode) + " Error message: " + getLastErrorMessage(errorCode)}});
     }
     return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Data sent successfully."}});
 }
