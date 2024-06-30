@@ -628,7 +628,7 @@ std::string mcsm::MultiServerOption::getServerStartCommand(std::variant<mcsm::Se
             sArgs = sArgs + s1 + " ";
         }
 
-        file = sPtr->getOptionPath() + "/" + sPtr->getServerJarFile();
+        file = sPtr->getServerJarFile();
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
 
         
@@ -651,7 +651,7 @@ std::string mcsm::MultiServerOption::getServerStartCommand(std::variant<mcsm::Se
             sArgs = sArgs + s1 + " ";
         }
 
-        file = fsPtr->getOptionPath() + "/" + fsPtr->getServerJarFile();
+        file = fsPtr->getServerJarFile();
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     }else{
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
@@ -697,7 +697,11 @@ mcsm::Result mcsm::MultiServerOption::addProcesses() const {
                 return res;
             }
 
-            command = getServerStartCommand(*v);
+            #ifdef _WIN32
+                command = "cmd /c " + getServerStartCommand(*v);
+            #else
+                command = getServerStartCommand(*v);
+            #endif
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
                 std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
                 mcsm::Result res(resp.first, resp.second);
@@ -731,8 +735,11 @@ mcsm::Result mcsm::MultiServerOption::addProcesses() const {
                 mcsm::Result res(resp.first, resp.second);
                 return res;
             }
-
-            command = getServerStartCommand(*v);
+            #ifdef _WIN32
+                command = "cmd /c " + getServerStartCommand(*v);
+            #else
+                command = getServerStartCommand(*v);
+            #endif
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
                 std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
                 mcsm::Result res(resp.first, resp.second);
@@ -745,6 +752,7 @@ mcsm::Result mcsm::MultiServerOption::addProcesses() const {
             }});
             return res;
         }
+        //std::cout << path << std::endl;
         std::shared_ptr<mcsm::ServerProcess> sp = std::make_shared<mcsm::ServerProcess>(command, path);
         processes.push_back({name, std::move(sp)});
     }
@@ -752,7 +760,7 @@ mcsm::Result mcsm::MultiServerOption::addProcesses() const {
     return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
 }
 
-mcsm::Result mcsm::MultiServerOption::downloadPerServer(){
+mcsm::Result mcsm::MultiServerOption::downloadPerServer() const {
     std::string version, path, name;
 
     for(auto &v : this->servers){
@@ -882,6 +890,8 @@ mcsm::Result mcsm::MultiServerOption::downloadPerServer(){
 }
 
 mcsm::Result mcsm::MultiServerOption::start() const {
+    mcsm::Result downloadRes = downloadPerServer();
+    if(!downloadRes.isSuccess()) return downloadRes;
     mcsm::Result addPRes = addProcesses();
     if(this->processes.empty()){
         return mcsm::Result({mcsm::ResultType::MCSM_FAIL, {
@@ -941,44 +951,54 @@ bool mcsm::MultiServerOption::anyRunning() const {
 
 #ifdef _WIN32
 void mcsm::MultiServerOption::inputHandler(std::atomic_bool& stopFlag) const {
-    std::string input;
     HANDLE hStdin = GetStdHandle(STD_INPUT_HANDLE);
     DWORD mode = 0;
     GetConsoleMode(hStdin, &mode);
-    SetConsoleMode(hStdin, mode & (~ENABLE_LINE_INPUT));
+    SetConsoleMode(hStdin, mode & ~(ENABLE_ECHO_INPUT | ENABLE_LINE_INPUT));
 
-    bool promptPrinted = false;
+    std::string input;
+    DWORD eventsRead = 0;
+    INPUT_RECORD inputBuffer[128];
 
-    while (!stopFlag.load()){
-        if(!promptPrinted && anyRunning()){
+    while (!stopFlag.load()) {
+        if (anyRunning()) {
             std::cerr << ">> " << std::flush;
-            promptPrinted = true;
-        }
-
-        DWORD bytesAvailable = 0;
-        INPUT_RECORD record;
-        DWORD eventsRead = 0;
-        PeekConsoleInput(hStdin, &record, 1, &eventsRead);
-        if(eventsRead > 0 && record.EventType == KEY_EVENT && record.Event.KeyEvent.bKeyDown){
-            if(std::getline(std::cin, input)){
-                processInput(input, stopFlag);
-                promptPrinted = false;
-            }else{
-                break;
+            while (true) {
+                ReadConsoleInput(hStdin, inputBuffer, 128, &eventsRead);
+                for (DWORD i = 0; i < eventsRead; ++i) {
+                    if (inputBuffer[i].EventType == KEY_EVENT && inputBuffer[i].Event.KeyEvent.bKeyDown) {
+                        char ch = inputBuffer[i].Event.KeyEvent.uChar.AsciiChar;
+                        if (ch == '\r' || ch == '\n') {
+                            if (!input.empty()) {
+                                processInput(input, stopFlag);
+                                input.clear();
+                            }
+                            std::cerr << ">> " << std::flush;
+                        } else if (ch == '\b') {
+                            if (!input.empty()) {
+                                input.pop_back();
+                                std::cerr << "\b \b" << std::flush;
+                            }
+                        } else {
+                            input += ch;
+                            std::cerr << ch << std::flush;
+                        }
+                    }
+                }
+                if (stopFlag.load() || !anyRunning()) {
+                    break;
+                }
             }
-        }else{
+        } else {
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
-
-        {
-            std::lock_guard<std::mutex> lock(mtx);
-            if(stopFlag.load() || !anyRunning()){
-                break;
-            }
+        
+        if (stopFlag.load() || !anyRunning()) {
+            break;
         }
     }
 
-    if(!anyRunning()){
+    if (!anyRunning()) {
         std::cerr << "All server processes have either exited or been instructed to stop." << std::endl << std::flush;
     }
 

@@ -48,7 +48,7 @@ namespace mcsm {
         
         std::string getServerStartCommand(std::variant<mcsm::ServerOption, mcsm::FabricServerOption>& server) const;
 
-        mcsm::Result downloadPerServer();
+        mcsm::Result downloadPerServer() const;
 
         void inputHandler(std::atomic_bool& stopFlag) const;
         void processMonitor(std::atomic_bool& stopFlag) const;
