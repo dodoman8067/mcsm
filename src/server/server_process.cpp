@@ -137,12 +137,13 @@ std::string mcsm::ServerProcess::getLastErrorMessage(DWORD errorCode) const {
 mcsm::Result mcsm::ServerProcess::start(){
     STARTUPINFOW si;
     PROCESS_INFORMATION pi;
-    HANDLE hInputWrite, hInputReadTmp, hInputRead, hErrorWrite, hErrorReadTmp, hErrorRead;
+    HANDLE hInputWrite, hInputReadTmp, hInputRead, hErrorWrite, hErrorReadTmp, hErrorRead, hOutputWrite, hOutputReadTmp, hOutputRead;
 
     ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
 
+    // Create a pipe for the child's input
     if(!CreatePipe(&hInputReadTmp, &hInputWrite, NULL, 0)){
         return mcsm::Result({ResultType::MCSM_FAIL, {"Pipe failed."}});
     }
@@ -154,6 +155,7 @@ mcsm::Result mcsm::ServerProcess::start(){
     }
     CloseHandle(hInputReadTmp);
 
+    // Create a pipe for the child's standard error
     if(!CreatePipe(&hErrorReadTmp, &hErrorWrite, NULL, 0)){
         CloseHandle(hInputRead);
         CloseHandle(hInputWrite);
@@ -169,9 +171,29 @@ mcsm::Result mcsm::ServerProcess::start(){
     }
     CloseHandle(hErrorReadTmp);
 
+    // Create a pipe for the child's standard output
+    if(!CreatePipe(&hOutputReadTmp, &hOutputWrite, NULL, 0)){
+        CloseHandle(hInputRead);
+        CloseHandle(hInputWrite);
+        CloseHandle(hErrorRead);
+        CloseHandle(hErrorWrite);
+        return mcsm::Result({ResultType::MCSM_FAIL, {"Output pipe failed."}});
+    }
+    if(!DuplicateHandle(GetCurrentProcess(), hOutputReadTmp, GetCurrentProcess(),
+                         &hOutputRead, 0, FALSE, DUPLICATE_SAME_ACCESS)){
+        CloseHandle(hInputRead);
+        CloseHandle(hInputWrite);
+        CloseHandle(hErrorRead);
+        CloseHandle(hErrorWrite);
+        CloseHandle(hOutputReadTmp);
+        CloseHandle(hOutputWrite);
+        return mcsm::Result({ResultType::MCSM_FAIL, {"Output DuplicateHandle failed."}});
+    }
+    CloseHandle(hOutputReadTmp);
+
     si.dwFlags = STARTF_USESTDHANDLES;
     si.hStdInput = hInputRead;
-    si.hStdOutput = GetStdHandle(STD_OUTPUT_HANDLE);
+    si.hStdOutput = hOutputWrite;  // Redirect standard output to the pipe
     si.hStdError = hErrorWrite;
 
     // Convert command to a modifiable array for CreateProcessW
@@ -186,6 +208,8 @@ mcsm::Result mcsm::ServerProcess::start(){
         CloseHandle(hInputWrite);
         CloseHandle(hErrorRead);
         CloseHandle(hErrorWrite);
+        CloseHandle(hOutputRead);
+        CloseHandle(hOutputWrite);
         free(cmd);
         return mcsm::Result({ResultType::MCSM_FAIL, {"CreateProcess failed. Error code: " + std::to_string(errorCode) + " Error message: " + getLastErrorMessage(errorCode)}});
     }
@@ -197,6 +221,7 @@ mcsm::Result mcsm::ServerProcess::start(){
     this->errorHandle = hErrorRead;
     CloseHandle(hInputRead); // The readable end is now embedded in the child process, close our copy.
     CloseHandle(hErrorWrite); // Close the write end of the error pipe in the parent.
+    CloseHandle(hOutputWrite); // Close the write end of the output pipe in the parent.
     free(cmd);
 
     return mcsm::Result({ResultType::MCSM_SUCCESS, {"Starting process with pid " + std::to_string(pid)}});
