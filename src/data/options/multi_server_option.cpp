@@ -960,46 +960,46 @@ void mcsm::MultiServerOption::inputHandler(std::atomic_bool& stopFlag) const {
     DWORD eventsRead = 0;
     INPUT_RECORD inputBuffer[128];
 
-    while (!stopFlag.load()) {
-        if (anyRunning()) {
+    while (!stopFlag.load()){
+        if(anyRunning()){
             std::cerr << ">> " << std::flush;
-            while (true) {
+            while (true){
                 ReadConsoleInput(hStdin, inputBuffer, 128, &eventsRead);
-                for (DWORD i = 0; i < eventsRead; ++i) {
-                    if (inputBuffer[i].EventType == KEY_EVENT && inputBuffer[i].Event.KeyEvent.bKeyDown) {
+                for(DWORD i = 0; i < eventsRead; ++i){
+                    if(inputBuffer[i].EventType == KEY_EVENT && inputBuffer[i].Event.KeyEvent.bKeyDown){
                         char ch = inputBuffer[i].Event.KeyEvent.uChar.AsciiChar;
-                        if (ch == '\r' || ch == '\n') {
-                            if (!input.empty()) {
+                        if(ch == '\r' || ch == '\n'){
+                            if(!input.empty()){
                                 std::cerr << "\n";
                                 processInput(input, stopFlag);
                                 input.clear();
                                 std::cerr << ">> " << std::flush;
                             }else std::cerr << "\n>> " << std::flush;
-                        } else if (ch == '\b') {
-                            if (!input.empty()) {
+                        }else if (ch == '\b'){
+                            if(!input.empty()){
                                 input.pop_back();
                                 std::cerr << "\b \b" << std::flush;
                             }
-                        } else {
+                        }else{
                             input += ch;
                             std::cerr << ch << std::flush;
                         }
                     }
                 }
-                if (stopFlag.load() || !anyRunning()) {
+                if(stopFlag.load() || !anyRunning()){
                     break;
                 }
             }
-        } else {
+        }else{
             std::this_thread::sleep_for(std::chrono::milliseconds(100));
         }
         
-        if (stopFlag.load() || !anyRunning()) {
+        if(stopFlag.load() || !anyRunning()){
             break;
         }
     }
 
-    if (!anyRunning()) {
+    if(!anyRunning()){
         std::cerr << "All server processes have either exited or been instructed to stop." << std::endl << std::flush;
     }
 
@@ -1064,6 +1064,7 @@ void mcsm::MultiServerOption::processInput(const std::string& input, std::atomic
             mcsm::Result stop1Res = pair.second->send("stop\n");
             if(!stop1Res.isSuccess()){
                 std::cerr << "Stop failed for reason: " << stop1Res.getMessage()[0] << ".\n";
+                if(stop1Res.getResult() != mcsm::ResultType::MCSM_FAIL) continue;
                 std::cerr << "Force stopping: this might lead to data loss.\n";
                 mcsm::Result stop2Res = pair.second->stop();
                 if(!stop2Res.isSuccess()){
@@ -1074,7 +1075,6 @@ void mcsm::MultiServerOption::processInput(const std::string& input, std::atomic
             }
         }
         stopFlag.store(true);
-        fclose(stdin);
     }else{
         if(!input.empty()){
             std::lock_guard<std::mutex> lock(mtx);
