@@ -1091,6 +1091,9 @@ void mcsm::MultiServerOption::processMonitor(std::atomic_bool& stopFlag) const {
                 if(it->second && !it->second->isActivate()){
                     std::cerr << "[mcsm/INFO] Server " << it->first << " (pid " << it->second->getPID() << ") stopped." << std::endl << std::flush;
                     it = this->processes.erase(it);
+                }else if(!it->second){
+                    std::cerr << termcolor::bright_yellow << "[mcsm/INFO] Server " << it->first << " (pid " << it->second->getPID() << ") server process instance not valid." << termcolor::reset << std::endl << std::flush;
+                    it = this->processes.erase(it);
                 }else{
                     ++it;
                 }
