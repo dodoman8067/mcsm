@@ -171,6 +171,23 @@ mcsm::Result mcsm::MultiServerOption::load(){
             return res;
         }
 
+        // Usually C++ runtime library fails to check if there's no such directory
+
+        bool pathExists = mcsm::fileExists(path);
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
+
+        if(!pathExists){
+            mcsm::Result res({mcsm::ResultType::MCSM_WARN, {
+                "Cannot find server path " + path + ".",
+                "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you believe that this is a software issue."
+            }});
+            return res;
+        }
+
         if(path == this->option->getPath()){
             mcsm::Result res({mcsm::ResultType::MCSM_WARN, {
                 "Multi server configuration file and its linked server configuration file cannot exist in the same path.",
