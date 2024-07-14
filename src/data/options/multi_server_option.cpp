@@ -1039,7 +1039,7 @@ void mcsm::MultiServerOption::inputHandler(std::atomic_bool& stopFlag) const {
         FD_ZERO(&readfds);
         FD_SET(stdin_fd, &readfds);
 
-        struct timeval timeout;
+        timeval timeout;
         timeout.tv_sec = 0;
         timeout.tv_usec = 100000;
 
