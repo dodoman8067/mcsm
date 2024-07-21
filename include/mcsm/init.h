@@ -20,6 +20,7 @@ namespace mcsm {
         bool* initialized;
 
         void initCommands(const std::string& version);
+        void initServers();
     public:
         init();
         ~init();

@@ -34,8 +34,8 @@ mcsm::init::~init(){
 }
 
 void mcsm::init::initMCSM(const std::string& version){
-    // Some other init tasks will be added
     initCommands(version);
+    initServers();
 
     *this->initialized = true;
 }
@@ -98,6 +98,15 @@ void mcsm::init::initCommands(const std::string& version){
     viewServerTypeCommand->addAlias("infoServer");
     viewServerTypeCommand->addAlias("infoserver");
     mcsm::CommandManager::addCommand(std::move(viewServerTypeCommand));
+}
+
+void mcsm::init::initServers(){
+    auto& sr = mcsm::ServerRegistry::getServerRegistry();
+
+    sr.registerServer("vanilla", []() { return std::make_shared<VanillaServer>(); }, ServerType::VANILLA);
+    sr.registerServer("paper", []() { return std::make_shared<PaperServer>(); }, ServerType::BUKKIT);
+    sr.registerServer("purpur", []() { return std::make_shared<PurpurServer>(); }, ServerType::BUKKIT);
+    sr.registerServer("fabric", []() { return std::make_shared<FabricServer>(); }, ServerType::FABRIC);
 }
 
 bool mcsm::init::isInitialized() const {

@@ -29,7 +29,7 @@ SOFTWARE.
 #include <mcsm/server/type/base/vanilla_server.h>
 #include <mcsm/server/type/modded/fabric_server.h>
 #include <mcsm/data/options/modded/fabric_server_option.h>
-#include <mcsm/server/server_type.h>
+#include <mcsm/server/server_registry.h>
 
 namespace mcsm {
     /**
