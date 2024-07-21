@@ -921,7 +921,7 @@ mcsm::Result mcsm::MultiServerOption::start() const {
 
     std::vector<std::thread> monitorThreads;
     
-    for (auto& pair : this->processes) {
+    for(auto& pair : this->processes){
         std::string serverName = pair.first;
         std::shared_ptr<mcsm::ServerProcess> process = pair.second;
         mcsm::Result startResult = process->start();
@@ -942,15 +942,15 @@ mcsm::Result mcsm::MultiServerOption::start() const {
     // Start process monitor thread
     std::thread monitorThread(&mcsm::MultiServerOption::processMonitor, this, std::ref(stopFlag));
 
-    for (auto& t : monitorThreads) {
+    for(auto& t : monitorThreads){
         t.join();
     }
 
-    if (inputThread.joinable()) {
+    if(inputThread.joinable()){
         inputThread.join();
     }
 
-    if (monitorThread.joinable()) {
+    if(monitorThread.joinable()){
         monitorThread.join();
     }
 
