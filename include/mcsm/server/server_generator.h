@@ -105,6 +105,7 @@ namespace mcsm {
          * @param server server's type
          * @return pointer of server instance based on `server`
         */
+        [[deprecated]]
         std::shared_ptr<mcsm::Server> detectServerType(const std::string& server);
     };
 }

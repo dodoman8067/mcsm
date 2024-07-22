@@ -67,7 +67,7 @@ mcsm::ServerOption::ServerOption(const std::string& version, const std::string& 
     }
 
     // Creates a server instance with the string obtained from from option.getValue("type").
-    std::shared_ptr<mcsm::Server> sPtr = mcsm::server::detectServerType(type);
+    std::shared_ptr<mcsm::Server> sPtr = mcsm::ServerRegistry::getServerRegistry().getServer(type);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
 
     this->path = path;
@@ -124,7 +124,7 @@ mcsm::ServerOption::ServerOption(const std::string& path){
         return; 
     }
 
-    std::shared_ptr<mcsm::Server> sPtr = mcsm::server::detectServerType(type);
+    std::shared_ptr<mcsm::Server> sPtr = mcsm::ServerRegistry::getServerRegistry().getServer(type);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
     this->path = path;
     this->server = sPtr;
@@ -274,7 +274,7 @@ mcsm::Result mcsm::ServerOption::start(mcsm::JvmOption& option, const std::strin
 
     if(this->server == nullptr){
         this->server.reset();
-        this->server = mcsm::server::detectServerType(getServerType());
+        this->server = mcsm::ServerRegistry::getServerRegistry().getServer(getServerType());
         
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
             std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -330,7 +330,7 @@ mcsm::Result mcsm::ServerOption::update(const std::string& /* path */, const std
 
     if(this->server == nullptr){
         this->server.reset();
-        this->server = mcsm::server::detectServerType(getServerType());
+        this->server = mcsm::ServerRegistry::getServerRegistry().getServer(getServerType());
         
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
             std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();

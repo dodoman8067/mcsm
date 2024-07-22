@@ -41,7 +41,7 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& version, const s
     }
 
     // Creates a server instance with the string obtained from from option.getValue("type"). It has to be a Fabric server.
-    std::shared_ptr<mcsm::Server> sPtr = mcsm::server::detectServerType(type);
+    std::shared_ptr<mcsm::Server> sPtr = mcsm::ServerRegistry::getServerRegistry().getServer(type);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
 
     // Checks if the server json file is for fabric servers
@@ -110,7 +110,7 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& path){
         return; 
     }
 
-    std::shared_ptr<mcsm::Server> sPtr = mcsm::server::detectServerType(type);
+    std::shared_ptr<mcsm::Server> sPtr = mcsm::ServerRegistry::getServerRegistry().getServer(type);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
     std::string sType = sPtr->getTypeAsString();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;

@@ -27,6 +27,7 @@ SOFTWARE.
 #include <mcsm/server/server.h>
 #include <mcsm/server/type/downloadable.h>
 #include <mcsm/data/options/server_data_option.h>
+#include <mcsm/server/server_registry.h>
 #include <memory>
 
 namespace mcsm {
@@ -79,7 +80,5 @@ namespace mcsm {
         std::shared_ptr<mcsm::Server> getServer() const;
     };
 }
-
-#include <mcsm/server/server_generator.h>
 
 #endif // __MCSM_SERVER_OPTION_H__
