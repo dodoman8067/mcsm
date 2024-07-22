@@ -28,6 +28,8 @@ SOFTWARE.
 #include <mcsm/util/cli/cli_utils.h>
 
 namespace mcsm {
+    class ServerOption;
+
     /**
      * Represents base of server.
      */
@@ -113,6 +115,10 @@ namespace mcsm {
          * 
          */
         //virtual mcsm::Result obtainJarFile(const std::string version, const std::string workingPath, const std::string outputPath);
+
+        virtual mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& version, const bool& autoUpdate) = 0;
+
+        mcsm::Result configure(mcsm::ServerOption& serverOption, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate);
     };
 }
 

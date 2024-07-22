@@ -26,11 +26,11 @@ SOFTWARE.
 #include <mcsm/server/type/downloadable.h>
 #include <mcsm/http/get.h>
 #include <mcsm/http/download.h>
-#include <mcsm/data/options/server_option.h>
+#include <mcsm/data/options/modded/fabric_server_option.h>
 #include <mcsm/util/mc/mc_utils.h>
 
 namespace mcsm {
-    class FabricServer : public mcsm::Server, public mcsm::Downloadable {
+    class FabricServer : public mcsm::Server, public mcsm::Downloadable, public std::enable_shared_from_this<FabricServer> {
     private:
     public:
         FabricServer();
@@ -70,6 +70,8 @@ namespace mcsm {
         mcsm::Result update();
         mcsm::Result update(const std::string& optionPath);
         mcsm::Result update(const std::string& path, const std::string& optionPath);
+
+        mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& version, const bool& autoUpdate) override;
     };
 }
 
