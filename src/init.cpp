@@ -103,10 +103,10 @@ void mcsm::init::initCommands(const std::string& version){
 void mcsm::init::initServers(){
     auto& sr = mcsm::ServerRegistry::getServerRegistry();
 
-    sr.registerServer("vanilla", []() { return std::make_shared<VanillaServer>(); }, ServerType::VANILLA);
-    sr.registerServer("paper", []() { return std::make_shared<PaperServer>(); }, ServerType::BUKKIT);
-    sr.registerServer("purpur", []() { return std::make_shared<PurpurServer>(); }, ServerType::BUKKIT);
-    sr.registerServer("fabric", []() { return std::make_shared<FabricServer>(); }, ServerType::FABRIC);
+    sr.registerServer("vanilla", []() { return std::make_shared<mcsm::VanillaServer>(); }, mcsm::ServerType::VANILLA);
+    sr.registerServer("paper", []() { return std::make_shared<mcsm::PaperServer>(); }, mcsm::ServerType::BUKKIT);
+    sr.registerServer("purpur", []() { return std::make_shared<mcsm::PurpurServer>(); }, mcsm::ServerType::BUKKIT);
+    sr.registerServer("fabric", []() { return std::make_shared<mcsm::FabricServer>(); }, mcsm::ServerType::FABRIC);
 }
 
 bool mcsm::init::isInitialized() const {
