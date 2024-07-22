@@ -26,7 +26,7 @@ SOFTWARE.
 #include <mcsm/command/base/command.h>
 #include <mcsm/util/cli/ask_input.h>
 #include <mcsm/data/options/server_option.h>
-#include <mcsm/server/type/bukkit/paper_server.h>
+#include <mcsm/data/options/modded/fabric_server_option.h>
 
 namespace mcsm {
     class ViewServerCommand : public mcsm::Command {
