@@ -232,6 +232,11 @@ mcsm::Result mcsm::MultiServerOption::load(){
         std::string type = opt.getValue("type");
         if(type == "fabric"){
             std::unique_ptr<mcsm::FabricServerOption> fabric = std::make_unique<mcsm::FabricServerOption>(path);
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
 
             std::string name = fabric->getServerName();
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -250,6 +255,11 @@ mcsm::Result mcsm::MultiServerOption::load(){
             if(canTake) this->servers.push_back(std::make_unique<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>(std::move(*fabric)));
         }else{
             std::unique_ptr<mcsm::ServerOption> base = std::make_unique<mcsm::ServerOption>(path);
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
 
             std::string name = base->getServerName();
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
