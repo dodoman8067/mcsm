@@ -221,6 +221,20 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& a
         std::exit(1);
     }
 
+    auto sPtr = mcsm::ServerRegistry::getServerRegistry().getServer(type);
+    if((mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) || sPtr == nullptr){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+
+    mcsm::Result genRes = sPtr->generate(name, *option, version, shouldSkipUpdate);
+
+    if(!genRes.isSuccess()){
+        genRes.printMessage();
+        if(genRes.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+    return;
+    /*
     if(type == "bukkit" || type == "craftbukkit"){
         mcsm::Result res = mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::CRAFTBUKKIT, shouldSkipUpdate);
         if(!res.isSuccess()){
@@ -269,6 +283,7 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& a
         }
         return;
     }
+    */
     mcsm::error("Server type not supported : " + type);
     std::exit(1);
 }
