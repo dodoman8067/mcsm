@@ -23,7 +23,7 @@ SOFTWARE.
 */
 
 #include <mcsm/init.h>
-#include <mcsm/data/options/multi_server_option.h>
+//#include <mcsm/data/options/multi_server_option.h>
 
 const std::string version = "0.2";
 
@@ -55,12 +55,14 @@ int main(int argc, char *argv[]){
         std::cout << "Welcome to MCSM (Minecraft Server Manager).\n";
         std::cout << "Type \"mcsm help\" for a list of commands.\n";
 
+        /*
         mcsm::MultiServerOption a(mcsm::getCurrentPath());
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         mcsm::printResultMessage();
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
     }
         a.start().printMessage();
+        */
         return 0;
     }
 
