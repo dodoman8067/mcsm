@@ -21,6 +21,8 @@ SOFTWARE.
 */
 
 #include <mcsm/util/mc/mc_utils.h>
+#include <iostream>
+#include <sstream>
 
 std::vector<std::string> mcsm::getMinecraftVersions(){
     std::vector<std::string> versions = {
@@ -66,4 +68,35 @@ std::vector<std::string> mcsm::getMinecraftVersions(){
         "1.20.4"
     };
     return versions;
+}
+
+std::vector<int> splitVersion(const std::string& version){
+    std::stringstream ss(version);
+    std::string segment;
+    std::vector<int> segments;
+
+    while (std::getline(ss, segment, '.')){
+        segments.push_back(std::stoi(segment));
+    }
+
+    return segments;
+}
+
+int mcsm::compareVersions(const std::string& a, const std::string& b) {
+    std::vector<int> version1 = splitVersion(a);
+    std::vector<int> version2 = splitVersion(b);
+
+    size_t length = std::max(version1.size(), version2.size());
+    for(size_t i = 0; i < length; ++i){
+        int num1 = (i < version1.size()) ? version1[i] : 0;
+        int num2 = (i < version2.size()) ? version2[i] : 0;
+
+        if(num1 < num2){
+            return -1;  // a is less than b
+        }else if (num1 > num2){
+            return 1;   // a is greater than b
+        }
+    }
+
+    return 0;  // a is equal to b
 }
