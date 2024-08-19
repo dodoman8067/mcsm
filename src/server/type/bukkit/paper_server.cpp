@@ -45,6 +45,7 @@ int mcsm::PaperServer::getVersion(const std::string& ver) const {
     }
 }
 
+// used for checking if versions with specific build exists
 int mcsm::PaperServer::getVersion(const std::string& ver, const std::string& build) const {
     std::string res = mcsm::get("https://api.papermc.io/v2/projects/paper/versions/" + ver + "/builds/" + build);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
