@@ -41,6 +41,8 @@ namespace mcsm {
         int getVersion(const std::string& ver) const;
         int getVersion(const std::string& ver, const std::string& build) const;
 
+        std::string getLatestVersion() const;
+
         std::vector<std::string> getAvailableVersions() override;
 
         std::string getSupportedVersions() const override;
@@ -63,6 +65,8 @@ namespace mcsm {
 
         bool hasVersion(const std::string& version) override;
 
+        mcsm::ServerType getType() const override;
+        
         std::string getTypeAsString() const override;
 
         mcsm::Result update();

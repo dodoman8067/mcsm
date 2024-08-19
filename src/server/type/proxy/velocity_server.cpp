@@ -30,8 +30,11 @@ mcsm::VelocityServer::~VelocityServer(){}
 
 // TODO: Use Velocity API (Instead of Paper)
 
+// VelocityServer provides a method that returns the 'ver' required in getVersion method as users don't usually type versions like 3.3.0-SNAPSHOT
+// it is something like a method that returns latest mc version
+
 int mcsm::VelocityServer::getVersion(const std::string& ver) const {
-    std::string res = mcsm::get("https://api.papermc.io/v2/projects/paper/versions/" + ver);
+    std::string res = mcsm::get("https://api.papermc.io/v2/projects/velocity/versions/" + ver);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
     if(json.is_discarded()){
@@ -49,8 +52,9 @@ int mcsm::VelocityServer::getVersion(const std::string& ver) const {
     }
 }
 
+// used for checking if versions with specific build exists
 int mcsm::VelocityServer::getVersion(const std::string& ver, const std::string& build) const {
-    std::string res = mcsm::get("https://api.papermc.io/v2/projects/paper/versions/" + ver + "/builds/" + build);
+    std::string res = mcsm::get("https://api.papermc.io/v2/projects/velocity/versions/" + ver + "/builds/" + build);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
     if(json.is_discarded()){
@@ -63,6 +67,25 @@ int mcsm::VelocityServer::getVersion(const std::string& ver, const std::string& 
     }else{
         mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return json["build"];
+    }
+}
+
+std::string mcsm::VelocityServer::getLatestVersion() const {
+    std::string res = mcsm::get("https://api.papermc.io/v2/projects/velocity");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
+    if(json.is_discarded()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
+        return "";
+    }
+
+    if(json["versions"] == nullptr || !json["versions"].is_array()){
+        return "";
+    }else{
+        nlohmann::json builds = json["versions"];
+        if(builds[json["versions"].size() - 1] == nullptr || !builds[json["versions"].size() - 1].is_string()) return "";
+        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+        return builds[json["versions"].size() - 1];
     }
 }
 
@@ -449,6 +472,10 @@ mcsm::Result mcsm::VelocityServer::generate(const std::string& name, mcsm::JvmOp
 
 bool mcsm::VelocityServer::hasVersion(const std::string& version){
     return getVersion(version) != -1;
+}
+
+mcsm::ServerType mcsm::VelocityServer::getType() const {
+    return mcsm::ServerType::VELOCITY;
 }
 
 std::string mcsm::VelocityServer::getTypeAsString() const {
