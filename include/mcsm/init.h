@@ -14,6 +14,11 @@
 #include <mcsm/command/server/view_server_command.h>
 #include <mcsm/command/server/view_server_type_command.h>
 
+#include <mcsm/server/type/base/vanilla_server.h>
+#include <mcsm/server/type/bukkit/paper_server.h>
+#include <mcsm/server/type/bukkit/purpur_server.h>
+#include <mcsm/server/type/proxy/velocity_server.h>
+
 namespace mcsm {
     class init {
     private:
