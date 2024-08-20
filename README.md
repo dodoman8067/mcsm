@@ -2,7 +2,7 @@
 
 ## Description
 
-MCSM (MineCraft Server Manager) is a command-line program designed to manage Minecraft servers. Note that there's a better option called Docker and I wouldn't recommend using this right now because this project is mostly for me leaning C++.
+MCSM (MineCraft Server Manager) is a command-line program designed to manage Minecraft servers. Note that there should be some better options out there and I wouldn't recommend using this right now because this project is mostly for me leaning C++.
 
 ## Supported platforms
 
@@ -24,8 +24,6 @@ This project requires the following dependencies :
 * [nlohmann/json](https://github.com/nlohmann/json)
 * [termcolor](https://github.com/ikalnytskyi/termcolor)
 
-Before building, you must build them and install them with CMake.
-
 ## Usage
 
 To use the compiled executable, type:
@@ -35,10 +33,6 @@ To use the compiled executable, type:
 By doing this you can get a list of commands that would help you get started. Try this instead if it isn't working :
 
     ./mcsm help
-
-## Contributing
-
-Currently you can't contribute to this project because it isn't completed right now.
 
 ## License
 
