@@ -181,7 +181,7 @@ namespace mcsm {
 
         inline std::vector<std::string> serverWrongInstanceGenerated(const std::string& serverName){
             return { 
-                "Specified server path's server option wasn't for" + serverName + "servers.",
+                "Specified server path's server option wasn't for " + serverName + " servers.",
                 "Please try again in other directories." 
             };
         }
