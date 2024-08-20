@@ -196,8 +196,8 @@ mcsm::Result mcsm::VelocityServer::download(const std::string& version, const st
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongTypePlusFix("\"type\"", opt.getName(), "string", "change it into \"type\": \"[yourtype]\"")});
         return res;
     }
-    if(typeValue != "paper"){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverWrongInstanceGenerated("Paper")});
+    if(typeValue != "velocity"){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverWrongInstanceGenerated("Velocity")});
         return res;
     }
 
@@ -230,7 +230,7 @@ mcsm::Result mcsm::VelocityServer::download(const std::string& version, const st
             return res;
         }
         std::string strVer = std::to_string(ver);
-        std::string url = "https://api.papermc.io/v2/projects/paper/versions/" + version + "/builds/" + strVer + "/downloads/paper-" + version + "-" + strVer + ".jar";
+        std::string url = "https://api.papermc.io/v2/projects/velocity/versions/" + version + "/builds/" + strVer + "/downloads/velocity-" + version + "-" + strVer + ".jar";
         mcsm::info("URL : " + url);
         mcsm::Result res = mcsm::download(name, url, path, true);
         if(!res.isSuccess()) return res;
@@ -249,7 +249,7 @@ mcsm::Result mcsm::VelocityServer::download(const std::string& version, const st
             return res;
         }
         std::string strVer = std::to_string(ver);
-        std::string url = "https://api.papermc.io/v2/projects/paper/versions/" + version + "/builds/" + strVer + "/downloads/paper-" + version + "-" + strVer + ".jar";
+        std::string url = "https://api.papermc.io/v2/projects/velocity/versions/" + version + "/builds/" + strVer + "/downloads/velocity-" + version + "-" + strVer + ".jar";
         mcsm::info("URL : " + url);
         mcsm::Result res = mcsm::download(name, url, path, true);
         if(!res.isSuccess()) return res;
