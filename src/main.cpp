@@ -30,6 +30,7 @@ const std::string version = "0.2";
 int main(int argc, char *argv[]){
     /**
      * TODO
+     * Check if the name of each linked server in mcsm::MultiServerOption does not match the name of any other server
      * Implement mcsm update command.
      * Add multicurl task and make an internal method that returns CURL handle on Server class (obtainJarFile)
      */
