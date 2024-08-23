@@ -28,7 +28,7 @@ SOFTWARE.
 #include <regex>
 
 namespace mcsm {
-    class CustomServer : public mcsm::Server {
+    class CustomServer : public mcsm::Server, public std::enable_shared_from_this<CustomServer> {
     private:
         bool isFile(const std::string& location) const;
         bool isURL(const std::string& location) const;
@@ -51,7 +51,9 @@ namespace mcsm {
         std::string getWebSite() const override;
         std::string getGitHub() const override;
 
-        mcsm::Result obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override = 0;
+        mcsm::Result obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
+
+        mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& version, const bool& autoUpdate) override;
     };
 }
 

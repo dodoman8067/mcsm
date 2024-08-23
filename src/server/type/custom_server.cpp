@@ -122,6 +122,35 @@ mcsm::Result mcsm::CustomServer::setupServerJarFile(const std::string& optionPat
     return res;
 }
 
+mcsm::Result mcsm::CustomServer::obtainJarFile(const std::string& /* version */, const std::string& /* path */, const std::string& /* name */, const std::string& optionPath){
+    return setupServerJarFile(optionPath);
+}
+
+mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& version, const bool& autoUpdate){
+    std::shared_ptr<mcsm::CustomServer> server = shared_from_this();
+    /*
+    TODO: Add mcsm::CustomServerOption, implement custom configure method since it doesn't include the server build system and review code
+
+    bool vExists = server->hasVersion(version);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+    if(!vExists){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
+        return res;
+    }
+    mcsm::ServerOption serverOption(version, server);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+    return configure(serverOption, name, option, autoUpdate);
+    */
+}
+
 bool mcsm::CustomServer::isFile(const std::string& location) const {
     return mcsm::fileExists(location);
 }
