@@ -28,8 +28,6 @@ mcsm::VelocityServer::VelocityServer(){}
 
 mcsm::VelocityServer::~VelocityServer(){}
 
-// TODO: Use Velocity API (Instead of Paper)
-
 // VelocityServer provides a method that returns the 'ver' required in getVersion method as users don't usually type versions like 3.3.0-SNAPSHOT
 // it is something like a method that returns latest mc version
 
