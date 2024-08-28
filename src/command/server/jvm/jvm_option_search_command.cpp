@@ -120,14 +120,7 @@ std::string mcsm::JvmOptionSearchCommand::getProfileName(const std::vector<std::
         if(!(arg == "-name" || arg == "--name" || arg == "-n" || arg == "--n")) continue;
         if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
             name = args[i + 1];
-            if(name.find("\"") == std::string::npos && name.find("\'") == std::string::npos){
-                return name;
-            }else{
-                mcsm::replaceAll(name, "\"", "");
-                mcsm::replaceAll(name, "\'", "");
-                mcsm::warning("NOTE : \' and \" are not allowed in names; Name was modified to " + name + ".");
-            }
-            return name;
+            return mcsm::safeString(name);
         }
     }
     mcsm::warning("Name not provided; To continue, specify a name with --name option.");

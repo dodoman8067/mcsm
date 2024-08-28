@@ -94,14 +94,7 @@ std::string mcsm::GenerateServerCommand::getProfileName(const std::vector<std::s
             if(!(arg == "-profile" || arg == "--profile" || arg == "-p" || arg == "--p")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
                 name = args[i + 1];
-                if(name.find("\"") == std::string::npos && name.find("\'") == std::string::npos){
-                    return name;
-                }else{
-                    mcsm::replaceAll(name, "\"", "");
-                    mcsm::replaceAll(name, "\'", "");
-                    mcsm::warning("NOTE : \' and \" are not allowed in profile names; The profile name was modified to " + name + ".");
-                }
-                return name;
+                return mcsm::safeString(name);
             }
         }
     }
@@ -117,14 +110,7 @@ std::string mcsm::GenerateServerCommand::getServerName(const std::vector<std::st
             if(!(arg == "-name" || arg == "--name")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
                 name = args[i + 1];
-                if(name.find("\"") == std::string::npos && name.find("\'") == std::string::npos){
-                    return name;
-                }else{
-                    mcsm::replaceAll(name, "\"", "");
-                    mcsm::replaceAll(name, "\'", "");
-                    std::cout << "[mcsm] NOTE : \' and \" are not allowed in profile names; The profile name was modified to " << name << ".\n";
-                }
-                return name;
+                return mcsm::safeString(name);
             }
         }
     }
@@ -140,7 +126,7 @@ std::string mcsm::GenerateServerCommand::getServerVersion(const std::vector<std:
             if(!(arg == "-version" || arg == "--version" || arg == "-ver" || arg == "--ver" || arg == "-v" || arg == "--v" || arg == "-serverversion" || arg == "--serverversion" || arg == "-sversion" || arg == "--sversion" || arg == "-sver" || arg == "--sver" || arg == "-sv" || arg == "--sv")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
                 ver = args[i + 1];
-                return ver;
+                return mcsm::safeString(ver);
             }
         }
     }
@@ -187,7 +173,7 @@ std::string mcsm::GenerateServerCommand::getServerType(const std::vector<std::st
             if(!(arg == "-servertype" || arg == "--servertype" || arg == "-st" || arg == "--st")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
                 type = args[i + 1];
-                return type;
+                return mcsm::safeString(type);
             }
         }
     }

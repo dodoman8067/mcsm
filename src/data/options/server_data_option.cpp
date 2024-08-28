@@ -53,7 +53,7 @@ mcsm::Result mcsm::ServerDataOption::create(const std::string& lastTimeLaunched)
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverAlreadyConfigured(this->option->getPath())});
         return res;
     }
-    mcsm::Result res1 = this->option->setValue("last_time_launched", lastTimeLaunched);
+    mcsm::Result res1 = this->option->setValue("last_time_launched", mcsm::safeString(lastTimeLaunched));
     if(!res1.isSuccess()) return res1;
     mcsm::Result res2 = this->option->setValue("last_downloaded_build", "0");
     return res2;
@@ -84,7 +84,7 @@ std::string mcsm::ServerDataOption::getLastTimeLaunched() const {
     }
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return value;
+    return mcsm::safeString(value);
 }
 
 mcsm::Result mcsm::ServerDataOption::updateLastTimeLaunched(){
@@ -119,7 +119,7 @@ std::string mcsm::ServerDataOption::getServerTimeCreated() const {
     }
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return value;
+    return mcsm::safeString(value);
 }
 
 mcsm::Result mcsm::ServerDataOption::updateServerTimeCreated(){
@@ -154,11 +154,11 @@ std::string mcsm::ServerDataOption::getLastDownloadedBuild() const {
     }
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return value;
+    return mcsm::safeString(value);
 }
 
 mcsm::Result mcsm::ServerDataOption::updateLastDownloadedBuild(const std::string& build){
-    return this->option->setValue("last_downloaded_build", build);
+    return this->option->setValue("last_downloaded_build", mcsm::safeString(build));
 }
 
 bool mcsm::ServerDataOption::exists() const {

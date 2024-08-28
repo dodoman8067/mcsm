@@ -61,5 +61,7 @@ std::string mcsm::safeString(const std::string& str){
     mcsm::replaceAll(value, "\\", "_");
     mcsm::replaceAll(value, "..", "__");
     mcsm::replaceAll(value, "/", "_");
+    mcsm::replaceAll(value, "\"", "_");
+    mcsm::replaceAll(value, "\'", "_");
     return value;
 }

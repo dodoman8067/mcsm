@@ -205,10 +205,10 @@ mcsm::Result mcsm::ServerOption::create(const std::string& name, mcsm::JvmOption
         profileObj["location"] = "current";
     }
     
-    mcsm::Result res2 = option.setValue("name", name);
+    mcsm::Result res2 = option.setValue("name", mcsm::safeString(name));
     if(!res2.isSuccess()) return res2;
     
-    mcsm::Result res3 = option.setValue("version", this->version);
+    mcsm::Result res3 = option.setValue("version", mcsm::safeString(this->version));
     if(!res3.isSuccess()) return res3;
     
     mcsm::Result res4 = option.setValue("default_launch_profile", profileObj);
@@ -219,7 +219,7 @@ mcsm::Result mcsm::ServerOption::create(const std::string& name, mcsm::JvmOption
         jarFile = this->server->getTypeAsString() + ".jar";
     }
 
-    mcsm::Result res5 = option.setValue("server_jar", jarFile);
+    mcsm::Result res5 = option.setValue("server_jar", mcsm::safeString(jarFile));
     if(!res5.isSuccess()) return res5;
 
     mcsm::Result res6 = option.setValue("server_build", "latest");
@@ -471,12 +471,12 @@ std::string mcsm::ServerOption::getServerName() const {
     }
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return value;
+    return mcsm::safeString(value);
 }
 
 mcsm::Result mcsm::ServerOption::setServerName(const std::string& name){
     mcsm::Option option(this->path, "server");
-    return option.setValue("name", name);
+    return option.setValue("name", mcsm::safeString(name));
 }
 
 std::string mcsm::ServerOption::getServerVersion() const {
@@ -501,12 +501,12 @@ std::string mcsm::ServerOption::getServerVersion() const {
     }
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return value;
+    return mcsm::safeString(value);
 }
 
 mcsm::Result mcsm::ServerOption::setServerVersion(const std::string& version){
     mcsm::Option option(this->path, "server");
-    return option.setValue("version", version);    
+    return option.setValue("version", mcsm::safeString(version));    
 }
 
 std::string mcsm::ServerOption::getServerType() const {
@@ -531,7 +531,7 @@ std::string mcsm::ServerOption::getServerType() const {
     }
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return value;
+    return mcsm::safeString(value);
 }
 
 std::string mcsm::ServerOption::getServerJarFile() const{
@@ -556,12 +556,12 @@ std::string mcsm::ServerOption::getServerJarFile() const{
     }
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return value;
+    return mcsm::safeString(value);
 }
 
 mcsm::Result mcsm::ServerOption::setServerJarFile(const std::string& name){
     mcsm::Option option(this->path, "server");
-    return option.setValue("server_jar", name);
+    return option.setValue("server_jar", mcsm::safeString(name));
 }
 
 std::string mcsm::ServerOption::getServerJarBuild() const {
@@ -586,12 +586,12 @@ std::string mcsm::ServerOption::getServerJarBuild() const {
     }
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return value;
+    return mcsm::safeString(value);
 }
 
 mcsm::Result mcsm::ServerOption::setServerJarBuild(const std::string& build){
     mcsm::Option option(this->path, "server");
-    return option.setValue("server_build", build);
+    return option.setValue("server_build", mcsm::safeString(build));
 }
 
 bool mcsm::ServerOption::doesAutoUpdate() const {
