@@ -33,12 +33,34 @@ mcsm::SpongeServer::~SpongeServer(){}
 // SpongeServer provides a method that returns the 'ver' required in getVersion method as users don't usually type versions like 3.3.0-SNAPSHOT
 // it is something like a method that returns latest mc version
 
-int mcsm::SpongeServer::getVersion(const std::string& ver) const {
-    //TODO: Implement
+//ver: mc version
+std::string mcsm::SpongeServer::getVersion(const std::string& ver) const {
+    std::string res = mcsm::get("https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
+    if(json.is_discarded()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
+        return "";
+    }
+
+    nlohmann::json artifacts = json["artifacts"];
+    if(artifacts == nullptr) return ""; // has to exist
+    if(!artifacts.is_array()) return ""; // has to be an array
+
+    for(nlohmann::json& v : artifacts){
+        if(!v.is_object()) return ""; // api has changed
+    }
+
+    std::vector<std::string> keys;
+    for(nlohmann::json::iterator it = artifacts.begin(); it != artifacts.end(); it++){
+        keys.push_back(it.key());
+    }
+
+    return keys[0];
 }
 
 // used for checking if versions with specific build exists
-int mcsm::SpongeServer::getVersion(const std::string& ver, const std::string& build) const {
+std::string mcsm::SpongeServer::getVersion(const std::string& ver, const std::string& build) const {
     //TODO: Implement
 }
 
@@ -336,14 +358,14 @@ mcsm::Result mcsm::SpongeServer::update(const std::string& path, const std::stri
     }
     
     std::string version = sVer.get<std::string>();
-    int ver = getVersion(version);
+    std::string ver = getVersion(version);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    if(ver == -1){
+    if(ver == ""){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
         return res;
     }
@@ -354,12 +376,12 @@ mcsm::Result mcsm::SpongeServer::update(const std::string& path, const std::stri
         return res;
     }
 
-    if(lastBuild == std::to_string(ver)){
+    if(lastBuild == ver){
         mcsm::success("Server is up to date.");
         mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return res;
     }
-    mcsm::success("Update found : "  + std::to_string(ver) + ". Current build : " + lastBuild);
+    mcsm::success("Update found : "  + ver + ". Current build : " + lastBuild);
 
     std::string jar = getJarFile(optionPath);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -408,7 +430,7 @@ mcsm::Result mcsm::SpongeServer::generate(const std::string& name, mcsm::JvmOpti
 }
 
 bool mcsm::SpongeServer::hasVersion(const std::string& version){
-    return getVersion(version) != -1;
+    return getVersion(version) != "";
 }
 
 mcsm::ServerType mcsm::SpongeServer::getType() const {

@@ -38,8 +38,8 @@ namespace mcsm {
         SpongeServer();
         ~SpongeServer();
 
-        int getVersion(const std::string& ver) const;
-        int getVersion(const std::string& ver, const std::string& build) const;
+        std::string getVersion(const std::string& ver) const;
+        std::string getVersion(const std::string& ver, const std::string& build) const;
 
         std::string getLatestVersion() const;
 
