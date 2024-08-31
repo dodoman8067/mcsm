@@ -34,8 +34,10 @@ mcsm::SpongeServer::~SpongeServer(){}
 // it is something like a method that returns latest mc version
 
 //ver: mc version
+
+// Note: limit more than one will have to return keys[keys.size() - 1]
 std::string mcsm::SpongeServer::getVersion(const std::string& ver) const {
-    std::string res = mcsm::get("https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver);
+    std::string res = mcsm::get("https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver + "&limit=1");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
     if(json.is_discarded()){
@@ -45,23 +47,65 @@ std::string mcsm::SpongeServer::getVersion(const std::string& ver) const {
 
     nlohmann::json artifacts = json["artifacts"];
     if(artifacts == nullptr) return ""; // has to exist
-    if(!artifacts.is_array()) return ""; // has to be an array
-
-    for(nlohmann::json& v : artifacts){
-        if(!v.is_object()) return ""; // api has changed
-    }
+    if(!artifacts.is_object()) return ""; // has to be an object
 
     std::vector<std::string> keys;
     for(nlohmann::json::iterator it = artifacts.begin(); it != artifacts.end(); it++){
         keys.push_back(it.key());
     }
 
+    if(keys.empty()) return "";
     return keys[0];
 }
 
 // used for checking if versions with specific build exists
+// @param build number of build
+
+// Note: The actual list position and release numbers don't match.
+// The offset calculation is based on the list position, not the release number.
 std::string mcsm::SpongeServer::getVersion(const std::string& ver, const std::string& build) const {
-    //TODO: Implement
+    if(!mcsm::is_number(build)) return "";
+
+    int buildNo = std::stoi(build); 
+
+    std::string sizeRes = mcsm::get("https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver + "&limit=1");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    nlohmann::json json1 = nlohmann::json::parse(sizeRes, nullptr, false);
+    if(json1.is_discarded()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
+        return "";
+    }
+
+    nlohmann::json jSize = json1["size"];
+    if(jSize == nullptr) return ""; // has to exist
+    if(!jSize.is_number_integer()) return "";
+
+    int totalSize = jSize;
+
+    // 1 means limit in the request
+    // if you send the request like &limit=25, 1 should be replaced with 25
+    int offset = std::max(0, (totalSize - 1) - std::max(0, buildNo - 1));
+
+    std::string res = mcsm::get("https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver + "&limit=1&offset=" + std::to_string(offset));
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    
+    nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
+    if(json.is_discarded()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
+        return "";
+    }
+
+    nlohmann::json artifacts = json["artifacts"];
+    if(artifacts == nullptr) return ""; // has to exist
+    if(!artifacts.is_object()) return ""; // has to be an object
+
+    std::vector<std::string> keys;
+    for(nlohmann::json::iterator it = artifacts.begin(); it != artifacts.end(); it++){
+        keys.push_back(it.key());
+    }
+
+    if(keys.empty()) return "";
+    return keys[0];
 }
 
 std::string mcsm::SpongeServer::getLatestVersion() const {

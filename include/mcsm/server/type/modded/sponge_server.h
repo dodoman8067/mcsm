@@ -30,6 +30,7 @@ SOFTWARE.
 #include <mcsm/http/download.h>
 #include <mcsm/data/options/server_option.h>
 #include <mcsm/util/mc/mc_utils.h>
+#include <algorithm>
 
 namespace mcsm {
     class SpongeServer : public mcsm::Server, public mcsm::Downloadable, public std::enable_shared_from_this<SpongeServer> {
