@@ -255,9 +255,25 @@ mcsm::Result mcsm::SpongeServer::download(const std::string& version, const std:
         return res;
     }
     if(serverBuildValue != "latest"){
-        //TODO: Implement
+        mcsm::warning("Sponge release version does not match the actual order of the file names. The program will NOT use the \"server_build\" value to match the release name.");
+        mcsm::warning("Example: SpongeVanilla 1.12.2 build #2 is named '1.12.2-7.0.0-BETA-330', while the first build is named '1.12.2-7.0.0-BETA-1'.");
+        std::string build = getVersion(version, serverBuildValue);
+        if(mcsm::isWhitespaceOrEmpty(build)){
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
+            return res;
+        }
     }else{
+        std::string build = getVersion(version);
+        if(mcsm::isWhitespaceOrEmpty(build)){
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
+            return res;
+        }
 
+        std::string url;
+        /*
+        Note: use https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions/getVersion(version) to get the universal file download link.
+        The file name doesn't follow a specific pattern.
+        */
     }
 }
 
