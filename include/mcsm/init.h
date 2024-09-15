@@ -18,6 +18,7 @@
 #include <mcsm/server/type/bukkit/paper_server.h>
 #include <mcsm/server/type/bukkit/purpur_server.h>
 #include <mcsm/server/type/proxy/velocity_server.h>
+#include <mcsm/server/type/modded/sponge_server.h>
 
 namespace mcsm {
     class init {

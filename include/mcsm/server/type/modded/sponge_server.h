@@ -64,6 +64,8 @@ namespace mcsm {
 
         mcsm::Result obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
 
+        std::string getDownloadLink(const std::string& build) const;
+
         bool hasVersion(const std::string& version) override;
 
         mcsm::ServerType getType() const override;

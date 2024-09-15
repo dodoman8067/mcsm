@@ -108,6 +108,7 @@ void mcsm::init::initServers(){
     sr.registerServer("purpur", []() { return std::make_shared<mcsm::PurpurServer>(); }, mcsm::ServerType::BUKKIT);
     sr.registerServer("fabric", []() { return std::make_shared<mcsm::FabricServer>(); }, mcsm::ServerType::FABRIC);
     sr.registerServer("velocity", []() { return std::make_shared<mcsm::VelocityServer>(); }, mcsm::ServerType::VELOCITY);
+    sr.registerServer("sponge", []() { return std::make_shared<mcsm::SpongeServer>(); }, mcsm::ServerType::SPONGE_VANILLA);
 }
 
 bool mcsm::init::isInitialized() const {
