@@ -234,11 +234,6 @@ mcsm::Result mcsm::ServerOption::create(const std::string& name, mcsm::JvmOption
     mcsm::Result res8 = serverDataOpt.updateServerTimeCreated();
     if(!res8.isSuccess()) return res8;
 
-    if(this->server->getType() == mcsm::ServerType::SPONGE_VANILLA){
-        mcsm::Result sRes = option.setValue("api_serch_recommended", false);
-        if(!sRes.isSuccess()) return sRes;
-    }
-
     mcsm::Result res9({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return res9;
 }

@@ -541,7 +541,16 @@ mcsm::Result mcsm::SpongeServer::generate(const std::string& name, mcsm::JvmOpti
     }
 
     mcsm::Result res = configure(serverOption, name, option, autoUpdate);
-    return res;
+    if(!res.isSuccess()) return res;
+
+    mcsm::Option sOpt(mcsm::getCurrentPath(), "server");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    return sOpt.setValue("api_serch_recommended", false);
 }
 
 bool mcsm::SpongeServer::hasVersion(const std::string& version){
