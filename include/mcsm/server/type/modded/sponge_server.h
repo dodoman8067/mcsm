@@ -42,8 +42,6 @@ namespace mcsm {
         std::string getVersion(const std::string& ver) const;
         std::string getVersion(const std::string& ver, const std::string& build) const;
 
-        std::string getLatestVersion() const;
-
         std::vector<std::string> getAvailableVersions() override;
 
         std::string getSupportedVersions() const override;

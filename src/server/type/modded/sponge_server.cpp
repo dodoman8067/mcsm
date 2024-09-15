@@ -145,25 +145,6 @@ std::string mcsm::SpongeServer::getVersion(const std::string& ver, const std::st
     return keys[0];
 }
 
-std::string mcsm::SpongeServer::getLatestVersion() const {
-    std::string res = mcsm::get("https://api.papermc.io/v2/projects/velocity");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-    nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
-    if(json.is_discarded()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
-        return "";
-    }
-
-    if(json["versions"] == nullptr || !json["versions"].is_array()){
-        return "";
-    }else{
-        nlohmann::json builds = json["versions"];
-        if(builds[json["versions"].size() - 1] == nullptr || !builds[json["versions"].size() - 1].is_string()) return "";
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-        return builds[json["versions"].size() - 1];
-    }
-}
-
 std::vector<std::string> mcsm::SpongeServer::getAvailableVersions(){
     std::vector<std::string> versions;
     for(const std::string& s : mcsm::getMinecraftVersions()){
