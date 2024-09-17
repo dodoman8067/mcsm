@@ -220,56 +220,7 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& a
         if(genRes.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
     }
     return;
-    /*
-    if(type == "bukkit" || type == "craftbukkit"){
-        mcsm::Result res = mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::CRAFTBUKKIT, shouldSkipUpdate);
-        if(!res.isSuccess()){
-            res.printMessage();
-            if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
-        return;
-    }
-    if(type == "spigot"){
-        mcsm::Result res = mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::SPIGOT, shouldSkipUpdate);
-        if(!res.isSuccess()){
-            res.printMessage();
-            if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
-        return;
-    }
-    if(type == "paper" || type == "paperspigot"){
-        mcsm::Result res = mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::PAPER, shouldSkipUpdate);
-        if(!res.isSuccess()){
-            res.printMessage();
-            if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
-        return;
-    }
-    if(type == "purpur"){
-        mcsm::Result res = mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::PURPUR, shouldSkipUpdate);
-        if(!res.isSuccess()){
-            res.printMessage();
-            if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
-        return;
-    }
-    if(type == "fabric"){
-        mcsm::Result res = mcsm::server::generateFabric(name, *option, version, shouldSkipUpdate);
-        if(!res.isSuccess()){
-            res.printMessage();
-            if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
-        return;
-    }
-    if(type == "vanilla"){
-        mcsm::Result res = mcsm::server::generateVanilla(name, *option, version, shouldSkipUpdate);
-        if(!res.isSuccess()){
-            res.printMessage();
-            if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
-        return;
-    }
-    */
+    
     mcsm::error("Server type not supported : " + type);
     std::exit(1);
 }
