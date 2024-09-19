@@ -128,6 +128,23 @@ bool mcsm::mkdir(const std::string& dirName){
     return true;
 }
 
+void mcsm::getInput(std::string& input, std::function<void()> beforeInputFunction, std::function<void()> invalidInputFunction, std::function<bool(std::string)> checkValid){
+    beforeInputFunction();
+
+    std::string typedInput;
+    do {
+        std::getline(std::cin, typedInput);
+
+        if(!checkValid(typedInput)){
+            invalidInputFunction();
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+        }
+    } while (!checkValid(typedInput));
+
+    input = typedInput;
+}
+
 bool mcsm::isDebug(){
     #ifdef MCSM_DEBUG
         return true;

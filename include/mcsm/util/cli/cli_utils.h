@@ -27,6 +27,7 @@ SOFTWARE.
 #include <filesystem>
 #include <cstdlib>
 #include <iostream>
+#include <functional>
 #include <mcsm/util/os/os_detection.h>
 #include <mcsm/util/cli/result.h>
 #include <mcsm/util/cli/logging.h>
@@ -51,6 +52,16 @@ namespace mcsm {
     bool fileExists(const std::string& path);
     bool removeFile(const std::string& path);
     bool mkdir(const std::string& dirName);
+
+    /**
+     * @brief Get the Input object
+     * 
+     * @param input input string (will contain the final value)
+     * @param beforeInputFunction called before accepting an input.
+     * @param invalidInputFunction called if invalid input was passed
+     * @param checkValid checks if the input is valid
+     */
+    void getInput(std::string& input, std::function<void()> beforeInputFunction, std::function<void()> invalidInputFunction, std::function<bool(std::string)> checkValid);
 
     bool isDebug();
 }
