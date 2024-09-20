@@ -128,21 +128,41 @@ bool mcsm::mkdir(const std::string& dirName){
     return true;
 }
 
-void mcsm::getInput(std::string& input, std::function<void()> beforeInputFunction, std::function<void()> invalidInputFunction, std::function<bool(std::string)> checkValid){
-    beforeInputFunction();
+/*
+Example usage:
 
+    auto beforeInput = []() {
+        std::cout << "Enter a valid input: ";
+    };
+
+    auto invalidInput = [](const std::string& input) {
+        std::cout << "Invalid input " << input << ". Please try again." << std::endl;
+    };
+
+    auto isValid = [](const std::string& input) -> bool {
+        // Example validation: input must not be empty and must have more than 3 characters
+        return !input.empty() && input.length() > 3;
+    };
+
+    std::string userInput;
+    mcsm::getInput(userInput, beforeInput, invalidInput, isValid);
+
+    std::cout << "You entered a valid input: " << userInput << std::endl;
+*/
+
+void mcsm::getInput(std::string& input, std::function<void()> beforeInputFunction, std::function<void(std::string)> invalidInputFunction, std::function<bool(std::string)> checkValid) {
     std::string typedInput;
-    do {
+    while(true){
+        beforeInputFunction();
         std::getline(std::cin, typedInput);
-
-        if(!checkValid(typedInput)){
-            invalidInputFunction();
-            std::cin.clear();
-            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            
+        if(checkValid(typedInput)){
+            input = typedInput;
+            break;
+        }else{
+            invalidInputFunction(typedInput);
         }
-    } while (!checkValid(typedInput));
-
-    input = typedInput;
+    }
 }
 
 bool mcsm::isDebug(){

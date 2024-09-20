@@ -61,7 +61,7 @@ namespace mcsm {
      * @param invalidInputFunction called if invalid input was passed
      * @param checkValid checks if the input is valid
      */
-    void getInput(std::string& input, std::function<void()> beforeInputFunction, std::function<void()> invalidInputFunction, std::function<bool(std::string)> checkValid);
+    void getInput(std::string& input, std::function<void()> beforeInputFunction, std::function<void(std::string)> invalidInputFunction, std::function<bool(std::string)> checkValid);
 
     bool isDebug();
 }
