@@ -86,7 +86,7 @@ mcsm::Result mcsm::download(const std::string& name, const std::string& url, con
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl/8.6.0");
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl/8.10.0");
     
     if(percentages){
         curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
