@@ -27,6 +27,9 @@ mcsm::PaperServer::PaperServer() {}
 mcsm::PaperServer::~PaperServer() {}
 
 int mcsm::PaperServer::getVersion(const std::string& ver) const {
+    if(!mcsm::isSafeString(ver)){
+        return -1;
+    }
     std::string res = mcsm::get("https://api.papermc.io/v2/projects/paper/versions/" + ver);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
@@ -47,6 +50,12 @@ int mcsm::PaperServer::getVersion(const std::string& ver) const {
 
 // used for checking if versions with specific build exists
 int mcsm::PaperServer::getVersion(const std::string& ver, const std::string& build) const {
+    if(!mcsm::isSafeString(build)){
+        return -1;
+    }
+    if(!mcsm::isSafeString(ver)){
+        return -1;
+    }
     std::string res = mcsm::get("https://api.papermc.io/v2/projects/paper/versions/" + ver + "/builds/" + build);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);

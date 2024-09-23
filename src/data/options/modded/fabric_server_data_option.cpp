@@ -31,6 +31,10 @@ std::string mcsm::FabricServerDataOption::getLoaderVersion() const {
 }
 
 mcsm::Result mcsm::FabricServerDataOption::updateLoaderVersion(const std::string& version){
+    if(!mcsm::isSafeString(version)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(version)});
+        return res;
+    }
     return this->option->setValue("last_downloaded_loader_version", mcsm::safeString(version));
 }
 

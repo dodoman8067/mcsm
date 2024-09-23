@@ -31,6 +31,9 @@ mcsm::FabricServer::~FabricServer() {}
  * Returns fabric loader version.
  */
 std::string mcsm::FabricServer::getVersion(const std::string& ver) const {
+    if(!mcsm::isSafeString(ver)){
+        return "";
+    }
     std::string res = mcsm::get("https://meta.fabricmc.net/v2/versions/loader/" + ver);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);

@@ -111,6 +111,11 @@ mcsm::ServerOption::ServerOption(const std::string& path){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"type\"", "string")});
         return; 
     }
+    
+    if(!mcsm::isSafeString(type)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(path)});
+        return;
+    }
 
     nlohmann::json version = option.getValue("version");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
@@ -124,6 +129,11 @@ mcsm::ServerOption::ServerOption(const std::string& path){
         return; 
     }
 
+    if(!mcsm::isSafeString(version)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(version)});
+        return;
+    }
+
     std::shared_ptr<mcsm::Server> sPtr = mcsm::ServerRegistry::getServerRegistry().getServer(type);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
     this->path = path;
@@ -133,6 +143,10 @@ mcsm::ServerOption::ServerOption(const std::string& path){
 }
 
 mcsm::ServerOption::ServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server){
+    if(!mcsm::isSafeString(version)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(version)});
+        return;
+    }
     this->version = version;
     this->server = server;
     std::string path1 = mcsm::getCurrentPath();
@@ -142,6 +156,10 @@ mcsm::ServerOption::ServerOption(const std::string& version, std::shared_ptr<mcs
 }
 
 mcsm::ServerOption::ServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server, const std::string& path){
+    if(!mcsm::isSafeString(version)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(version)});
+        return;
+    }
     if(!mcsm::fileExists(path)){
         if(!mcsm::mkdir(path)){
             mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
@@ -208,7 +226,11 @@ mcsm::Result mcsm::ServerOption::create(const std::string& name, mcsm::JvmOption
     mcsm::Result res2 = option.setValue("name", mcsm::safeString(name));
     if(!res2.isSuccess()) return res2;
     
-    mcsm::Result res3 = option.setValue("version", mcsm::safeString(this->version));
+    if(!mcsm::isSafeString(this->version)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(this->version)});
+        return res;
+    }
+    mcsm::Result res3 = option.setValue("version", this->version);
     if(!res3.isSuccess()) return res3;
     
     mcsm::Result res4 = option.setValue("default_launch_profile", profileObj);
@@ -219,7 +241,11 @@ mcsm::Result mcsm::ServerOption::create(const std::string& name, mcsm::JvmOption
         jarFile = this->server->getTypeAsString() + ".jar";
     }
 
-    mcsm::Result res5 = option.setValue("server_jar", mcsm::safeString(jarFile));
+    if(!mcsm::isSafeString(jarFile)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(jarFile)});
+        return res;
+    }
+    mcsm::Result res5 = option.setValue("server_jar", jarFile);
     if(!res5.isSuccess()) return res5;
 
     mcsm::Result res6 = option.setValue("server_build", "latest");
@@ -471,12 +497,20 @@ std::string mcsm::ServerOption::getServerName() const {
     }
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return mcsm::safeString(value);
+    if(!mcsm::isSafeString(value)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
+        return "";
+    }
+    return value;
 }
 
 mcsm::Result mcsm::ServerOption::setServerName(const std::string& name){
     mcsm::Option option(this->path, "server");
-    return option.setValue("name", mcsm::safeString(name));
+    if(!mcsm::isSafeString(name)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(name)});
+        return res;
+    }
+    return option.setValue("name", name);
 }
 
 std::string mcsm::ServerOption::getServerVersion() const {
@@ -501,12 +535,20 @@ std::string mcsm::ServerOption::getServerVersion() const {
     }
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return mcsm::safeString(value);
+    if(!mcsm::isSafeString(value)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
+        return "";
+    }
+    return value;
 }
 
 mcsm::Result mcsm::ServerOption::setServerVersion(const std::string& version){
     mcsm::Option option(this->path, "server");
-    return option.setValue("version", mcsm::safeString(version));    
+    if(!mcsm::isSafeString(version)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(version)});
+        return res;
+    }
+    return option.setValue("version", version);    
 }
 
 std::string mcsm::ServerOption::getServerType() const {
@@ -531,7 +573,11 @@ std::string mcsm::ServerOption::getServerType() const {
     }
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return mcsm::safeString(value);
+    if(!mcsm::isSafeString(value)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
+        return "";
+    }
+    return value;
 }
 
 std::string mcsm::ServerOption::getServerJarFile() const{
@@ -555,13 +601,22 @@ std::string mcsm::ServerOption::getServerJarFile() const{
         return "";
     }
 
+    if(!mcsm::isSafeString(value)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
+        return "";
+    }
+
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return mcsm::safeString(value);
+    return value;
 }
 
 mcsm::Result mcsm::ServerOption::setServerJarFile(const std::string& name){
     mcsm::Option option(this->path, "server");
-    return option.setValue("server_jar", mcsm::safeString(name));
+    if(!mcsm::isSafeString(name)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(name)});
+        return res;
+    }
+    return option.setValue("server_jar", name);
 }
 
 std::string mcsm::ServerOption::getServerJarBuild() const {
@@ -585,13 +640,22 @@ std::string mcsm::ServerOption::getServerJarBuild() const {
         return "";
     }
 
+    if(!mcsm::isSafeString(value)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
+        return "";
+    }
+
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return mcsm::safeString(value);
+    return value;
 }
 
 mcsm::Result mcsm::ServerOption::setServerJarBuild(const std::string& build){
+    if(!mcsm::isSafeString(build)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(build)});
+        return res;
+    }
     mcsm::Option option(this->path, "server");
-    return option.setValue("server_build", mcsm::safeString(build));
+    return option.setValue("server_build", build);
 }
 
 bool mcsm::ServerOption::doesAutoUpdate() const {

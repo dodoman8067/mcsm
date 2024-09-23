@@ -27,6 +27,9 @@ mcsm::PurpurServer::PurpurServer() {}
 mcsm::PurpurServer::~PurpurServer() {}
 
 int mcsm::PurpurServer::getVersion(const std::string& ver) const {
+    if(!mcsm::isSafeString(ver)){
+        return -1;
+    }
     std::string res = mcsm::get("https://api.purpurmc.org/v2/purpur/" + ver);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
@@ -45,6 +48,12 @@ int mcsm::PurpurServer::getVersion(const std::string& ver) const {
 }
 
 int mcsm::PurpurServer::getVersion(const std::string& ver, const std::string& build) const {
+    if(!mcsm::isSafeString(build)){
+        return -1;
+    }
+    if(!mcsm::isSafeString(ver)){
+        return -1;
+    }
     std::string res = mcsm::get("https://api.purpurmc.org/v2/purpur/" + ver + "/" +  build);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);

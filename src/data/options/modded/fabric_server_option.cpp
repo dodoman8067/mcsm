@@ -4,6 +4,10 @@
 mcsm::FabricServerOption::FabricServerOption() : FabricServerOption(mcsm::getCurrentPath()){}
 
 mcsm::FabricServerOption::FabricServerOption(const std::string& version, const std::string& path){
+    if(!mcsm::isSafeString(version)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(version)});
+        return;
+    }
     // Result handle
     bool fileExists = mcsm::fileExists(path);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
@@ -110,6 +114,11 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& path){
         return; 
     }
 
+    if(!mcsm::isSafeString(version)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(version)});
+        return;
+    }
+
     std::shared_ptr<mcsm::Server> sPtr = mcsm::ServerRegistry::getServerRegistry().getServer(type);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
     std::string sType = sPtr->getTypeAsString();
@@ -128,6 +137,11 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& path){
 }
 
 mcsm::FabricServerOption::FabricServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server){
+    if(!mcsm::isSafeString(version)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(version)});
+        return;
+    }
+
     this->version = version;
     this->server = server;
     std::string sType = server->getTypeAsString();
@@ -146,6 +160,11 @@ mcsm::FabricServerOption::FabricServerOption(const std::string& version, std::sh
 }
 
 mcsm::FabricServerOption::FabricServerOption(const std::string& version, std::shared_ptr<mcsm::Server> server, const std::string& path){
+    if(!mcsm::isSafeString(version)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(version)});
+        return;
+    }
+
     bool fileExists = mcsm::fileExists(path);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
 
@@ -212,10 +231,14 @@ mcsm::Result mcsm::FabricServerOption::create(const std::string& name, mcsm::Jvm
         profileObj["location"] = "current";
     }
     
-    mcsm::Result res2 = option.setValue("name", mcsm::safeString(name));
+    mcsm::Result res2 = option.setValue("name", mcsm::safeString(name));    
     if(!res2.isSuccess()) return res2;
     
-    mcsm::Result res3 = option.setValue("version", mcsm::safeString(this->version));
+    if(!mcsm::isSafeString(this->version)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(this->version)});
+        return res;
+    }
+    mcsm::Result res3 = option.setValue("version", this->version);
     if(!res3.isSuccess()) return res3;
     
     mcsm::Result res4 = option.setValue("default_launch_profile", profileObj);
@@ -226,7 +249,11 @@ mcsm::Result mcsm::FabricServerOption::create(const std::string& name, mcsm::Jvm
         jarFile = "fabric.jar";
     }
 
-    mcsm::Result res5 = option.setValue("server_jar", mcsm::safeString(jarFile));
+    if(!mcsm::isSafeString(jarFile)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(jarFile)});
+        return res;
+    }
+    mcsm::Result res5 = option.setValue("server_jar", jarFile);
     if(!res5.isSuccess()) return res5;
     
     mcsm::Result res6 = option.setValue("server_build", "latest");
@@ -235,7 +262,7 @@ mcsm::Result mcsm::FabricServerOption::create(const std::string& name, mcsm::Jvm
     mcsm::Result res12 = option.setValue("auto_update", update);
     if(!res12.isSuccess()) return res12;
     
-    mcsm::Result res7 = option.setValue("type", mcsm::safeString(this->server->getTypeAsString()));
+    mcsm::Result res7 = option.setValue("type", this->server->getTypeAsString());
     if(!res7.isSuccess()) return res7;
     
     mcsm::Result res8 = serverDataOpt.updateServerTimeCreated();
@@ -372,12 +399,20 @@ std::string mcsm::FabricServerOption::getLoaderVersion() const {
     }
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return mcsm::safeString(value);
+    if(!mcsm::isSafeString(value)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
+        return "";
+    }
+    return value;
 }
 
 mcsm::Result mcsm::FabricServerOption::setLoaderVersion(const std::string& version){
     mcsm::Option option(this->path, "server");
-    return option.setValue("loader_version", mcsm::safeString(version));
+    if(!mcsm::isSafeString(version)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(version)});
+        return res;
+    }
+    return option.setValue("loader_version", version);
 }
 
 std::string mcsm::FabricServerOption::getInstallerVersion() const{
@@ -402,12 +437,20 @@ std::string mcsm::FabricServerOption::getInstallerVersion() const{
     }
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return mcsm::safeString(value);
+    if(!mcsm::isSafeString(value)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
+        return "";
+    }
+    return value;
 }
 
 mcsm::Result mcsm::FabricServerOption::setInstallerVersion(const std::string& version){
     mcsm::Option option(this->path, "server");
-    return option.setValue("installer_version", mcsm::safeString(version));
+    if(!mcsm::isSafeString(version)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(version)});
+        return res;
+    }
+    return option.setValue("installer_version", version);
 }
 
 bool mcsm::FabricServerOption::exists(){
@@ -535,12 +578,20 @@ std::string mcsm::FabricServerOption::getServerName() const {
     }
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return mcsm::safeString(value);
+    if(!mcsm::isSafeString(value)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
+        return "";
+    }
+    return value;
 }
 
 mcsm::Result mcsm::FabricServerOption::setServerName(const std::string& name){
     mcsm::Option option(this->path, "server");
-    return option.setValue("name", mcsm::safeString(name));
+    if(!mcsm::isSafeString(name)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(name)});
+        return res;
+    }
+    return option.setValue("name", name);
 }
 
 std::string mcsm::FabricServerOption::getServerVersion() const {
@@ -565,12 +616,20 @@ std::string mcsm::FabricServerOption::getServerVersion() const {
     }
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return mcsm::safeString(value);
+    if(!mcsm::isSafeString(value)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
+        return "";
+    }
+    return value;
 }
 
 mcsm::Result mcsm::FabricServerOption::setServerVersion(const std::string& version){
     mcsm::Option option(this->path, "server");
-    return option.setValue("version", mcsm::safeString(version));    
+    if(!mcsm::isSafeString(version)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(version)});
+        return res;
+    }
+    return option.setValue("version", version);    
 }
 
 std::string mcsm::FabricServerOption::getServerType() const {
@@ -595,7 +654,11 @@ std::string mcsm::FabricServerOption::getServerType() const {
     }
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return mcsm::safeString(value);
+    if(!mcsm::isSafeString(value)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
+        return "";
+    }
+    return value;
 }
 
 std::string mcsm::FabricServerOption::getServerJarFile() const{
@@ -620,12 +683,20 @@ std::string mcsm::FabricServerOption::getServerJarFile() const{
     }
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return mcsm::safeString(value);
+    if(!mcsm::isSafeString(value)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
+        return "";
+    }
+    return value;
 }
 
 mcsm::Result mcsm::FabricServerOption::setServerJarFile(const std::string& name){
     mcsm::Option option(this->path, "server");
-    return option.setValue("server_jar", mcsm::safeString(name));
+    if(!mcsm::isSafeString(name)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(name)});
+        return res;
+    }
+    return option.setValue("server_jar", name);
 }
 
 bool mcsm::FabricServerOption::doesAutoUpdate() const {

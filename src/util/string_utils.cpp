@@ -66,6 +66,11 @@ std::string mcsm::safeString(const std::string& str){
     return value;
 }
 
+bool mcsm::isSafeString(const std::string& str){
+    return str.find("&") == std::string::npos && str.find("&") == std::string::npos && str.find("|") == std::string::npos && str.find("\\") == std::string::npos &&
+    str.find("..") == std::string::npos && str.find("/") == std::string::npos && str.find("\"") == std::string::npos && str.find("\'") == std::string::npos;
+}
+
 bool mcsm::is_number(const std::string& s){
     std::string::const_iterator it = s.begin();
     while (it != s.end() && std::isdigit(*it)) ++it;

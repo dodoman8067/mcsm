@@ -43,6 +43,10 @@ mcsm::ServerDataOption::~ServerDataOption(){
 }
 
 mcsm::Result mcsm::ServerDataOption::create(const std::string& lastTimeLaunched){
+    if(!mcsm::isSafeString(lastTimeLaunched)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(lastTimeLaunched)});
+        return res;
+    }
     bool optExists = this->option->exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -53,7 +57,7 @@ mcsm::Result mcsm::ServerDataOption::create(const std::string& lastTimeLaunched)
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverAlreadyConfigured(this->option->getPath())});
         return res;
     }
-    mcsm::Result res1 = this->option->setValue("last_time_launched", mcsm::safeString(lastTimeLaunched));
+    mcsm::Result res1 = this->option->setValue("last_time_launched", lastTimeLaunched);
     if(!res1.isSuccess()) return res1;
     mcsm::Result res2 = this->option->setValue("last_downloaded_build", "0");
     return res2;
@@ -83,8 +87,13 @@ std::string mcsm::ServerDataOption::getLastTimeLaunched() const {
         return "";
     }
 
+    if(!mcsm::isSafeString(value)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
+        return "";
+    }
+
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return mcsm::safeString(value);
+    return value;
 }
 
 mcsm::Result mcsm::ServerDataOption::updateLastTimeLaunched(){
@@ -118,8 +127,13 @@ std::string mcsm::ServerDataOption::getServerTimeCreated() const {
         return "";
     }
 
+    if(!mcsm::isSafeString(value)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
+        return "";
+    }
+
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return mcsm::safeString(value);
+    return value;
 }
 
 mcsm::Result mcsm::ServerDataOption::updateServerTimeCreated(){
@@ -153,12 +167,21 @@ std::string mcsm::ServerDataOption::getLastDownloadedBuild() const {
         return "";
     }
 
+    if(!mcsm::isSafeString(value)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
+        return "";
+    }
+
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return mcsm::safeString(value);
+    return value;
 }
 
 mcsm::Result mcsm::ServerDataOption::updateLastDownloadedBuild(const std::string& build){
-    return this->option->setValue("last_downloaded_build", mcsm::safeString(build));
+    if(!mcsm::isSafeString(build)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(build)});
+        return res;
+    }
+    return this->option->setValue("last_downloaded_build", build);
 }
 
 bool mcsm::ServerDataOption::exists() const {

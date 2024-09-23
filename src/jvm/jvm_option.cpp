@@ -27,11 +27,11 @@ mcsm::JvmOption::JvmOption(const std::string& name) : JvmOption(name, mcsm::Sear
 mcsm::JvmOption::JvmOption(const std::string& name, const mcsm::SearchTarget& target) : JvmOption(name, target, mcsm::getCurrentPath()) {}
 
 mcsm::JvmOption::JvmOption(const std::string& name, const mcsm::SearchTarget& target, const std::string& workingPath){
+    if(!mcsm::isSafeString(name)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(name)});
+        return;
+    }
     this->name = name;
-    std::string name1 = name;
-    mcsm::replaceAll(name1, ".", "_");
-    mcsm::replaceAll(name1, "/", "_");
-    this->name = name1;
     this->workingDir = workingPath;
     switch (target){
         case mcsm::SearchTarget::ALL: {

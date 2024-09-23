@@ -27,6 +27,9 @@ mcsm::VanillaServer::VanillaServer(){}
 mcsm::VanillaServer::~VanillaServer(){}
 
 std::string mcsm::VanillaServer::getVersionObject(const std::string& ver) const {
+    if(!mcsm::isSafeString(ver)){
+        return "";
+    }
     std::string jsonData = mcsm::get("https://launchermeta.mojang.com/mc/game/version_manifest.json");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     

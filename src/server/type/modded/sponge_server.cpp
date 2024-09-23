@@ -37,6 +37,9 @@ mcsm::SpongeServer::~SpongeServer(){}
 
 // Note: limit more than one will have to return keys[keys.size() - 1]
 std::string mcsm::SpongeServer::getVersion(const std::string& ver) const {
+    if(!mcsm::isSafeString(ver)){
+        return "";
+    }
     mcsm::Option opt(mcsm::getCurrentPath(), "server");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     
@@ -83,6 +86,12 @@ std::string mcsm::SpongeServer::getVersion(const std::string& ver) const {
 // Note: The actual list position and release numbers don't match.
 // The offset calculation is based on the list position, not the release number.
 std::string mcsm::SpongeServer::getVersion(const std::string& ver, const std::string& build) const {
+    if(!mcsm::isSafeString(ver)){
+        return "";
+    }
+    if(!mcsm::isSafeString(build)){
+        return "";
+    }
     if(!mcsm::is_number(build)) return "";
 
     int buildNo = std::stoi(build); 
