@@ -1,0 +1,84 @@
+#ifndef __MCSM_SERVER_CONFIG_LOADER_H__
+#define __MCSM_SERVER_CONFIG_LOADER_H__
+
+#include <mcsm/data/option.h>
+#include <mcsm/server/server.h>
+
+namespace mcsm {
+    class ServerConfigLoader {
+    public:
+        explicit ServerConfigLoader(const std::string& path);
+        ~ServerConfigLoader();
+
+        mcsm::Result loadConfig();
+
+        template <typename T>
+        T get(const std::string& key){
+            if(!this->isLoaded){
+                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+                    "ServerConfigLoader function called without loadConfig.",
+                    "High chance to be a internal issue. Please open an issue in Github."
+                }});
+                return T();
+            }
+
+            nlohmann::json value = this->optionHandle->getValue(key);
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) {
+                return T();
+            }
+
+            if(value == nullptr){
+                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"" + key + "\"", this->optionHandle->getName())});
+                return T();
+            }
+
+            if(!value.is_primitive()){
+                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"" + key + "\"", "primitive type")});
+                return T();
+            }
+
+            if constexpr (std::is_same<T, std::string>::value){
+                if(!mcsm::isSafeString(value)){
+                    mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
+                    return T();
+                }
+            }
+
+            mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+            return value.get<T>();
+        }
+
+        std::string getServerName() const;
+        mcsm::Result setServerName(const std::string& name);
+
+        std::string getServerVersion() const;
+        mcsm::Result setServerVersion(const std::string& version);
+
+        std::unique_ptr<mcsm::JvmOption> getDefaultOption() const;
+        mcsm::Result setDefaultOption(mcsm::JvmOption& jvmOption);
+
+        std::string getServerType() const;
+
+        std::string getServerJarFile() const;
+        mcsm::Result setServerJarFile(const std::string& name);
+
+        std::string getServerJarBuild() const;
+        mcsm::Result setServerJarBuild(const std::string& build);
+
+        bool doesAutoUpddate() const;
+        mcsm::Result setAutoUpdate(const bool& update);
+
+        std::unique_ptr<mcsm::Option>& getHandle();
+
+        bool isFullyLoaded() const;
+
+        std::shared_ptr<mcsm::Server> getServerInstance();
+
+    private:
+        std::string configPath;
+        std::unique_ptr<mcsm::Option> optionHandle;
+        bool isLoaded;
+    };
+}
+
+#endif // __MCSM_SERVER_CONFIG_LOADER_H__
