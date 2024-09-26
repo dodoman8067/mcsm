@@ -1,6 +1,7 @@
 #include <mcsm/data/options/server_config_loader.h>
+#include <mcsm/server/server_registry.h>
 
-explicit mcsm::ServerConfigLoader::ServerConfigLoader(const std::string& path){
+mcsm::ServerConfigLoader::ServerConfigLoader(const std::string& path){
     this->configPath = path;
     this->optionHandle = nullptr;
     this->isLoaded = false;
@@ -384,5 +385,15 @@ bool mcsm::ServerConfigLoader::isFullyLoaded() const {
 }
 
 std::shared_ptr<mcsm::Server> mcsm::ServerConfigLoader::getServerInstance(){
+    if(!this->isLoaded){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "ServerConfigLoader function called without loadConfig.",
+            "High chance to be a internal issue. Please open an issue in Github."
+        }});
+        return nullptr;
+    }
+    std::string sType = getServerType();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return nullptr;
 
+    return mcsm::ServerRegistry::getServerRegistry().getServer(sType);
 }
