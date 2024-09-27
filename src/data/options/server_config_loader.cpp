@@ -29,6 +29,48 @@ mcsm::Result mcsm::ServerConfigLoader::loadConfig(){
     return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
 }
 
+template <>
+nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<int>(){
+    return nlohmann::json::value_t::number_integer;
+}   
+
+template <>
+nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<unsigned int>(){
+    return nlohmann::json::value_t::number_unsigned;
+}   
+
+template <>
+nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<float>(){
+    return nlohmann::json::value_t::number_float;
+}   
+
+template <>
+nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<double>(){
+    return nlohmann::json::value_t::number_float;
+}
+
+template <>
+nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<bool>(){
+    return nlohmann::json::value_t::boolean;
+}
+
+template <>
+nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<std::string>(){
+    return nlohmann::json::value_t::string;
+}
+
+// use json.is_array to get arrays
+
+template <>
+nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<nlohmann::json>(){
+    return nlohmann::json::value_t::object;
+}
+
+template <>
+nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<std::vector<nlohmann::json>>(){
+    return nlohmann::json::value_t::object;
+}
+
 // isLoaded won't be "true" if the option does not exist which is why I don't check the existence of the option file.
 
 std::string mcsm::ServerConfigLoader::getServerName() const {

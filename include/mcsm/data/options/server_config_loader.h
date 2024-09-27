@@ -32,11 +32,18 @@ namespace mcsm {
                 return T();
             }
 
-            if(!value.is_primitive()){
-                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"" + key + "\"", "primitive type")});
+            if constexpr(std::is_same<T, std::vector<int>>::value ||
+                        std::is_same<T, std::vector<double>>::value ||
+                        std::is_same<T, std::vector<bool>>::value ||
+                        std::is_same<T, std::vector<std::string>>::value){
+                if(value.type() != nlohmann::json::value_t::array){
+                    mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"" + key + "\"", "array")});
+                    return T();
+                }
+            }else if (value.type() != getJsonType<T>()){
+                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"" + key + "\"", value.type_name())});
                 return T();
             }
-
             if constexpr (std::is_same<T, std::string>::value){
                 if(!mcsm::isSafeString(value)){
                     mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
@@ -78,6 +85,9 @@ namespace mcsm {
         std::string configPath;
         std::unique_ptr<mcsm::Option> optionHandle;
         bool isLoaded;
+
+        template <typename T>
+        nlohmann::json::value_t getJsonType();
     };
 }
 
