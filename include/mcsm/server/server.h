@@ -26,6 +26,7 @@ SOFTWARE.
 #include <mcsm/server/server_type.h>
 #include <mcsm/jvm/jvm_option.h>
 #include <mcsm/util/cli/cli_utils.h>
+#include <mcsm/data/options/server_data_option.h>
 
 namespace mcsm {
     class ServerOption;
@@ -116,10 +117,13 @@ namespace mcsm {
          */
         //virtual mcsm::Result obtainJarFile(const std::string version, const std::string workingPath, const std::string outputPath);
 
-        virtual mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& version, const bool& autoUpdate) = 0;
+        virtual mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate) = 0;
 
-        mcsm::Result configure(mcsm::ServerOption& serverOption, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate);
+        mcsm::Result configure(const std::string &version, std::shared_ptr<mcsm::Server> server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate);
     };
 }
+
+#include <mcsm/data/options/server_config_generator.h>
+#include <mcsm/data/options/server_config_loader.h>
 
 #endif // __MCSM_SERVER_H__

@@ -66,7 +66,7 @@ namespace mcsm {
         mcsm::ServerType getType() const override;
         std::string getTypeAsString() const override;
 
-        mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& version, const bool& autoUpdate) override;
+        mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate) override;
     };
 }
 

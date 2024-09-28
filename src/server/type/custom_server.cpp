@@ -126,7 +126,7 @@ mcsm::Result mcsm::CustomServer::obtainJarFile(const std::string& /* version */,
     return setupServerJarFile(optionPath);
 }
 
-mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& version, const bool& autoUpdate){
+mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate){
     std::shared_ptr<mcsm::CustomServer> server = shared_from_this();
     /*
     TODO: Add mcsm::CustomServerOption, implement custom configure method since it doesn't include the server build system and review code

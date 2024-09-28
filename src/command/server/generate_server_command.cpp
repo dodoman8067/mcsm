@@ -213,7 +213,7 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& a
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
     }
 
-    mcsm::Result genRes = sPtr->generate(name, *option, version, shouldSkipUpdate);
+    mcsm::Result genRes = sPtr->generate(name, *option, mcsm::getCurrentPath(), version, shouldSkipUpdate);
 
     if(!genRes.isSuccess()){
         genRes.printMessage();

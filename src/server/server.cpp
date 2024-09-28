@@ -21,7 +21,6 @@ SOFTWARE.
 */
 
 #include <mcsm/server/server.h>
-#include <mcsm/data/options/server_option.h>
 
 mcsm::Result mcsm::Server::start(mcsm::JvmOption& option){
     return start(option);
@@ -92,42 +91,39 @@ mcsm::Result mcsm::Server::start(mcsm::JvmOption& option, const std::string& /* 
     return res;
 }
 
-mcsm::Result mcsm::Server::configure(mcsm::ServerOption& serverOption, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate){
-    bool sExists = serverOption.exists();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
-    if(sExists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverAlreadyConfigured()});
-        return res;
-    }
-    mcsm::Result sRes = serverOption.create(name, option, autoUpdate);
+mcsm::Result mcsm::Server::configure(const std::string &version, std::shared_ptr<mcsm::Server> server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate){
+    mcsm::ServerConfigGenerator serverOption(path);
+    
+    mcsm::Result sRes = serverOption.generate(version, server, sDataOpt, name, option, autoUpdate);
     if(!sRes.isSuccess()) return sRes;
 
-    std::string sName = serverOption.getServerName();
+    mcsm::ServerConfigLoader loader(path);
+    
+    mcsm::Result loadRes = loader.loadConfig();
+    if(!loadRes.isSuccess()) return loadRes;
+
+    std::string sName = loader.getServerName();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    std::string type = serverOption.getServerType();
+    std::string type = loader.getServerType();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    std::string sVersion = serverOption.getServerVersion();
+    std::string sVersion = loader.getServerVersion();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    std::string profile = serverOption.getDefaultOption()->getProfileName();
+    std::string profile = loader.getDefaultOption()->getProfileName();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);

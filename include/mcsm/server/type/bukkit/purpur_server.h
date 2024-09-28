@@ -68,7 +68,7 @@ namespace mcsm {
         mcsm::Result update(const std::string& optionPath);
         mcsm::Result update(const std::string& path, const std::string& optionPath);
 
-        mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& version, const bool& autoUpdate) override;
+        mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate) override;
     };
 }
 
