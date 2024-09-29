@@ -102,39 +102,11 @@ mcsm::Result mcsm::Server::configure(const std::string &version, std::shared_ptr
     mcsm::Result loadRes = loader.loadConfig();
     if(!loadRes.isSuccess()) return loadRes;
 
-    std::string sName = loader.getServerName();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
-
-    std::string type = loader.getServerType();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
-
-    std::string sVersion = loader.getServerVersion();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
-
-    std::string profile = loader.getDefaultOption()->getProfileName();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
-
     mcsm::success("Configured server's information : ");
-    mcsm::info("Server name : " + sName);
-    mcsm::info("Server type : " + type);
-    mcsm::info("Server version : " + sVersion);
-    mcsm::info("Server JVM launch profile : " + profile);
+    mcsm::info("Server name : " + mcsm::safeString(name));
+    mcsm::info("Server type : " + server->getTypeAsString());
+    mcsm::info("Server version : " + version);
+    mcsm::info("Server JVM launch profile : " + option.getProfileName());
     if(!autoUpdate) mcsm::info("Automatic updates : disabled");
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
