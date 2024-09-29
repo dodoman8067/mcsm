@@ -26,6 +26,7 @@ SOFTWARE.
 
 #include <curl/curl.h>
 #include <mcsm/util/cli/logging.h>
+#include <mcsm/http/holder.h>
 #include <mcsm/util/cli/cli_utils.h>
 #include <cstdio>
 #include <filesystem>

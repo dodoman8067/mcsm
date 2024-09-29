@@ -29,11 +29,15 @@ mcsm::init::init(){
 }
 
 mcsm::init::~init(){
+    curl_global_cleanup();
+    mcsm::curl_holder::cleanup();
     delete this->initialized;
     this->initialized = nullptr;
 }
 
 void mcsm::init::initMCSM(const std::string& version){
+    curl_global_init(CURL_GLOBAL_DEFAULT);
+    mcsm::curl_holder::init();
     initCommands(version);
     initServers();
 

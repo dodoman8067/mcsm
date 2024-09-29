@@ -69,14 +69,7 @@ mcsm::Result mcsm::download(const std::string& name, const std::string& url, con
 }
 
 mcsm::Result mcsm::download(const std::string& name, const std::string& url, const std::string& path, const bool& percentages){
-    curl_global_init(CURL_GLOBAL_DEFAULT);
-    CURL* curl = curl_easy_init();
-    if(!curl){
-        mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::curlInitFailed()});
-        curl_easy_cleanup(curl);
-        curl_global_cleanup();
-        return result;
-    }
+    CURL* curl = mcsm::curl_holder::curl;
     CURLcode res;
     std::FILE* file;
     std::string filename = path + "/" + name;
@@ -87,6 +80,10 @@ mcsm::Result mcsm::download(const std::string& name, const std::string& url, con
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl/8.10.0");
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
+    curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
+    curl_easy_setopt(curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2TLS);
+    curl_easy_setopt(curl, CURLOPT_DNS_CACHE_TIMEOUT, 60L);
     
     if(percentages){
         curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
@@ -100,42 +97,34 @@ mcsm::Result mcsm::download(const std::string& name, const std::string& url, con
     if(res != CURLE_OK){
         mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::downloadRequestFailed(url, curl_easy_strerror(res))});
         std::fclose(file);
-        curl_easy_cleanup(curl);
-        curl_global_cleanup();
+        curl_easy_reset(curl);
         return result;
     }
 
     std::fclose(file);
-    curl_easy_cleanup(curl);
-    curl_global_cleanup();
+    curl_easy_reset(curl);
     mcsm::Result result({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return result;
 }
 
 bool mcsm::isText(const std::string& url){
-    curl_global_init(CURL_GLOBAL_DEFAULT);
-    CURL* curl = curl_easy_init();
+    CURL* curl = mcsm::curl_holder::curl;
     char *contentType = nullptr;
     bool isText = false;
-
-    if(!curl){
-        mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::curlInitFailed()});
-        curl_easy_cleanup(curl);
-        curl_global_cleanup();
-        return false;
-    }
     CURLcode res;
 
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(curl, CURLOPT_NOBODY, 1L);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
+    curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
+    curl_easy_setopt(curl, CURLOPT_DNS_CACHE_TIMEOUT, 60L);
 
     res = curl_easy_perform(curl);
 
     if(res != CURLE_OK){
         mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::getRequestFailed(url, curl_easy_strerror(res))});
-        curl_easy_cleanup(curl);
-        curl_global_cleanup();
+        curl_easy_reset(curl);
         return false;
     }
 
@@ -145,13 +134,11 @@ bool mcsm::isText(const std::string& url){
         isText = contentTypeStr.find("text") == 0 || contentTypeStr.find("json") != std::string::npos;
     }else{
         mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::getRequestFailed(url, curl_easy_strerror(res))});
-        curl_easy_cleanup(curl);
-        curl_global_cleanup();
+        curl_easy_reset(curl);
         return false;
     }
 
-    curl_easy_cleanup(curl);
-    curl_global_cleanup();
+    curl_easy_reset(curl);
     mcsm::Result result({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return isText;
 }
