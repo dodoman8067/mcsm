@@ -7,11 +7,12 @@
 namespace mcsm {
     class ServerStarter {
     public:
-        explicit ServerStarter(ServerConfigLoader* loader);
+        explicit ServerStarter(mcsm::ServerConfigLoader* loader);
+        ~ServerStarter();
 
-        mcsm::Result startServer();
+        mcsm::Result startServer(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath);
     private:
-        ServerConfigLoader* configLoader;
+        mcsm::ServerConfigLoader* loader;
     };
 }
 #endif // __MCSM_SERVER_STARTER_H__
