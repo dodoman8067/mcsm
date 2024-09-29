@@ -447,23 +447,17 @@ mcsm::Result mcsm::SpongeServer::update(const std::string& path, const std::stri
         return res;
     }
 
-    mcsm::Option opt(optionPath, "server");
-    nlohmann::json sBuild = opt.getValue("server_build");
+    mcsm::ServerConfigLoader loader(optionPath);
+    mcsm::Result loadRes = loader.loadConfig();
+    if(!loadRes.isSuccess()) return loadRes;
+
+    std::string build = loader.getServerJarBuild();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    if(sBuild == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"server_build\"", opt.getName())});
-        return res;
-    }
-    if(!sBuild.is_string()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongTypePlusFix("\"server_build\"", opt.getName(), "string", "change it into \"server_build\": \"latest\"")});
-        return res;
-    }
-    std::string build = sBuild.get<std::string>();
     if(build != "latest"){
         mcsm::warning("This server won't update to the latest build.");
         mcsm::warning("Change server.json into \"server_build\": \"latest\" for automatic download.");
@@ -473,23 +467,13 @@ mcsm::Result mcsm::SpongeServer::update(const std::string& path, const std::stri
         return res;
     }
 
-    nlohmann::json sVer = opt.getValue("version");
+    std::string version = loader.getServerVersion();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    if(sVer == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"version\"", opt.getName())});
-        return res;
-    }
-    if(!sVer.is_string()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"version\"", "string")});
-        return res;
-    }
-    
-    std::string version = sVer.get<std::string>();
     std::string ver = getVersion(version);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
