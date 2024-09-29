@@ -77,7 +77,7 @@ std::string mcsm::ServerConfigLoader::getServerName() const {
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
-            "High chance to be a internal issue. Please open an issue in Github."
+            "High chance to be an internal issue. Please open an issue in Github."
         }});
         return "";
     }
@@ -106,7 +106,7 @@ mcsm::Result mcsm::ServerConfigLoader::setServerName(const std::string& name){
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
-            "High chance to be a internal issue. Please open an issue in Github."
+            "High chance to be an internal issue. Please open an issue in Github."
         }});
         return res;
     }
@@ -121,7 +121,7 @@ std::string mcsm::ServerConfigLoader::getServerVersion() const {
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
-            "High chance to be a internal issue. Please open an issue in Github."
+            "High chance to be an internal issue. Please open an issue in Github."
         }});
         return "";
     }
@@ -150,7 +150,7 @@ mcsm::Result mcsm::ServerConfigLoader::setServerVersion(const std::string& versi
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
-            "High chance to be a internal issue. Please open an issue in Github."
+            "High chance to be an internal issue. Please open an issue in Github."
         }});
         return res;
     }
@@ -165,7 +165,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerConfigLoader::getDefaultOption() co
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
-            "High chance to be a internal issue. Please open an issue in Github."
+            "High chance to be an internal issue. Please open an issue in Github."
         }});
         return nullptr;
     }
@@ -248,7 +248,7 @@ mcsm::Result mcsm::ServerConfigLoader::setDefaultOption(mcsm::JvmOption& jvmOpti
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
-            "High chance to be a internal issue. Please open an issue in Github."
+            "High chance to be an internal issue. Please open an issue in Github."
         }});
         return res;
     }
@@ -266,7 +266,7 @@ std::string mcsm::ServerConfigLoader::getServerType() const {
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
-            "High chance to be a internal issue. Please open an issue in Github."
+            "High chance to be an internal issue. Please open an issue in Github."
         }});
         return "";
     }
@@ -295,7 +295,7 @@ std::string mcsm::ServerConfigLoader::getServerJarFile() const {
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
-            "High chance to be a internal issue. Please open an issue in Github."
+            "High chance to be an internal issue. Please open an issue in Github."
         }});
         return "";
     }
@@ -325,7 +325,7 @@ mcsm::Result mcsm::ServerConfigLoader::setServerJarFile(const std::string& name)
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
-            "High chance to be a internal issue. Please open an issue in Github."
+            "High chance to be an internal issue. Please open an issue in Github."
         }});
         return res;
     }
@@ -340,7 +340,7 @@ std::string mcsm::ServerConfigLoader::getServerJarBuild() const {
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
-            "High chance to be a internal issue. Please open an issue in Github."
+            "High chance to be an internal issue. Please open an issue in Github."
         }});
         return "";
     }
@@ -370,7 +370,7 @@ mcsm::Result mcsm::ServerConfigLoader::setServerJarBuild(const std::string& buil
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
-            "High chance to be a internal issue. Please open an issue in Github."
+            "High chance to be an internal issue. Please open an issue in Github."
         }});
         return res;
     }
@@ -386,7 +386,7 @@ bool mcsm::ServerConfigLoader::doesAutoUpddate() const {
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
-            "High chance to be a internal issue. Please open an issue in Github."
+            "High chance to be an internal issue. Please open an issue in Github."
         }});
         return false;
     }
@@ -411,7 +411,7 @@ mcsm::Result mcsm::ServerConfigLoader::setAutoUpdate(const bool& update){
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
-            "High chance to be a internal issue. Please open an issue in Github."
+            "High chance to be an internal issue. Please open an issue in Github."
         }});
         return res;
     }
@@ -430,7 +430,7 @@ std::shared_ptr<mcsm::Server> mcsm::ServerConfigLoader::getServerInstance(){
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
-            "High chance to be a internal issue. Please open an issue in Github."
+            "High chance to be an internal issue. Please open an issue in Github."
         }});
         return nullptr;
     }

@@ -17,7 +17,7 @@ namespace mcsm {
             if(!this->isLoaded){
                 mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
                     "ServerConfigLoader function called without loadConfig.",
-                    "High chance to be a internal issue. Please open an issue in Github."
+                    "High chance to be an internal issue. Please open an issue in Github."
                 }});
                 return T();
             }
