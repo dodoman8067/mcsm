@@ -7,6 +7,8 @@
 namespace mcsm {
     struct curl_holder {
         static CURL* curl;
+        static std::mutex curl_mutex;
+        
         static mcsm::Result init();
         static void cleanup();
     };
