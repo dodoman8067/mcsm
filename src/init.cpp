@@ -37,7 +37,7 @@ mcsm::init::~init(){
 
 void mcsm::init::initMCSM(const std::string& version){
     curl_global_init(CURL_GLOBAL_DEFAULT);
-    mcsm::curl_holder::init();
+    if(!mcsm::curl_holder::init().isSuccess()) return;
     initCommands(version);
     initServers();
 
