@@ -92,13 +92,13 @@ std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const st
                     mcsm::warning("Task aborted.");
                     std::exit(1);
                 }
-                mcsm::info("Found specified JVM launch profile " + pName + ".");
+                mcsm::info("Found JVM launch profile " + pName + ".");
                 mcsm::info("Location : " + profile->getProfilePath());
                 return profile;
             }
         }
     }
-    mcsm::info("No JVM launch profile specified; Using default JVM launch profile.");
+    mcsm::info("No specified JVM launch profile detected; using default JVM launch profile.");
     
     std::unique_ptr<mcsm::JvmOption> jvmOpt = loader->getDefaultOption();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){

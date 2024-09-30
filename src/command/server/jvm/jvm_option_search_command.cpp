@@ -28,7 +28,7 @@ mcsm::JvmOptionSearchCommand::~JvmOptionSearchCommand() {}
 
 void mcsm::JvmOptionSearchCommand::execute(const std::vector<std::string>& args){
     if(args.empty()){
-        mcsm::warning("Name not provided; To continue, specify a name with --name option.");
+        mcsm::warning("Name not provided; specify a name with --name option to coutinue.");
         std::exit(1);
     }
     std::string name = getProfileName(args);
@@ -123,7 +123,7 @@ std::string mcsm::JvmOptionSearchCommand::getProfileName(const std::vector<std::
             return mcsm::safeString(name);
         }
     }
-    mcsm::warning("Name not provided; To continue, specify a name with --name option.");
+    mcsm::warning("Name not provided; specify a name with --name option to continue.");
     std::exit(1);
 }
 

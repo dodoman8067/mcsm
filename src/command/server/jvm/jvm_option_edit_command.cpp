@@ -125,7 +125,7 @@ std::string mcsm::JvmOptionEditCommand::getProfileName(const std::vector<std::st
             }
         }
     }
-    mcsm::warning("Name not provided; To continue, specify a name with --name option.");
+    mcsm::warning("Name not provided; specify a name with --name option to continue.");
     std::exit(1);
 }
 
