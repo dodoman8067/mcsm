@@ -57,8 +57,8 @@ namespace mcsm {
 
         mcsm::Result obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
 
-        mcsm::Result start(mcsm::JvmOption& option) override;
-        mcsm::Result start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
+        mcsm::Result start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option) override;
+        mcsm::Result start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
         
         bool hasVersion(const std::string& version) override;
 

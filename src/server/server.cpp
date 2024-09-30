@@ -22,11 +22,11 @@ SOFTWARE.
 
 #include <mcsm/server/server.h>
 
-mcsm::Result mcsm::Server::start(mcsm::JvmOption& option){
-    return start(option);
+mcsm::Result mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
+    return start(loader, option, mcsm::getCurrentPath(), mcsm::getCurrentPath());
 }
 
-mcsm::Result mcsm::Server::start(mcsm::JvmOption& option, const std::string& /* path */, const std::string& optionPath){
+mcsm::Result mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
     std::string jvmOpt = " ";
     auto jArgs = option.getJvmArguments();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -58,14 +58,14 @@ mcsm::Result mcsm::Server::start(mcsm::JvmOption& option, const std::string& /* 
         return res;
     }
 
-    std::string jar = getJarFile(optionPath);
+    std::string jar = loader->getServerJarFile();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    std::string command = jPath + jvmOpt + optionPath + "/" + jar + svrOpt;
+    std::string command = jPath + jvmOpt + path + "/" + jar + svrOpt;
     mcsm::info("Running command : " + command);
     
     std::error_code ec;

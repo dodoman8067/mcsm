@@ -62,6 +62,6 @@ mcsm::Result mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const std
     mcsm::info("Server JVM launch profile : " + profileName);
     mcsm::Result res = serverDataOpt.updateLastTimeLaunched();
     if(!res.isSuccess()) return res;
-    mcsm::Result res2 = server->start(option, path, optionPath);
+    mcsm::Result res2 = server->start(this->loader, option, path, optionPath);
     return res2;
 }

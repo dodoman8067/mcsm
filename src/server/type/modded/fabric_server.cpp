@@ -555,7 +555,7 @@ mcsm::Result mcsm::FabricServer::obtainJarFile(const std::string& version, const
     return download(version, path, name, optionPath);
 }
 
-mcsm::Result mcsm::FabricServer::start(mcsm::JvmOption& option){
+mcsm::Result mcsm::FabricServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
     std::string cPath = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -563,17 +563,13 @@ mcsm::Result mcsm::FabricServer::start(mcsm::JvmOption& option){
         return res;
     }
 
-    return start(option, cPath, cPath);
+    return start(loader, option, cPath, cPath);
 }
 
-mcsm::Result mcsm::FabricServer::start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
+mcsm::Result mcsm::FabricServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
     // ServerOption class handles the data file stuff
-    mcsm::ServerConfigLoader sOpt(optionPath);
-
-    mcsm::Result loadRes = sOpt.loadConfig();
-    if(!loadRes.isSuccess()) return loadRes;
     
-    std::string jar = getJarFile(optionPath);
+    std::string jar = loader->getServerJarFile();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -589,7 +585,7 @@ mcsm::Result mcsm::FabricServer::start(mcsm::JvmOption& option, const std::strin
 
     if(!fileExists){
         mcsm::info("Downloading " + jar + "...");
-        std::string sVer = sOpt.getServerVersion();
+        std::string sVer = loader->getServerVersion();
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
             std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
             mcsm::Result res(resp.first, resp.second);
@@ -599,7 +595,7 @@ mcsm::Result mcsm::FabricServer::start(mcsm::JvmOption& option, const std::strin
         mcsm::Result res = download(sVer, path, jar, optionPath);
         if(!res.isSuccess()) return res;
     }else{
-        bool doesUpdate = sOpt.doesAutoUpdate();
+        bool doesUpdate = loader->doesAutoUpdate();
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
             std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
             mcsm::Result res(resp.first, resp.second);
@@ -611,7 +607,7 @@ mcsm::Result mcsm::FabricServer::start(mcsm::JvmOption& option, const std::strin
             if(!res.isSuccess()) return res;
         }
     }
-    return Server::start(option, path, optionPath);
+    return Server::start(loader, option, path, optionPath);
 }
 
 mcsm::Result mcsm::FabricServer::update(){
