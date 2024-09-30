@@ -762,8 +762,7 @@ mcsm::Result mcsm::FabricServer::update(const std::string& path, const std::stri
 }
 
 mcsm::Result mcsm::FabricServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate){
-    std::shared_ptr<mcsm::FabricServer> server = shared_from_this();
-    bool vExists = server->hasVersion(version);
+    bool vExists = this->hasVersion(version);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -773,6 +772,7 @@ mcsm::Result mcsm::FabricServer::generate(const std::string& name, mcsm::JvmOpti
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
         return res;
     }
+    std::shared_ptr<mcsm::FabricServer> server = shared_from_this();
     mcsm::FabricServerDataOption fSDOpt(path);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
