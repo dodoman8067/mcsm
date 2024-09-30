@@ -44,17 +44,22 @@ std::string mcsm::SpongeServer::getVersion(const std::string& ver) const {
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     
     bool bRecommended = false;
-
-    nlohmann::json nRecommended = opt.getValue("api_serch_recommended");
+    
+    bool optExists = opt.exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-    if(nRecommended == nullptr){
-        bRecommended = false;
-    }else{
-        if(!nRecommended.is_boolean()){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"api_serch_recommended\"", "boolean")});
-            return "";
+
+    if(optExists){
+        nlohmann::json nRecommended = opt.getValue("api_serch_recommended");
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+        if(nRecommended == nullptr){
+            bRecommended = false;
+        }else{
+            if(!nRecommended.is_boolean()){
+                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"api_serch_recommended\"", "boolean")});
+                return "";
+            }
+            bRecommended = nRecommended;
         }
-        bRecommended = nRecommended;
     }
 
     std::string recommended = bRecommended ? "true" : "false";
@@ -525,6 +530,16 @@ mcsm::Result mcsm::SpongeServer::update(const std::string& path, const std::stri
 }
 
 mcsm::Result mcsm::SpongeServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate){
+    bool vExists = this->hasVersion(version);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+    if(!vExists){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
+        return res;
+    }
     std::shared_ptr<mcsm::SpongeServer> server = shared_from_this();
     mcsm::ServerDataOption opt(path);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
