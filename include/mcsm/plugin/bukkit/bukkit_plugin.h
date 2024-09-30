@@ -24,7 +24,7 @@ SOFTWARE.
 #define __MCSM_BUKKIT_PLUGIN_H__
 
 #include <mcsm/http/get.h>
-#include <mcsm/data/options/server_option.h>
+#include <nlohmann/json.hpp>
 
 namespace mcsm {
     enum PluginRepo {

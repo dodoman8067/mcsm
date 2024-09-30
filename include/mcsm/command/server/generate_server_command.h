@@ -25,7 +25,7 @@ SOFTWARE.
 
 #include <mcsm/command/base/command.h>
 #include <mcsm/util/cli/ask_input.h>
-#include <mcsm/data/options/server_option.h>
+#include <mcsm/server/server_registry.h>
 
 namespace mcsm {
     class GenerateServerCommand : public mcsm::Command {

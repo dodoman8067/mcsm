@@ -27,7 +27,6 @@ SOFTWARE.
 #include <mcsm/server/type/downloadable.h>
 #include <mcsm/http/get.h>
 #include <mcsm/http/download.h>
-#include <mcsm/data/options/server_option.h>
 #include <mcsm/util/mc/mc_utils.h>
 
 namespace mcsm {

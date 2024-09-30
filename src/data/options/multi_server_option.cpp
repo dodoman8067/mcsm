@@ -27,6 +27,12 @@ SOFTWARE.
 
 #include <mcsm/data/options/multi_server_option.h>
 
+/** 
+ * TODO: Rewrite
+*/
+
+
+/*
 mcsm::MultiServerOption::MultiServerOption(const std::string& path){
     std::error_code ec;
     bool isPath = std::filesystem::is_directory(path, ec);
@@ -1139,3 +1145,4 @@ void mcsm::MultiServerOption::processMonitor(std::atomic_bool& stopFlag) const {
 mcsm::MultiServerOption::~MultiServerOption(){
 
 }
+*/

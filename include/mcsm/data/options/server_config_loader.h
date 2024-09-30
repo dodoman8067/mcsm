@@ -72,7 +72,7 @@ namespace mcsm {
         std::string getServerJarBuild() const;
         mcsm::Result setServerJarBuild(const std::string& build);
 
-        bool doesAutoUpddate() const;
+        bool doesAutoUpdate() const;
         mcsm::Result setAutoUpdate(const bool& update);
 
         std::unique_ptr<mcsm::Option>& getHandle();

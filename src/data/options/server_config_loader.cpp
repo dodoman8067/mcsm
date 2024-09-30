@@ -382,7 +382,7 @@ mcsm::Result mcsm::ServerConfigLoader::setServerJarBuild(const std::string& buil
     return this->optionHandle->setValue("server_build", build);
 }
 
-bool mcsm::ServerConfigLoader::doesAutoUpddate() const {
+bool mcsm::ServerConfigLoader::doesAutoUpdate() const {
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",

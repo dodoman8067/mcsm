@@ -50,7 +50,13 @@ inline bool mcsm::ViewServerCommand::isConfigured(){
 }
 
 inline void mcsm::ViewServerCommand::printServerInfo(){
-    mcsm::ServerOption sOpt;
+    mcsm::ServerConfigLoader sOpt(mcsm::getCurrentPath());
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+
+    sOpt.loadConfig();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         mcsm::printResultMessage();
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);

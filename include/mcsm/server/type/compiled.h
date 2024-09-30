@@ -23,7 +23,7 @@ SOFTWARE.
 #ifndef __MCSM_COMPILED_H__
 #define __MCSM_COMPILED_H__
 
-#include <mcsm/data/options/server_option.h>
+#include <mcsm/data/options/server_config_loader.h>
 
 namespace mcsm {
     /**

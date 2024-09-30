@@ -23,6 +23,12 @@ SOFTWARE.
 #ifndef __MCSM_MULTI_SERVER_OPTION_H__
 #define __MCSM_MULTI_SERVER_OPTION_H__
 
+/** 
+ * TODO: Rewrite
+*/
+
+/*
+
 #include <mcsm/data/options/server_option.h>
 #include <mcsm/server/server_process.h>
 #include <mcsm/data/options/modded/fabric_server_option.h>
@@ -72,5 +78,7 @@ namespace mcsm {
         mcsm::Result start() const;
     };
 }
+
+*/
 
 #endif // __MCSM_MULTI_SERVER_OPTION_H__
