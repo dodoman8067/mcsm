@@ -77,6 +77,7 @@ mcsm::Result mcsm::CustomServer::setupServerJarFile(const std::string& path, con
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
+    std::string jar = getJarFile(optionPath);
 
     // how it works:
     // 1. check if the location is url, will try to download if it is
@@ -85,7 +86,6 @@ mcsm::Result mcsm::CustomServer::setupServerJarFile(const std::string& path, con
     bool url = isURL(location);
     
     if(url){
-        std::string jar = getJarFile(optionPath);
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
             std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
             mcsm::Result res(resp.first, resp.second);
@@ -100,13 +100,6 @@ mcsm::Result mcsm::CustomServer::setupServerJarFile(const std::string& path, con
             return res;
         }
         if(file){
-            std::string jar = getJarFile(optionPath);
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-                mcsm::Result res(resp.first, resp.second);
-                return res;
-            }
-
             bool fileExists = mcsm::fileExists(location);
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
                 std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -193,6 +186,7 @@ mcsm::Result mcsm::CustomServer::start(mcsm::ServerConfigLoader* loader, mcsm::J
 
     if(!fileExists){
         mcsm::info("Setting up " + jar + "...");
+        mcsm::info("\"server_jar\" will be used as the copied/downloaded file name. Make sure you don't have characters like \"/\".");
         std::string sVer = loader->getServerVersion();
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
             std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
