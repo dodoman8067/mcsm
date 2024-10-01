@@ -20,6 +20,7 @@
 #include <mcsm/server/type/proxy/velocity_server.h>
 #include <mcsm/server/type/modded/sponge_server.h>
 #include <mcsm/server/type/modded/fabric_server.h>
+#include <mcsm/server/type/custom_server.h>
 
 namespace mcsm {
     class init {
