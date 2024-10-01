@@ -40,6 +40,8 @@ int main(int argc, char *argv[]){
     //libcurl-linux : cmake -B ./build -DBUILD_SHARED_LIBS=OFF -DOPENSSL_USE_STATIC_LIBS=ON -DZLIB_USE_STATIC_LIBS=ON
     //libcurl : cmake command : cmake -B ./build -G "MinGW Makefiles" -DBUILD_SHARED_LIBS=OFF -DZLIB_USE_STATIC_LIBS=ON -DCURL_USE_SCHANNEL=ON
 
+    mcsm::set_log_enabled(true);
+
     mcsm::init init;
     init.initMCSM(version);
 

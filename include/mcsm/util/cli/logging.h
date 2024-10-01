@@ -34,30 +34,55 @@ SOFTWARE.
 #endif
 
 namespace mcsm {
+    extern bool log; // means defined elsewhere
+
+    inline void set_log_enabled(const bool& value){
+        log = value;
+    }
+
     /**
      * Prints normal information message to the console.
      * @param message string to print
      */
-    void info(const std::string& message);
+    inline void info(const std::string& message){
+        if(!log) return;
+        std::string msg = message;
+        if(!mcsm::endsWith(msg, "\n")) msg += "\n";
+        std::cout << "[mcsm/INFO] " << msg;
+    }
 
     /**
      * Prints successful (green) message to the console.
      * @param message string to print
      */
-    void success(const std::string& message);
+    inline void success(const std::string& message){
+        if(!log) return;
+        std::string msg = message;
+        if(!mcsm::endsWith(msg, "\n")) msg += "\n";
+        std::cout << termcolor::bright_green << "[mcsm/INFO] " << msg << termcolor::reset;
+    }
 
     /**
      * Prints warning (yellow) message to the console.
      * @param message string to print
     */
-    void warning(const std::string& message);
+    inline void warning(const std::string& message){
+        if(!log) return;
+        std::string msg = message;
+        if(!mcsm::endsWith(msg, "\n")) msg += "\n";
+        std::cerr << termcolor::bright_yellow << "[mcsm/WARN] " << msg << termcolor::reset;
+    }
 
     /**
      * Prints error (red) message to the console.
      * @param message string to print
     */
-    void error(const std::string& message);
-
+    inline void error(const std::string& message){
+        if(!log) return;
+        std::string msg = message;
+        if(!mcsm::endsWith(msg, "\n")) msg += "\n";
+        std::cerr << termcolor::bright_red << "[mcsm/ERROR] " << msg << termcolor::reset;
+    }
 }
 
 #endif // __MCSM_LOGGING_H__
