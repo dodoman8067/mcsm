@@ -25,7 +25,7 @@ SOFTWARE.
 #include <mcsm/init.h>
 //#include <mcsm/data/options/multi_server_option.h>
 
-const std::string version = "0.2";
+const std::string version = "0.3";
 
 int main(int argc, char *argv[]){
     /**
