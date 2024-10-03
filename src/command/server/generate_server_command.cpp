@@ -75,7 +75,7 @@ mcsm::GenerateServerCommand::~GenerateServerCommand(){}
 
 void mcsm::GenerateServerCommand::execute(const std::vector<std::string>& args){
     if(args.empty()){
-        mcsm::warning("Name not provided; To continue, specify a name with --name option.");
+        mcsm::warning("Name not provided; specify a name with --name option to continue.");
         std::exit(1);
     }
     if(isConfigured()){
@@ -94,18 +94,11 @@ std::string mcsm::GenerateServerCommand::getProfileName(const std::vector<std::s
             if(!(arg == "-profile" || arg == "--profile" || arg == "-p" || arg == "--p")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
                 name = args[i + 1];
-                if(name.find("\"") == std::string::npos && name.find("\'") == std::string::npos){
-                    return name;
-                }else{
-                    mcsm::replaceAll(name, "\"", "");
-                    mcsm::replaceAll(name, "\'", "");
-                    mcsm::warning("NOTE : \' and \" are not allowed in profile names; The profile name was modified to " + name + ".");
-                }
-                return name;
+                return mcsm::safeString(name);
             }
         }
     }
-    mcsm::warning("Profile name not provided; To continue, specify a profile name with --profile option.");
+    mcsm::warning("Profile name not provided; specify a profile name with --profile option to coutinue.");
     std::exit(1);
 }
 
@@ -117,18 +110,11 @@ std::string mcsm::GenerateServerCommand::getServerName(const std::vector<std::st
             if(!(arg == "-name" || arg == "--name")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
                 name = args[i + 1];
-                if(name.find("\"") == std::string::npos && name.find("\'") == std::string::npos){
-                    return name;
-                }else{
-                    mcsm::replaceAll(name, "\"", "");
-                    mcsm::replaceAll(name, "\'", "");
-                    std::cout << "[mcsm] NOTE : \' and \" are not allowed in profile names; The profile name was modified to " << name << ".\n";
-                }
-                return name;
+                return mcsm::safeString(name);
             }
         }
     }
-    mcsm::warning("Server name not provided; To continue, specify a name with --name option.");
+    mcsm::warning("Server name not provided; specify a name with --name option to continue.");
     std::exit(1);
 }
 
@@ -140,11 +126,11 @@ std::string mcsm::GenerateServerCommand::getServerVersion(const std::vector<std:
             if(!(arg == "-version" || arg == "--version" || arg == "-ver" || arg == "--ver" || arg == "-v" || arg == "--v" || arg == "-serverversion" || arg == "--serverversion" || arg == "-sversion" || arg == "--sversion" || arg == "-sver" || arg == "--sver" || arg == "-sv" || arg == "--sv")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
                 ver = args[i + 1];
-                return ver;
+                return mcsm::safeString(ver);
             }
         }
     }
-    mcsm::warning("Server version not provided; To continue, specify a version with --version option.");
+    mcsm::warning("Server version not provided; specify a version with --version option to coutinue.");
     std::exit(1);
 }
 
@@ -187,11 +173,11 @@ std::string mcsm::GenerateServerCommand::getServerType(const std::vector<std::st
             if(!(arg == "-servertype" || arg == "--servertype" || arg == "-st" || arg == "--st")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
                 type = args[i + 1];
-                return type;
+                return mcsm::safeString(type);
             }
         }
     }
-    mcsm::warning("Server type not provided; To continue, specify a type with --servertype option.");
+    mcsm::warning("Server type not provided; specify a type with --servertype option to continue.");
     std::exit(1);
 }
 
@@ -221,54 +207,20 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& a
         std::exit(1);
     }
 
-    if(type == "bukkit" || type == "craftbukkit"){
-        mcsm::Result res = mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::CRAFTBUKKIT, shouldSkipUpdate);
-        if(!res.isSuccess()){
-            res.printMessage();
-            if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
-        return;
+    auto sPtr = mcsm::ServerRegistry::getServerRegistry().getServer(type);
+    if((mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) || sPtr == nullptr){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
     }
-    if(type == "spigot"){
-        mcsm::Result res = mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::SPIGOT, shouldSkipUpdate);
-        if(!res.isSuccess()){
-            res.printMessage();
-            if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
-        return;
+
+    mcsm::Result genRes = sPtr->generate(name, *option, mcsm::getCurrentPath(), version, shouldSkipUpdate);
+
+    if(!genRes.isSuccess()){
+        genRes.printMessage();
+        if(genRes.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
     }
-    if(type == "paper" || type == "paperspigot"){
-        mcsm::Result res = mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::PAPER, shouldSkipUpdate);
-        if(!res.isSuccess()){
-            res.printMessage();
-            if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
-        return;
-    }
-    if(type == "purpur"){
-        mcsm::Result res = mcsm::server::generateBukkit(name, *option, version, mcsm::BukkitServerType::PURPUR, shouldSkipUpdate);
-        if(!res.isSuccess()){
-            res.printMessage();
-            if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
-        return;
-    }
-    if(type == "fabric"){
-        mcsm::Result res = mcsm::server::generateFabric(name, *option, version, shouldSkipUpdate);
-        if(!res.isSuccess()){
-            res.printMessage();
-            if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
-        return;
-    }
-    if(type == "vanilla"){
-        mcsm::Result res = mcsm::server::generateVanilla(name, *option, version, shouldSkipUpdate);
-        if(!res.isSuccess()){
-            res.printMessage();
-            if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
-        return;
-    }
+    return;
+    
     mcsm::error("Server type not supported : " + type);
     std::exit(1);
 }

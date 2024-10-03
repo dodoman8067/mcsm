@@ -21,6 +21,7 @@ SOFTWARE.
 */
 
 #include <mcsm/server/server_type.h>
+#include <mcsm/server/server_registry.h>
 
 mcsm::ServerType mcsm::getServerType(const std::string& name){
     if(name == "vanilla"){
@@ -43,21 +44,9 @@ mcsm::ServerType mcsm::getServerType(const std::string& name){
 }
 
 std::string mcsm::getServerType(const mcsm::ServerType& type){
-    if(type == mcsm::ServerType::VANILLA){
-        return "vanilla";
-    }else if (type == mcsm::ServerType::BUKKIT){
-        return "bukkit";
-    }else if (type == mcsm::ServerType::SPONGE_VANILLA){
-        return "sponge_vanilla";
-    }else if(type == mcsm::ServerType::BUNGEECORD){
-        return "bungeecord";
-    }else if(type == mcsm::ServerType::VELOCITY){
-        return "velocity";
-    }else if(type == mcsm::ServerType::FORGE){
-        return "forge";
-    }else if(type == mcsm::ServerType::FABRIC){
-        return "fabric";
-    } else{
-        return nullptr;
-    }
+    std::string typeS = mcsm::ServerRegistry::getServerRegistry().getServerTypeString(type);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    return typeS;
 }

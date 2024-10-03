@@ -27,11 +27,10 @@ SOFTWARE.
 #include <mcsm/server/type/downloadable.h>
 #include <mcsm/http/get.h>
 #include <mcsm/http/download.h>
-#include <mcsm/data/options/server_option.h>
 #include <mcsm/util/mc/mc_utils.h>
 
 namespace mcsm {
-    class PaperServer : public mcsm::BukkitServer, public mcsm::Downloadable {
+    class PaperServer : public mcsm::BukkitServer, public mcsm::Downloadable, public std::enable_shared_from_this<PaperServer> {
     private:
     public:
         PaperServer();
@@ -50,13 +49,15 @@ namespace mcsm {
         
         std::string getGitHub() const override;
 
-        mcsm::Result start(mcsm::JvmOption& option) override;
-        mcsm::Result start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
+        mcsm::Result start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option) override;
+        mcsm::Result start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
 
         mcsm::Result download(const std::string& version) override;
         mcsm::Result download(const std::string& version, const std::string& path) override;
         mcsm::Result download(const std::string& version, const std::string& path, const std::string& name) override;
         mcsm::Result download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
+
+        mcsm::Result obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
 
         bool hasVersion(const std::string& version) override;
 
@@ -65,6 +66,8 @@ namespace mcsm {
         mcsm::Result update();
         mcsm::Result update(const std::string& optionPath);
         mcsm::Result update(const std::string& path, const std::string& optionPath);
+
+        mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate) override;
     };
 }
 

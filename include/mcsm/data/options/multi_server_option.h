@@ -23,20 +23,42 @@ SOFTWARE.
 #ifndef __MCSM_MULTI_SERVER_OPTION_H__
 #define __MCSM_MULTI_SERVER_OPTION_H__
 
+/** 
+ * TODO: Rewrite
+*/
+
+/*
+
 #include <mcsm/data/options/server_option.h>
+#include <mcsm/server/server_process.h>
 #include <mcsm/data/options/modded/fabric_server_option.h>
 #include <variant>
+#include <atomic>
 
 namespace mcsm {
     class MultiServerOption {
     private:
         std::vector<std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>> servers;
+        mutable std::vector<std::pair<std::string, std::shared_ptr<mcsm::ServerProcess>>> processes;
         std::unique_ptr<mcsm::Option> option;
+
+        mutable std::mutex mtx;
 
         mcsm::Result load();
         mcsm::Result save();
+        
         bool canBeTaken(const std::string& serverName) const;
-        mcsm::Result createProcesses() const;
+        bool anyRunning() const;
+        
+        mcsm::Result addProcesses() const;
+        
+        std::string getServerStartCommand(std::variant<mcsm::ServerOption, mcsm::FabricServerOption>& server) const;
+
+        mcsm::Result downloadPerServer() const;
+
+        void inputHandler(std::atomic_bool& stopFlag) const;
+        void processMonitor(std::atomic_bool& stopFlag) const;
+        void processInput(const std::string& input, std::atomic_bool& stopFlag) const;
     public:
         MultiServerOption(const std::string& path);
         ~MultiServerOption();
@@ -49,9 +71,14 @@ namespace mcsm {
         mcsm::Result removeServer(std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>& server);
 
         const std::vector<std::unique_ptr<std::variant<mcsm::ServerOption, mcsm::FabricServerOption>>>& getServers() const;
+        
+        const std::vector<mcsm::ServerOption*> getServerOptions() const;
+        const std::vector<mcsm::FabricServerOption*> getFabricServerOptions() const;
 
         mcsm::Result start() const;
     };
 }
+
+*/
 
 #endif // __MCSM_MULTI_SERVER_OPTION_H__

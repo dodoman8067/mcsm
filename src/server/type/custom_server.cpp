@@ -66,70 +66,158 @@ std::string mcsm::CustomServer::getFileLocation(const std::string& optionPath) c
     return value;
 }
 
-mcsm::Result mcsm::CustomServer::setFileLocation(const std::string& optionPath, const std::string& location) {
-    mcsm::Option option(".", "server");
-    return option.setValue("jar_location", location);
+mcsm::Result mcsm::CustomServer::setFileLocation(mcsm::Option* option, const std::string& location) {
+    return option->setValue("jar_location", location);
 }
 
-mcsm::Result mcsm::CustomServer::setupServerJarFile(const std::string& optionPath){
+mcsm::Result mcsm::CustomServer::setupServerJarFile(const std::string& path, const std::string& optionPath){
     std::string location = getFileLocation(optionPath);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
+    std::string jar = getJarFile(optionPath);
 
+    // how it works:
+    // 1. check if the location is url, will try to download if it is
+    // 2. non urls will be treated as files and it will be searched by the program.
+    // 3. copy the file to `path` if present, otherwise throw error
     bool url = isURL(location);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
-
-    bool file = isFile(location);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
-
     
     if(url){
-        std::string jar = getJarFile(optionPath);
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
             std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
             mcsm::Result res(resp.first, resp.second);
             return res;
         }
-        std::string loc = getFileLocation(optionPath);
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-            mcsm::Result res(resp.first, resp.second);
-            return res;
-        }
-        return mcsm::download(jar, location, loc, true);
-    }else if(file){
-        // TODO : Copy file
+        return mcsm::download(jar, location, path, true);
     }else{
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "The following server jarfile wasn't located in the vaild location : " + location,
-            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
-        }});
-        return res;
+        bool file = isFile(location);
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
+        if(file){
+            bool fileExists = mcsm::fileExists(location);
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
+
+            if(!fileExists){
+                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+                    "Cannot copy a file that doesn't exist.",
+                    "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
+                }});
+                return res;
+            }
+
+            std::error_code copyEC;
+            std::filesystem::copy_file(location, path + "/" + jar, copyEC);
+            if(copyEC){
+                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+                    "Copying jarfile from " + location + " to " + path + "/" + jar + " failed for reason: " + copyEC.message(),
+                    "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
+                }});
+                return res;
+            }
+        }
     }
+    mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+        "The following server jarfile wasn't in a vaild location : " + location,
+        "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
+    }});
+    return res;
+}
+
+mcsm::Result mcsm::CustomServer::obtainJarFile(const std::string& /* version */, const std::string& path, const std::string& /* name */, const std::string& optionPath){
+    return setupServerJarFile(path, optionPath);
+}
+
+mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate){
+    return generate(name, option, path, version, autoUpdate, "current");
+}
+
+mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& /* version */, const bool& /* autoUpdate */, const std::string& fileLocation){
+    mcsm::ServerConfigGenerator serverOption(path);
+    mcsm::ServerDataOption sDOpt(path);
+    
+    mcsm::Result sRes = serverOption.generate("ignored", shared_from_this(), &sDOpt, name, option, false);
+    if(!sRes.isSuccess()) return sRes;
+
+    mcsm::Result fileRes = setFileLocation(&(*serverOption.getHandle()), fileLocation);
+    if(!fileRes.isSuccess()) return fileRes;
+
+    mcsm::ServerConfigLoader loader(path);
+    
+    mcsm::Result loadRes = loader.loadConfig();
+    if(!loadRes.isSuccess()) return loadRes;
+
+    mcsm::success("Custom configured server's information : ");
+    mcsm::info("Server name : " + mcsm::safeString(name));
+    mcsm::info("Server type : custom");
+    mcsm::info("Server JVM launch profile : " + option.getProfileName());
+    mcsm::warning("NOTE: Custom servers are currently in beta state.");
+    mcsm::warning("We are not responsible for the consequences of using beta features.");
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return res;
 }
 
-bool mcsm::CustomServer::isFile(const std::string& location) const {
-    return mcsm::fileExists(location);
+mcsm::Result mcsm::CustomServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
+    // ServerOption class handles the data file stuff
+    
+    std::string jar = loader->getServerJarFile();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    bool fileExists = mcsm::fileExists(path + "/" + jar);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    if(!fileExists){
+        mcsm::info("Setting up " + jar + "...");
+        mcsm::info("\"server_jar\" will be used as the copied/downloaded file name. Make sure you don't have characters like \"/\".");
+        std::string sVer = loader->getServerVersion();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
+
+        mcsm::Result res = setupServerJarFile(path, optionPath);
+        if(!res.isSuccess()) return res;
+    }
+    return Server::start(loader, option, path, optionPath);
 }
 
+bool mcsm::CustomServer::isFile(const std::string& location) const {
+    std::error_code ec;
+    bool isRegularFile = std::filesystem::is_regular_file(location, ec);
+    if(ec){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "Checking if " + location + " is a file operation failed : " + ec.message(), 
+            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
+            }});
+        return false;
+    }
+    return isRegularFile;
+}
+
+
+//TODO: Update regex. the program thinks url is a file rn
 bool mcsm::CustomServer::isURL(const std::string& location) const {
     std::regex urlPattern(
-        R"(https?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{1,256}\.[a-zA-Z0-9()]{1,6}\b"
-        R"([-a-zA-Z0-9()@:%_\+.~#?&//=]*))"
+        R"(^https?://[0-9a-z\.-]+(:[1-9][0-9]*)?(/[^\s]*)*$)"
     );
     return std::regex_match(location, urlPattern);
 }

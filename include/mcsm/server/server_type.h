@@ -64,14 +64,14 @@ namespace mcsm {
 
     /**
      * Returns an enum representing server type in string.
-     * @param name string to convert to enum
+     * @param name string to convert to an enum value
      * @return enum representing server type
     */
     mcsm::ServerType getServerType(const std::string& name);
 
     /**
      * Returns a string representing server type in enum.
-     * @param type enum value to convert it to string
+     * @param type enum value to convert it to a string
      * @return string version of server type
     */
     std::string getServerType(const mcsm::ServerType& type);

@@ -24,7 +24,7 @@ SOFTWARE.
 #define __MCSM_JVM_OPTION_GENERATOR_COMMAND_H__
 
 #include <mcsm/command/base/command.h>
-#include <mcsm/data/options/jvm_option.h>
+#include <mcsm/jvm/jvm_option.h>
 
 namespace mcsm {
     class JvmOptionGeneratorCommand : public mcsm::Command {

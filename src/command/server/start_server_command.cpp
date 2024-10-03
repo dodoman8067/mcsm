@@ -51,24 +51,29 @@ void mcsm::StartServerCommand::execute(const std::vector<std::string>& args){
         mcsm::warning("Task aborted.");
         std::exit(1);
     }
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    std::unique_ptr<mcsm::JvmOption> jvmOpt = searchOption(args);
-    mcsm::ServerOption sOpt(mcsm::getCurrentPath());
-    if(sOpt.getServerType() == "fabric"){
-        mcsm::FabricServerOption fsOpt;
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            mcsm::printResultMessage();
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
-        mcsm::Result res = fsOpt.start(*jvmOpt);
-        res.printMessage();
-    }else{
-        mcsm::Result res = sOpt.start(*jvmOpt);
-        res.printMessage();
+    mcsm::ServerConfigLoader loader(mcsm::getCurrentPath());
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+
+    loader.loadConfig();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+
+    std::unique_ptr<mcsm::JvmOption> jvmOpt = searchOption(args, &loader);
+
+    mcsm::ServerStarter starter(&loader);
+    starter.startServer(*jvmOpt, mcsm::getCurrentPath(), mcsm::getCurrentPath());
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
     }
 }
 
-std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const std::vector<std::string>& args){
+std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const std::vector<std::string>& args, mcsm::ServerConfigLoader* loader){
     if(!isConfigured()){
         mcsm::warning("Server not configured.");
         mcsm::warning("Task aborted.");
@@ -79,7 +84,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const st
         if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
             if(!(arg == "-profile" || arg == "--profile" || arg == "-p" || arg == "--p" || arg == "-jvmprofile" || arg == "--jvmprofile" || arg == "-jp" || "--jp")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-'){
-                std::string pName = args[i + 1];
+                std::string pName = mcsm::safeString(args[i + 1]);
                 mcsm::SearchTarget target = getSearchTarget(args);
                 std::unique_ptr<mcsm::JvmOption> profile = searchOption(target, pName);
                 if(profile == nullptr){
@@ -87,20 +92,15 @@ std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const st
                     mcsm::warning("Task aborted.");
                     std::exit(1);
                 }
-                mcsm::info("Found specified JVM launch profile " + pName + ".");
+                mcsm::info("Found JVM launch profile " + pName + ".");
                 mcsm::info("Location : " + profile->getProfilePath());
                 return profile;
             }
         }
     }
-    mcsm::info("No JVM launch profile specified; Using default JVM launch profile.");
-    mcsm::ServerOption option;
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        mcsm::printResultMessage();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-    }
+    mcsm::info("No specified JVM launch profile detected; using default JVM launch profile.");
     
-    std::unique_ptr<mcsm::JvmOption> jvmOpt = option.getDefaultOption();
+    std::unique_ptr<mcsm::JvmOption> jvmOpt = loader->getDefaultOption();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         mcsm::printResultMessage();
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);

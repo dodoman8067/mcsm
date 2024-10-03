@@ -181,7 +181,7 @@ namespace mcsm {
 
         inline std::vector<std::string> serverWrongInstanceGenerated(const std::string& serverName){
             return { 
-                "Specified server path's server option wasn't for" + serverName + "servers.",
+                "Specified server path's server option wasn't for " + serverName + " servers.",
                 "Please try again in other directories." 
             };
         }
@@ -283,7 +283,7 @@ namespace mcsm {
             };
         }
 
-        inline std::vector<std::string> downloadTargetIsNotText(const std::string& url, const std::string reason){
+        inline std::vector<std::string> downloadTargetIsNotText(const std::string& url, const std::string& reason){
             return {
                 "Failed to check if the following url : " + url + " returns a text with the following reason : " + reason
             };
@@ -293,6 +293,13 @@ namespace mcsm {
             return {
                 "Current operating system is not supported.",
                 "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
+            };
+        }
+
+        inline std::vector<std::string> unsafeString(const std::string& str){
+            return {
+                str + " contains characters that is not allowed. (&, |, \\, .., / \", \')",
+                "Please resolve this issue before trying again."
             };
         }
     }

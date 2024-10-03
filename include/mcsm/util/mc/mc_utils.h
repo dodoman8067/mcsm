@@ -32,6 +32,8 @@ namespace mcsm {
      * @return vector of versions starting from 1.8
     */
     std::vector<std::string> getMinecraftVersions();
+
+    int compareVersions(const std::string& a, const std::string& b);
 }
 
 

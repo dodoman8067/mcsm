@@ -23,13 +23,16 @@ SOFTWARE.
 */
 
 #include <mcsm/init.h>
+//#include <mcsm/data/options/multi_server_option.h>
 
-const std::string version = "0.1.1.3";
+const std::string version = "0.3";
 
 int main(int argc, char *argv[]){
     /**
      * TODO
+     * Check if the name of each linked server in mcsm::MultiServerOption does not match the name of any other server
      * Implement mcsm update command.
+     * Add multicurl task and make an internal method that returns CURL handle on Server class (obtainJarFile)
      */
 
     //libssh2 : cmake -B ./build -DBUILD_SHARED_LIBS=OFF -DOPENSSL_USE_STATIC_LIBS=ON -DZLIB_USE_STATIC_LIBS=ON -DENABLE_ZLIB_COMPRESSION=ON -DCRYPTO_BACKEND=OpenSSL
@@ -37,12 +40,14 @@ int main(int argc, char *argv[]){
     //libcurl-linux : cmake -B ./build -DBUILD_SHARED_LIBS=OFF -DOPENSSL_USE_STATIC_LIBS=ON -DZLIB_USE_STATIC_LIBS=ON
     //libcurl : cmake command : cmake -B ./build -G "MinGW Makefiles" -DBUILD_SHARED_LIBS=OFF -DZLIB_USE_STATIC_LIBS=ON -DCURL_USE_SCHANNEL=ON
 
+    mcsm::set_log_enabled(true);
+
     mcsm::init init;
     init.initMCSM(version);
 
     if(!init.isInitialized()){
         std::cerr << "Program initialization failed.\n";
-        std::cerr << "High chance to be a software issue. Please report it to GitHub (https://github.com/dodoman8067/mcsm).\n";
+        std::cerr << "High chance to be a software issue. Please report this to GitHub (https://github.com/dodoman8067/mcsm).\n";
         std::exit(1);
     }
 
@@ -52,6 +57,15 @@ int main(int argc, char *argv[]){
     if(argc < 2){
         std::cout << "Welcome to MCSM (Minecraft Server Manager).\n";
         std::cout << "Type \"mcsm help\" for a list of commands.\n";
+
+        /*
+        mcsm::MultiServerOption a(mcsm::getCurrentPath());
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+        a.start().printMessage();
+        */
         return 0;
     }
 

@@ -26,16 +26,14 @@ SOFTWARE.
 #include <mcsm/server/server.h>
 #include <mcsm/server/type/downloadable.h>
 #include <mcsm/data/global_option.h>
-#include <mcsm/data/options/server_option.h>
+#include <mcsm/http/get.h>
 #include <mcsm/http/download.h>
 #include <map>
 
 namespace mcsm {
-    class VanillaServer : public mcsm::Server, public mcsm::Downloadable {
+    class VanillaServer : public mcsm::Server, public mcsm::Downloadable, public std::enable_shared_from_this<VanillaServer> {
     private:
         std::unique_ptr<std::map<const std::string, const std::string>> versions;
-        [[deprecated]]
-        mcsm::Result init();
         std::string getVersionObject(const std::string& ver) const;
         std::string getServerJarURL(const std::string& ver) const;
     public:
@@ -57,13 +55,17 @@ namespace mcsm {
         mcsm::Result download(const std::string& version, const std::string& path, const std::string& name) override;
         mcsm::Result download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
 
-        mcsm::Result start(mcsm::JvmOption& option) override;
-        mcsm::Result start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
+        mcsm::Result obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
+
+        mcsm::Result start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option) override;
+        mcsm::Result start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
         
         bool hasVersion(const std::string& version) override;
 
         mcsm::ServerType getType() const override;
         std::string getTypeAsString() const override;
+
+        mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate) override;
     };
 }
 

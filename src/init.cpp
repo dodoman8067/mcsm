@@ -29,13 +29,17 @@ mcsm::init::init(){
 }
 
 mcsm::init::~init(){
+    curl_global_cleanup();
+    mcsm::curl_holder::cleanup();
     delete this->initialized;
     this->initialized = nullptr;
 }
 
 void mcsm::init::initMCSM(const std::string& version){
-    // Some other init tasks will be added
+    curl_global_init(CURL_GLOBAL_DEFAULT);
+    if(!mcsm::curl_holder::init().isSuccess()) return;
     initCommands(version);
+    initServers();
 
     *this->initialized = true;
 }
@@ -98,6 +102,18 @@ void mcsm::init::initCommands(const std::string& version){
     viewServerTypeCommand->addAlias("infoServer");
     viewServerTypeCommand->addAlias("infoserver");
     mcsm::CommandManager::addCommand(std::move(viewServerTypeCommand));
+}
+
+void mcsm::init::initServers(){
+    auto& sr = mcsm::ServerRegistry::getServerRegistry();
+
+    sr.registerServer("vanilla", []() { return std::make_shared<mcsm::VanillaServer>(); }, mcsm::ServerType::VANILLA);
+    sr.registerServer("paper", []() { return std::make_shared<mcsm::PaperServer>(); }, mcsm::ServerType::BUKKIT);
+    sr.registerServer("purpur", []() { return std::make_shared<mcsm::PurpurServer>(); }, mcsm::ServerType::BUKKIT);
+    sr.registerServer("fabric", []() { return std::make_shared<mcsm::FabricServer>(); }, mcsm::ServerType::FABRIC);
+    sr.registerServer("velocity", []() { return std::make_shared<mcsm::VelocityServer>(); }, mcsm::ServerType::VELOCITY);
+    sr.registerServer("sponge", []() { return std::make_shared<mcsm::SpongeServer>(); }, mcsm::ServerType::SPONGE_VANILLA);
+    sr.registerServer("custom", []() { return std::make_shared<mcsm::CustomServer>(); }, mcsm::ServerType::CUSTOM);
 }
 
 bool mcsm::init::isInitialized() const {

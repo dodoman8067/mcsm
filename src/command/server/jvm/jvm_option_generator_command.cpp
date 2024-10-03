@@ -57,7 +57,7 @@ mcsm::JvmOptionGeneratorCommand::~JvmOptionGeneratorCommand() {}
 
 void mcsm::JvmOptionGeneratorCommand::execute(const std::vector<std::string>& args) {
     if(args.empty()){
-        mcsm::warning("Name not provided; To continue, specify a name with --name option.");
+        mcsm::warning("Name not provided; specify a name with --name option to coutinue.");
         std::exit(1);
     }
     if(getSaveTarget(args) == mcsm::SearchTarget::GLOBAL){
@@ -113,50 +113,28 @@ std::string mcsm::JvmOptionGeneratorCommand::getProfileName(const std::vector<st
         if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
             if(!(arg == "-name" || arg == "--name" || arg == "-n" || arg == "--n")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
-                name = args[i + 1];
-                if(name.find("\"") == std::string::npos && name.find("\'") == std::string::npos){
-                    mcsm::JvmOption option(name, target);
-                    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-                        mcsm::printResultMessage();
-                        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-                    }
+                name = mcsm::safeString(args[i + 1]);
+                mcsm::JvmOption option(name, target);
+                if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                    mcsm::printResultMessage();
+                    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+                }
                     
-                    bool exists = option.exists();
-                    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-                        mcsm::printResultMessage();
-                        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-                    }
+                bool exists = option.exists();
+                if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                    mcsm::printResultMessage();
+                    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+                }
 
-                    if(exists){
-                        mcsm::warning("JVM launch profile " + name + " already exists. Command failed.");
-                        std::exit(1); 
-                    }
-                }else{
-                    mcsm::replaceAll(name, "\"", "");
-                    mcsm::replaceAll(name, "\'", "");
-                    mcsm::warning("NOTE : \' and \" are not allowed in names; Name was modified to " + name + ".");
-                    mcsm::JvmOption option(name, target);
-                    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-                        mcsm::printResultMessage();
-                        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-                    }
-
-                    bool exists = option.exists();
-                    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-                        mcsm::printResultMessage();
-                        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-                    }
-
-                    if(exists){
-                        mcsm::warning("JVM launch profile " + name + " already exists. Command failed.");
-                        std::exit(1); 
-                    }
+                if(exists){
+                    mcsm::warning("JVM launch profile " + name + " already exists. Command failed.");
+                    std::exit(1); 
                 }
                 return name;
             }
         }
     }
-    mcsm::warning("Name not provided; To continue, specify a name with --name option.");
+    mcsm::warning("Name not provided; specify a name with --name option to continue.");
     std::exit(1);
 }
 

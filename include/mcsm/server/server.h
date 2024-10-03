@@ -24,10 +24,13 @@ SOFTWARE.
 #define __MCSM_SERVER_H__
 
 #include <mcsm/server/server_type.h>
-#include <mcsm/data/options/jvm_option.h>
+#include <mcsm/jvm/jvm_option.h>
 #include <mcsm/util/cli/cli_utils.h>
+#include <mcsm/data/options/server_data_option.h>
 
 namespace mcsm {
+    class ServerConfigLoader;
+
     /**
      * Represents base of server.
      */
@@ -93,15 +96,34 @@ namespace mcsm {
          * Starts the configured server with following launch profile `option`
          * @param option JVM launch profile
         */
-        virtual mcsm::Result start(mcsm::JvmOption& option);
+        virtual mcsm::Result start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option);
 
         /**
          * Starts the configured server in `optionPath` with following launch profile `option`
          * @param option JVM launch profile
          * @param optionPath server.json path
         */
-        virtual mcsm::Result start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath);
+        virtual mcsm::Result start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath);
+
+        /**
+         * Obtains jar file. (Will compile the server jarfile or download if downloadable server)
+         * 
+         */
+        virtual mcsm::Result obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) = 0;
+
+        /**
+         * Obtains jar file. (Will compile the server jarfile or download if downloadable server)
+         * 
+         */
+        //virtual mcsm::Result obtainJarFile(const std::string version, const std::string workingPath, const std::string outputPath);
+
+        virtual mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate) = 0;
+
+        mcsm::Result configure(const std::string &version, std::shared_ptr<mcsm::Server> server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate);
     };
 }
+
+#include <mcsm/data/options/server_config_loader.h>
+#include <mcsm/data/options/server_config_generator.h>
 
 #endif // __MCSM_SERVER_H__

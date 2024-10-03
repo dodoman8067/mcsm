@@ -29,15 +29,7 @@ static size_t writeFunction(void* contents, size_t size, size_t nmemb, std::stri
 }
 
 const std::string mcsm::get(const std::string& url){
-    curl_global_init(CURL_GLOBAL_DEFAULT);
-    CURL *curl = curl_easy_init();
-
-    if(!curl){
-        mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::curlInitFailed()});
-        curl_easy_cleanup(curl);
-        curl_global_cleanup();
-        return "";
-    }
+    CURL *curl = mcsm::curl_holder::curl;
 
     std::string response;
 
@@ -45,19 +37,21 @@ const std::string mcsm::get(const std::string& url){
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, &response);
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl/8.6.0");
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl/8.10.0");
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
+    curl_easy_setopt(curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2TLS);
+    curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
+    curl_easy_setopt(curl, CURLOPT_DNS_CACHE_TIMEOUT, 60L);
 
     CURLcode res = curl_easy_perform(curl);
 
     if(res != CURLE_OK){
         mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::getRequestFailed(url, curl_easy_strerror(res))});
-        curl_easy_cleanup(curl);
-        curl_global_cleanup();
+        curl_easy_reset(curl);
         return "";
     }
 
-    curl_easy_cleanup(curl);
-    curl_global_cleanup();
+    curl_easy_reset(curl);
     mcsm::Result result({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return response;
 }

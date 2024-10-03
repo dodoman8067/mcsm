@@ -43,6 +43,10 @@ mcsm::ServerDataOption::~ServerDataOption(){
 }
 
 mcsm::Result mcsm::ServerDataOption::create(const std::string& lastTimeLaunched){
+    if(!mcsm::isSafeString(lastTimeLaunched)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(lastTimeLaunched)});
+        return res;
+    }
     bool optExists = this->option->exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -83,6 +87,11 @@ std::string mcsm::ServerDataOption::getLastTimeLaunched() const {
         return "";
     }
 
+    if(!mcsm::isSafeString(value)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
+        return "";
+    }
+
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return value;
 }
@@ -115,6 +124,11 @@ std::string mcsm::ServerDataOption::getServerTimeCreated() const {
     }
     if(!value.is_string()){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"server_time_created\"", "string")});
+        return "";
+    }
+
+    if(!mcsm::isSafeString(value)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
         return "";
     }
 
@@ -153,11 +167,20 @@ std::string mcsm::ServerDataOption::getLastDownloadedBuild() const {
         return "";
     }
 
+    if(!mcsm::isSafeString(value)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
+        return "";
+    }
+
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return value;
 }
 
 mcsm::Result mcsm::ServerDataOption::updateLastDownloadedBuild(const std::string& build){
+    if(!mcsm::isSafeString(build)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(build)});
+        return res;
+    }
     return this->option->setValue("last_downloaded_build", build);
 }
 

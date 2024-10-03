@@ -22,11 +22,11 @@ SOFTWARE.
 
 #include <mcsm/server/server.h>
 
-mcsm::Result mcsm::Server::start(mcsm::JvmOption& option){
-    return start(option);
+mcsm::Result mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
+    return start(loader, option, mcsm::getCurrentPath(), mcsm::getCurrentPath());
 }
 
-mcsm::Result mcsm::Server::start(mcsm::JvmOption& option, const std::string& /* path */, const std::string& optionPath){
+mcsm::Result mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
     std::string jvmOpt = " ";
     auto jArgs = option.getJvmArguments();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -58,14 +58,14 @@ mcsm::Result mcsm::Server::start(mcsm::JvmOption& option, const std::string& /* 
         return res;
     }
 
-    std::string jar = getJarFile(optionPath);
+    std::string jar = loader->getServerJarFile();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    std::string command = jPath + jvmOpt + optionPath + "/" + jar + svrOpt;
+    std::string command = jPath + jvmOpt + path + "/" + jar + svrOpt;
     mcsm::info("Running command : " + command);
     
     std::error_code ec;
@@ -88,6 +88,28 @@ mcsm::Result mcsm::Server::start(mcsm::JvmOption& option, const std::string& /* 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {
         "Server exited with error code : 0"
     }});
+    return res;
+}
+
+mcsm::Result mcsm::Server::configure(const std::string &version, std::shared_ptr<mcsm::Server> server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate){
+    mcsm::ServerConfigGenerator serverOption(path);
+    
+    mcsm::Result sRes = serverOption.generate(version, server, sDataOpt, name, option, autoUpdate);
+    if(!sRes.isSuccess()) return sRes;
+
+    mcsm::ServerConfigLoader loader(path);
+    
+    mcsm::Result loadRes = loader.loadConfig();
+    if(!loadRes.isSuccess()) return loadRes;
+
+    mcsm::success("Configured server's information : ");
+    mcsm::info("Server name : " + mcsm::safeString(name));
+    mcsm::info("Server type : " + server->getTypeAsString());
+    mcsm::info("Server version : " + version);
+    mcsm::info("Server JVM launch profile : " + option.getProfileName());
+    if(!autoUpdate) mcsm::info("Automatic updates : disabled");
+
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return res;
 }
 

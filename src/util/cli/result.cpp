@@ -62,6 +62,8 @@ void mcsm::Result::printMessage(const mcsm::ResultType& type){
     for(const auto& str : message){
         switch (type){
             case mcsm::ResultType::MCSM_SUCCESS:
+                mcsm::success(str);
+                break;
             case mcsm::ResultType::MCSM_OK:
                 mcsm::info(str);
                 break;
@@ -104,6 +106,8 @@ void mcsm::printResultMessage(const std::pair<mcsm::ResultType, std::vector<std:
     for(const auto& str : message){
         switch (type){
             case mcsm::ResultType::MCSM_SUCCESS:
+                mcsm::success(str);
+                break;
             case mcsm::ResultType::MCSM_OK:
                 mcsm::info(str);
                 break;

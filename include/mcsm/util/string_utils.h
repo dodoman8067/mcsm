@@ -59,6 +59,10 @@ namespace mcsm {
     void replaceAll(std::string& str, const std::string& value, const std::string& replacement);
 
     std::string safeString(const std::string& str);
+
+    bool isSafeString(const std::string& str);
+
+    bool is_number(const std::string& s);
 }
 
 #endif
