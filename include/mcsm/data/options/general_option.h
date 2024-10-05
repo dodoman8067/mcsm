@@ -2,12 +2,12 @@
 #define __MCSM_GENERAL_OPTION_H__
 
 #include <mcsm/data/global_option.h>
+#include <mcsm/data/options/general_property.h>
 
 // how it is gonna be implemented:
 // save method serializes the current properties vector. add/remove method will modify the vector and call save()
 
 namespace mcsm {
-    class GeneralProperty;
     class GeneralOption {
     private:
         GeneralOption();
