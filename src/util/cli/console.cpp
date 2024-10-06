@@ -12,8 +12,6 @@ mcsm::Console::~Console(){
 void mcsm::Console::start(){
     this->running = true;
 
-    auto loggerThread = std::thread(&mcsm::Console::randomLogging, this);
-
     std::string input;
     while (this->running){
         displayPrompt();
@@ -21,15 +19,6 @@ void mcsm::Console::start(){
             break;
         }
         handleInput(input);
-    }
-
-    loggerThread.join();
-}
-
-void mcsm::Console::randomLogging(){
-    for (int i = 0; i < 50 && running; ++i) {
-        std::this_thread::sleep_for(std::chrono::seconds(rand() % 3 + 1)); // Random delay
-        log("Random log message " + std::to_string(i + 1));
     }
 }
 

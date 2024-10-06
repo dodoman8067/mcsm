@@ -6,9 +6,6 @@
 #include <chrono>
 #include <atomic>
 #include <mutex>
-#include <thread>
-
-// todo: use cpp-terminal
 
 namespace mcsm {
     class Console {
@@ -23,12 +20,10 @@ namespace mcsm {
         Console();
         ~Console();
 
-        void start();
-        void stop();
-        void log(const std::string& message);
-        void input(const std::string& str);
-
-        void randomLogging();
+        virtual void start();
+        virtual void stop();
+        virtual void log(const std::string& message);
+        virtual void input(const std::string& str);
     };
 }
 
