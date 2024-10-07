@@ -22,6 +22,13 @@ mcsm::Result mcsm::GeneralOption::initialize(){
     }
     init = true;
     
+    instance.optionHandle = std::make_unique<mcsm::GlobalOption>("/", "general_options");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
     return instance.load();
 }
 
