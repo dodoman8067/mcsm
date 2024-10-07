@@ -13,7 +13,7 @@ namespace mcsm {
         mcsm::Result loadConfig();
 
         template <typename T>
-        T get(const std::string& key){
+        inline T get(const std::string& key){
             if(!this->isLoaded){
                 mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
                     "ServerConfigLoader function called without loadConfig.",
