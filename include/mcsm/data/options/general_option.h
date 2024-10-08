@@ -4,6 +4,7 @@
 #include <mcsm/data/global_option.h>
 #include <algorithm>
 #include <mcsm/data/options/general_property.h>
+#include <mcsm/server/server_registry.h>
 
 // how it is gonna be implemented:
 // save method serializes the current properties vector. add/remove method will modify the vector and call save()
@@ -29,9 +30,6 @@ namespace mcsm {
         static mcsm::GeneralOption& getGeneralOption();
 
         std::vector<mcsm::GeneralProperty*>& getProperties() const;
-
-        mcsm::Result addProperty(mcsm::GeneralProperty& property);
-        mcsm::Result removeProperty(const std::string& propertyName);
 
         mcsm::Result setProperty(const std::string& propertyName, nlohmann::json newValue);
 
