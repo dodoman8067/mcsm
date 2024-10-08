@@ -31,6 +31,7 @@ SOFTWARE.
 #include <string>
 #include <mcsm/server/server.h>
 #include <mcsm/server/server_type.h>
+#include <mcsm/data/options/general_property.h>
 
 namespace mcsm {
     using ServerFactory = std::function<std::shared_ptr<mcsm::Server>()>;
@@ -43,6 +44,12 @@ namespace mcsm {
         std::shared_ptr<mcsm::Server> getServer(const std::string& name) const;
 
         std::string getServerTypeString(const mcsm::ServerType type) const;
+
+        void registerGeneralProperty(const std::string& name, mcsm::GeneralProperty* property);
+
+        mcsm::GeneralProperty* getGeneralProperty(const std::string& name);
+
+        std::vector<mcsm::GeneralProperty*> getRegisteredProperties();
     private:
         struct ServerEntry {
             mcsm::ServerFactory factory;
@@ -50,6 +57,7 @@ namespace mcsm {
         };
 
         static std::unordered_map<std::string, ServerEntry> serverFactories;
+        static std::unordered_map<std::string, mcsm::GeneralProperty*> generalProperties;
 
         ServerRegistry() = default;
         ~ServerRegistry() = default;
