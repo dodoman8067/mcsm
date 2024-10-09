@@ -23,6 +23,8 @@ SOFTWARE.
 */
 
 #include <mcsm/init.h>
+#include <mcsm/data/options/general/test1.h>
+#include <mcsm/data/options/general/test2.h>
 
 mcsm::init::init(){
     this->initialized = new bool(false);
@@ -40,6 +42,12 @@ void mcsm::init::initMCSM(const std::string& version){
     if(!mcsm::curl_holder::init().isSuccess()) return;
     initCommands(version);
     initServers();
+
+    mcsm::Result res = mcsm::GeneralOption::getGeneralOption().initialize();
+    if(!res.isSuccess()){
+        res.printMessage();
+        return;
+    }
 
     *this->initialized = true;
 }
@@ -114,6 +122,12 @@ void mcsm::init::initServers(){
     sr.registerServer("velocity", []() { return std::make_shared<mcsm::VelocityServer>(); }, mcsm::ServerType::VELOCITY);
     sr.registerServer("sponge", []() { return std::make_shared<mcsm::SpongeServer>(); }, mcsm::ServerType::SPONGE_VANILLA);
     sr.registerServer("custom", []() { return std::make_shared<mcsm::CustomServer>(); }, mcsm::ServerType::CUSTOM);
+
+    std::unique_ptr<mcsm::Test1> t = std::make_unique<mcsm::Test1>("test1");
+    sr.registerGeneralProperty("test1", std::move(t));
+
+    std::unique_ptr<mcsm::Test2> t2 = std::make_unique<mcsm::Test2>("test2");
+    sr.registerGeneralProperty("test2", std::move(t2));
 }
 
 bool mcsm::init::isInitialized() const {
