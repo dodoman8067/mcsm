@@ -25,7 +25,7 @@ SOFTWARE.
 #include <mcsm/server/server_registry.h>
 
 std::unordered_map<std::string, mcsm::ServerRegistry::ServerEntry> mcsm::ServerRegistry::serverFactories;
-std::unordered_map<std::string, mcsm::GeneralProperty*> mcsm::ServerRegistry::generalProperties;
+std::unordered_map<std::string, std::unique_ptr<mcsm::GeneralProperty>> mcsm::ServerRegistry::generalProperties;
 
 mcsm::ServerRegistry& mcsm::ServerRegistry::getServerRegistry(){
     static mcsm::ServerRegistry instance;
@@ -36,15 +36,15 @@ void mcsm::ServerRegistry::registerServer(const std::string& name, ServerFactory
     this->serverFactories[name] = { factory, type };
 }
 
-void mcsm::ServerRegistry::registerGeneralProperty(const std::string& name, mcsm::GeneralProperty* property){
-    this->generalProperties[name] = property;
+void mcsm::ServerRegistry::registerGeneralProperty(const std::string& name, std::unique_ptr<mcsm::GeneralProperty> property){
+    this->generalProperties[name] = std::move(property);
 }
 
 mcsm::GeneralProperty* mcsm::ServerRegistry::getGeneralProperty(const std::string& name){
     auto it = this->generalProperties.find(name);
     if(it != this->generalProperties.end()){
         mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, { "Success" }});
-        return it->second;
+        return it->second.get();
     }
     mcsm::Result res({mcsm::ResultType::MCSM_FAIL, { "Not a registered property: " + name }});
     return nullptr;
@@ -52,9 +52,9 @@ mcsm::GeneralProperty* mcsm::ServerRegistry::getGeneralProperty(const std::strin
 
 std::vector<mcsm::GeneralProperty*> mcsm::ServerRegistry::getRegisteredProperties(){
     std::vector<mcsm::GeneralProperty*> properties;
-    std::unordered_map<std::string, mcsm::GeneralProperty*>::iterator it;
+    std::unordered_map<std::string, std::unique_ptr<mcsm::GeneralProperty>>::iterator it;
     for(it = this->generalProperties.begin(); it != this->generalProperties.end(); ++it){
-        properties.push_back(it->second);
+        properties.push_back(it->second.get());
     }
     return properties;
 }

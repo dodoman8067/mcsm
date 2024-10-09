@@ -45,7 +45,7 @@ namespace mcsm {
 
         std::string getServerTypeString(const mcsm::ServerType type) const;
 
-        void registerGeneralProperty(const std::string& name, mcsm::GeneralProperty* property);
+        void registerGeneralProperty(const std::string& name, std::unique_ptr<mcsm::GeneralProperty> property);
 
         mcsm::GeneralProperty* getGeneralProperty(const std::string& name);
 
@@ -57,7 +57,7 @@ namespace mcsm {
         };
 
         static std::unordered_map<std::string, ServerEntry> serverFactories;
-        static std::unordered_map<std::string, mcsm::GeneralProperty*> generalProperties;
+        static std::unordered_map<std::string, std::unique_ptr<mcsm::GeneralProperty>> generalProperties;
 
         ServerRegistry() = default;
         ~ServerRegistry() = default;
