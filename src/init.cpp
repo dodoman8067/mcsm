@@ -23,8 +23,7 @@ SOFTWARE.
 */
 
 #include <mcsm/init.h>
-#include <mcsm/data/options/general/test1.h>
-#include <mcsm/data/options/general/test2.h>
+#include <mcsm/data/options/general/skip_version_check_property.h>
 
 mcsm::init::init(){
     this->initialized = new bool(false);
@@ -123,11 +122,8 @@ void mcsm::init::initServers(){
     sr.registerServer("sponge", []() { return std::make_shared<mcsm::SpongeServer>(); }, mcsm::ServerType::SPONGE_VANILLA);
     sr.registerServer("custom", []() { return std::make_shared<mcsm::CustomServer>(); }, mcsm::ServerType::CUSTOM);
 
-    std::unique_ptr<mcsm::Test1> t = std::make_unique<mcsm::Test1>("test1");
-    sr.registerGeneralProperty("test1", std::move(t));
-
-    std::unique_ptr<mcsm::Test2> t2 = std::make_unique<mcsm::Test2>("test2");
-    sr.registerGeneralProperty("test2", std::move(t2));
+    std::unique_ptr<mcsm::SkipVersionCheckProperty> p1 = std::make_unique<mcsm::SkipVersionCheckProperty>("skip_version_check_while_configuring");
+    sr.registerGeneralProperty("skip_version_check_while_configuring", std::move(p1));
 }
 
 bool mcsm::init::isInitialized() const {

@@ -16,7 +16,7 @@ namespace mcsm {
 
         std::string getName() const;
 
-        virtual nlohmann::json getDefaultValue() = 0;
+        virtual inline nlohmann::json getDefaultValue() = 0;
 
         nlohmann::json getCurrentValue();
         void setCurrentValue(nlohmann::json& value);

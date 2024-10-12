@@ -25,6 +25,7 @@ SOFTWARE.
 
 #include <memory>
 #include <mcsm/util/cli/result.h>
+#include <mcsm/data/options/general_option.h>
 
 namespace mcsm {
     /**

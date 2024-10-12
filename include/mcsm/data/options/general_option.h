@@ -31,6 +31,7 @@ namespace mcsm {
 
         std::vector<mcsm::GeneralProperty*>& getProperties() const;
 
+        mcsm::GeneralProperty* getProperty(const std::string& propertyName) const;
         mcsm::Result setProperty(const std::string& propertyName, nlohmann::json newValue);
 
         mcsm::GlobalOption* getOption();

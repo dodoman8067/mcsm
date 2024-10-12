@@ -5,6 +5,7 @@ static bool init = false;
 
 // loads poperties vector from json
 mcsm::Result mcsm::GeneralOption::load(){
+    instance.properties.reserve(3);
     nlohmann::json json = instance.optionHandle->load();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -72,6 +73,15 @@ mcsm::Result mcsm::GeneralOption::initialize(){
     }
 
     return instance.load();
+}
+
+mcsm::GeneralProperty* mcsm::GeneralOption::getProperty(const std::string& propertyName) const {
+    for(auto& v : instance.properties){
+        if(v->getName() == propertyName){
+            return v;
+        }
+    }
+    return nullptr;
 }
 
 mcsm::Result mcsm::GeneralOption::setProperty(const std::string& propertyName, nlohmann::json newValue){
