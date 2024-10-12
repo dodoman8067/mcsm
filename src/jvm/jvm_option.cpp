@@ -209,7 +209,7 @@ std::vector<std::string> mcsm::JvmOption::getJvmArguments(){
     if(this->option->isGlobal()){
         mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
         
-        nlohmann::json value = opt->getValue("args");
+        const nlohmann::json& value = opt->getValue("args");
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
         
         if(value == nullptr){
@@ -227,12 +227,12 @@ std::vector<std::string> mcsm::JvmOption::getJvmArguments(){
             }
         }
         mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-        std::vector<std::string> args = value;
+        const std::vector<std::string>& args = value;
         return args;
     }else{
         mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
         
-        nlohmann::json value = opt2->getValue("args");
+        const nlohmann::json& value = opt2->getValue("args");
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
         
         if(value == nullptr){
@@ -250,7 +250,7 @@ std::vector<std::string> mcsm::JvmOption::getJvmArguments(){
             }
         }
         mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-        std::vector<std::string> args = value;
+        const std::vector<std::string>& args = value;
         return args;
     }
 }
@@ -284,7 +284,7 @@ std::string mcsm::JvmOption::getJvmPath(){
     if(this->option->isGlobal()){
         mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
         
-        nlohmann::json value = opt->getValue("path");
+        const nlohmann::json& value = opt->getValue("path");
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
         
         if(value == nullptr){
@@ -296,12 +296,12 @@ std::string mcsm::JvmOption::getJvmPath(){
             return "";
         }
         mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-        std::string path = value;
+        const std::string& path = value;
         return path;
     }else{
         mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
         
-        nlohmann::json value = opt2->getValue("path");
+        const nlohmann::json& value = opt2->getValue("path");
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
         
         if(value == nullptr){
@@ -313,7 +313,7 @@ std::string mcsm::JvmOption::getJvmPath(){
             return "";
         }
         mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-        std::string path = value;
+        const std::string& path = value;
         return path;
     }
 }
@@ -347,7 +347,7 @@ std::vector<std::string> mcsm::JvmOption::getServerArguments(){
     if(this->option->isGlobal()){
         mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
         
-        nlohmann::json value = opt->getValue("server_args");
+        const nlohmann::json& value = opt->getValue("server_args");
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
         
         if(value == nullptr){
@@ -365,12 +365,12 @@ std::vector<std::string> mcsm::JvmOption::getServerArguments(){
             }
         }
         mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-        std::vector<std::string> args = value;
+        const std::vector<std::string>& args = value;
         return args;
     }else{
         mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
         
-        nlohmann::json value = opt2->getValue("server_args");
+        const nlohmann::json& value = opt2->getValue("server_args");
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
         
         if(value == nullptr){
@@ -388,7 +388,7 @@ std::vector<std::string> mcsm::JvmOption::getServerArguments(){
             }
         }
         mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-        std::vector<std::string> args = value;
+        const std::vector<std::string>& args = value;
         return args;
     }
 }

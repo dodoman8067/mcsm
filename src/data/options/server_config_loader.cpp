@@ -13,7 +13,7 @@ mcsm::ServerConfigLoader::~ServerConfigLoader(){
 
 mcsm::Result mcsm::ServerConfigLoader::loadConfig(){
     this->optionHandle = std::make_unique<mcsm::Option>(this->configPath, "server");
-    bool optExists = this->optionHandle->exists();
+    const bool& optExists = this->optionHandle->exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -126,7 +126,7 @@ std::string mcsm::ServerConfigLoader::getServerVersion() const {
         return "";
     }
 
-    nlohmann::json value = this->optionHandle->getValue("version");
+    const nlohmann::json& value = this->optionHandle->getValue("version");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
 
     if(value == nullptr){
@@ -170,7 +170,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerConfigLoader::getDefaultOption() co
         return nullptr;
     }
 
-    nlohmann::json profileObj = this->optionHandle->getValue("default_launch_profile");
+    const nlohmann::json& profileObj = this->optionHandle->getValue("default_launch_profile");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return nullptr;
 
     if(profileObj == nullptr){
@@ -271,7 +271,7 @@ std::string mcsm::ServerConfigLoader::getServerType() const {
         return "";
     }
 
-    nlohmann::json value = this->optionHandle->getValue("type");
+    const nlohmann::json& value = this->optionHandle->getValue("type");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
 
     if(value == nullptr){
@@ -300,7 +300,7 @@ std::string mcsm::ServerConfigLoader::getServerJarFile() const {
         return "";
     }
 
-    nlohmann::json value = this->optionHandle->getValue("server_jar");
+    const nlohmann::json& value = this->optionHandle->getValue("server_jar");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
 
     if(value == nullptr){
@@ -345,7 +345,7 @@ std::string mcsm::ServerConfigLoader::getServerJarBuild() const {
         return "";
     }
 
-    nlohmann::json value = this->optionHandle->getValue("server_build");
+    const nlohmann::json& value = this->optionHandle->getValue("server_build");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
 
     if(value == nullptr){
@@ -391,7 +391,7 @@ bool mcsm::ServerConfigLoader::doesAutoUpdate() const {
         return false;
     }
 
-    nlohmann::json value = this->optionHandle->getValue("auto_update");
+    const nlohmann::json& value = this->optionHandle->getValue("auto_update");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
 
     if(value == nullptr){

@@ -79,7 +79,7 @@ bool mcsm::GlobalOption::createDirectories(std::string const &dirName, std::erro
 }
 
 nlohmann::json mcsm::GlobalOption::load() const {
-    std::string fullPath = this->path + "/" + this->name;
+    const std::string& fullPath = this->path + "/" + this->name;
     if(!std::filesystem::exists(fullPath)){
         std::error_code ec;
         createDirectories(this->path, ec);
@@ -101,7 +101,7 @@ nlohmann::json mcsm::GlobalOption::load() const {
 
     std::string content((std::istreambuf_iterator<char>(fileStream)), std::istreambuf_iterator<char>());
     fileStream.close();
-    nlohmann::json finalValue = nlohmann::json::parse(content, nullptr, false);
+    const nlohmann::json& finalValue = nlohmann::json::parse(content, nullptr, false);
     if(finalValue.is_discarded()) {
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailed(fullPath)});
         return nullptr;
@@ -111,7 +111,7 @@ nlohmann::json mcsm::GlobalOption::load() const {
 }
 
 nlohmann::json mcsm::GlobalOption::getValue(const std::string& key) const {
-    nlohmann::json jsonData = load();
+    const nlohmann::json& jsonData = load();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return nullptr;
     if(jsonData.find(key) != jsonData.end()){
         mcsm::Result res({mcsm::ResultType::MCSM_OK, {"Success"}});
@@ -123,14 +123,14 @@ nlohmann::json mcsm::GlobalOption::getValue(const std::string& key) const {
 }
 
 bool mcsm::GlobalOption::hasValue(const std::string& key) const {
-    nlohmann::json data = load();
+    const nlohmann::json& data = load();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return false;
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return data.find(key) != data.end();
 }
 
 bool mcsm::GlobalOption::exists() const {
-    std::string fullPath = this->path + "/" + this->name;
+    const std::string& fullPath = this->path + "/" + this->name;
     return mcsm::fileExists(fullPath);
 }
 
@@ -139,7 +139,7 @@ bool mcsm::GlobalOption::isGlobal() const {
 }
 
 mcsm::Result mcsm::GlobalOption::setValue(const std::string& key, const nlohmann::json& value) const {
-    std::string fullPath = this->path + "/" + this->name;
+    const std::string& fullPath = this->path + "/" + this->name;
     nlohmann::json jsonData = load();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -152,7 +152,7 @@ mcsm::Result mcsm::GlobalOption::setValue(const std::string& key, const nlohmann
 }
 
 mcsm::Result mcsm::GlobalOption::save(const nlohmann::json& jsonData) const {
-    std::string fullPath = this->path + "/" + this->name;
+    const std::string& fullPath = this->path + "/" + this->name;
     std::ofstream outFile(fullPath);
     if (outFile.is_open()) {
         outFile << jsonData.dump(2); 
@@ -166,7 +166,7 @@ mcsm::Result mcsm::GlobalOption::save(const nlohmann::json& jsonData) const {
 }
 
 mcsm::Result mcsm::GlobalOption::reset() const {
-    std::string fullPath = this->path + "/" + this->name;
+    const std::string& fullPath = this->path + "/" + this->name;
     std::ofstream outFile(fullPath);
     if (outFile.is_open()) {
         outFile << "{}";

@@ -75,7 +75,7 @@ std::string mcsm::ServerDataOption::getLastTimeLaunched() const {
         return "";
     }
 
-    nlohmann::json value = this->option->getValue("last_time_launched");
+    const nlohmann::json& value = this->option->getValue("last_time_launched");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
 
     if(value == nullptr){
@@ -115,7 +115,7 @@ std::string mcsm::ServerDataOption::getServerTimeCreated() const {
         return "";
     }
 
-    nlohmann::json value = this->option->getValue("server_time_created");
+    const nlohmann::json& value = this->option->getValue("server_time_created");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
 
     if(value == nullptr){
@@ -155,7 +155,7 @@ std::string mcsm::ServerDataOption::getLastDownloadedBuild() const {
         return "";
     }
 
-    nlohmann::json value = this->option->getValue("last_downloaded_build");
+    const nlohmann::json& value = this->option->getValue("last_downloaded_build");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
 
     if(value == nullptr){
