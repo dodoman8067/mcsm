@@ -89,7 +89,7 @@ void mcsm::GenerateServerCommand::execute(const std::vector<std::string>& args){
 std::string mcsm::GenerateServerCommand::getProfileName(const std::vector<std::string>& args) const {
     std::string name;
     for(size_t i = 0; i < args.size(); ++i){
-        std::string_view arg = args[i];
+        const std::string& arg = args[i];
         if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
             if(!(arg == "-profile" || arg == "--profile" || arg == "-p" || arg == "--p")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
@@ -105,7 +105,7 @@ std::string mcsm::GenerateServerCommand::getProfileName(const std::vector<std::s
 std::string mcsm::GenerateServerCommand::getServerName(const std::vector<std::string>& args) const {
     std::string name;
     for(size_t i = 0; i < args.size(); ++i){
-        std::string_view arg = args[i];
+        const std::string& arg = args[i];
         if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
             if(!(arg == "-name" || arg == "--name")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
@@ -121,7 +121,7 @@ std::string mcsm::GenerateServerCommand::getServerName(const std::vector<std::st
 std::string mcsm::GenerateServerCommand::getServerVersion(const std::vector<std::string>& args) const {
     std::string ver;
     for(size_t i = 0; i < args.size(); ++i){
-        std::string_view arg = args[i];
+        const std::string& arg = args[i];
         if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
             if(!(arg == "-version" || arg == "--version" || arg == "-ver" || arg == "--ver" || arg == "-v" || arg == "--v" || arg == "-serverversion" || arg == "--serverversion" || arg == "-sversion" || arg == "--sversion" || arg == "-sver" || arg == "--sver" || arg == "-sv" || arg == "--sv")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
@@ -158,7 +158,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::GenerateServerCommand::searchOption(const
 
 mcsm::SearchTarget mcsm::GenerateServerCommand::getSearchTarget(const std::vector<std::string>& args) const {
     if(args.empty()) return mcsm::SearchTarget::ALL;
-    for(std::string_view arg : args) {
+    for(const std::string& arg : args) {
         if(arg == "--global" || arg == "-global" || arg == "--g" || arg == "-g") return mcsm::SearchTarget::GLOBAL;
         if(arg == "--current" || arg == "-current" || arg == "--c" || arg == "-c") return mcsm::SearchTarget::CURRENT;
     }
@@ -168,7 +168,7 @@ mcsm::SearchTarget mcsm::GenerateServerCommand::getSearchTarget(const std::vecto
 std::string mcsm::GenerateServerCommand::getServerType(const std::vector<std::string>& args) const {
     std::string type;
     for(size_t i = 0; i < args.size(); ++i){
-        std::string_view arg = args[i];
+        const std::string& arg = args[i];
         if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
             if(!(arg == "-servertype" || arg == "--servertype" || arg == "-st" || arg == "--st")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
@@ -183,7 +183,7 @@ std::string mcsm::GenerateServerCommand::getServerType(const std::vector<std::st
 
 bool mcsm::GenerateServerCommand::shouldSkipAutoUpdate(const std::vector<std::string>& args) const {
     for(size_t i = 0; i < args.size(); ++i){
-        std::string_view arg = args[i];
+        const std::string& arg = args[i];
         if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
             if(!(arg == "-no-auto-update" || arg == "-no-auto-updates" || arg == "--no-auto-update" || arg == "--no-auto-updates"
             || arg == "-skip-auto-update" || arg == "-skip-auto-updates" || arg == "--skip-auto-update" || arg == "--skip-auto-updates")) continue;

@@ -53,7 +53,7 @@ inline void mcsm::ViewServerTypeCommand::printServerTypeInfo(const std::vector<s
 
 inline std::shared_ptr<mcsm::Server> mcsm::ViewServerTypeCommand::getServer(const std::vector<std::string>& args) const {
     for(size_t i = 0; i < args.size(); ++i){
-        std::string_view arg = args[i];
+        const std::string& arg = args[i];
         if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
             if(!(arg == "-type" || arg == "--type" || arg == "-t" || arg == "--t" || arg == "-servertype" || arg == "--servertype" || arg == "-st" || "--st")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-'){

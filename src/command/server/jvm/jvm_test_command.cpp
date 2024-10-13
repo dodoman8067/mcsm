@@ -54,7 +54,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::JvmTestCommand::searchOption(const mcsm::
 
 mcsm::SearchTarget mcsm::JvmTestCommand::getSearchTarget(const std::vector<std::string>& args){
     if(args.empty()) return mcsm::SearchTarget::ALL;
-    for(std::string_view arg : args) {
+    for(const std::string& arg : args) {
         if(arg == "--global" || arg == "-global" || arg == "--g" || arg == "-g") return mcsm::SearchTarget::GLOBAL;
         if(arg == "--current" || arg == "-current" || arg == "--c" || arg == "-c") return mcsm::SearchTarget::CURRENT;
     }
@@ -64,7 +64,7 @@ mcsm::SearchTarget mcsm::JvmTestCommand::getSearchTarget(const std::vector<std::
 std::string mcsm::JvmTestCommand::getProfileName(const std::vector<std::string>& args) const {
     std::string name;
     for(size_t i = 0; i < args.size(); ++i){
-        std::string_view arg = args[i];
+        const std::string& arg = args[i];
         if(!(arg == "-name" || arg == "--name" || arg == "-n" || arg == "--n")) continue;
         if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
             name = args[i + 1];

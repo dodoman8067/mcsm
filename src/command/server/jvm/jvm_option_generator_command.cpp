@@ -70,7 +70,7 @@ void mcsm::JvmOptionGeneratorCommand::execute(const std::vector<std::string>& ar
 
 mcsm::SearchTarget mcsm::JvmOptionGeneratorCommand::getSaveTarget(const std::vector<std::string>& args){
     if(args.empty()) return mcsm::SearchTarget::ALL;
-    for(std::string_view arg : args) {
+    for(const std::string& arg : args) {
         if(arg == "--global" || arg == "-global" || arg == "--g" || arg == "-g") return mcsm::SearchTarget::GLOBAL;
     }
     return mcsm::SearchTarget::CURRENT;
@@ -79,7 +79,7 @@ mcsm::SearchTarget mcsm::JvmOptionGeneratorCommand::getSaveTarget(const std::vec
 std::string mcsm::JvmOptionGeneratorCommand::getJvmPath(const std::vector<std::string>& args) const {
     std::string jvmPath;
     for(size_t i = 0; i < args.size(); ++i){
-        std::string_view arg = args[i];
+        const std::string& arg = args[i];
         if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
             if(!(arg == "-jvmpath" || arg == "--jvmpath" || arg == "-jp" || arg == "--jp")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
@@ -109,7 +109,7 @@ std::string mcsm::JvmOptionGeneratorCommand::getJvmPath(const std::vector<std::s
 std::string mcsm::JvmOptionGeneratorCommand::getProfileName(const std::vector<std::string>& args, const mcsm::SearchTarget& target) const {
     std::string name;
     for(size_t i = 0; i < args.size(); ++i){
-        std::string_view arg = args[i];
+        const std::string& arg = args[i];
         if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
             if(!(arg == "-name" || arg == "--name" || arg == "-n" || arg == "--n")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
@@ -238,7 +238,7 @@ inline void mcsm::JvmOptionGeneratorCommand::createProfile(const std::vector<std
     
     if(!jArgs.empty()){
         std::cout << "[mcsm/INFO] JVM arguments : ";
-        for(std::string_view args : jArgs){
+        for(const std::string& args : jArgs){
             std::cout << args << " ";
         }
         std::cout << "\n";

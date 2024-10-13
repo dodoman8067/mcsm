@@ -55,7 +55,7 @@ std::vector<std::unique_ptr<mcsm::Command>>& mcsm::CommandManager::getCommands()
     return *commands;
 }
 
-bool mcsm::CommandManager::hasCommand(std::string_view name){
+bool mcsm::CommandManager::hasCommand(const std::string& name){
     for(auto& command : *commands){
         if(command->getName() != name && !command->hasAlias(name)) continue;
         return true;

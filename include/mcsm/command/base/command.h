@@ -29,16 +29,16 @@ SOFTWARE.
 namespace mcsm {
     class Command {
     private:
-        std::string_view name;
-        std::string_view description;
+        std::string name;
+        std::string description;
         std::vector<std::string>* aliases;
     public:
         Command(const std::string& name, const std::string& description);
         ~Command();
-        std::string_view getName() const;
-        std::string_view getDescription() const;
+        std::string getName() const;
+        std::string getDescription() const;
         void addAlias(const std::string& value);
-        bool hasAlias(std::string_view value) const;
+        bool hasAlias(const std::string& value) const;
         const std::vector<std::string>& getAliases() const;
         virtual void execute(const std::vector<std::string>& args) = 0;
     };
