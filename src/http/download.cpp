@@ -54,7 +54,7 @@ static int xferinfoCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow,
 }
 
 mcsm::Result mcsm::download(const std::string& name, const std::string& url){
-    std::string path = mcsm::getCurrentPath();
+    const std::string& path = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -72,7 +72,7 @@ mcsm::Result mcsm::download(const std::string& name, const std::string& url, con
     CURL* curl = mcsm::curl_holder::curl;
     CURLcode res;
     std::FILE* file;
-    std::string filename = path + "/" + name;
+    const std::string& filename = path + "/" + name;
     file = std::fopen(filename.c_str(), "wb");
 
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
@@ -130,7 +130,7 @@ bool mcsm::isText(const std::string& url){
 
     res = curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &contentType);
     if(res == CURLE_OK && contentType){
-        std::string contentTypeStr(contentType);
+        const std::string& contentTypeStr = contentType;
         isText = contentTypeStr.find("text") == 0 || contentTypeStr.find("json") != std::string::npos;
     }else{
         mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::getRequestFailed(url, curl_easy_strerror(res))});
