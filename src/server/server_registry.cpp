@@ -70,10 +70,10 @@ std::shared_ptr<mcsm::Server> mcsm::ServerRegistry::getServer(const std::string&
 }
 
 std::string mcsm::ServerRegistry::getServerTypeString(const mcsm::ServerType type) const {
-    for(const auto& pair : serverFactories){
-        if(pair.second.type == type){
+    for(const auto&[id, server]: serverFactories){
+        if(server.type == type){
             mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, { "Success" }});
-            return pair.first;
+            return id;
         }
     }
     mcsm::Result res({mcsm::ResultType::MCSM_FAIL, { "Server type not found" }});
