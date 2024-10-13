@@ -62,7 +62,7 @@ void mcsm::JvmOptionEditCommand::execute(const std::vector<std::string>& args){
 
 mcsm::SearchTarget mcsm::JvmOptionEditCommand::getSearchTarget(const std::vector<std::string>& args){
     if(args.empty()) return mcsm::SearchTarget::ALL;
-    for(const std::string& arg : args) {
+    for(std::string_view arg : args) {
         if(arg == "--global" || arg == "-global" || arg == "--g" || arg == "-g") return mcsm::SearchTarget::GLOBAL;
         if(arg == "--current" || arg == "-current" || arg == "--c" || arg == "-c") return mcsm::SearchTarget::CURRENT;
     }
@@ -73,7 +73,7 @@ std::string mcsm::JvmOptionEditCommand::getJvmPath(const std::vector<std::string
     std::string jvmPath;
     bool valid = false;
     for(size_t i = 0; i < args.size(); ++i){
-        const std::string& arg = args[i];
+        std::string_view arg = args[i];
         if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
             if(!(arg == "-jvmpath" || arg == "--jvmpath" || arg == "-jp" || arg == "--jp")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
@@ -100,7 +100,7 @@ std::string mcsm::JvmOptionEditCommand::getJvmPath(const std::vector<std::string
 std::string mcsm::JvmOptionEditCommand::getProfileName(const std::vector<std::string>& args, const mcsm::SearchTarget& target) const {
     std::string name;
     for(size_t i = 0; i < args.size(); ++i){
-        const std::string& arg = args[i];
+        std::string_view arg = args[i];
         if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
             if(!(arg == "-name" || arg == "--name" || arg == "-n" || arg == "--n")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
@@ -154,7 +154,6 @@ std::vector<std::string> mcsm::JvmOptionEditCommand::getServerArguments(const st
 std::vector<std::string> mcsm::JvmOptionEditCommand::getJvmArguments(const std::vector<std::string>& args) const {
     std::vector<std::string> result;
     bool foundServerArgsFlag = false;
-
     for(const std::string& arg : args){
         if(foundServerArgsFlag){
             if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()) break;
@@ -248,14 +247,14 @@ inline void mcsm::JvmOptionEditCommand::printDifference(const std::string& categ
         std::cout << "[mcsm/INFO] " << category << " : \n";
         if(!from.empty()){
             std::cout << "[mcsm/INFO] From : ";
-            for (const std::string& arg : from) {
+            for (std::string_view arg : from) {
                 std::cout << arg << " ";
             }
         }
 
         if(!to.empty()){
             std::cout << "\n[mcsm/INFO] To : ";
-            for(const std::string& arg : to){
+            for(std::string_view arg : to){
                 std::cout << arg << " ";
             }
         }
