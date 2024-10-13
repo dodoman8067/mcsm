@@ -31,6 +31,7 @@ int main(int argc, char *argv[]){
     /**
      * TODO
      * Add global settings
+     * Add "clear" command which removes the current server jarfile
      * Example
      * skip_version_check_while_configuring: Skip hasVersion check while configuring. Can be used to reduce configuring time (more than 10 secs)
      * enable_beta_features: Enable beta fetures by implementing hasBetaEnabled() 
