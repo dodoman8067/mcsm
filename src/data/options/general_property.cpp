@@ -12,7 +12,7 @@ std::string mcsm::GeneralProperty::getName() const {
     return this->name;
 }
 
-nlohmann::json mcsm::GeneralProperty::getCurrentValue(){
+const nlohmann::json& mcsm::GeneralProperty::getCurrentValue() const {
     return this->value;
 }
 

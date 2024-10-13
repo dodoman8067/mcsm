@@ -18,7 +18,7 @@ namespace mcsm {
 
         virtual inline nlohmann::json getDefaultValue() = 0;
 
-        nlohmann::json getCurrentValue();
+        const nlohmann::json& getCurrentValue() const;
         void setCurrentValue(nlohmann::json& value);
     };
 }
