@@ -65,49 +65,34 @@ void mcsm::init::initCommands(const std::string& version){
     mcsm::CommandManager::addCommand(std::move(helpCommand));
 
     std::unique_ptr<mcsm::GenerateServerCommand> generateServerCommand = std::make_unique<mcsm::GenerateServerCommand>("init", "Configures a server.");
-    generateServerCommand->addAlias("initServer");
     generateServerCommand->addAlias("initserver");
-    generateServerCommand->addAlias("initialize");
-    generateServerCommand->addAlias("initializeServer");
-    generateServerCommand->addAlias("initializeserver");
     mcsm::CommandManager::addCommand(std::move(generateServerCommand));
 
     std::unique_ptr<mcsm::JvmOptionGeneratorCommand> jvmOptionGeneratorCommand = std::make_unique<mcsm::JvmOptionGeneratorCommand>("genJvmProfile", "Generates a Java Virtual Machine launch profile.");
-    jvmOptionGeneratorCommand->addAlias("generateJvmProfile");
     jvmOptionGeneratorCommand->addAlias("generatejvmprofile");
-    jvmOptionGeneratorCommand->addAlias("generateJavaVirtualMachineProfile");
     jvmOptionGeneratorCommand->addAlias("genjvmprofile");
     mcsm::CommandManager::addCommand(std::move(jvmOptionGeneratorCommand));
 
     std::unique_ptr<mcsm::JvmOptionSearchCommand> jvmProfileSearchCommand = std::make_unique<mcsm::JvmOptionSearchCommand>("searchJvmProfile", "Looks up Java Virtual Machine profiles.");
-    jvmProfileSearchCommand->addAlias("searchProfile");
-    jvmProfileSearchCommand->addAlias("searchJavaVirtualMachineProfile");
     jvmProfileSearchCommand->addAlias("searchprofile");
+    jvmProfileSearchCommand->addAlias("searchjvmprofile");
     mcsm::CommandManager::addCommand(std::move(jvmProfileSearchCommand));
 
     std::unique_ptr<mcsm::JvmOptionEditCommand> jvmOptionEditCommand = std::make_unique<mcsm::JvmOptionEditCommand>("editJvmProfile", "Edits the specified Java Virtual Machine launch profile.");
-    jvmOptionEditCommand->addAlias("editJavaVirtualMachineProfile");
-    jvmOptionEditCommand->addAlias("editprofile");
-    jvmOptionEditCommand->addAlias("editProfile");
     jvmOptionEditCommand->addAlias("editjvmprofile");
+    jvmOptionEditCommand->addAlias("editprofile");
     mcsm::CommandManager::addCommand(std::move(jvmOptionEditCommand));
 
     std::unique_ptr<mcsm::StartServerCommand> startServerCommand = std::make_unique<mcsm::StartServerCommand>("start", "Starts the configured server.");
-    startServerCommand->addAlias("startServer");
     startServerCommand->addAlias("startserver");
     mcsm::CommandManager::addCommand(std::move(startServerCommand));
 
     std::unique_ptr<mcsm::ViewServerCommand> viewServerCommand = std::make_unique<mcsm::ViewServerCommand>("view", "Provides the configured server's basic information.");
-    viewServerCommand->addAlias("viewServer");
-    viewServerCommand->addAlias("viewserver");
+    viewServerCommand->addAlias("status");
     mcsm::CommandManager::addCommand(std::move(viewServerCommand));
 
     std::unique_ptr<mcsm::ViewServerTypeCommand> viewServerTypeCommand = std::make_unique<mcsm::ViewServerTypeCommand>("info", "Provides a basic information about the specified server implementation.");
     viewServerTypeCommand->addAlias("information");
-    viewServerTypeCommand->addAlias("informationServer");
-    viewServerTypeCommand->addAlias("informationserver");
-    viewServerTypeCommand->addAlias("infoServer");
-    viewServerTypeCommand->addAlias("infoserver");
     mcsm::CommandManager::addCommand(std::move(viewServerTypeCommand));
 }
 
