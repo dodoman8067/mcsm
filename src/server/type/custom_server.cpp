@@ -186,7 +186,7 @@ mcsm::Result mcsm::CustomServer::start(mcsm::ServerConfigLoader* loader, mcsm::J
 
     if(!fileExists){
         mcsm::info("Setting up " + jar + "...");
-        mcsm::info("\"server_jar\" will be used as the copied/downloaded file name. Make sure you don't have characters like \"/\".");
+        mcsm::info("\"server_jar_name\" will be used as the copied/downloaded file name. Make sure you don't have characters like \"/\".");
         std::string sVer = loader->getServerVersion();
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
             std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();

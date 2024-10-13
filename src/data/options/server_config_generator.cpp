@@ -67,7 +67,7 @@ mcsm::Result mcsm::ServerConfigGenerator::generate(const std::string& version, s
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(jarFile)});
         return res;
     }
-    mcsm::Result res5 = this->optionHandle->setValue("server_jar", jarFile);
+    mcsm::Result res5 = this->optionHandle->setValue("server_jar_name", jarFile);
     if(!res5.isSuccess()) return res5;
 
     mcsm::Result res6 = this->optionHandle->setValue("server_build", "latest");

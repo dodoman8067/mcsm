@@ -300,15 +300,15 @@ std::string mcsm::ServerConfigLoader::getServerJarFile() const {
         return "";
     }
 
-    const nlohmann::json& value = this->optionHandle->getValue("server_jar");
+    const nlohmann::json& value = this->optionHandle->getValue("server_jar_name");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
 
     if(value == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"server_jar\"", this->optionHandle->getName())});
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"server_jar_name\"", this->optionHandle->getName())});
         return "";
     }
     if(!value.is_string()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"server_jar\"", "string")});
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"server_jar_name\"", "string")});
         return "";
     }
 
@@ -333,7 +333,7 @@ mcsm::Result mcsm::ServerConfigLoader::setServerJarFile(const std::string& name)
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(name)});
         return res;
     }
-    return this->optionHandle->setValue("server_jar", name);
+    return this->optionHandle->setValue("server_jar_name", name);
 }
 
 std::string mcsm::ServerConfigLoader::getServerJarBuild() const {

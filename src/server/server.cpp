@@ -126,16 +126,16 @@ std::string mcsm::Server::getJarFile(const std::string& checkDir) const {
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
 
     if(exists){
-        nlohmann::json value = opt.getValue("server_jar");
+        nlohmann::json value = opt.getValue("server_jar_name");
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
 
         if(value == nullptr){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"server_jar\"", opt.getName())});
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"server_jar_name\"", opt.getName())});
             return "";
         }
 
         if(!value.is_string()){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"server_jar\"", "string")});
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"server_jar_name\"", "string")});
             return "";
         }
         mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
