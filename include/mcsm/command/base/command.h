@@ -29,8 +29,8 @@ SOFTWARE.
 namespace mcsm {
     class Command {
     private:
-        std::string_view name;
-        std::string_view description;
+        std::string name;
+        std::string description;
         std::vector<std::string>* aliases;
     public:
         Command(const std::string& name, const std::string& description);
