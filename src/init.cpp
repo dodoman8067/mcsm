@@ -94,6 +94,10 @@ void mcsm::init::initCommands(const std::string& version){
     std::unique_ptr<mcsm::ViewServerTypeCommand> viewServerTypeCommand = std::make_unique<mcsm::ViewServerTypeCommand>("info", "Provides a basic information about the specified server implementation.");
     viewServerTypeCommand->addAlias("information");
     mcsm::CommandManager::addCommand(std::move(viewServerTypeCommand));
+
+    std::unique_ptr<mcsm::ClearServerCommand> clearServerCommand = std::make_unique<mcsm::ClearServerCommand>("clear", "Clears the configured server's jarfile and its update history.");
+    clearServerCommand->addAlias("clean");
+    mcsm::CommandManager::addCommand(std::move(clearServerCommand));
 }
 
 void mcsm::init::initServers(){
