@@ -102,6 +102,22 @@ std::vector<mcsm::GeneralProperty*>& mcsm::GeneralOption::getProperties() const 
     return instance.properties;
 }
 
+const bool mcsm::GeneralOption::advancedParseEnabled() const {
+    auto* property = getProperty("advanced_json_parse_fail_errors");
+    if(property == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFoundPlusFix("advanced_json_parse_fail_errors", "general option", "\"advanced_json_parse_fail_errors\": false")});
+        return false;
+    }
+
+    const nlohmann::json& propertyValue = property->getCurrentValue();
+    if(!propertyValue.is_boolean()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongTypePlusFix("advanced_json_parse_fail_errors", "general option", "boolean", "false or true")});
+        return false;
+    }
+
+    return propertyValue.get<bool>();
+}
+
 mcsm::GeneralOption& mcsm::GeneralOption::getGeneralOption(){
     static mcsm::GeneralOption o;
     return o;
