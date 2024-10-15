@@ -24,6 +24,7 @@ SOFTWARE.
 
 #include <mcsm/init.h>
 #include <mcsm/data/options/general/skip_version_check_property.h>
+#include <mcsm/data/options/general/advanced_json_errors_property.h>
 
 mcsm::init::init(){
     this->initialized = new bool(false);
@@ -113,6 +114,9 @@ void mcsm::init::initServers(){
 
     std::unique_ptr<mcsm::SkipVersionCheckProperty> p1 = std::make_unique<mcsm::SkipVersionCheckProperty>("skip_version_check_while_configuring");
     sr.registerGeneralProperty("skip_version_check_while_configuring", std::move(p1));
+
+    std::unique_ptr<mcsm::AdvancedJsonErrorsProperty> p2 = std::make_unique<mcsm::AdvancedJsonErrorsProperty>("advanced_json_parse_fail_errors");
+    sr.registerGeneralProperty("advanced_json_parse_fail_errors", std::move(p2));
 }
 
 bool mcsm::init::isInitialized() const {
