@@ -23,11 +23,13 @@ SOFTWARE.
 */
 
 #include <mcsm/init.h>
+#include <mcsm/util/cli/segfault_handler.h>
 //#include <mcsm/data/options/multi_server_option.h>
 
 const std::string version = "0.4";
 
 int main(int argc, char *argv[]){
+    std::signal(SIGSEGV, mcsm::segfault_handler::handle);
     /**
      * TODO
      * Add global settings
