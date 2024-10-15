@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include <mcsm/data/options/general_option.h>
 #include <mcsm/data/option.h>
 
 mcsm::Option::Option(const std::string& path, const std::string& name){
@@ -51,6 +52,10 @@ bool mcsm::Option::createDirectories(const std::string &dirName, std::error_code
 }
 
 nlohmann::json mcsm::Option::load() const {
+    return load(false);
+}
+
+nlohmann::json mcsm::Option::load(const bool& advancedParse) const {
     const std::string& fullPath = this->path + "/" + this->name;
     if(!std::filesystem::exists(fullPath)){
         std::error_code ec;
@@ -73,10 +78,26 @@ nlohmann::json mcsm::Option::load() const {
 
     std::string content((std::istreambuf_iterator<char>(fileStream)), std::istreambuf_iterator<char>());
     fileStream.close();
-    const nlohmann::json& finalValue = nlohmann::json::parse(content, nullptr, false);
-    if(finalValue.is_discarded()) {
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailed(fullPath)});
-        return nullptr;
+
+    nlohmann::json finalValue;
+
+    if(advancedParse){
+        try {
+            finalValue = nlohmann::json::parse(content);
+        }catch (const nlohmann::json::parse_error& e){
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+                "Json parsed failed with: " + std::string(e.what()),
+                "Byte position of error: " + std::to_string(e.byte),
+                "Report this to Github if you believe that this is an error."
+            }});
+            return nullptr;
+        }
+    }else{
+        finalValue = nlohmann::json::parse(content, nullptr, false);
+        if(finalValue.is_discarded()) {
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailed(fullPath)});
+            return nullptr;
+        }
     }
     mcsm::Result res({mcsm::ResultType::MCSM_OK, {"Success"}});
     return finalValue;

@@ -50,6 +50,8 @@ namespace mcsm {
 
         nlohmann::json load() const;
 
+        nlohmann::json load(const bool& advancedParse) const;
+
         /**
          * @brief No mcsm::Result needed
         */
