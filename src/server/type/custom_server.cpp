@@ -124,6 +124,8 @@ mcsm::Result mcsm::CustomServer::setupServerJarFile(const std::string& path, con
                 }});
                 return res;
             }
+
+            return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
         }
     }
     mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
