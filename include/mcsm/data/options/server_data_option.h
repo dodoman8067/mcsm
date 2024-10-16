@@ -37,6 +37,8 @@ namespace mcsm {
         ServerDataOption(const std::string& path);
         ~ServerDataOption();
 
+        mcsm::Result load();
+
         mcsm::Result create(const std::string& lastTimeLaunched);
 
         mcsm::Result reset();

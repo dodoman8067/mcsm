@@ -6,7 +6,10 @@ static bool init = false;
 // loads poperties vector from json
 mcsm::Result mcsm::GeneralOption::load(){
     instance.properties.reserve(3);
-    nlohmann::json json = instance.optionHandle->load();
+    mcsm::Result jLoadRes = instance.optionHandle->load();
+    if(!jLoadRes.isSuccess()) return jLoadRes;
+
+    nlohmann::json json = instance.optionHandle->getData();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         //if(resp.second[0].find("parse json") == std::string::npos){
@@ -102,7 +105,7 @@ std::vector<mcsm::GeneralProperty*>& mcsm::GeneralOption::getProperties() const 
     return instance.properties;
 }
 
-const bool mcsm::GeneralOption::advancedParseEnabled() const {
+bool mcsm::GeneralOption::advancedParseEnabled() const {
     auto* property = getProperty("advanced_json_parse_fail_errors");
     if(property == nullptr){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFoundPlusFix("advanced_json_parse_fail_errors", "general option", "\"advanced_json_parse_fail_errors\": false")});

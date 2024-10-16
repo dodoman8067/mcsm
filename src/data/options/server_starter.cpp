@@ -16,6 +16,9 @@ mcsm::Result mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const std
         return res;
     }
 
+    mcsm::Result sLoadRes = serverDataOpt.load();
+    if(!sLoadRes.isSuccess()) return sLoadRes;
+
     bool fileExists = mcsm::fileExists(optionPath + "/server.json");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();

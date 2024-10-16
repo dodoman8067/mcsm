@@ -35,7 +35,10 @@ mcsm::Result mcsm::FabricServerDataOption::updateLoaderVersion(const std::string
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(version)});
         return res;
     }
-    return this->option->setValue("last_downloaded_loader_version", mcsm::safeString(version));
+    mcsm::Result res1 = this->option->setValue("last_downloaded_loader_version", mcsm::safeString(version));
+    if(!res1.isSuccess()) return res1;
+
+    return this->option->save();
 }
 
 std::string mcsm::FabricServerDataOption::getInstallerVersion() const {
@@ -63,5 +66,8 @@ std::string mcsm::FabricServerDataOption::getInstallerVersion() const {
 }
 
 mcsm::Result mcsm::FabricServerDataOption::updateInstallerVersion(const std::string& version){
-    return this->option->setValue("last_downloaded_installer_version", mcsm::safeString(version));
+    mcsm::Result res = this->option->setValue("last_downloaded_installer_version", mcsm::safeString(version));
+    if(!res.isSuccess()) return res;
+
+    return this->option->save();
 }

@@ -172,6 +172,13 @@ mcsm::Result mcsm::VelocityServer::download(const std::string& version, const st
         return res;
     }
 
+    opt.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
     mcsm::ServerDataOption sDataOpt(optionPath);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -458,6 +465,7 @@ mcsm::Result mcsm::VelocityServer::generate(const std::string& name, mcsm::JvmOp
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
+    // No need to call opt.load() here. create() in ServerDataOption will call it eventually
     return configure(version, server, &opt, path, name, option, autoUpdate);
 }
 

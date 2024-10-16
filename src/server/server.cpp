@@ -21,6 +21,7 @@ SOFTWARE.
 */
 
 #include <mcsm/server/server.h>
+#include <mcsm/data/options/general_option.h>
 
 mcsm::Result mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
     return start(loader, option, mcsm::getCurrentPath(), mcsm::getCurrentPath());
@@ -123,6 +124,9 @@ std::string mcsm::Server::getJarFile(const std::string& checkDir) const {
     //this method is usually for getting the configured server's jarfile.
     mcsm::Option opt(checkDir, "server");
     bool exists = opt.exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+
+    opt.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
 
     if(exists){

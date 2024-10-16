@@ -1,4 +1,5 @@
 #include <mcsm/data/options/server_config_loader.h>
+#include <mcsm/data/options/general_option.h>
 #include <mcsm/server/server_registry.h>
 
 mcsm::ServerConfigLoader::ServerConfigLoader(const std::string& path){
@@ -24,6 +25,16 @@ mcsm::Result mcsm::ServerConfigLoader::loadConfig(){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured(this->configPath)});
         return res;
     }
+
+    bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    mcsm::Result lRes = this->optionHandle->load(advp);
+    if(!lRes.isSuccess()) return lRes;
 
     this->isLoaded = true;
     return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
@@ -114,7 +125,10 @@ mcsm::Result mcsm::ServerConfigLoader::setServerName(const std::string& name){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(name)});
         return res;
     }
-    return this->optionHandle->setValue("name", name);
+    mcsm::Result setRes = this->optionHandle->setValue("name", name);
+
+    if(!setRes.isSuccess()) return setRes;
+    return this->optionHandle->save();
 }
 
 std::string mcsm::ServerConfigLoader::getServerVersion() const {
@@ -158,7 +172,10 @@ mcsm::Result mcsm::ServerConfigLoader::setServerVersion(const std::string& versi
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(version)});
         return res;
     }
-    return this->optionHandle->setValue("version", version);
+    mcsm::Result setRes = this->optionHandle->setValue("version", version);
+
+    if(!setRes.isSuccess()) return setRes;
+    return this->optionHandle->save();
 }
 
 std::unique_ptr<mcsm::JvmOption> mcsm::ServerConfigLoader::getDefaultOption() const {
@@ -259,7 +276,10 @@ mcsm::Result mcsm::ServerConfigLoader::setDefaultOption(mcsm::JvmOption& jvmOpti
     }else{
         profileObj["location"] = "current";
     }
-    return this->optionHandle->setValue("default_launch_profile", profileObj);
+    mcsm::Result setRes = this->optionHandle->setValue("default_launch_profile", profileObj);
+
+    if(!setRes.isSuccess()) return setRes;
+    return this->optionHandle->save();
 }
 
 std::string mcsm::ServerConfigLoader::getServerType() const {
@@ -333,7 +353,10 @@ mcsm::Result mcsm::ServerConfigLoader::setServerJarFile(const std::string& name)
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(name)});
         return res;
     }
-    return this->optionHandle->setValue("server_jar_name", name);
+    mcsm::Result setRes = this->optionHandle->setValue("server_jar_name", name);
+
+    if(!setRes.isSuccess()) return setRes;
+    return this->optionHandle->save();
 }
 
 std::string mcsm::ServerConfigLoader::getServerJarBuild() const {
@@ -379,7 +402,10 @@ mcsm::Result mcsm::ServerConfigLoader::setServerJarBuild(const std::string& buil
         return res;
     }
     mcsm::Option option(this->configPath, "server");
-    return this->optionHandle->setValue("server_build", build);
+    mcsm::Result setRes =  this->optionHandle->setValue("server_build", build);
+
+    if(!setRes.isSuccess()) return setRes;
+    return this->optionHandle->save();
 }
 
 bool mcsm::ServerConfigLoader::doesAutoUpdate() const {
@@ -415,7 +441,10 @@ mcsm::Result mcsm::ServerConfigLoader::setAutoUpdate(const bool& update){
         }});
         return res;
     }
-    return this->optionHandle->setValue("auto_update", update);
+    
+    mcsm::Result setRes = this->optionHandle->setValue("auto_update", update);
+    if(!setRes.isSuccess()) return setRes;
+    return this->optionHandle->save();
 }
 
 std::unique_ptr<mcsm::Option>& mcsm::ServerConfigLoader::getHandle(){

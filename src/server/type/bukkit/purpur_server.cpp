@@ -155,12 +155,22 @@ mcsm::Result mcsm::PurpurServer::download(const std::string& version, const std:
         return res;
     }
 
+    opt.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
     mcsm::ServerDataOption sDataOpt(optionPath);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
+
+    mcsm::Result sLoadRes = sDataOpt.load();
+    if(!sLoadRes.isSuccess()) return sLoadRes;
 
     nlohmann::json typeValue = opt.getValue("type");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -330,6 +340,9 @@ mcsm::Result mcsm::PurpurServer::update(const std::string& path, const std::stri
         return res;
     }
 
+    mcsm::Result sLoadRes = sDataOpt.load();
+    if(!sLoadRes.isSuccess()) return sLoadRes;
+
     mcsm::ServerConfigLoader loader(optionPath);
     mcsm::Result loadRes = loader.loadConfig();
     if(!loadRes.isSuccess()) return loadRes;
@@ -440,6 +453,9 @@ mcsm::Result mcsm::PurpurServer::generate(const std::string& name, mcsm::JvmOpti
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
+
+    // No need to call opt.load() here. create() in ServerDataOption will call it eventually
+
     return configure(version, server, &opt, path, name, option, autoUpdate);
 }
 

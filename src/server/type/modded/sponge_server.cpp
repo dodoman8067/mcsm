@@ -49,6 +49,12 @@ std::string mcsm::SpongeServer::getVersion(const std::string& ver) const {
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
 
     if(optExists){
+        opt.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return "";
+        }
         nlohmann::json nRecommended = opt.getValue("api_serch_recommended");
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
         if(nRecommended == nullptr){
@@ -241,6 +247,13 @@ mcsm::Result mcsm::SpongeServer::download(const std::string& version, const std:
 
     if(!optExists){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        return res;
+    }
+
+    opt.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
@@ -446,6 +459,9 @@ mcsm::Result mcsm::SpongeServer::update(const std::string& path, const std::stri
         return res;
     }
 
+    mcsm::Result sLoadRes = sDataOpt.load();
+    if(!sLoadRes.isSuccess()) return sLoadRes;
+
     mcsm::ServerConfigLoader loader(optionPath);
     mcsm::Result loadRes = loader.loadConfig();
     if(!loadRes.isSuccess()) return loadRes;
@@ -557,17 +573,24 @@ mcsm::Result mcsm::SpongeServer::generate(const std::string& name, mcsm::JvmOpti
         return res;
     }
 
+    // No need to call opt.load() here. create() in ServerDataOption will call it eventually
+
     mcsm::Result res = configure(version, server, &opt, path, name, option, autoUpdate);
     if(!res.isSuccess()) return res;
 
     mcsm::Option sOpt(mcsm::getCurrentPath(), "server");
+
+    sOpt.load();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    return sOpt.setValue("api_serch_recommended", false);
+    mcsm::Result setRes = sOpt.setValue("api_serch_recommended", false);
+    if(!setRes.isSuccess()) return setRes;
+
+    return sOpt.save();
 }
 
 bool mcsm::SpongeServer::hasVersion(const std::string& version){

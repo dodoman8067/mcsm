@@ -37,7 +37,7 @@ namespace mcsm {
 
         mcsm::GlobalOption* getOption();
 
-        const bool advancedParseEnabled() const;
+        bool advancedParseEnabled() const;
     };
 }
 
