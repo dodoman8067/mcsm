@@ -52,11 +52,11 @@ bool mcsm::Result::isSuccess() const {
     return this->result == mcsm::ResultType::MCSM_SUCCESS || this->result == mcsm::ResultType::MCSM_OK;
 }
 
-void mcsm::Result::printMessage(){
+void mcsm::Result::printMessage() const {
     printMessage(this->result);
 }
 
-void mcsm::Result::printMessage(const mcsm::ResultType& type){
+void mcsm::Result::printMessage(const mcsm::ResultType& type) const {
     std::vector<std::string> message = this->message;
 
     for(const auto& str : message){
