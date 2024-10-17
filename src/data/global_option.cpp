@@ -38,6 +38,7 @@ mcsm::GlobalOption::GlobalOption(const std::string& path, const std::string& nam
 }
 
 mcsm::GlobalOption::~GlobalOption(){
+    this->data = nullptr;
 }
 
 std::string mcsm::GlobalOption::getDataPathPerOS(){
@@ -135,6 +136,10 @@ mcsm::Result mcsm::GlobalOption::load(const bool& advancedParse) const {
 }
 
 nlohmann::json mcsm::GlobalOption::getValue(const std::string& key) const {
+    if(this->data == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Option's get/set function called without being loaded.", "Please report this to Github."}});
+        return nullptr;
+    }
     const nlohmann::json& jsonData = this->data;
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return nullptr;
     if(jsonData.find(key) != jsonData.end()){
@@ -147,7 +152,10 @@ nlohmann::json mcsm::GlobalOption::getValue(const std::string& key) const {
 }
 
 bool mcsm::GlobalOption::hasValue(const std::string& key) const {
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return false;
+    if(this->data == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Option's get/set function called without being loaded.", "Please report this to Github."}});
+        return false;
+    }
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return this->data.find(key) != this->data.end();
 }
@@ -162,6 +170,10 @@ bool mcsm::GlobalOption::isGlobal() const {
 }
 
 mcsm::Result mcsm::GlobalOption::setValue(const std::string& key, const nlohmann::json& value) const {
+    if(this->data == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Option's get/set function called without being loaded.", "Please report this to Github."}});
+        return res;
+    }
     const std::string& fullPath = this->path + "/" + this->name;
     nlohmann::json jsonData = this->data;
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){

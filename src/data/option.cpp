@@ -37,6 +37,7 @@ mcsm::Option::Option(const std::string& path, const std::string& name){
 }
 
 mcsm::Option::~Option(){
+    this->data = nullptr;
 }
 
 bool mcsm::Option::createDirectories(const std::string &dirName, std::error_code &err) const{
@@ -107,7 +108,7 @@ mcsm::Result mcsm::Option::load(const bool& advancedParse) const {
 
 nlohmann::json mcsm::Option::getValue(const std::string& key) const {
     if(this->data == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Option's get/set function called without calling load()."}});
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Option's get/set function called without being loaded.", "Please report this to Github."}});
         return nullptr;
     }
     const nlohmann::json& jsonData = this->data;
@@ -123,7 +124,7 @@ nlohmann::json mcsm::Option::getValue(const std::string& key) const {
 
 bool mcsm::Option::hasValue(const std::string& key) const {
     if(this->data == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Option's get/set function called without calling load()."}});
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Option's get/set function called without being loaded.", "Please report this to Github."}});
         return false;
     }
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return false;
@@ -142,7 +143,7 @@ bool mcsm::Option::isGlobal() const {
 
 mcsm::Result mcsm::Option::setValue(const std::string& key, const nlohmann::json& value) const {
     if(this->data == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Option's get/set function called without calling load()."}});
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Option's get/set function called without being loaded.", "Please report this to Github."}});
         return res;
     }
     const std::string& fullPath = this->path + "/" + this->name;
