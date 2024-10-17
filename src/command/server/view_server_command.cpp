@@ -107,6 +107,9 @@ inline void mcsm::ViewServerCommand::printServerInfo(){
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
         }
     }
+
+    mcsm::Result rLoadRes = sDataOpt->load();
+
     std::string timeCreated, timeLaunched;
     timeCreated = sDataOpt->getServerTimeCreated();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){

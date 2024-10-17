@@ -15,7 +15,7 @@ void mcsm::ClearServerCommand::execute(const std::vector<std::string>& /* args *
     }
 
     mcsm::ServerConfigLoader loader(path);
-    mcsm::Result loadRes = loader.loadConfig();
+    const mcsm::Result& loadRes = loader.loadConfig();
     if(!loadRes.isSuccess()){
         loadRes.printMessage();
         if(loadRes.getResultPair().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
@@ -54,6 +54,12 @@ void mcsm::ClearServerCommand::execute(const std::vector<std::string>& /* args *
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
         }
 
+        mcsm::Result fLoadRes = option->load();
+        if(!fLoadRes.isSuccess()){
+            fLoadRes.printMessage();
+            if(fLoadRes.getResultPair().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+        }
+
         mcsm::Result res1 = option->updateLastDownloadedBuild("");
         if(!res1.isSuccess()){
             res1.printMessage();
@@ -79,6 +85,12 @@ void mcsm::ClearServerCommand::execute(const std::vector<std::string>& /* args *
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
             mcsm::printResultMessage();
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+        }
+
+        mcsm::Result sLoadRes = option->load();
+        if(!sLoadRes.isSuccess()){
+            sLoadRes.printMessage();
+            if(sLoadRes.getResultPair().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
         }
 
         mcsm::Result res1 = option->updateLastDownloadedBuild("");
