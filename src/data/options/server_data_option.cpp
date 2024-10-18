@@ -21,6 +21,7 @@ SOFTWARE.
 */
 
 #include <mcsm/data/options/server_data_option.h>
+#include <mcsm/data/options/general_option.h>
 
 mcsm::ServerDataOption::ServerDataOption() : ServerDataOption(mcsm::getCurrentPath()){}
 
@@ -44,7 +45,18 @@ mcsm::ServerDataOption::~ServerDataOption(){
 }
 
 mcsm::Result mcsm::ServerDataOption::load(){
-    return this->option->load();
+    bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    return this->option->load(advp);
+}
+
+mcsm::Result mcsm::ServerDataOption::load(const bool& advp){
+    return this->option->load(advp);
 }
 
 mcsm::Result mcsm::ServerDataOption::create(const std::string& lastTimeLaunched){
@@ -63,7 +75,14 @@ mcsm::Result mcsm::ServerDataOption::create(const std::string& lastTimeLaunched)
         return res;
     }
 
-    mcsm::Result sLoadRes = load();
+    bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    mcsm::Result sLoadRes = load(advp);
     if(!sLoadRes.isSuccess()) return sLoadRes;
 
     mcsm::Result res1 = this->option->setValue("last_time_launched", lastTimeLaunched);

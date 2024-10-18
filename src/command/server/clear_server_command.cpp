@@ -1,4 +1,5 @@
 #include <mcsm/command/server/clear_server_command.h>
+#include <mcsm/data/options/general_option.h>
 
 mcsm::ClearServerCommand::ClearServerCommand(const std::string& name, const std::string& description) : mcsm::Command(name, description) {}
 
@@ -47,6 +48,12 @@ void mcsm::ClearServerCommand::execute(const std::vector<std::string>& /* args *
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
     }
 
+    bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+
     if(type == "fabric"){
         mcsm::FabricServerDataOption* option = new mcsm::FabricServerDataOption(path);
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -54,7 +61,7 @@ void mcsm::ClearServerCommand::execute(const std::vector<std::string>& /* args *
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
         }
 
-        mcsm::Result fLoadRes = option->load();
+        mcsm::Result fLoadRes = option->load(advp);
         if(!fLoadRes.isSuccess()){
             fLoadRes.printMessage();
             if(fLoadRes.getResultPair().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
@@ -87,7 +94,7 @@ void mcsm::ClearServerCommand::execute(const std::vector<std::string>& /* args *
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
         }
 
-        mcsm::Result sLoadRes = option->load();
+        mcsm::Result sLoadRes = option->load(advp);
         if(!sLoadRes.isSuccess()){
             sLoadRes.printMessage();
             if(sLoadRes.getResultPair().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);

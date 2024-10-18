@@ -39,6 +39,8 @@ namespace mcsm {
 
         mcsm::Result load();
 
+        mcsm::Result load(const bool& advp);
+
         mcsm::Result create(const std::string& lastTimeLaunched);
 
         mcsm::Result reset();
