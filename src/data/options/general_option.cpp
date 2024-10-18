@@ -43,6 +43,20 @@ mcsm::Result mcsm::GeneralOption::load(){
         }
     }
 
+    auto* property = getProperty("advanced_json_parse_fail_errors");
+    if(property == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFoundPlusFix("advanced_json_parse_fail_errors", "general option", "\"advanced_json_parse_fail_errors\": false")});
+        return res;
+    }
+
+    const nlohmann::json& propertyValue = property->getCurrentValue();
+    if(!propertyValue.is_boolean()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongTypePlusFix("advanced_json_parse_fail_errors", "general option", "boolean", "false or true")});
+        return res;
+    }
+
+    this->advp = propertyValue;
+
     return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
 }
 
@@ -106,19 +120,7 @@ std::vector<mcsm::GeneralProperty*>& mcsm::GeneralOption::getProperties() const 
 }
 
 bool mcsm::GeneralOption::advancedParseEnabled() const {
-    auto* property = getProperty("advanced_json_parse_fail_errors");
-    if(property == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFoundPlusFix("advanced_json_parse_fail_errors", "general option", "\"advanced_json_parse_fail_errors\": false")});
-        return false;
-    }
-
-    const nlohmann::json& propertyValue = property->getCurrentValue();
-    if(!propertyValue.is_boolean()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongTypePlusFix("advanced_json_parse_fail_errors", "general option", "boolean", "false or true")});
-        return false;
-    }
-
-    return propertyValue.get<bool>();
+    return instance.advp;
 }
 
 mcsm::GeneralOption& mcsm::GeneralOption::getGeneralOption(){

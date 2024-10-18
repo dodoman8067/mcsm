@@ -20,6 +20,8 @@ namespace mcsm {
 
         mcsm::Result save();
         mcsm::Result load();
+
+        bool advp;
     public:
         GeneralOption(const mcsm::GeneralOption&) = delete;
         GeneralOption& operator=(const mcsm::GeneralOption&) = delete;
