@@ -87,7 +87,7 @@ mcsm::Result mcsm::Option::load(const bool& advancedParse) const {
             finalValue = nlohmann::json::parse(content);
         }catch (const nlohmann::json::parse_error& e){
             mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-                "Json parsed failed with: " + std::string(e.what()),
+                "Json parsed failed in " + fullPath + " with reason: " + std::string(e.what()),
                 "Byte position of error: " + std::to_string(e.byte),
                 "Report this to Github if you believe that this is an error."
             }});
