@@ -23,7 +23,7 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Mo
 # Find dependencies 
 find_package(termcolor REQUIRED)
 find_package(CURL REQUIRED CONFIG)
-find_package(nlohmann_json 3.2.0 REQUIRED)
+find_package(nlohmann_json REQUIRED)
 include(Findlibgit2)
 if(LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
     find_package(Backward REQUIRED)
@@ -47,7 +47,7 @@ endif()
 
 # Set compiler options
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -DMCSM_NLOHMANN_VER=\\\"${nlohmann_json_VERSION}\\\"")
     set(CMAKE_CXX_FLAGS_DEBUG "-g -DMCSM_DEBUG")
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -flto")
 endif()
