@@ -10,8 +10,8 @@ namespace mcsm {
         explicit ServerConfigGenerator(const std::string& path);
         ~ServerConfigGenerator();
 
-        mcsm::Result generate(const std::string& version, std::shared_ptr<mcsm::Server> server, mcsm::ServerDataOption* sDataOpt, const std::string& name, mcsm::JvmOption& defaultOption);
-        mcsm::Result generate(const std::string& version, std::shared_ptr<mcsm::Server> server, mcsm::ServerDataOption* sDataOpt, const std::string& name, mcsm::JvmOption& defaultOption, const bool& update);
+        mcsm::Result generate(const std::string& version, mcsm::Server* server, mcsm::ServerDataOption* sDataOpt, const std::string& name, mcsm::JvmOption& defaultOption);
+        mcsm::Result generate(const std::string& version, mcsm::Server* server, mcsm::ServerDataOption* sDataOpt, const std::string& name, mcsm::JvmOption& defaultOption, const bool& update);
 
         std::unique_ptr<mcsm::Option>& getHandle();
 

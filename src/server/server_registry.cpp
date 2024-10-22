@@ -24,7 +24,7 @@ SOFTWARE.
 
 #include <mcsm/server/server_registry.h>
 
-std::unordered_map<std::string, mcsm::ServerRegistry::ServerEntry> mcsm::ServerRegistry::serverFactories;
+std::unordered_map<std::string, std::unique_ptr<mcsm::Server>> mcsm::ServerRegistry::serverFactories;
 std::unordered_map<std::string, std::unique_ptr<mcsm::GeneralProperty>> mcsm::ServerRegistry::generalProperties;
 
 mcsm::ServerRegistry& mcsm::ServerRegistry::getServerRegistry(){
@@ -32,8 +32,8 @@ mcsm::ServerRegistry& mcsm::ServerRegistry::getServerRegistry(){
     return instance;
 }
 
-void mcsm::ServerRegistry::registerServer(const std::string& name, ServerFactory factory, mcsm::ServerType type){
-    this->serverFactories[name] = { factory, type };
+void mcsm::ServerRegistry::registerServer(const std::string& name, std::unique_ptr<mcsm::Server> server){
+    this->serverFactories[name] = std::move(server);
 }
 
 void mcsm::ServerRegistry::registerGeneralProperty(const std::string& name, std::unique_ptr<mcsm::GeneralProperty> property){
@@ -59,19 +59,19 @@ std::vector<mcsm::GeneralProperty*> mcsm::ServerRegistry::getRegisteredPropertie
     return properties;
 }
 
-std::shared_ptr<mcsm::Server> mcsm::ServerRegistry::getServer(const std::string& name) const {
+mcsm::Server* mcsm::ServerRegistry::getServer(const std::string& name) const {
     auto it = this->serverFactories.find(name);
     if(it != this->serverFactories.end()){
         mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, { "Success" }});
-        return it->second.factory();
+        return it->second.get();
     }
     mcsm::Result res({mcsm::ResultType::MCSM_FAIL, { "Server type not found: " + name }});
     return nullptr;
 }
 
-std::string mcsm::ServerRegistry::getServerTypeString(const mcsm::ServerType type) const {
+std::string mcsm::ServerRegistry::getServerTypeString(const mcsm::ServerType& type) const {
     for(const auto&[id, server]: serverFactories){
-        if(server.type == type){
+        if(server->getType() == type){
             mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, { "Success" }});
             return id;
         }

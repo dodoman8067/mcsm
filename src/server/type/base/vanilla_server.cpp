@@ -364,7 +364,6 @@ mcsm::Result mcsm::VanillaServer::generate(const std::string& name, mcsm::JvmOpt
             return res;
         }
     }
-    std::shared_ptr<mcsm::VanillaServer> server = shared_from_this();
     mcsm::ServerDataOption opt(path);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -372,7 +371,7 @@ mcsm::Result mcsm::VanillaServer::generate(const std::string& name, mcsm::JvmOpt
         return res;
     }
 
-    return configure(version, server, &opt, path, name, option, autoUpdate);
+    return configure(version, this, &opt, path, name, option, autoUpdate);
 }
 
 bool mcsm::VanillaServer::hasVersion(const std::string& version){

@@ -104,13 +104,26 @@ void mcsm::init::initCommands(const std::string& version){
 void mcsm::init::initServers(){
     auto& sr = mcsm::ServerRegistry::getServerRegistry();
 
-    sr.registerServer("vanilla", []() { return std::make_shared<mcsm::VanillaServer>(); }, mcsm::ServerType::VANILLA);
-    sr.registerServer("paper", []() { return std::make_shared<mcsm::PaperServer>(); }, mcsm::ServerType::BUKKIT);
-    sr.registerServer("purpur", []() { return std::make_shared<mcsm::PurpurServer>(); }, mcsm::ServerType::BUKKIT);
-    sr.registerServer("fabric", []() { return std::make_shared<mcsm::FabricServer>(); }, mcsm::ServerType::FABRIC);
-    sr.registerServer("velocity", []() { return std::make_shared<mcsm::VelocityServer>(); }, mcsm::ServerType::VELOCITY);
-    sr.registerServer("sponge", []() { return std::make_shared<mcsm::SpongeServer>(); }, mcsm::ServerType::SPONGE_VANILLA);
-    sr.registerServer("custom", []() { return std::make_shared<mcsm::CustomServer>(); }, mcsm::ServerType::CUSTOM);
+    auto vanilla = std::make_unique<mcsm::VanillaServer>();
+    sr.registerServer("vanilla", std::move(vanilla));
+    
+    auto paper = std::make_unique<mcsm::PaperServer>();
+    sr.registerServer("paper", std::move(paper));
+
+    auto purpur = std::make_unique<mcsm::PurpurServer>();
+    sr.registerServer("purpur", std::move(purpur));
+
+    auto fabric = std::make_unique<mcsm::FabricServer>();
+    sr.registerServer("fabric", std::move(fabric));
+
+    auto velocity = std::make_unique<mcsm::VelocityServer>();
+    sr.registerServer("velocity", std::move(velocity));
+
+    auto sponge = std::make_unique<mcsm::SpongeServer>();
+    sr.registerServer("sponge", std::move(sponge));
+
+    auto custom = std::make_unique<mcsm::CustomServer>();
+    sr.registerServer("custom", std::move(custom));
 
     std::unique_ptr<mcsm::SkipVersionCheckProperty> p1 = std::make_unique<mcsm::SkipVersionCheckProperty>("skip_version_check_while_configuring");
     sr.registerGeneralProperty("skip_version_check_while_configuring", std::move(p1));

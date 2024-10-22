@@ -119,7 +119,7 @@ namespace mcsm {
 
         virtual mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate) = 0;
 
-        mcsm::Result configure(const std::string &version, std::shared_ptr<mcsm::Server> server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate);
+        mcsm::Result configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate);
     };
 }
 

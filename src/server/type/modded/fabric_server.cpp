@@ -809,7 +809,6 @@ mcsm::Result mcsm::FabricServer::generate(const std::string& name, mcsm::JvmOpti
             return res;
         }
     }
-    std::shared_ptr<mcsm::FabricServer> server = shared_from_this();
     mcsm::FabricServerDataOption fSDOpt(path);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -820,7 +819,7 @@ mcsm::Result mcsm::FabricServer::generate(const std::string& name, mcsm::JvmOpti
     // No need to call fSDOpt.load() here. create() in ServerDataOption will call it eventually
 
     mcsm::ServerConfigGenerator generator(path);
-    mcsm::Result generateRes = generator.generate(version, server, &fSDOpt, name, option, autoUpdate);
+    mcsm::Result generateRes = generator.generate(version, this, &fSDOpt, name, option, autoUpdate);
     if(!generateRes.isSuccess()) return generateRes;
 
     std::unique_ptr<mcsm::Option>& fabricOpt = generator.getHandle();

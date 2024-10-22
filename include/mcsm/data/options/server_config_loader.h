@@ -79,8 +79,8 @@ namespace mcsm {
 
         bool isFullyLoaded() const;
 
-        std::shared_ptr<mcsm::Server> getServerInstance();
-
+        mcsm::Server* getServerInstance();
+        
     private:
         std::string configPath;
         std::unique_ptr<mcsm::Option> optionHandle;

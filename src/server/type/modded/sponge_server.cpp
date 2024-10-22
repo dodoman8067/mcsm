@@ -581,7 +581,6 @@ mcsm::Result mcsm::SpongeServer::generate(const std::string& name, mcsm::JvmOpti
             return res;
         }
     }
-    std::shared_ptr<mcsm::SpongeServer> server = shared_from_this();
     mcsm::ServerDataOption opt(path);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -591,7 +590,7 @@ mcsm::Result mcsm::SpongeServer::generate(const std::string& name, mcsm::JvmOpti
 
     // No need to call opt.load() here. create() in ServerDataOption will call it eventually
 
-    mcsm::Result res = configure(version, server, &opt, path, name, option, autoUpdate);
+    mcsm::Result res = configure(version, this, &opt, path, name, option, autoUpdate);
     if(!res.isSuccess()) return res;
 
     mcsm::Option sOpt(mcsm::getCurrentPath(), "server");

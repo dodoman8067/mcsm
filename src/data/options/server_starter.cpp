@@ -31,7 +31,7 @@ mcsm::Result mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const std
         return res;
     }
 
-    std::shared_ptr<mcsm::Server> server = this->loader->getServerInstance();
+    mcsm::Server* server = this->loader->getServerInstance();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);

@@ -10,11 +10,11 @@ mcsm::ServerConfigGenerator::~ServerConfigGenerator(){
 
 }
 
-mcsm::Result mcsm::ServerConfigGenerator::generate(const std::string& version, std::shared_ptr<mcsm::Server> server, mcsm::ServerDataOption* sDataOpt, const std::string& name, mcsm::JvmOption& defaultOption){
+mcsm::Result mcsm::ServerConfigGenerator::generate(const std::string& version, mcsm::Server* server, mcsm::ServerDataOption* sDataOpt, const std::string& name, mcsm::JvmOption& defaultOption){
     return generate(version, server, sDataOpt, name, defaultOption, true);
 }
 
-mcsm::Result mcsm::ServerConfigGenerator::generate(const std::string& version, std::shared_ptr<mcsm::Server> server, mcsm::ServerDataOption* sDataOpt, const std::string& name, mcsm::JvmOption& defaultOption, const bool& update){
+mcsm::Result mcsm::ServerConfigGenerator::generate(const std::string& version, mcsm::Server* server, mcsm::ServerDataOption* sDataOpt, const std::string& name, mcsm::JvmOption& defaultOption, const bool& update){
     bool canGenerate = validatePath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();

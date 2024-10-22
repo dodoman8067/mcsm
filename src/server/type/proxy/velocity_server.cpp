@@ -458,7 +458,6 @@ mcsm::Result mcsm::VelocityServer::generate(const std::string& name, mcsm::JvmOp
             return res;
         }
     }
-    std::shared_ptr<mcsm::VelocityServer> server = shared_from_this();
     mcsm::ServerDataOption opt(path);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -466,7 +465,7 @@ mcsm::Result mcsm::VelocityServer::generate(const std::string& name, mcsm::JvmOp
         return res;
     }
     // No need to call opt.load() here. create() in ServerDataOption will call it eventually
-    return configure(version, server, &opt, path, name, option, autoUpdate);
+    return configure(version, this, &opt, path, name, option, autoUpdate);
 }
 
 bool mcsm::VelocityServer::hasVersion(const std::string& version){

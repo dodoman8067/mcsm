@@ -455,7 +455,7 @@ bool mcsm::ServerConfigLoader::isFullyLoaded() const {
     return this->isLoaded;
 }
 
-std::shared_ptr<mcsm::Server> mcsm::ServerConfigLoader::getServerInstance(){
+mcsm::Server* mcsm::ServerConfigLoader::getServerInstance(){
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",

@@ -156,7 +156,7 @@ mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOpti
 
     // No need to call opt.load() here. create() in ServerDataOption will call it eventually
     
-    mcsm::Result sRes = serverOption.generate("ignored", shared_from_this(), &sDOpt, name, option, false);
+    mcsm::Result sRes = serverOption.generate("ignored", this, &sDOpt, name, option, false);
     if(!sRes.isSuccess()) return sRes;
 
     mcsm::Result fileRes = setFileLocation(&(*serverOption.getHandle()), fileLocation);

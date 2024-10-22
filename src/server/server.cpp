@@ -92,7 +92,7 @@ mcsm::Result mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOpti
     return res;
 }
 
-mcsm::Result mcsm::Server::configure(const std::string &version, std::shared_ptr<mcsm::Server> server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate){
+mcsm::Result mcsm::Server::configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate){
     mcsm::ServerConfigGenerator serverOption(path);
     
     mcsm::Result sRes = serverOption.generate(version, server, sDataOpt, name, option, autoUpdate);
