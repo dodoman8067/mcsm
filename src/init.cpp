@@ -25,6 +25,7 @@ SOFTWARE.
 #include <mcsm/init.h>
 #include <mcsm/data/options/general/skip_version_check_property.h>
 #include <mcsm/data/options/general/advanced_json_errors_property.h>
+#include <mcsm/data/options/general/sponge_api_search_recommended_versions_property.h>
 
 mcsm::init::init(){
     this->initialized = new bool(false);
@@ -130,6 +131,9 @@ void mcsm::init::initServers(){
 
     std::unique_ptr<mcsm::AdvancedJsonErrorsProperty> p2 = std::make_unique<mcsm::AdvancedJsonErrorsProperty>("advanced_json_parse_fail_errors");
     sr.registerGeneralProperty("advanced_json_parse_fail_errors", std::move(p2));
+
+    std::unique_ptr<mcsm::SpongeAPISearchRecommendedVersionsProperty> p3 = std::make_unique<mcsm::SpongeAPISearchRecommendedVersionsProperty>("sponge_api_search_recommended_versions");
+    sr.registerGeneralProperty("sponge_api_search_recommended_versions", std::move(p3));
 }
 
 bool mcsm::init::isInitialized() const {

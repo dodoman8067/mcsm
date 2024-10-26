@@ -8,8 +8,9 @@ namespace mcsm {
     public:
         AdvancedJsonErrorsProperty(const std::string& name): GeneralProperty(name){}
         ~AdvancedJsonErrorsProperty() = default;
-
-        nlohmann::json getDefaultValue() override {
+        
+        // virtual function; means constexpr is impossible
+        inline nlohmann::json getDefaultValue() override {
             return false;
         }
     };

@@ -9,7 +9,8 @@ namespace mcsm {
         SkipVersionCheckProperty(const std::string& name): GeneralProperty(name){}
         ~SkipVersionCheckProperty() = default;
 
-        nlohmann::json getDefaultValue() override {
+        // virtual function; means constexpr is impossible
+        inline nlohmann::json getDefaultValue() override {
             return false;
         }
     };

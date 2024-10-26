@@ -66,6 +66,20 @@ std::string mcsm::SpongeServer::getVersion(const std::string& ver) const {
             }
             bRecommended = nRecommended;
         }
+    }else{
+        auto* property = mcsm::GeneralOption::getGeneralOption().getProperty("sponge_api_search_recommended_versions");
+        if(property == nullptr){
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Failed to get property \"sponge_api_search_recommended_versions\".", "Report this to the developer of this project."}});
+            return "";
+        }
+
+        const nlohmann::json& v = property->getCurrentValue();
+        if(!v.is_boolean()){
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"sponge_api_search_recommended_versions\"", "boolean")});
+            return "";
+        }
+
+        bRecommended = property->getCurrentValue().get<bool>();
     }
 
     std::string recommended = bRecommended ? "true" : "false";
@@ -602,7 +616,19 @@ mcsm::Result mcsm::SpongeServer::generate(const std::string& name, mcsm::JvmOpti
         return res;
     }
 
-    mcsm::Result setRes = sOpt.setValue("api_serch_recommended", false);
+    auto* property1 = mcsm::GeneralOption::getGeneralOption().getProperty("sponge_api_search_recommended_versions");
+    if(property1 == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Failed to get property \"sponge_api_search_recommended_versions\".", "Report this to the developer of this project."}});
+        return res;
+    }
+
+    const nlohmann::json& v = property1->getCurrentValue();
+    if(!v.is_boolean()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"sponge_api_search_recommended_versions\"", "boolean")});
+        return res;
+    }
+
+    mcsm::Result setRes = sOpt.setValue("api_serch_recommended", property1->getCurrentValue().get<bool>());
     if(!setRes.isSuccess()) return setRes;
 
     return sOpt.save();
