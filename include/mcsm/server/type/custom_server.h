@@ -55,8 +55,10 @@ namespace mcsm {
 
         mcsm::Result start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
 
-        mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate) override;
-        mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::string& fileLocation);
+        const std::map<std::string, std::string> getRequiredValues() const override;
+
+        mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues) override;
+        mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::string& fileLocation, const std::map<std::string, std::string>& extraValues);
     };
 }
 

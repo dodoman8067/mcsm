@@ -420,7 +420,7 @@ mcsm::Result mcsm::PurpurServer::update(const std::string& path, const std::stri
     return download(version, path, jar, optionPath);
 }
 
-mcsm::Result mcsm::PurpurServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate){
+mcsm::Result mcsm::PurpurServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues){
     mcsm::GeneralProperty* property = mcsm::GeneralOption::getGeneralOption().getProperty("skip_version_check_while_configuring");
 
     if(property == nullptr){
@@ -455,7 +455,7 @@ mcsm::Result mcsm::PurpurServer::generate(const std::string& name, mcsm::JvmOpti
 
     // No need to call opt.load() here. create() in ServerDataOption will call it eventually
 
-    return configure(version, this, &opt, path, name, option, autoUpdate);
+    return configure(version, this, &opt, path, name, option, autoUpdate, extraValues.find("server build version")->second);
 }
 
 bool mcsm::PurpurServer::hasVersion(const std::string& version){

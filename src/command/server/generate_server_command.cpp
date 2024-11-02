@@ -74,10 +74,6 @@ mcsm::GenerateServerCommand::GenerateServerCommand(const std::string& name, cons
 mcsm::GenerateServerCommand::~GenerateServerCommand(){}
 
 void mcsm::GenerateServerCommand::execute(const std::vector<std::string>& args){
-    if(args.empty()){
-        mcsm::warning("Name not provided; specify a name with --name option to continue.");
-        std::exit(1);
-    }
     if(isConfigured()){
         mcsm::warning("Server is already configured in this directory.");
         mcsm::warning("Please try again in other directories.");
@@ -156,12 +152,9 @@ std::unique_ptr<mcsm::JvmOption> mcsm::GenerateServerCommand::searchOption(const
     return nullptr;
 }
 
-mcsm::SearchTarget mcsm::GenerateServerCommand::getSearchTarget(const std::vector<std::string>& args) const {
-    if(args.empty()) return mcsm::SearchTarget::ALL;
-    for(std::string_view arg : args) {
-        if(arg == "--global" || arg == "-global" || arg == "--g" || arg == "-g") return mcsm::SearchTarget::GLOBAL;
-        if(arg == "--current" || arg == "-current" || arg == "--c" || arg == "-c") return mcsm::SearchTarget::CURRENT;
-    }
+mcsm::SearchTarget mcsm::GenerateServerCommand::getSearchTarget(const std::string& value) const {
+    if(value == "global") return mcsm::SearchTarget::GLOBAL;
+    if(value == "current") return mcsm::SearchTarget::CURRENT;
     return mcsm::SearchTarget::ALL;
 }
 
@@ -193,19 +186,73 @@ bool mcsm::GenerateServerCommand::shouldSkipAutoUpdate(const std::vector<std::st
     return false;
 }
 
-void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& args){
-    mcsm::SearchTarget target = getSearchTarget(args);
-    std::unique_ptr<mcsm::JvmOption> option = searchOption(target, getProfileName(args));
-    std::string version = getServerVersion(args);
-    std::string name = getServerName(args);
-    std::string type = getServerType(args);
-    bool shouldSkipUpdate = !shouldSkipAutoUpdate(args);
-
-    if(option == nullptr){
-        mcsm::warning("JVM launch profile " + getProfileName(args) + " not found.");
-        mcsm::warning("Maybe you have misspelled --c or --g option.");
-        std::exit(1);
+bool mcsm::GenerateServerCommand::checkValid(const std::string& key, std::string& value, const std::string& defaultValue){
+    if(key == "default JVM launch profile search path (current/global)"){
+        if(mcsm::isWhitespaceOrEmpty(value)){
+            value = defaultValue;
+            return true;
+        }
+        return !(value != "global" && value != "current");
     }
+    if(key == "if server should update the server jarfile automatically"){
+        if(mcsm::isWhitespaceOrEmpty(value)){
+            value = defaultValue;
+            return true;
+        }
+        return !(value != "true" && value != "false");
+    }
+    if(key == "server jarfile name"){
+        if(mcsm::isWhitespaceOrEmpty(value)){
+            value = defaultValue;
+            return true;
+        }
+        return !(value != "true" && value != "false");
+    }
+    if(key == "server build version"){
+        if(mcsm::isWhitespaceOrEmpty(value)){
+            value = defaultValue;
+        }
+        return true;
+    }
+    return !mcsm::isWhitespaceOrEmpty(value);
+}
+
+void mcsm::GenerateServerCommand::handle(const std::string& key, std::map<std::string, std::string>& extras, const std::string& defaultValue){
+    std::string typedInput;
+    while(true){
+        if(!mcsm::isWhitespaceOrEmpty(defaultValue)){
+            std::cout << "Enter " << key << "(default : " << defaultValue << ") : ";
+        }else{
+            std::cout << "Enter " << key << " : ";
+        }
+        
+        std::getline(std::cin, typedInput);
+            
+        if(checkValid(key, typedInput, defaultValue)){
+            extras[key] = typedInput;
+            break;
+        }else{
+            std::cout << "Invalid input \"" << typedInput << "\". Please try again.\n";
+        }
+    }
+}
+
+void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& /* args */){
+    std::string type;
+    while(true){
+        std::cout << "Enter server type : ";
+        
+        std::getline(std::cin, type);
+            
+        if(mcsm::ServerRegistry::getServerRegistry().getServer(type) != nullptr){
+            break;
+        }else{
+            mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Success"}}); // clear the result
+            std::cout << "Server type \"" << type << "\" does not exist. Please try again.\n";
+        }
+    }
+
+    std::map<std::string, std::string> extras;
 
     auto sPtr = mcsm::ServerRegistry::getServerRegistry().getServer(type);
     if((mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) || sPtr == nullptr){
@@ -213,7 +260,32 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& a
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
     }
 
-    mcsm::Result genRes = sPtr->generate(name, *option, mcsm::getCurrentPath(), version, shouldSkipUpdate);
+    for(auto&[name, defaultValue] : sPtr->getRequiredValues()){
+        handle(name, extras, defaultValue);
+    }
+
+    std::string name = extras["name"];
+    std::string version = extras["Minecraft version"];
+    std::string update = extras["if server should update the server jarfile automatically"];
+    bool bUpdate = false;
+    if(!mcsm::isWhitespaceOrEmpty(update)){
+        bUpdate = update == "true" ? true : false;
+    }
+
+    mcsm::SearchTarget t = getSearchTarget(extras["default JVM launch profile search path (current/global)"]);
+    if(t == mcsm::SearchTarget::ALL){
+        mcsm::error("default JVM launch profile search path (current/global) invalid value detected");
+        std::exit(1);
+    }
+ 
+    mcsm::JvmOption defaultProfile(extras["default JVM launch profile name"], t);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+
+
+    mcsm::Result genRes = sPtr->generate(name, defaultProfile, mcsm::getCurrentPath(), version, bUpdate, extras);
 
     if(!genRes.isSuccess()){
         genRes.printMessage();

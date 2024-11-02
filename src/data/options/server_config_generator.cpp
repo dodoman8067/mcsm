@@ -11,10 +11,14 @@ mcsm::ServerConfigGenerator::~ServerConfigGenerator(){
 }
 
 mcsm::Result mcsm::ServerConfigGenerator::generate(const std::string& version, mcsm::Server* server, mcsm::ServerDataOption* sDataOpt, const std::string& name, mcsm::JvmOption& defaultOption){
-    return generate(version, server, sDataOpt, name, defaultOption, true);
+    return generate(version, server, sDataOpt, name, defaultOption, true, "latest");
 }
 
 mcsm::Result mcsm::ServerConfigGenerator::generate(const std::string& version, mcsm::Server* server, mcsm::ServerDataOption* sDataOpt, const std::string& name, mcsm::JvmOption& defaultOption, const bool& update){
+    return generate(version, server, sDataOpt, name, defaultOption, update, "latest");
+}
+
+mcsm::Result mcsm::ServerConfigGenerator::generate(const std::string& version, mcsm::Server* server, mcsm::ServerDataOption* sDataOpt, const std::string& name, mcsm::JvmOption& defaultOption, const bool& update, const std::string& build){
     bool canGenerate = validatePath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -77,7 +81,7 @@ mcsm::Result mcsm::ServerConfigGenerator::generate(const std::string& version, m
     mcsm::Result res5 = this->optionHandle->setValue("server_jar_name", jarFile);
     if(!res5.isSuccess()) return res5;
 
-    mcsm::Result res6 = this->optionHandle->setValue("server_build", "latest");
+    mcsm::Result res6 = this->optionHandle->setValue("server_build", build);
     if(!res6.isSuccess()) return res6;
 
     mcsm::Result res10 = this->optionHandle->setValue("auto_update", update);

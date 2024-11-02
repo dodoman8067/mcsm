@@ -105,6 +105,8 @@ namespace mcsm {
         */
         virtual mcsm::Result start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath);
 
+        virtual const std::map<std::string, std::string> getRequiredValues() const;
+
         /**
          * Obtains jar file. (Will compile the server jarfile or download if downloadable server)
          * 
@@ -117,9 +119,11 @@ namespace mcsm {
          */
         //virtual mcsm::Result obtainJarFile(const std::string version, const std::string workingPath, const std::string outputPath);
 
-        virtual mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate) = 0;
+        virtual mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues) = 0;
 
         mcsm::Result configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate);
+
+        mcsm::Result configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate, const std::string& build);
     };
 }
 

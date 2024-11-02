@@ -146,11 +146,11 @@ mcsm::Result mcsm::CustomServer::obtainJarFile(const std::string& /* version */,
     return setupServerJarFile(path, optionPath);
 }
 
-mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate){
-    return generate(name, option, path, version, autoUpdate, "current");
+mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues){
+    return generate(name, option, path, version, autoUpdate, extraValues.find("server file location (url/filepath)")->second, extraValues);
 }
 
-mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& /* version */, const bool& /* autoUpdate */, const std::string& fileLocation){
+mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& /* version */, const bool& /* autoUpdate */, const std::string& fileLocation, const std::map<std::string, std::string>& extraValues){
     mcsm::ServerConfigGenerator serverOption(path);
     mcsm::ServerDataOption sDOpt(path);
 
@@ -231,6 +231,17 @@ bool mcsm::CustomServer::isURL(const std::string& location) const {
         R"(^https?://[0-9a-z\.-]+(:[1-9][0-9]*)?(/[^\s]*)*$)"
     );
     return std::regex_match(location, urlPattern);
+}
+
+const std::map<std::string, std::string> mcsm::CustomServer::getRequiredValues() const {
+    return {
+        {"name", "" },
+        {"Minecraft version", ""},
+        {"default JVM launch profile search path (current/global)", "current"},
+        {"default JVM launch profile name", ""},
+        {"server jarfile name", "custom.jar"},
+        {"server file location (url/filepath)", ""}
+    };
 }
 
 std::string mcsm::CustomServer::getBasedServer() const {

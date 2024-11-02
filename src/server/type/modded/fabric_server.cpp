@@ -783,7 +783,7 @@ mcsm::Result mcsm::FabricServer::update(const std::string& path, const std::stri
     return download(sVer, loaderVer, installerVer, path, jar, optionPath);
 }
 
-mcsm::Result mcsm::FabricServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate){
+mcsm::Result mcsm::FabricServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues){
     mcsm::GeneralProperty* property = mcsm::GeneralOption::getGeneralOption().getProperty("skip_version_check_while_configuring");
 
     if(property == nullptr){
@@ -823,10 +823,10 @@ mcsm::Result mcsm::FabricServer::generate(const std::string& name, mcsm::JvmOpti
     if(!generateRes.isSuccess()) return generateRes;
 
     std::unique_ptr<mcsm::Option>& fabricOpt = generator.getHandle();
-    mcsm::Result res9 = fabricOpt->setValue("loader_version", "latest");
+    mcsm::Result res9 = fabricOpt->setValue("loader_version", extraValues.find("server loader version")->second);
     if(!res9.isSuccess()) return res9;
 
-    mcsm::Result res10 = fabricOpt->setValue("installer_version", "latest");
+    mcsm::Result res10 = fabricOpt->setValue("installer_version", extraValues.find("server installer version")->second);
     if(!res10.isSuccess()) return res10;
     
     mcsm::Result fSaveRes = fabricOpt->save();
@@ -873,6 +873,19 @@ mcsm::Result mcsm::FabricServer::generate(const std::string& name, mcsm::JvmOpti
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return res;
+}
+
+const std::map<std::string, std::string> mcsm::FabricServer::getRequiredValues() const {
+    return {
+        {"name", "" },
+        {"Minecraft version", ""},
+        {"default JVM launch profile search path (current/global)", "current"},
+        {"default JVM launch profile name", ""},
+        {"server jarfile name", getTypeAsString() + ".jar"},
+        {"server loader version", "latest"},
+        {"server installer version", "latest"},
+        {"if server should update the server jarfile automatically", "true"}
+    };
 }
 
 bool mcsm::FabricServer::hasVersion(const std::string& version){

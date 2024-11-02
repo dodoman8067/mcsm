@@ -569,7 +569,7 @@ mcsm::Result mcsm::SpongeServer::update(const std::string& path, const std::stri
     return download(version, path, jar, optionPath);
 }
 
-mcsm::Result mcsm::SpongeServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate){
+mcsm::Result mcsm::SpongeServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues){
     mcsm::GeneralProperty* property = mcsm::GeneralOption::getGeneralOption().getProperty("skip_version_check_while_configuring");
 
     if(property == nullptr){
@@ -604,7 +604,7 @@ mcsm::Result mcsm::SpongeServer::generate(const std::string& name, mcsm::JvmOpti
 
     // No need to call opt.load() here. create() in ServerDataOption will call it eventually
 
-    mcsm::Result res = configure(version, this, &opt, path, name, option, autoUpdate);
+    mcsm::Result res = configure(version, this, &opt, path, name, option, autoUpdate, extraValues.find("server build version")->second);
     if(!res.isSuccess()) return res;
 
     mcsm::Option sOpt(mcsm::getCurrentPath(), "server");
@@ -616,22 +616,46 @@ mcsm::Result mcsm::SpongeServer::generate(const std::string& name, mcsm::JvmOpti
         return res;
     }
 
+    std::string apib = extraValues.find("if the server search on recommended versions api")->second;
+    if(apib != "false" && apib != "true"){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Invalid value"}});
+        return res;
+    }
+
+    bool bApi = apib == "true" ? true : false;
+
+    mcsm::Result setRes = sOpt.setValue("api_serch_recommended", bApi);
+    if(!setRes.isSuccess()) return setRes;
+
+    return sOpt.save();
+}
+
+const std::map<std::string, std::string> mcsm::SpongeServer::getRequiredValues() const {
     auto* property1 = mcsm::GeneralOption::getGeneralOption().getProperty("sponge_api_search_recommended_versions");
     if(property1 == nullptr){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Failed to get property \"sponge_api_search_recommended_versions\".", "Report this to the developer of this project."}});
-        return res;
+        return {};
     }
 
     const nlohmann::json& v = property1->getCurrentValue();
     if(!v.is_boolean()){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"sponge_api_search_recommended_versions\"", "boolean")});
-        return res;
+        return {};
     }
 
-    mcsm::Result setRes = sOpt.setValue("api_serch_recommended", property1->getCurrentValue().get<bool>());
-    if(!setRes.isSuccess()) return setRes;
+    std::string strV = v.get<bool>() ? "true" : "false";
 
-    return sOpt.save();
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    return {
+        {"name", "" },
+        {"Minecraft version", ""},
+        {"default JVM launch profile search path (current/global)", "current"},
+        {"default JVM launch profile name", ""},
+        {"server jarfile name", getTypeAsString() + ".jar"},
+        {"server build version", "latest"},
+        {"if server should update the server jarfile automatically", "true"},
+        {"if the server search on recommended versions api", strV}
+    };
 }
 
 bool mcsm::SpongeServer::hasVersion(const std::string& version){

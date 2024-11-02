@@ -93,9 +93,24 @@ mcsm::Result mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOpti
 }
 
 mcsm::Result mcsm::Server::configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate){
+    return configure(version, server, sDataOpt, path, name, option, autoUpdate, "latest");
+}
+
+mcsm::Result mcsm::Server::configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate, const std::string& build){
+    bool jvmOptionExists = option.exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    if(!jvmOptionExists){
+        return {mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jvmProfileNotFound()};
+    }
+
     mcsm::ServerConfigGenerator serverOption(path);
     
-    mcsm::Result sRes = serverOption.generate(version, server, sDataOpt, name, option, autoUpdate);
+    mcsm::Result sRes = serverOption.generate(version, server, sDataOpt, name, option, autoUpdate, build);
     if(!sRes.isSuccess()) return sRes;
 
     mcsm::ServerConfigLoader loader(path);
@@ -107,6 +122,7 @@ mcsm::Result mcsm::Server::configure(const std::string &version, mcsm::Server* s
     mcsm::info("Server name : " + mcsm::safeString(name));
     mcsm::info("Server type : " + server->getTypeAsString());
     mcsm::info("Server version : " + version);
+    mcsm::info("Server build version : " + build);
     mcsm::info("Server JVM launch profile : " + option.getProfileName());
     if(!autoUpdate) mcsm::info("Automatic updates : disabled");
 
@@ -152,4 +168,16 @@ std::string mcsm::Server::getJarFile(const std::string& checkDir) const {
 bool mcsm::Server::isBasedAs(const std::string& input) const {
     if(!mcsm::isWhitespaceOrEmpty(getBasedServer())) return false;
     return getBasedServer() == input;
+}
+
+const std::map<std::string, std::string> mcsm::Server::getRequiredValues() const {
+    return {
+        {"name", "" },
+        {"Minecraft version", ""},
+        {"default JVM launch profile search path (current/global)", "current"},
+        {"default JVM launch profile name", ""},
+        {"server jarfile name", getTypeAsString() + ".jar"},
+        {"server build version", "latest"},
+        {"if server should update the server jarfile automatically", "true"}
+    };
 }
