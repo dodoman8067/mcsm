@@ -30,13 +30,7 @@ SOFTWARE.
 namespace mcsm {
     class GenerateServerCommand : public mcsm::Command {
     private:
-        std::string getProfileName(const std::vector<std::string>& args) const;
-        std::string getServerName(const std::vector<std::string>& args) const;
-        std::string getServerVersion(const std::vector<std::string>& args) const;
-        std::string getServerType(const std::vector<std::string>& args) const;
         mcsm::SearchTarget getSearchTarget(const std::string& value) const;
-        bool shouldSkipAutoUpdate(const std::vector<std::string>& args) const;
-        std::unique_ptr<mcsm::JvmOption> searchOption(const mcsm::SearchTarget& target, const std::string& name);
         void detectServer(const std::vector<std::string>& args);
         inline bool isConfigured();
 

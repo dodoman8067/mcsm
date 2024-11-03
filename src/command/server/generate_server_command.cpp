@@ -82,108 +82,10 @@ void mcsm::GenerateServerCommand::execute(const std::vector<std::string>& args){
     detectServer(args);
 }
 
-std::string mcsm::GenerateServerCommand::getProfileName(const std::vector<std::string>& args) const {
-    std::string name;
-    for(size_t i = 0; i < args.size(); ++i){
-        std::string_view arg = args[i];
-        if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
-            if(!(arg == "-profile" || arg == "--profile" || arg == "-p" || arg == "--p")) continue;
-            if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
-                name = args[i + 1];
-                return mcsm::safeString(name);
-            }
-        }
-    }
-    mcsm::warning("Profile name not provided; specify a profile name with --profile option to coutinue.");
-    std::exit(1);
-}
-
-std::string mcsm::GenerateServerCommand::getServerName(const std::vector<std::string>& args) const {
-    std::string name;
-    for(size_t i = 0; i < args.size(); ++i){
-        std::string_view arg = args[i];
-        if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
-            if(!(arg == "-name" || arg == "--name")) continue;
-            if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
-                name = args[i + 1];
-                return mcsm::safeString(name);
-            }
-        }
-    }
-    mcsm::warning("Server name not provided; specify a name with --name option to continue.");
-    std::exit(1);
-}
-
-std::string mcsm::GenerateServerCommand::getServerVersion(const std::vector<std::string>& args) const {
-    std::string ver;
-    for(size_t i = 0; i < args.size(); ++i){
-        std::string_view arg = args[i];
-        if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
-            if(!(arg == "-version" || arg == "--version" || arg == "-ver" || arg == "--ver" || arg == "-v" || arg == "--v" || arg == "-serverversion" || arg == "--serverversion" || arg == "-sversion" || arg == "--sversion" || arg == "-sver" || arg == "--sver" || arg == "-sv" || arg == "--sv")) continue;
-            if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
-                ver = args[i + 1];
-                return mcsm::safeString(ver);
-            }
-        }
-    }
-    mcsm::warning("Server version not provided; specify a version with --version option to coutinue.");
-    std::exit(1);
-}
-
-std::unique_ptr<mcsm::JvmOption> mcsm::GenerateServerCommand::searchOption(const mcsm::SearchTarget& target, const std::string& name){
-    if(target == mcsm::SearchTarget::GLOBAL || target == mcsm::SearchTarget::ALL){
-        std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(name, mcsm::SearchTarget::GLOBAL);
-        bool profileExists = opt->exists();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            mcsm::printResultMessage();
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
-        if(profileExists) return opt;
-    }
-    if(target == mcsm::SearchTarget::CURRENT || target == mcsm::SearchTarget::ALL){
-        std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(name, mcsm::SearchTarget::CURRENT);
-        bool profileExists = opt->exists();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            mcsm::printResultMessage();
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
-        if(profileExists) return opt;
-    }
-    return nullptr;
-}
-
 mcsm::SearchTarget mcsm::GenerateServerCommand::getSearchTarget(const std::string& value) const {
     if(value == "global") return mcsm::SearchTarget::GLOBAL;
     if(value == "current") return mcsm::SearchTarget::CURRENT;
     return mcsm::SearchTarget::ALL;
-}
-
-std::string mcsm::GenerateServerCommand::getServerType(const std::vector<std::string>& args) const {
-    std::string type;
-    for(size_t i = 0; i < args.size(); ++i){
-        std::string_view arg = args[i];
-        if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
-            if(!(arg == "-servertype" || arg == "--servertype" || arg == "-st" || arg == "--st")) continue;
-            if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
-                type = args[i + 1];
-                return mcsm::safeString(type);
-            }
-        }
-    }
-    mcsm::warning("Server type not provided; specify a type with --servertype option to continue.");
-    std::exit(1);
-}
-
-bool mcsm::GenerateServerCommand::shouldSkipAutoUpdate(const std::vector<std::string>& args) const {
-    for(size_t i = 0; i < args.size(); ++i){
-        std::string_view arg = args[i];
-        if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
-            if(!(arg == "-no-auto-update" || arg == "-no-auto-updates" || arg == "--no-auto-update" || arg == "--no-auto-updates"
-            || arg == "-skip-auto-update" || arg == "-skip-auto-updates" || arg == "--skip-auto-update" || arg == "--skip-auto-updates")) continue;
-            return true;
-        }
-    }
-    return false;
 }
 
 bool mcsm::GenerateServerCommand::checkValid(const std::string& key, std::string& value, const std::string& defaultValue){
