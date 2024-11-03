@@ -155,6 +155,13 @@ mcsm::Result mcsm::FabricServer::download(const std::string& version, const std:
         return res;
     }
 
+    opt.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
     std::string loaderVer, installerVer;
 
     nlohmann::json sType = opt.getValue("type");
@@ -265,6 +272,13 @@ mcsm::Result mcsm::FabricServer::download(const std::string& version, const std:
 
     if(!exists){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        return res;
+    }
+
+    opt.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
@@ -393,6 +407,13 @@ mcsm::Result mcsm::FabricServer::download(const std::string& version, const std:
         return res;
     }
 
+    opt.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
     nlohmann::json sType = opt.getValue("type");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -417,6 +438,9 @@ mcsm::Result mcsm::FabricServer::download(const std::string& version, const std:
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
+
+    mcsm::Result sLoadRes = sDataOpt.load();
+    if(!sLoadRes.isSuccess()) return sLoadRes;
 
     nlohmann::json sLoaderVer = opt.getValue("loader_version");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -635,6 +659,10 @@ mcsm::Result mcsm::FabricServer::update(const std::string& optionPath){
 mcsm::Result mcsm::FabricServer::update(const std::string& path, const std::string& optionPath){
     mcsm::FabricServerDataOption sDataOpt(optionPath);
     mcsm::ServerConfigLoader loader(optionPath);
+
+    mcsm::Result sLoadRes = sDataOpt.load();
+    if(!sLoadRes.isSuccess()) return sLoadRes;
+
     mcsm::Result loadRes = loader.loadConfig();
     if(!loadRes.isSuccess()) return loadRes;
 
@@ -755,18 +783,32 @@ mcsm::Result mcsm::FabricServer::update(const std::string& path, const std::stri
     return download(sVer, loaderVer, installerVer, path, jar, optionPath);
 }
 
-mcsm::Result mcsm::FabricServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate){
-    bool vExists = this->hasVersion(version);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
+mcsm::Result mcsm::FabricServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues){
+    mcsm::GeneralProperty* property = mcsm::GeneralOption::getGeneralOption().getProperty("skip_version_check_while_configuring");
+
+    if(property == nullptr){
+        return {mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFoundPlusFix("skip_version_check_while_configuring", "general option", "\"skip_version_check_while_configuring\": false")};
     }
-    if(!vExists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
-        return res;
+
+    const nlohmann::json& propertyValue = property->getCurrentValue();
+    if(!propertyValue.is_boolean()){
+        return {mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongTypePlusFix("skip_version_check_while_configuring", "general option", "boolean", "false or true")};
     }
-    std::shared_ptr<mcsm::FabricServer> server = shared_from_this();
+
+    bool skipCheck = propertyValue;
+
+    if(!skipCheck){
+        bool vExists = this->hasVersion(version);
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
+        if(!vExists){
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
+            return res;
+        }
+    }
     mcsm::FabricServerDataOption fSDOpt(path);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -774,16 +816,21 @@ mcsm::Result mcsm::FabricServer::generate(const std::string& name, mcsm::JvmOpti
         return res;
     }
 
+    // No need to call fSDOpt.load() here. create() in ServerDataOption will call it eventually
+
     mcsm::ServerConfigGenerator generator(path);
-    mcsm::Result generateRes = generator.generate(version, server, &fSDOpt, name, option, autoUpdate);
+    mcsm::Result generateRes = generator.generate(version, this, &fSDOpt, name, option, autoUpdate);
     if(!generateRes.isSuccess()) return generateRes;
 
     std::unique_ptr<mcsm::Option>& fabricOpt = generator.getHandle();
-    mcsm::Result res9 = fabricOpt->setValue("loader_version", "latest");
+    mcsm::Result res9 = fabricOpt->setValue("loader_version", extraValues.find("server loader version")->second);
     if(!res9.isSuccess()) return res9;
 
-    mcsm::Result res10 = fabricOpt->setValue("installer_version", "latest");
+    mcsm::Result res10 = fabricOpt->setValue("installer_version", extraValues.find("server installer version")->second);
     if(!res10.isSuccess()) return res10;
+    
+    mcsm::Result fSaveRes = fabricOpt->save();
+    if(!fSaveRes.isSuccess()) return fSaveRes;
 
     mcsm::ServerConfigLoader serverOption(path);
     mcsm::Result loadRes = serverOption.loadConfig();
@@ -826,6 +873,19 @@ mcsm::Result mcsm::FabricServer::generate(const std::string& name, mcsm::JvmOpti
 
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return res;
+}
+
+const std::map<std::string, std::string> mcsm::FabricServer::getRequiredValues() const {
+    return {
+        {"name", "" },
+        {"Minecraft version", ""},
+        {"default JVM launch profile search path (current/global)", "current"},
+        {"default JVM launch profile name", ""},
+        {"server jarfile name", getTypeAsString() + ".jar"},
+        {"server loader version", "latest"},
+        {"server installer version", "latest"},
+        {"if server should update the server jarfile automatically", "true"}
+    };
 }
 
 bool mcsm::FabricServer::hasVersion(const std::string& version){

@@ -31,6 +31,7 @@ SOFTWARE.
 #include <mcsm/util/os/os_detection.h>
 #include <mcsm/util/cli/result.h>
 #include <mcsm/util/cli/logging.h>
+#include <any>
 #ifdef __linux__
     #include <sys/wait.h>
 #endif
@@ -61,7 +62,7 @@ namespace mcsm {
      * @param invalidInputFunction called if invalid input was passed
      * @param checkValid checks if the input is valid
      */
-    void getInput(std::string& input, std::function<void()> beforeInputFunction, std::function<void(std::string)> invalidInputFunction, std::function<bool(std::string)> checkValid);
+    void getInput(std::string& input, std::function<void(std::vector<std::string>)> beforeInputFunction, std::function<void(std::vector<std::string>)> invalidInputFunction, std::function<bool(std::vector<std::string>)> checkValid);
 
     bool isDebug();
 }

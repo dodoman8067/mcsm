@@ -67,12 +67,14 @@ namespace mcsm {
         std::string getTypeAsString() const override;
 
         mcsm::ServerType getType() const override;
+
+        const std::map<std::string, std::string> getRequiredValues() const override;
         
         mcsm::Result update();
         mcsm::Result update(const std::string& optionPath);
         mcsm::Result update(const std::string& path, const std::string& optionPath);
 
-        mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate) override;
+        mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues) override;
     };
 }
 

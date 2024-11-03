@@ -40,7 +40,7 @@ namespace mcsm {
         static void init();
         static std::vector<std::unique_ptr<mcsm::Command>>& getCommands();
         static void addCommand(std::unique_ptr<mcsm::Command> command);
-        static bool hasCommand(const std::string& name);
+        static bool hasCommand(std::string_view name);
         static bool hasAlias(const std::string& command, const std::string& value);
         static bool hasAliasInGlobal(const std::string& value);
         static std::unique_ptr<mcsm::Command> getCommand(const std::string& name);

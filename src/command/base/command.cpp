@@ -36,11 +36,11 @@ mcsm::Command::~Command(){
     }
 }
 
-std::string mcsm::Command::getName() const {
+std::string_view mcsm::Command::getName() const {
     return this->name;
 }
 
-std::string mcsm::Command::getDescription() const {
+std::string_view mcsm::Command::getDescription() const {
     return this->description;
 }
 
@@ -49,7 +49,7 @@ void mcsm::Command::addAlias(const std::string& value){
     this->aliases->push_back(value);
 }
 
-bool mcsm::Command::hasAlias(const std::string& value) const{
+bool mcsm::Command::hasAlias(std::string_view value) const{
     for(std::string& aliases : *this->aliases){
         if(aliases != value) continue;;
         return true;

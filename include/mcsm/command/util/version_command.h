@@ -25,6 +25,7 @@ SOFTWARE.
 
 #include <iostream>
 #include <mcsm/command/base/command.h>
+#include <git2/version.h>
 
 namespace mcsm {
     class VersionCommand : public mcsm::Command {

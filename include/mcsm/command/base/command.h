@@ -35,10 +35,10 @@ namespace mcsm {
     public:
         Command(const std::string& name, const std::string& description);
         ~Command();
-        std::string getName() const;
-        std::string getDescription() const;
+        std::string_view getName() const;
+        std::string_view getDescription() const;
         void addAlias(const std::string& value);
-        bool hasAlias(const std::string& value) const;
+        bool hasAlias(std::string_view value) const;
         const std::vector<std::string>& getAliases() const;
         virtual void execute(const std::vector<std::string>& args) = 0;
     };

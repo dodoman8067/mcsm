@@ -42,7 +42,7 @@ void mcsm::ViewServerTypeCommand::execute(const std::vector<std::string>& args){
 }
 
 inline void mcsm::ViewServerTypeCommand::printServerTypeInfo(const std::vector<std::string>& args){
-    std::shared_ptr<mcsm::Server> server = getServer(args);
+    mcsm::Server* server = getServer(args);
     mcsm::info("Server implementation info : ");
     mcsm::info("Implementation's name : " + server->getTypeAsString());
     mcsm::info("Implementation is based on : " + server->getBasedServer());
@@ -51,14 +51,14 @@ inline void mcsm::ViewServerTypeCommand::printServerTypeInfo(const std::vector<s
     mcsm::info("Implementation's GitHub repository : " + server->getGitHub());
 }
 
-inline std::shared_ptr<mcsm::Server> mcsm::ViewServerTypeCommand::getServer(const std::vector<std::string>& args) const {
+inline mcsm::Server* mcsm::ViewServerTypeCommand::getServer(const std::vector<std::string>& args) const {
     for(size_t i = 0; i < args.size(); ++i){
-        const std::string& arg = args[i];
+        std::string_view arg = args[i];
         if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
             if(!(arg == "-type" || arg == "--type" || arg == "-t" || arg == "--t" || arg == "-servertype" || arg == "--servertype" || arg == "-st" || "--st")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-'){
                 std::string server = args[i + 1];
-                std::shared_ptr<mcsm::Server> type = mcsm::ServerRegistry::getServerRegistry().getServer(server);
+                mcsm::Server* type = mcsm::ServerRegistry::getServerRegistry().getServer(server);
                 if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
                     mcsm::printResultMessage();
                     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);

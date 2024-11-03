@@ -21,6 +21,7 @@ SOFTWARE.
 */
 
 #include <mcsm/server/server.h>
+#include <mcsm/data/options/general_option.h>
 
 mcsm::Result mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
     return start(loader, option, mcsm::getCurrentPath(), mcsm::getCurrentPath());
@@ -91,10 +92,14 @@ mcsm::Result mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOpti
     return res;
 }
 
-mcsm::Result mcsm::Server::configure(const std::string &version, std::shared_ptr<mcsm::Server> server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate){
+mcsm::Result mcsm::Server::configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate){
+    return configure(version, server, sDataOpt, path, name, option, autoUpdate, "latest");
+}
+
+mcsm::Result mcsm::Server::configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate, const std::string& build){
     mcsm::ServerConfigGenerator serverOption(path);
     
-    mcsm::Result sRes = serverOption.generate(version, server, sDataOpt, name, option, autoUpdate);
+    mcsm::Result sRes = serverOption.generate(version, server, sDataOpt, name, option, autoUpdate, build);
     if(!sRes.isSuccess()) return sRes;
 
     mcsm::ServerConfigLoader loader(path);
@@ -106,6 +111,7 @@ mcsm::Result mcsm::Server::configure(const std::string &version, std::shared_ptr
     mcsm::info("Server name : " + mcsm::safeString(name));
     mcsm::info("Server type : " + server->getTypeAsString());
     mcsm::info("Server version : " + version);
+    mcsm::info("Server build version : " + build);
     mcsm::info("Server JVM launch profile : " + option.getProfileName());
     if(!autoUpdate) mcsm::info("Automatic updates : disabled");
 
@@ -125,17 +131,20 @@ std::string mcsm::Server::getJarFile(const std::string& checkDir) const {
     bool exists = opt.exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
 
+    opt.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+
     if(exists){
-        nlohmann::json value = opt.getValue("server_jar");
+        nlohmann::json value = opt.getValue("server_jar_name");
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
 
         if(value == nullptr){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"server_jar\"", opt.getName())});
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"server_jar_name\"", opt.getName())});
             return "";
         }
 
         if(!value.is_string()){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"server_jar\"", "string")});
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"server_jar_name\"", "string")});
             return "";
         }
         mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
@@ -148,4 +157,16 @@ std::string mcsm::Server::getJarFile(const std::string& checkDir) const {
 bool mcsm::Server::isBasedAs(const std::string& input) const {
     if(!mcsm::isWhitespaceOrEmpty(getBasedServer())) return false;
     return getBasedServer() == input;
+}
+
+const std::map<std::string, std::string> mcsm::Server::getRequiredValues() const {
+    return {
+        {"name", "" },
+        {"Minecraft version", ""},
+        {"default JVM launch profile search path (current/global)", "current"},
+        {"default JVM launch profile name", ""},
+        {"server jarfile name", getTypeAsString() + ".jar"},
+        {"server build version", "latest"},
+        {"if server should update the server jarfile automatically", "true"}
+    };
 }

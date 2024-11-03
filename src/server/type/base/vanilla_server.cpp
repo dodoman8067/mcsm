@@ -338,18 +338,32 @@ mcsm::Result mcsm::VanillaServer::start(mcsm::ServerConfigLoader* loader, mcsm::
     return Server::start(loader, option, path, optionPath);
 }
 
-mcsm::Result mcsm::VanillaServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate){
-    bool vExists = this->hasVersion(version);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
+mcsm::Result mcsm::VanillaServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues){
+    mcsm::GeneralProperty* property = mcsm::GeneralOption::getGeneralOption().getProperty("skip_version_check_while_configuring");
+
+    if(property == nullptr){
+        return {mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFoundPlusFix("skip_version_check_while_configuring", "general option", "\"skip_version_check_while_configuring\": false")};
     }
-    if(!vExists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
-        return res;
+
+    const nlohmann::json& propertyValue = property->getCurrentValue();
+    if(!propertyValue.is_boolean()){
+        return {mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongTypePlusFix("skip_version_check_while_configuring", "general option", "boolean", "false or true")};
     }
-    std::shared_ptr<mcsm::VanillaServer> server = shared_from_this();
+
+    bool skipCheck = propertyValue;
+
+    if(!skipCheck){
+        bool vExists = this->hasVersion(version);
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
+        if(!vExists){
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
+            return res;
+        }
+    }
     mcsm::ServerDataOption opt(path);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -357,13 +371,23 @@ mcsm::Result mcsm::VanillaServer::generate(const std::string& name, mcsm::JvmOpt
         return res;
     }
 
-    return configure(version, server, &opt, path, name, option, autoUpdate);
+    return configure(version, this, &opt, path, name, option, autoUpdate, "ignored");
 }
 
 bool mcsm::VanillaServer::hasVersion(const std::string& version){
     std::string ver = getVersionObject(version);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return false;
     return !mcsm::isWhitespaceOrEmpty(ver);
+}
+
+const std::map<std::string, std::string> mcsm::VanillaServer::getRequiredValues() const {
+    return {
+        {"name", "" },
+        {"Minecraft version", ""},
+        {"default JVM launch profile search path (current/global)", "current"},
+        {"default JVM launch profile name", ""},
+        {"server jarfile name", getTypeAsString() + ".jar"}
+    };
 }
 
 mcsm::ServerType mcsm::VanillaServer::getType() const {

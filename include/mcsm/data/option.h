@@ -36,6 +36,7 @@ namespace mcsm {
     private:
         std::string path;
         std::string name;
+        mutable nlohmann::json data; 
 
         bool createDirectories(std::string const &dirName, std::error_code &err) const;
     public:
@@ -48,7 +49,11 @@ namespace mcsm {
         */
         ~Option();
 
-        nlohmann::json load() const;
+        mcsm::Result load() const;
+
+        mcsm::Result load(const bool& advancedParse) const;
+
+        nlohmann::json& getData() const;
 
         /**
          * @brief No mcsm::Result needed
@@ -71,7 +76,9 @@ namespace mcsm {
         */
         bool isGlobal() const override;
 
-        mcsm::Result save(const nlohmann::json& jsonData) const;
+        mcsm::Result save() const;
+
+        mcsm::Result save(const nlohmann::json& json) const;
         
         mcsm::Result reset() const;
     };

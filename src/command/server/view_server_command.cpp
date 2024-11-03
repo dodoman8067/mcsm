@@ -21,6 +21,7 @@ SOFTWARE.
 */
 
 #include <mcsm/command/server/view_server_command.h>
+#include <mcsm/data/options/general_option.h>
 
 mcsm::ViewServerCommand::ViewServerCommand(const std::string& name, const std::string& description) : mcsm::Command(name, description) {}
 
@@ -81,18 +82,6 @@ inline void mcsm::ViewServerCommand::printServerInfo(){
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
     }
 
-    mcsm::info("Server information : ");
-    mcsm::info("Server name : " + name);
-    mcsm::info("Server version : " + version);
-    mcsm::info("Server type : "  + type);
-
-    std::unique_ptr<mcsm::JvmOption> jvmOpt = sOpt.getDefaultOption();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        mcsm::printResultMessage();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-    }
-    mcsm::info("Server default launch profile : " + jvmOpt->getProfileName());
-
     mcsm::ServerDataOption* sDataOpt = nullptr;
     if(type == "fabric"){
         sDataOpt = new mcsm::FabricServerDataOption();
@@ -107,6 +96,31 @@ inline void mcsm::ViewServerCommand::printServerInfo(){
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
         }
     }
+
+    bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+
+    mcsm::Result rLoadRes = sDataOpt->load(advp);
+    if(!rLoadRes.isSuccess()){
+        rLoadRes.printMessage();
+        if(rLoadRes.getResultPair().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+
+    mcsm::info("Server information : ");
+    mcsm::info("Server name : " + name);
+    mcsm::info("Server version : " + version);
+    mcsm::info("Server type : "  + type);
+
+    std::unique_ptr<mcsm::JvmOption> jvmOpt = sOpt.getDefaultOption();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+    mcsm::info("Server default launch profile : " + jvmOpt->getProfileName());
+
     std::string timeCreated, timeLaunched;
     timeCreated = sDataOpt->getServerTimeCreated();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){

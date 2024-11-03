@@ -16,6 +16,9 @@ mcsm::Result mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const std
         return res;
     }
 
+    mcsm::Result sLoadRes = serverDataOpt.load();
+    if(!sLoadRes.isSuccess()) return sLoadRes;
+
     bool fileExists = mcsm::fileExists(optionPath + "/server.json");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -28,28 +31,28 @@ mcsm::Result mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const std
         return res;
     }
 
-    std::shared_ptr<mcsm::Server> server = this->loader->getServerInstance();
+    mcsm::Server* server = this->loader->getServerInstance();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    std::string name = this->loader->getServerName();
+    const std::string& name = this->loader->getServerName();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    std::string version = this->loader->getServerVersion();
+    const std::string& version = this->loader->getServerVersion();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
 
-    std::string profileName = option.getProfileName();
+    const std::string& profileName = option.getProfileName();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);

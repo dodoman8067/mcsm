@@ -21,6 +21,7 @@ SOFTWARE.
 */
 
 #include <mcsm/server/type/custom_server.h>
+#include <mcsm/data/options/general_option.h>
 
 mcsm::CustomServer::CustomServer(){
 
@@ -50,6 +51,10 @@ std::string mcsm::CustomServer::getFileLocation(const std::string& optionPath) c
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
         return "";
     }
+
+    option.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+
     if(option.getValue("jar_location") == nullptr){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"jar_location\"", "server.json")});
         return "";
@@ -67,7 +72,9 @@ std::string mcsm::CustomServer::getFileLocation(const std::string& optionPath) c
 }
 
 mcsm::Result mcsm::CustomServer::setFileLocation(mcsm::Option* option, const std::string& location) {
-    return option->setValue("jar_location", location);
+    mcsm::Result setRes = option->setValue("jar_location", location);
+    if(!setRes.isSuccess()) return setRes;
+    return option->save();
 }
 
 mcsm::Result mcsm::CustomServer::setupServerJarFile(const std::string& path, const std::string& optionPath){
@@ -124,6 +131,8 @@ mcsm::Result mcsm::CustomServer::setupServerJarFile(const std::string& path, con
                 }});
                 return res;
             }
+
+            return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
         }
     }
     mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
@@ -137,15 +146,17 @@ mcsm::Result mcsm::CustomServer::obtainJarFile(const std::string& /* version */,
     return setupServerJarFile(path, optionPath);
 }
 
-mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate){
-    return generate(name, option, path, version, autoUpdate, "current");
+mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues){
+    return generate(name, option, path, version, autoUpdate, extraValues.find("server file location (url/filepath)")->second, extraValues);
 }
 
-mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& /* version */, const bool& /* autoUpdate */, const std::string& fileLocation){
+mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& /* version */, const bool& /* autoUpdate */, const std::string& fileLocation, const std::map<std::string, std::string>& extraValues){
     mcsm::ServerConfigGenerator serverOption(path);
     mcsm::ServerDataOption sDOpt(path);
+
+    // No need to call opt.load() here. create() in ServerDataOption will call it eventually
     
-    mcsm::Result sRes = serverOption.generate("ignored", shared_from_this(), &sDOpt, name, option, false);
+    mcsm::Result sRes = serverOption.generate("ignored", this, &sDOpt, name, option, false);
     if(!sRes.isSuccess()) return sRes;
 
     mcsm::Result fileRes = setFileLocation(&(*serverOption.getHandle()), fileLocation);
@@ -186,7 +197,7 @@ mcsm::Result mcsm::CustomServer::start(mcsm::ServerConfigLoader* loader, mcsm::J
 
     if(!fileExists){
         mcsm::info("Setting up " + jar + "...");
-        mcsm::info("\"server_jar\" will be used as the copied/downloaded file name. Make sure you don't have characters like \"/\".");
+        mcsm::info("\"server_jar_name\" will be used as the copied/downloaded file name. Make sure you don't have characters like \"/\".");
         std::string sVer = loader->getServerVersion();
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
             std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -220,6 +231,16 @@ bool mcsm::CustomServer::isURL(const std::string& location) const {
         R"(^https?://[0-9a-z\.-]+(:[1-9][0-9]*)?(/[^\s]*)*$)"
     );
     return std::regex_match(location, urlPattern);
+}
+
+const std::map<std::string, std::string> mcsm::CustomServer::getRequiredValues() const {
+    return {
+        {"name", "" },
+        {"default JVM launch profile search path (current/global)", "current"},
+        {"default JVM launch profile name", ""},
+        {"server jarfile name", "custom.jar"},
+        {"server file location (url/filepath)", ""}
+    };
 }
 
 std::string mcsm::CustomServer::getBasedServer() const {

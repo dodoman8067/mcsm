@@ -24,32 +24,56 @@ SOFTWARE.
 
 #include <mcsm/server/server_registry.h>
 
-std::unordered_map<std::string, mcsm::ServerRegistry::ServerEntry> mcsm::ServerRegistry::serverFactories;
+std::unordered_map<std::string, std::unique_ptr<mcsm::Server>> mcsm::ServerRegistry::serverFactories;
+std::unordered_map<std::string, std::unique_ptr<mcsm::GeneralProperty>> mcsm::ServerRegistry::generalProperties;
 
 mcsm::ServerRegistry& mcsm::ServerRegistry::getServerRegistry(){
     static mcsm::ServerRegistry instance;
     return instance;
 }
 
-void mcsm::ServerRegistry::registerServer(const std::string& name, ServerFactory factory, mcsm::ServerType type){
-    this->serverFactories[name] = { factory, type };
+void mcsm::ServerRegistry::registerServer(const std::string& name, std::unique_ptr<mcsm::Server> server){
+    this->serverFactories[name] = std::move(server);
 }
 
-std::shared_ptr<mcsm::Server> mcsm::ServerRegistry::getServer(const std::string& name) const {
+void mcsm::ServerRegistry::registerGeneralProperty(const std::string& name, std::unique_ptr<mcsm::GeneralProperty> property){
+    this->generalProperties[name] = std::move(property);
+}
+
+mcsm::GeneralProperty* mcsm::ServerRegistry::getGeneralProperty(const std::string& name){
+    auto it = this->generalProperties.find(name);
+    if(it != this->generalProperties.end()){
+        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, { "Success" }});
+        return it->second.get();
+    }
+    mcsm::Result res({mcsm::ResultType::MCSM_FAIL, { "Not a registered property: " + name }});
+    return nullptr;
+}
+
+std::vector<mcsm::GeneralProperty*> mcsm::ServerRegistry::getRegisteredProperties(){
+    std::vector<mcsm::GeneralProperty*> properties;
+    std::unordered_map<std::string, std::unique_ptr<mcsm::GeneralProperty>>::iterator it;
+    for(it = this->generalProperties.begin(); it != this->generalProperties.end(); ++it){
+        properties.push_back(it->second.get());
+    }
+    return properties;
+}
+
+mcsm::Server* mcsm::ServerRegistry::getServer(const std::string& name) const {
     auto it = this->serverFactories.find(name);
     if(it != this->serverFactories.end()){
         mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, { "Success" }});
-        return it->second.factory();
+        return it->second.get();
     }
     mcsm::Result res({mcsm::ResultType::MCSM_FAIL, { "Server type not found: " + name }});
     return nullptr;
 }
 
-std::string mcsm::ServerRegistry::getServerTypeString(const mcsm::ServerType type) const {
-    for(const auto& pair : serverFactories){
-        if(pair.second.type == type){
+std::string mcsm::ServerRegistry::getServerTypeString(const mcsm::ServerType& type) const {
+    for(const auto&[id, server]: serverFactories){
+        if(server->getType() == type){
             mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, { "Success" }});
-            return pair.first;
+            return id;
         }
     }
     mcsm::Result res({mcsm::ResultType::MCSM_FAIL, { "Server type not found" }});

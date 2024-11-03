@@ -14,7 +14,7 @@ std::string mcsm::FabricServerDataOption::getLoaderVersion() const {
         return "";
     }
 
-    nlohmann::json value = this->option->getValue("last_downloaded_loader_version");
+    const nlohmann::json& value = this->option->getValue("last_downloaded_loader_version");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
 
     if(value == nullptr){
@@ -35,7 +35,10 @@ mcsm::Result mcsm::FabricServerDataOption::updateLoaderVersion(const std::string
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(version)});
         return res;
     }
-    return this->option->setValue("last_downloaded_loader_version", mcsm::safeString(version));
+    mcsm::Result res1 = this->option->setValue("last_downloaded_loader_version", mcsm::safeString(version));
+    if(!res1.isSuccess()) return res1;
+
+    return this->option->save();
 }
 
 std::string mcsm::FabricServerDataOption::getInstallerVersion() const {
@@ -46,7 +49,7 @@ std::string mcsm::FabricServerDataOption::getInstallerVersion() const {
         return "";
     }
 
-    nlohmann::json value = this->option->getValue("last_downloaded_installer_version");
+    const nlohmann::json& value = this->option->getValue("last_downloaded_installer_version");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
 
     if(value == nullptr){
@@ -63,5 +66,8 @@ std::string mcsm::FabricServerDataOption::getInstallerVersion() const {
 }
 
 mcsm::Result mcsm::FabricServerDataOption::updateInstallerVersion(const std::string& version){
-    return this->option->setValue("last_downloaded_installer_version", mcsm::safeString(version));
+    mcsm::Result res = this->option->setValue("last_downloaded_installer_version", mcsm::safeString(version));
+    if(!res.isSuccess()) return res;
+
+    return this->option->save();
 }

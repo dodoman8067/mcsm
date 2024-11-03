@@ -80,7 +80,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const st
         std::exit(1);
     }
     for(size_t i = 0; i < args.size(); ++i){
-        const std::string& arg = args[i];
+        std::string_view arg = args[i];
         if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
             if(!(arg == "-profile" || arg == "--profile" || arg == "-p" || arg == "--p" || arg == "-jvmprofile" || arg == "--jvmprofile" || arg == "-jp" || "--jp")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-'){
@@ -127,7 +127,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const mc
 
 mcsm::SearchTarget mcsm::StartServerCommand::getSearchTarget(const std::vector<std::string>& args){
     if(args.empty()) return mcsm::SearchTarget::ALL;
-    for(const std::string& arg : args) {
+    for(std::string_view arg : args) {
         if(arg == "--global" || arg == "-global" || arg == "--g" || arg == "-g") return mcsm::SearchTarget::GLOBAL;
         if(arg == "--current" || arg == "-current" || arg == "--c" || arg == "-c") return mcsm::SearchTarget::CURRENT;
     }

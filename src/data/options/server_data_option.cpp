@@ -21,6 +21,7 @@ SOFTWARE.
 */
 
 #include <mcsm/data/options/server_data_option.h>
+#include <mcsm/data/options/general_option.h>
 
 mcsm::ServerDataOption::ServerDataOption() : ServerDataOption(mcsm::getCurrentPath()){}
 
@@ -35,11 +36,27 @@ mcsm::ServerDataOption::ServerDataOption(const std::string& path){
         }
     }
     this->option = std::make_unique<mcsm::Option>(path + "/.mcsm/", "server_datas");
+
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
 }
 
 mcsm::ServerDataOption::~ServerDataOption(){
 
+}
+
+mcsm::Result mcsm::ServerDataOption::load(){
+    bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    return this->option->load(advp);
+}
+
+mcsm::Result mcsm::ServerDataOption::load(const bool& advp){
+    return this->option->load(advp);
 }
 
 mcsm::Result mcsm::ServerDataOption::create(const std::string& lastTimeLaunched){
@@ -57,10 +74,23 @@ mcsm::Result mcsm::ServerDataOption::create(const std::string& lastTimeLaunched)
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverAlreadyConfigured(this->option->getPath())});
         return res;
     }
+
+    bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    mcsm::Result sLoadRes = load(advp);
+    if(!sLoadRes.isSuccess()) return sLoadRes;
+
     mcsm::Result res1 = this->option->setValue("last_time_launched", lastTimeLaunched);
     if(!res1.isSuccess()) return res1;
     mcsm::Result res2 = this->option->setValue("last_downloaded_build", "0");
-    return res2;
+    if(!res2.isSuccess()) return res2;
+
+    return this->option->save();
 }
 
 mcsm::Result mcsm::ServerDataOption::reset(){
@@ -75,7 +105,7 @@ std::string mcsm::ServerDataOption::getLastTimeLaunched() const {
         return "";
     }
 
-    nlohmann::json value = this->option->getValue("last_time_launched");
+    const nlohmann::json& value = this->option->getValue("last_time_launched");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
 
     if(value == nullptr){
@@ -104,7 +134,10 @@ mcsm::Result mcsm::ServerDataOption::updateLastTimeLaunched(){
 
     std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", std::localtime(&currentTime));
 
-    return this->option->setValue("last_time_launched", buffer);
+    mcsm::Result setRes = this->option->setValue("last_time_launched", buffer);
+    if(!setRes.isSuccess()) return setRes;
+
+    return this->option->save();
 }
 
 std::string mcsm::ServerDataOption::getServerTimeCreated() const {
@@ -115,7 +148,7 @@ std::string mcsm::ServerDataOption::getServerTimeCreated() const {
         return "";
     }
 
-    nlohmann::json value = this->option->getValue("server_time_created");
+    const nlohmann::json& value = this->option->getValue("server_time_created");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
 
     if(value == nullptr){
@@ -144,7 +177,10 @@ mcsm::Result mcsm::ServerDataOption::updateServerTimeCreated(){
 
     std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", std::localtime(&currentTime));
 
-    return this->option->setValue("server_time_created", buffer);
+    mcsm::Result setRes = this->option->setValue("server_time_created", buffer);
+    if(!setRes.isSuccess()) return setRes;
+
+    return this->option->save();
 }
 
 std::string mcsm::ServerDataOption::getLastDownloadedBuild() const {
@@ -155,7 +191,7 @@ std::string mcsm::ServerDataOption::getLastDownloadedBuild() const {
         return "";
     }
 
-    nlohmann::json value = this->option->getValue("last_downloaded_build");
+    const nlohmann::json& value = this->option->getValue("last_downloaded_build");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
 
     if(value == nullptr){
@@ -181,7 +217,10 @@ mcsm::Result mcsm::ServerDataOption::updateLastDownloadedBuild(const std::string
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(build)});
         return res;
     }
-    return this->option->setValue("last_downloaded_build", build);
+    mcsm::Result setRes = this->option->setValue("last_downloaded_build", build);
+    if(!setRes.isSuccess()) return setRes;
+
+    return this->option->save();
 }
 
 bool mcsm::ServerDataOption::exists() const {

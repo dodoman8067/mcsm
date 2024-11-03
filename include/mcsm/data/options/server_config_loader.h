@@ -13,7 +13,7 @@ namespace mcsm {
         mcsm::Result loadConfig();
 
         template <typename T>
-        T get(const std::string& key){
+        inline T get(const std::string& key){
             if(!this->isLoaded){
                 mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
                     "ServerConfigLoader function called without loadConfig.",
@@ -79,8 +79,8 @@ namespace mcsm {
 
         bool isFullyLoaded() const;
 
-        std::shared_ptr<mcsm::Server> getServerInstance();
-
+        mcsm::Server* getServerInstance();
+        
     private:
         std::string configPath;
         std::unique_ptr<mcsm::Option> optionHandle;

@@ -150,17 +150,17 @@ Example usage:
     std::cout << "You entered a valid input: " << userInput << std::endl;
 */
 
-void mcsm::getInput(std::string& input, std::function<void()> beforeInputFunction, std::function<void(std::string)> invalidInputFunction, std::function<bool(std::string)> checkValid) {
+void mcsm::getInput(std::string& input, std::function<void(std::vector<std::string>)> beforeInputFunction, std::function<void(std::vector<std::string>)> invalidInputFunction, std::function<bool(std::vector<std::string>)> checkValid) {
     std::string typedInput;
     while(true){
-        beforeInputFunction();
+        beforeInputFunction({});
         std::getline(std::cin, typedInput);
             
-        if(checkValid(typedInput)){
+        if(checkValid({typedInput})){
             input = typedInput;
             break;
         }else{
-            invalidInputFunction(typedInput);
+            invalidInputFunction({typedInput});
         }
     }
 }
