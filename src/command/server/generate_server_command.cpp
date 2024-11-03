@@ -22,53 +22,6 @@ SOFTWARE.
 
 #include <mcsm/command/server/generate_server_command.h>
 
-const std::vector<std::string> availableOptions = {
-    "-servertype",
-    "--servertype",
-    "-st",
-    "--st",
-    "--profile",
-    "-profile",
-    "-p",
-    "--p",
-    "--name",
-    "-name",
-    "--current",
-    "-current",
-    "--c",
-    "-c",
-    "--global",
-    "-global",
-    "-g",
-    "--g",
-    "--jarpath",
-    "-jarpath",
-    "--jp",
-    "-jp",
-    "--serverversion",
-    "-serverversion",
-    "--sversion",
-    "-sversion",
-    "--sver",
-    "-sver",
-    "--sv",
-    "-sv",
-    "--version",
-    "-version",
-    "--ver",
-    "-ver",
-    "--v",
-    "-v",
-    "--no-auto-update",
-    "-no-auto-update",
-    "--no-auto-updates",
-    "-no-auto-updates",
-    "--skip-auto-update",
-    "-skip-auto-update",
-    "--skip-auto-updates",
-    "-skip-auto-updates"
-};
-
 mcsm::GenerateServerCommand::GenerateServerCommand(const std::string& name, const std::string& description) : Command(name, description) {}
 
 mcsm::GenerateServerCommand::~GenerateServerCommand(){}
