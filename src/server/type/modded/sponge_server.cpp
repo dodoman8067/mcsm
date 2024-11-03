@@ -42,7 +42,7 @@ std::string mcsm::SpongeServer::getVersion(const std::string& ver) const {
     }
     mcsm::Option opt(mcsm::getCurrentPath(), "server");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-    
+
     bool bRecommended = false;
     
     bool optExists = opt.exists();
@@ -105,12 +105,59 @@ std::string mcsm::SpongeServer::getVersion(const std::string& ver) const {
     return keys[0];
 }
 
+std::string mcsm::SpongeServer::getVersion(const std::string& ver, const bool& apiSearchRecommended) const {
+    if(!mcsm::isSafeString(ver)){
+        return "";
+    }
+    mcsm::Option opt(mcsm::getCurrentPath(), "server");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    
+    bool optExists = opt.exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+
+    if(optExists){
+        bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+
+        opt.load(advp);
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    }else{
+        auto* property = mcsm::GeneralOption::getGeneralOption().getProperty("sponge_api_search_recommended_versions");
+        if(property == nullptr){
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Failed to get property \"sponge_api_search_recommended_versions\".", "Report this to the developer of this project."}});
+            return "";
+        }
+    }
+
+    std::string recommended = apiSearchRecommended ? "true" : "false";
+
+    std::string res = mcsm::get("https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver + "&limit=1&recommended=" + recommended);
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
+    if(json.is_discarded()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
+        return "";
+    }
+
+    nlohmann::json artifacts = json["artifacts"];
+    if(artifacts == nullptr) return ""; // has to exist
+    if(!artifacts.is_object()) return ""; // has to be an object
+
+    std::vector<std::string> keys;
+    for(nlohmann::json::iterator it = artifacts.begin(); it != artifacts.end(); it++){
+        keys.push_back(it.key());
+    }
+
+    if(keys.empty()) return "";
+    return keys[0];
+}
+
 // used for checking if versions with specific build exists
 // @param build number of build
 
 // Note: The actual list position and release numbers don't match.
 // The offset calculation is based on the list position, not the release number.
-std::string mcsm::SpongeServer::getVersion(const std::string& ver, const std::string& build) const {
+std::string mcsm::SpongeServer::getVersion(const std::string& ver, const std::string& build, const bool& /* apiSearchRecommended */) const {
     if(!mcsm::isSafeString(ver)){
         return "";
     }
@@ -324,7 +371,7 @@ mcsm::Result mcsm::SpongeServer::download(const std::string& version, const std:
     if(serverBuildValue != "latest"){
         mcsm::warning("Sponge release version does not match the actual order of the file names. The program will NOT use the \"server_build\" value to match the release name.");
         mcsm::warning("Example: SpongeVanilla 1.12.2 build #2 is named '1.12.2-7.0.0-BETA-330', while the first build is named '1.12.2-7.0.0-BETA-1'.");
-        build = getVersion(version, serverBuildValue);
+        build = getVersion(version, serverBuildValue, false);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -583,8 +630,16 @@ mcsm::Result mcsm::SpongeServer::generate(const std::string& name, mcsm::JvmOpti
 
     bool skipCheck = propertyValue;
 
+    std::string apib = extraValues.find("if the server search on recommended versions api")->second;
+    if(apib != "false" && apib != "true"){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Invalid value"}});
+        return res;
+    }
+
+    bool bApi = apib == "true" ? true : false;
+
     if(!skipCheck){
-        bool vExists = this->hasVersion(version);
+        bool vExists = getVersion(version, bApi) != "";
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
             std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
             mcsm::Result res(resp.first, resp.second);
@@ -615,14 +670,6 @@ mcsm::Result mcsm::SpongeServer::generate(const std::string& name, mcsm::JvmOpti
         mcsm::Result res(resp.first, resp.second);
         return res;
     }
-
-    std::string apib = extraValues.find("if the server search on recommended versions api")->second;
-    if(apib != "false" && apib != "true"){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Invalid value"}});
-        return res;
-    }
-
-    bool bApi = apib == "true" ? true : false;
 
     mcsm::Result setRes = sOpt.setValue("api_serch_recommended", bApi);
     if(!setRes.isSuccess()) return setRes;

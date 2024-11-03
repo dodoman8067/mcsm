@@ -236,7 +236,6 @@ bool mcsm::CustomServer::isURL(const std::string& location) const {
 const std::map<std::string, std::string> mcsm::CustomServer::getRequiredValues() const {
     return {
         {"name", "" },
-        {"Minecraft version", ""},
         {"default JVM launch profile search path (current/global)", "current"},
         {"default JVM launch profile name", ""},
         {"server jarfile name", "custom.jar"},

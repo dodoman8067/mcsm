@@ -69,6 +69,18 @@ bool mcsm::GenerateServerCommand::checkValid(const std::string& key, std::string
         }
         return true;
     }
+    if(key == "server installer version"){
+        if(mcsm::isWhitespaceOrEmpty(value)){
+            value = defaultValue;
+        }
+        return true;
+    }
+    if(key == "server loader version"){
+        if(mcsm::isWhitespaceOrEmpty(value)){
+            value = defaultValue;
+        }
+        return true;
+    }
     return !mcsm::isWhitespaceOrEmpty(value);
 }
 
