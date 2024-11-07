@@ -401,7 +401,6 @@ mcsm::Result mcsm::ServerConfigLoader::setServerJarBuild(const std::string& buil
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(build)});
         return res;
     }
-    mcsm::Option option(this->configPath, "server");
     mcsm::Result setRes =  this->optionHandle->setValue("server_build", build);
 
     if(!setRes.isSuccess()) return setRes;
