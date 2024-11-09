@@ -41,13 +41,15 @@ void mcsm::CommandManager::init(){
     }
     commands = std::make_unique<std::vector<std::unique_ptr<mcsm::Command>>>();
     commands->reserve(11);
-    commands->shrink_to_fit();
     initialized = true;
 }
 
 void mcsm::CommandManager::cleanup(){
-    commands->clear();
-    commands.reset();
+    if(commands){
+        commands->clear();
+        commands.reset();
+    }
+    initialized = false;
 }
 
 void mcsm::CommandManager::addCommand(std::unique_ptr<mcsm::Command> command){
