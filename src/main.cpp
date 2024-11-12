@@ -27,7 +27,7 @@ SOFTWARE.
 #include <new>
 //#include <mcsm/data/options/multi_server_option.h>
 
-const std::string version = "0.4";
+const std::string version = "0.4.1";
 
 int main(int argc, char *argv[]){
     std::set_new_handler(mcsm::signal_handler::new_handle);
