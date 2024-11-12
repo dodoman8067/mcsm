@@ -32,6 +32,7 @@ mcsm::init::init(){
 }
 
 mcsm::init::~init(){
+    mcsm::CommandManager::cleanup();
     curl_global_cleanup();
     mcsm::curl_holder::cleanup();
     delete this->initialized;

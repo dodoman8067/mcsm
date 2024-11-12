@@ -23,13 +23,20 @@ SOFTWARE.
 */
 
 #include <mcsm/init.h>
-#include <mcsm/util/cli/segfault_handler.h>
+#include <mcsm/util/cli/signal_handler.h>
+#include <new>
 //#include <mcsm/data/options/multi_server_option.h>
 
-const std::string version = "0.4";
+const std::string version = "0.4.1";
 
 int main(int argc, char *argv[]){
-    std::signal(SIGSEGV, mcsm::segfault_handler::handle);
+    std::set_new_handler(mcsm::signal_handler::new_handle);
+    std::signal(SIGSEGV, mcsm::signal_handler::handle);
+    std::signal(SIGFPE, mcsm::signal_handler::handle);
+    std::signal(SIGILL, mcsm::signal_handler::handle);
+    std::signal(SIGBUS, mcsm::signal_handler::handle);
+    std::signal(SIGTERM, mcsm::signal_handler::handle);
+    std::signal(SIGINT, mcsm::signal_handler::handle);
     /**
      * TODO
      * Add an option to toggle copying the server jarfile when filepath is given on custom server configurations

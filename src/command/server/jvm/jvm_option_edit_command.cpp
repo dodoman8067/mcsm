@@ -61,12 +61,11 @@ void mcsm::JvmOptionEditCommand::execute(const std::vector<std::string>& args){
 
 
 mcsm::SearchTarget mcsm::JvmOptionEditCommand::getSearchTarget(const std::vector<std::string>& args){
-    if(args.empty()) return mcsm::SearchTarget::ALL;
+    if(args.empty()) return mcsm::SearchTarget::CURRENT;
     for(std::string_view arg : args) {
         if(arg == "--global" || arg == "-global" || arg == "--g" || arg == "-g") return mcsm::SearchTarget::GLOBAL;
-        if(arg == "--current" || arg == "-current" || arg == "--c" || arg == "-c") return mcsm::SearchTarget::CURRENT;
     }
-    return mcsm::SearchTarget::ALL;
+    return mcsm::SearchTarget::CURRENT;
 }
 
 std::string mcsm::JvmOptionEditCommand::getJvmPath(const std::vector<std::string>& args) const {

@@ -316,10 +316,18 @@ mcsm::Result mcsm::JvmOption::setJvmArguments(const std::vector<std::string>& jv
     }
     if(this->option->isGlobal()){
         mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
-        return opt->setValue("args", jvmArgs);
+        mcsm::Result lRes = opt->load();
+        if(!lRes.isSuccess()) return lRes;
+        mcsm::Result sRes = opt->setValue("args", jvmArgs);
+        if(!sRes.isSuccess()) return sRes;
+        return opt->save();
     }else{
         mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
-        return opt2->setValue("args", jvmArgs);
+        mcsm::Result lRes = opt2->load();
+        if(!lRes.isSuccess()) return lRes;
+        mcsm::Result sRes = opt2->setValue("args", jvmArgs);
+        if(!sRes.isSuccess()) return sRes;
+        return opt2->save();
     }
 }
 
@@ -399,10 +407,18 @@ mcsm::Result mcsm::JvmOption::setJvmPath(const std::string& jvmPath){
     }
     if(this->option->isGlobal()){
         mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
-        return opt->setValue("path", jvmPath);
+        mcsm::Result lRes = opt->load();
+        if(!lRes.isSuccess()) return lRes;
+        mcsm::Result sRes = opt->setValue("path", jvmPath);
+        if(!sRes.isSuccess()) return sRes;
+        return opt->save();
     }else{
         mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
-        return opt2->setValue("path", jvmPath);
+        mcsm::Result lRes = opt2->load();
+        if(!lRes.isSuccess()) return lRes;
+        mcsm::Result sRes = opt2->setValue("path", jvmPath);
+        if(!sRes.isSuccess()) return sRes;
+        return opt2->save();
     }
 }
 
@@ -494,10 +510,18 @@ mcsm::Result mcsm::JvmOption::setServerArguments(const std::vector<std::string>&
     }
     if(this->option->isGlobal()){
         mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
-        return opt->setValue("server_args", serverArgs);
+        mcsm::Result lRes = opt->load();
+        if(!lRes.isSuccess()) return lRes;
+        mcsm::Result sRes = opt->setValue("server_args", serverArgs);
+        if(!sRes.isSuccess()) return sRes;
+        return opt->save();
     }else{
         mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
-        return opt2->setValue("server_args", serverArgs);
+        mcsm::Result lRes = opt2->load();
+        if(!lRes.isSuccess()) return lRes;
+        mcsm::Result sRes = opt2->setValue("server_args", serverArgs);
+        if(!sRes.isSuccess()) return sRes;
+        return opt2->save();
     }
 }
 

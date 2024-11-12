@@ -175,7 +175,7 @@ mcsm::Result mcsm::GlobalOption::setValue(const std::string& key, const nlohmann
         return res;
     }
     const std::string& fullPath = this->path + "/" + this->name;
-    nlohmann::json jsonData = this->data;
+    nlohmann::json& jsonData = this->data;
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);

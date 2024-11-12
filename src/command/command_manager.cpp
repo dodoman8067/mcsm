@@ -40,8 +40,16 @@ void mcsm::CommandManager::init(){
         std::exit(1);
     }
     commands = std::make_unique<std::vector<std::unique_ptr<mcsm::Command>>>();
-    commands->shrink_to_fit();
+    commands->reserve(11);
     initialized = true;
+}
+
+void mcsm::CommandManager::cleanup(){
+    if(commands){
+        commands->clear();
+        commands.reset();
+    }
+    initialized = false;
 }
 
 void mcsm::CommandManager::addCommand(std::unique_ptr<mcsm::Command> command){
@@ -49,7 +57,7 @@ void mcsm::CommandManager::addCommand(std::unique_ptr<mcsm::Command> command){
    commands->push_back(std::move(command));
 }
 
-std::vector<std::unique_ptr<mcsm::Command>>& mcsm::CommandManager::getCommands(){
+const std::vector<std::unique_ptr<mcsm::Command>>& mcsm::CommandManager::getCommands(){
     return *commands;
 }
 
@@ -63,12 +71,12 @@ bool mcsm::CommandManager::hasCommand(std::string_view name){
 
 bool mcsm::CommandManager::hasAlias(const std::string& command, const std::string& value){
     if(!hasCommand(command)) return false;
-    std::unique_ptr<mcsm::Command> commandInstance = getCommand(command);
-    return commandInstance->hasAlias(value);
+    mcsm::Command* commandInstance = getCommand(command);
+    return commandInstance && commandInstance->hasAlias(value);
 }
 
 bool mcsm::CommandManager::hasAliasInGlobal(const std::string& value){
-    for(std::unique_ptr<mcsm::Command>& command : mcsm::CommandManager::getCommands()){
+    for(const auto& command : mcsm::CommandManager::getCommands()){
         if(command->hasAlias(value)){
             return true;
         }
@@ -76,10 +84,10 @@ bool mcsm::CommandManager::hasAliasInGlobal(const std::string& value){
     return false;
 }
 
-std::unique_ptr<mcsm::Command> mcsm::CommandManager::getCommand(const std::string& name){
+mcsm::Command* mcsm::CommandManager::getCommand(const std::string& name){
     for(auto& command : *commands){
         if(command->getName() != name && !command->hasAlias(name)) continue;
-        return std::move(command);
+        return command.get();
     }
     return nullptr;
 }
