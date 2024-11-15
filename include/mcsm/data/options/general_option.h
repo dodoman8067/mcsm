@@ -22,6 +22,7 @@ namespace mcsm {
         mcsm::Result load();
 
         bool advp;
+        std::string sbp;
     public:
         GeneralOption(const mcsm::GeneralOption&) = delete;
         GeneralOption& operator=(const mcsm::GeneralOption&) = delete;
@@ -40,6 +41,7 @@ namespace mcsm {
         mcsm::GlobalOption* getOption();
 
         bool advancedParseEnabled() const;
+        std::string screenBinPathProperty() const;
     };
 }
 
