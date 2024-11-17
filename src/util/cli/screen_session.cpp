@@ -10,9 +10,6 @@ mcsm::Result mcsm::ScreenSession::start(){
         return {mcsm::ResultType::MCSM_FAIL, {"A screen session with the same name already exists."}};
     }
     std::string startCommand = this->screenPath + " -dmS " + getFullSessionName() + " sh -c '" + this->command + "'";
-    #ifdef MCSM_DEBUG
-        std::cout << "DEBUG: " << startCommand << "\n";
-    #endif
     if(mcsm::runCommandQuietly(startCommand) != 0){
         return {mcsm::ResultType::MCSM_FAIL, {"Failed to start screen session " + getFullSessionName()}};
     }
@@ -24,9 +21,6 @@ mcsm::Result mcsm::ScreenSession::stop(){
         return {mcsm::ResultType::MCSM_FAIL, {"No running session with name " + this->name + ".mcsm to stop."}};
     }
     std::string stopCommand = this->screenPath + " -S " + getFullSessionName() + " -X quit";
-    #ifdef MCSM_DEBUG
-        std::cout << "DEBUG: " << stopCommand << "\n";
-    #endif
     if(mcsm::runCommandQuietly(stopCommand) != 0){
         return {mcsm::ResultType::MCSM_FAIL, {"Failed to stop screen session " + getFullSessionName()}};
     }
@@ -49,9 +43,6 @@ mcsm::Result mcsm::ScreenSession::sendCommand(const std::string& str){
         return {mcsm::ResultType::MCSM_FAIL, {"Cannot send command to a non-existent session: " + this->name + ".mcsm"}};
     }
     std::string command = this->screenPath + " -S " + getFullSessionName() + " -p 0 -X stuff \"" + str + "\\n\"";
-    #ifdef MCSM_DEBUG
-        std::cout << "DEBUG: " << command << "\n";
-    #endif
     if(mcsm::runCommandQuietly(command) != 0){
         return {mcsm::ResultType::MCSM_FAIL, {"Failed to send command to session: " + getFullSessionName()}};
     }
