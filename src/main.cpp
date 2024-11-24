@@ -81,7 +81,9 @@ int main(int argc, char *argv[]){
     std::signal(SIGSEGV, mcsm::signal_handler::handle);
     std::signal(SIGFPE, mcsm::signal_handler::handle);
     std::signal(SIGILL, mcsm::signal_handler::handle);
-    std::signal(SIGBUS, mcsm::signal_handler::handle);
+    #ifdef SIGBUS
+        std::signal(SIGBUS, mcsm::signal_handler::handle);
+    #endif
     std::signal(SIGTERM, mcsm::signal_handler::handle);
     std::signal(SIGINT, mcsm::signal_handler::handle);
     /**
