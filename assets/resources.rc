@@ -4,16 +4,16 @@
 #define STRING_FILE_DESCRIPTION "Minecraft Server Manager"
 
 1 VERSIONINFO
-FILEVERSION 0,1,1,3
-PRODUCTVERSION 0,1,1,3
+FILEVERSION 0,4,1
+PRODUCTVERSION 0,4,1
 BEGIN
     BLOCK "StringFileInfo"
     BEGIN
         BLOCK "040904E4"
         BEGIN
             VALUE "FileDescription", STRING_FILE_DESCRIPTION
-            VALUE "FileVersion", "0,1,1,3"
-            VALUE "ProductVersion", "0,1,1,3"
+            VALUE "FileVersion", "0,4,1"
+            VALUE "ProductVersion", "0,4,1"
             VALUE "ProductName", STRING_FILE_DESCRIPTION
             VALUE "CompanyName", "dodoman8067\0"
             VALUE "LegalCopyright", "MIT license\0" 
