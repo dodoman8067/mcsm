@@ -26,9 +26,7 @@ SOFTWARE.
 #include <mcsm/data/options/general/skip_version_check_property.h>
 #include <mcsm/data/options/general/advanced_json_errors_property.h>
 #include <mcsm/data/options/general/sponge_api_search_recommended_versions_property.h>
-#ifdef __linux__
-    #include <mcsm/data/options/general/screen_bin_path_property.h>
-#endif
+#include <mcsm/data/options/general/screen_bin_path_property.h>
 
 mcsm::init::init(){
     this->initialized = new bool(false);
@@ -36,8 +34,8 @@ mcsm::init::init(){
 
 mcsm::init::~init(){
     mcsm::CommandManager::cleanup();
-    curl_global_cleanup();
     mcsm::curl_holder::cleanup();
+    curl_global_cleanup();
     delete this->initialized;
     this->initialized = nullptr;
 }
@@ -139,10 +137,8 @@ void mcsm::init::initServers(){
     std::unique_ptr<mcsm::SpongeAPISearchRecommendedVersionsProperty> p3 = std::make_unique<mcsm::SpongeAPISearchRecommendedVersionsProperty>("sponge_api_search_recommended_versions");
     sr.registerGeneralProperty("sponge_api_search_recommended_versions", std::move(p3));
 
-    #ifdef __linux__
-        std::unique_ptr<mcsm::ScreenBinPathProperty> p4 = std::make_unique<mcsm::ScreenBinPathProperty>("screen_binary_path");
-        sr.registerGeneralProperty("screen_binary_path", std::move(p4));
-    #endif
+    std::unique_ptr<mcsm::ScreenBinPathProperty> p4 = std::make_unique<mcsm::ScreenBinPathProperty>("screen_binary_path");
+    sr.registerGeneralProperty("screen_binary_path", std::move(p4));
 }
 
 bool mcsm::init::isInitialized() const {

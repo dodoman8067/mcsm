@@ -12,20 +12,22 @@ void mcsm::signal_handler::handle(int signal){
         case SIGILL:
             std::cerr << termcolor::red << "[mcsm/FATAL] Illegal instruction (SIGILL) encountered." << termcolor::reset << std::endl;
             break;
-        case SIGBUS:
-            std::cerr << termcolor::red << "[mcsm/FATAL] Bus error (SIGBUS) encountered." << termcolor::reset << std::endl;
-            break;
+        #ifdef SIGBUS
+            case SIGBUS:
+                std::cerr << termcolor::red << "[mcsm/FATAL] Bus error (SIGBUS) encountered." << termcolor::reset << std::endl;
+                break;
+        #endif
         case SIGTERM:
             mcsm::CommandManager::cleanup();
             mcsm::warning("SIGTERM detected. Cleaning up..");
-            curl_global_cleanup();
             mcsm::curl_holder::cleanup();
+            curl_global_cleanup();
             std::exit(signal);
             break;
         case SIGINT:
             mcsm::CommandManager::cleanup();
-            curl_global_cleanup();
             mcsm::curl_holder::cleanup();
+            curl_global_cleanup();
             std::exit(signal);
             break;
     }
