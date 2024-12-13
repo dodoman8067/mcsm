@@ -13,6 +13,7 @@ namespace mcsm {
         ~ServerStarter();
 
         mcsm::Result startServer(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath);
+        mcsm::Result startServer(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::string& groupOptionPath);
     private:
         mcsm::ServerConfigLoader* loader;
     };
