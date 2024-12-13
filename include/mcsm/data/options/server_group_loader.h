@@ -6,12 +6,12 @@
 namespace mcsm {
     class ServerGroupLoader {
     private:
-        std::string path;
+        std::string path, mode;
         std::unique_ptr<mcsm::Option> handle;
         std::vector<std::unique_ptr<mcsm::ServerConfigLoader>> loaders;
         bool loaded;
     public: 
-        ServerGroupLoader(const std::string& path) : loaded(false){};
+        ServerGroupLoader(const std::string& path);
         ~ServerGroupLoader();
 
         mcsm::Result load();
