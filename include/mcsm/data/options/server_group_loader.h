@@ -15,6 +15,7 @@ namespace mcsm {
         ~ServerGroupLoader();
 
         mcsm::Result load();
+        mcsm::Result save();
 
         const mcsm::Option* getHandle() const;
 
