@@ -68,7 +68,7 @@ mcsm::Result mcsm::ServerGroupLoader::load() {
 mcsm::Result mcsm::ServerGroupLoader::save(){
     std::vector<std::string> strVec;
     for(auto& v : this->loaders){
-        if(!v){
+        if(v == nullptr){
             return {mcsm::ResultType::MCSM_FAIL, {"Null server loader instance detected on server group loader instance."}};
         }
         strVec.push_back(v->getHandle()->getPath());
@@ -206,22 +206,42 @@ mcsm::Result mcsm::ServerGroupLoader::setServers(const std::vector<mcsm::ServerC
 
 mcsm::Result mcsm::ServerGroupLoader::addServer(const std::string& path){
     std::unique_ptr<mcsm::ServerConfigLoader> serv = std::make_unique<mcsm::ServerConfigLoader>(path);
+    mcsm::Result loadRes = serv->loadConfig();
+    if(!loadRes.isSuccess()) return loadRes;
     this->loaders.push_back(std::move(serv));
     return this->handle->save();
 }
 
 mcsm::Result mcsm::ServerGroupLoader::addServer(mcsm::ServerConfigLoader* server){
+    if(server == nullptr){
+        return {mcsm::ResultType::MCSM_FAIL, {"Null serverconfigloader instance detected on servergrouploader. Report this to github."}};
+    }
+    if(!server->isFullyLoaded()){
+        return {mcsm::ResultType::MCSM_FAIL, {"ServerConfigLoader instance passed without being fully loaded on ServerGroupLoader. Report this to github."}};
+    }
     this->loaders.push_back(std::make_unique<mcsm::ServerConfigLoader>(*server));
     return this->handle->save();
 }
 
 mcsm::Result mcsm::ServerGroupLoader::addServer(std::unique_ptr<mcsm::ServerConfigLoader> server){
+    if(server == nullptr){
+        return {mcsm::ResultType::MCSM_FAIL, {"Null serverconfigloader instance detected on servergrouploader. Report this to github."}};
+    }
+    if(!server->isFullyLoaded()){
+        return {mcsm::ResultType::MCSM_FAIL, {"ServerConfigLoader instance passed without being fully loaded on ServerGroupLoader. Report this to github."}};
+    }
     this->loaders.push_back(std::move(server));
     return this->handle->save();
 }
 
 mcsm::Result mcsm::ServerGroupLoader::addServer(const std::vector<std::unique_ptr<mcsm::ServerConfigLoader>>& servers){
     for(auto& serv : servers){
+        if(serv == nullptr){
+            return {mcsm::ResultType::MCSM_FAIL, {"Null serverconfigloader instance detected on servergrouploader. Report this to github."}};
+        }
+        if(!serv->isFullyLoaded()){
+            return {mcsm::ResultType::MCSM_FAIL, {"ServerConfigLoader instance passed without being fully loaded on ServerGroupLoader. Report this to github."}};
+        }
         this->loaders.push_back(std::make_unique<mcsm::ServerConfigLoader>(*serv));
     }
     return this->handle->save();
