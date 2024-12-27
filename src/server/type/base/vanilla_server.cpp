@@ -338,7 +338,7 @@ mcsm::Result mcsm::VanillaServer::start(mcsm::ServerConfigLoader* loader, mcsm::
     return Server::start(loader, option, path, optionPath);
 }
 
-mcsm::Result mcsm::VanillaServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues){
+mcsm::Result mcsm::VanillaServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& /* extraValues */){
     mcsm::GeneralProperty* property = mcsm::GeneralOption::getGeneralOption().getProperty("skip_version_check_while_configuring");
 
     if(property == nullptr){

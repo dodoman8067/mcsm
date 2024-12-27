@@ -150,7 +150,7 @@ mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOpti
     return generate(name, option, path, version, autoUpdate, extraValues.find("server file location (url/filepath)")->second, extraValues);
 }
 
-mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& /* version */, const bool& /* autoUpdate */, const std::string& fileLocation, const std::map<std::string, std::string>& extraValues){
+mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& /* version */, const bool& /* autoUpdate */, const std::string& fileLocation, const std::map<std::string, std::string>& /* extraValues */){
     mcsm::ServerConfigGenerator serverOption(path);
     mcsm::ServerDataOption sDOpt(path);
 
