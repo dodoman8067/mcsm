@@ -65,6 +65,7 @@ mcsm::Result mcsm::ServerGroupLoader::load() {
     return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
 }
 
+// call this instead of handle->save() when the function modifies and saves this->loaders
 mcsm::Result mcsm::ServerGroupLoader::save(){
     std::vector<std::string> strVec;
     for(auto& v : this->loaders){
@@ -118,7 +119,21 @@ std::string mcsm::ServerGroupLoader::getName() const {
 }
 
 mcsm::Result mcsm::ServerGroupLoader::setName(const std::string& name){
+    if(!this->loaded){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+            "ServerGroupLoader function called without load.",
+            "High chance to be an internal issue. Please open an issue in Github."
+        }});
+        return res;
+    }
+    if(!mcsm::isSafeString(name)){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(name)});
+        return res;
+    }
+    mcsm::Result setRes = this->handle->setValue("name", name);
 
+    if(!setRes.isSuccess()) return setRes;
+    return this->handle->save();
 }
 
 std::string mcsm::ServerGroupLoader::getMode() const {
@@ -201,7 +216,7 @@ mcsm::Result mcsm::ServerGroupLoader::setServers(const std::vector<mcsm::ServerC
         this->loaders.push_back(std::make_unique<mcsm::ServerConfigLoader>(*loader));
     }
 
-    return this->handle->save();
+    return this->save();
 }
 
 mcsm::Result mcsm::ServerGroupLoader::addServer(const std::string& path){
@@ -209,7 +224,7 @@ mcsm::Result mcsm::ServerGroupLoader::addServer(const std::string& path){
     mcsm::Result loadRes = serv->loadConfig();
     if(!loadRes.isSuccess()) return loadRes;
     this->loaders.push_back(std::move(serv));
-    return this->handle->save();
+    return this->save();
 }
 
 mcsm::Result mcsm::ServerGroupLoader::addServer(mcsm::ServerConfigLoader* server){
@@ -220,7 +235,7 @@ mcsm::Result mcsm::ServerGroupLoader::addServer(mcsm::ServerConfigLoader* server
         return {mcsm::ResultType::MCSM_FAIL, {"ServerConfigLoader instance passed without being fully loaded on ServerGroupLoader. Report this to github."}};
     }
     this->loaders.push_back(std::make_unique<mcsm::ServerConfigLoader>(*server));
-    return this->handle->save();
+    return this->save();
 }
 
 mcsm::Result mcsm::ServerGroupLoader::addServer(std::unique_ptr<mcsm::ServerConfigLoader> server){
@@ -231,7 +246,7 @@ mcsm::Result mcsm::ServerGroupLoader::addServer(std::unique_ptr<mcsm::ServerConf
         return {mcsm::ResultType::MCSM_FAIL, {"ServerConfigLoader instance passed without being fully loaded on ServerGroupLoader. Report this to github."}};
     }
     this->loaders.push_back(std::move(server));
-    return this->handle->save();
+    return this->save();
 }
 
 mcsm::Result mcsm::ServerGroupLoader::addServer(const std::vector<std::unique_ptr<mcsm::ServerConfigLoader>>& servers){
@@ -244,16 +259,56 @@ mcsm::Result mcsm::ServerGroupLoader::addServer(const std::vector<std::unique_pt
         }
         this->loaders.push_back(std::make_unique<mcsm::ServerConfigLoader>(*serv));
     }
-    return this->handle->save();
+    return this->save();
 }
 
 mcsm::Result mcsm::ServerGroupLoader::removeServer(const std::string& path){
+    for(size_t i = 0; i<this->loaders.size(); i++){
+        if(this->loaders[i]->getHandle()->getPath() == path){
+            this->loaders.erase(this->loaders.begin() + i);
+            return save();
+        }
+    }
+    return {mcsm::ResultType::MCSM_FAIL, {
+        "Cannot remove an element that doesn't exist.",
+        "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you believe that this is a software issue."
+    }};
 }
 
 mcsm::Result mcsm::ServerGroupLoader::removeServer(mcsm::ServerConfigLoader* server){
-
+    for(size_t i = 0; i<this->loaders.size(); i++){
+        if(this->loaders[i]->getHandle()->getPath() == server->getHandle()->getPath()){
+            this->loaders.erase(this->loaders.begin() + i);
+            return save();
+        }
+    }
+    return {mcsm::ResultType::MCSM_FAIL, {
+        "Cannot remove an element that doesn't exist.",
+        "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you believe that this is a software issue."
+    }};
 }
 
 mcsm::Result mcsm::ServerGroupLoader::removeServer(const std::vector<mcsm::ServerConfigLoader*>& servers){
+    bool removedAny = false;
 
+    for(const auto& server : servers){
+        auto it = std::find_if(this->loaders.begin(), this->loaders.end(),
+            [&](const std::unique_ptr<mcsm::ServerConfigLoader>& loader){
+                return loader->getHandle()->getPath() == server->getHandle()->getPath();
+            });
+
+        if(it != this->loaders.end()){
+            this->loaders.erase(it);
+            removedAny = true;
+        }
+    }
+
+    if(removedAny){
+        return save();
+    }
+
+    return {mcsm::ResultType::MCSM_FAIL, {
+        "None of the specified servers could be removed.",
+        "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you believe that this is a software issue."
+    }};
 }
