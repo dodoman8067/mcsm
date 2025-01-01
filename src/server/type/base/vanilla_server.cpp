@@ -374,7 +374,7 @@ mcsm::Result mcsm::VanillaServer::generate(const std::string& name, mcsm::JvmOpt
     return configure(version, this, &opt, path, name, option, autoUpdate, "ignored");
 }
 
-bool mcsm::VanillaServer::hasVersion(const std::string& version){
+bool mcsm::VanillaServer::hasVersion(const std::string& version) const {
     std::string ver = getVersionObject(version);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return false;
     return !mcsm::isWhitespaceOrEmpty(ver);

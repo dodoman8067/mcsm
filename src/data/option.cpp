@@ -52,11 +52,7 @@ bool mcsm::Option::createDirectories(const std::string &dirName, std::error_code
     return true;
 }
 
-mcsm::Result mcsm::Option::load() const {
-    return load(false);
-}
-
-mcsm::Result mcsm::Option::load(const bool& advancedParse) const {
+mcsm::Result mcsm::Option::create(){
     const std::string& fullPath = this->path + "/" + this->name;
     if(!std::filesystem::exists(fullPath)){
         std::error_code ec;
@@ -69,6 +65,26 @@ mcsm::Result mcsm::Option::load(const bool& advancedParse) const {
         
         ofs << "{}";
         ofs.close();
+        mcsm::Result res({mcsm::ResultType::MCSM_OK, {"Success"}});
+        return res;
+    }
+    mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::fileCreateFailed(fullPath)});
+    return res;
+}
+
+mcsm::Result mcsm::Option::load(){
+    return load(false);
+}
+
+mcsm::Result mcsm::Option::load(const bool& advancedParse){
+    const std::string& fullPath = this->path + "/" + this->name;
+    if(!std::filesystem::exists(fullPath)){
+        mcsm::Result cRes = create();
+        if(!cRes.isSuccess()) return cRes;
+        /*
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::fileNotFound(fullPath)});
+        return res;
+        */
     }
 
     std::ifstream fileStream(fullPath);
@@ -141,7 +157,7 @@ bool mcsm::Option::isGlobal() const {
     return false;
 }
 
-mcsm::Result mcsm::Option::setValue(const std::string& key, const nlohmann::json& value) const {
+mcsm::Result mcsm::Option::setValue(const std::string& key, const nlohmann::json& value){
     if(this->data == nullptr){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Option's get/set function called without being loaded.", "Please report this to Github."}});
         return res;
@@ -158,7 +174,7 @@ mcsm::Result mcsm::Option::setValue(const std::string& key, const nlohmann::json
     return {mcsm::ResultType::MCSM_OK, {"Success"}};
 }
 
-mcsm::Result mcsm::Option::save() const {
+mcsm::Result mcsm::Option::save(){
     const std::string& fullPath = this->path + "/" + this->name;
     std::ofstream outFile(fullPath);
     if (outFile.is_open()) {
@@ -172,7 +188,7 @@ mcsm::Result mcsm::Option::save() const {
     return res;
 }
 
-mcsm::Result mcsm::Option::save(const nlohmann::json& json) const {
+mcsm::Result mcsm::Option::save(const nlohmann::json& json){
     this->data = json;
     const std::string& fullPath = this->path + "/" + this->name;
     std::ofstream outFile(fullPath);
@@ -187,7 +203,7 @@ mcsm::Result mcsm::Option::save(const nlohmann::json& json) const {
     return res;
 }
 
-mcsm::Result mcsm::Option::reset() const {
+mcsm::Result mcsm::Option::reset(){
     const std::string& fullPath = this->path + "/" + this->name;
     std::ofstream outFile(fullPath);
     if (outFile.is_open()) {
@@ -201,11 +217,11 @@ mcsm::Result mcsm::Option::reset() const {
     return res; 
 }
 
-std::string mcsm::Option::getName(){
+std::string mcsm::Option::getName() const {
     return this->name;
 }
 
-std::string mcsm::Option::getPath(){
+std::string mcsm::Option::getPath() const {
     return this->path;
 }
 

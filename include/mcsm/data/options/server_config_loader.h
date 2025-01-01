@@ -13,7 +13,7 @@ namespace mcsm {
         mcsm::Result loadConfig();
 
         template <typename T>
-        inline T get(const std::string& key){
+        inline T get(const std::string& key) const{
             if(!this->isLoaded){
                 mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
                     "ServerConfigLoader function called without loadConfig.",
@@ -87,7 +87,7 @@ namespace mcsm {
         bool isLoaded;
 
         template <typename T>
-        nlohmann::json::value_t getJsonType();
+        nlohmann::json::value_t getJsonType() const;
     };
 }
 

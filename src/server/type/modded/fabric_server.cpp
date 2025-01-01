@@ -888,7 +888,7 @@ const std::map<std::string, std::string> mcsm::FabricServer::getRequiredValues()
     };
 }
 
-bool mcsm::FabricServer::hasVersion(const std::string& version){
+bool mcsm::FabricServer::hasVersion(const std::string& version) const {
     return !mcsm::isWhitespaceOrEmpty(getVersion(version));
 }
 

@@ -458,7 +458,7 @@ mcsm::Result mcsm::PaperServer::generate(const std::string& name, mcsm::JvmOptio
     return configure(version, this, &opt, path, name, option, autoUpdate, extraValues.find("server build version")->second);
 }
 
-bool mcsm::PaperServer::hasVersion(const std::string& version){
+bool mcsm::PaperServer::hasVersion(const std::string& version) const {
     return getVersion(version) != -1;
 }
 

@@ -59,7 +59,7 @@ namespace mcsm {
 
         mcsm::Result obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
 
-        bool hasVersion(const std::string& version) override;
+        bool hasVersion(const std::string& version) const override;
 
         std::string getTypeAsString() const override;
         

@@ -705,7 +705,7 @@ const std::map<std::string, std::string> mcsm::SpongeServer::getRequiredValues()
     };
 }
 
-bool mcsm::SpongeServer::hasVersion(const std::string& version){
+bool mcsm::SpongeServer::hasVersion(const std::string& version) const {
     return getVersion(version) != "";
 }
 

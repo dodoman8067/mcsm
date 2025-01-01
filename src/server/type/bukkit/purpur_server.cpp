@@ -458,7 +458,7 @@ mcsm::Result mcsm::PurpurServer::generate(const std::string& name, mcsm::JvmOpti
     return configure(version, this, &opt, path, name, option, autoUpdate, extraValues.find("server build version")->second);
 }
 
-bool mcsm::PurpurServer::hasVersion(const std::string& version){
+bool mcsm::PurpurServer::hasVersion(const std::string& version) const {
     return getVersion(version) != -1;
 }
 

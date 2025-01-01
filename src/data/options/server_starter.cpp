@@ -69,7 +69,7 @@ mcsm::Result mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const std
     return res2;
 }
 
-mcsm::Result mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::string& groupOptionPath){
+mcsm::Result mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::string& /* groupOptionPath */){
     // Doesn't do anything now.
     // Will verify if the group option is valid and if it has current server added on the list then update running sessions file
 
