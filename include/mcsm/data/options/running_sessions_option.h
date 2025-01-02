@@ -4,10 +4,35 @@
 #include <mcsm/data/options/server_group_loader.h>
 
 namespace mcsm {
+    struct RunningGroup {
+        RunningGroup& operator=(RunningGroup&& other) noexcept {
+            if(this != &other){
+                group = std::move(other.group);
+                running = other.running;
+            }
+            return *this;
+        }
+
+        std::unique_ptr<mcsm::ServerGroupLoader> group;
+        std::vector<const mcsm::ServerConfigLoader*> running;
+    };
+
     class RunningSessionsOption {
     private:
         std::unique_ptr<mcsm::GlobalOption> handle;
-        std::vector<std::unique_ptr<mcsm::ServerGroupLoader>> runningGroups;
+        std::vector<std::unique_ptr<mcsm::RunningGroup>> runningGroups;
+    public:
+        RunningSessionsOption();
+        ~RunningSessionsOption();
+
+        std::vector<const mcsm::RunningGroup*> getRunningGroups() const;
+        std::vector<const mcsm::ServerGroupLoader*> getRunningServersOfGroup(const std::string& groupName) const;
+
+        mcsm::Result addRunningGroup(std::unique_ptr<mcsm::RunningGroup> group);
+        mcsm::Result addRunningServer(const std::string& groupName, const mcsm::ServerConfigLoader* server);
+
+        mcsm::Result removeRunningGroup(std::unique_ptr<mcsm::RunningGroup> group);
+        mcsm::Result removeRunningServer(const std::string& groupName, const mcsm::ServerConfigLoader* server);
     };
 }
 
