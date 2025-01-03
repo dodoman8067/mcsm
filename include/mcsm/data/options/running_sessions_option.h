@@ -14,7 +14,7 @@ namespace mcsm {
         }
 
         std::unique_ptr<mcsm::ServerGroupLoader> group;
-        std::vector<const mcsm::ServerConfigLoader*> running;
+        std::vector<std::unique_ptr<mcsm::ServerConfigLoader>> running;
     };
 
     class RunningSessionsOption {
@@ -24,6 +24,9 @@ namespace mcsm {
     public:
         RunningSessionsOption();
         ~RunningSessionsOption();
+
+        mcsm::Result load();
+        mcsm::Result save();
 
         std::vector<const mcsm::RunningGroup*> getRunningGroups() const;
         std::vector<const mcsm::ServerGroupLoader*> getRunningServersOfGroup(const std::string& groupName) const;
