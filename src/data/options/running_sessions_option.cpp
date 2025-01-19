@@ -89,10 +89,34 @@ mcsm::Result mcsm::RunningSessionsOption::load(){
 
             rgp->running.push_back(std::move(scl));
         }
-
+        this->runningGroups.push_back(std::move(rgp));
     }
 }
 
 std::vector<const mcsm::RunningGroup*> mcsm::RunningSessionsOption::getRunningGroups() const {
+    std::vector<const mcsm::RunningGroup*> rtv;
+    for(auto& v : this->runningGroups){
+        rtv.push_back(v.get());
+    }
+    return rtv;
+}
 
+std::vector<const mcsm::ServerConfigLoader*> mcsm::RunningSessionsOption::getRunningServersOfGroup(const std::string& groupName) const {
+    std::vector<const mcsm::ServerConfigLoader*> rtv;
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+
+    for(const auto& group : this->runningGroups){
+        if(group->group->getName() != groupName) continue;
+
+        for(const auto& server : group->running){
+            if(server){
+                rtv.push_back(server.get());
+            }else{
+                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Null serverconfigloader pointer detected."}});
+                break;
+            }
+        }
+    }
+
+    return rtv;
 }

@@ -8,7 +8,7 @@ namespace mcsm {
         RunningGroup& operator=(RunningGroup&& other) noexcept {
             if(this != &other){
                 group = std::move(other.group);
-                running = other.running;
+                running = std::move(other.running);
             }
             return *this;
         }
@@ -29,7 +29,7 @@ namespace mcsm {
         mcsm::Result save();
 
         std::vector<const mcsm::RunningGroup*> getRunningGroups() const;
-        std::vector<const mcsm::ServerGroupLoader*> getRunningServersOfGroup(const std::string& groupName) const;
+        std::vector<const mcsm::ServerConfigLoader*> getRunningServersOfGroup(const std::string& groupName) const;
 
         mcsm::Result addRunningGroup(std::unique_ptr<mcsm::RunningGroup> group);
         mcsm::Result addRunningServer(const std::string& groupName, const mcsm::ServerConfigLoader* server);
