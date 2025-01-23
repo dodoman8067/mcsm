@@ -96,7 +96,9 @@ mcsm::Result mcsm::RunningSessionsOption::load(){
 std::vector<const mcsm::RunningGroup*> mcsm::RunningSessionsOption::getRunningGroups() const {
     std::vector<const mcsm::RunningGroup*> rtv;
     for(auto& v : this->runningGroups){
-        rtv.push_back(v.get());
+        if(v){
+            rtv.push_back(v.get());
+        }
     }
     return rtv;
 }
@@ -104,6 +106,7 @@ std::vector<const mcsm::RunningGroup*> mcsm::RunningSessionsOption::getRunningGr
 std::vector<const mcsm::ServerConfigLoader*> mcsm::RunningSessionsOption::getRunningServersOfGroup(const std::string& groupName) const {
     std::vector<const mcsm::ServerConfigLoader*> rtv;
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    bool success = false;
 
     for(const auto& group : this->runningGroups){
         if(group->group->getName() != groupName) continue;
@@ -111,12 +114,90 @@ std::vector<const mcsm::ServerConfigLoader*> mcsm::RunningSessionsOption::getRun
         for(const auto& server : group->running){
             if(server){
                 rtv.push_back(server.get());
+                success = true;
             }else{
                 mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Null serverconfigloader pointer detected."}});
+                success = false;
                 break;
             }
         }
     }
 
+    if(!success){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"No valid running group \"" + groupName + "\" found."}});
+    }
     return rtv;
+}
+
+mcsm::Result mcsm::RunningSessionsOption::addRunningGroup(std::unique_ptr<mcsm::RunningGroup> group){
+    for(auto& g : this->runningGroups){
+        std::string rgn = g->group->getName();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
+        std::string ggn = group->group->getName();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
+        if(rgn == ggn){
+            return {mcsm::ResultType::MCSM_FAIL, {"Group already running: " + ggn}};
+        }
+    }
+    this->runningGroups.push_back(std::move(group));
+    return this->save();
+}
+
+mcsm::Result mcsm::RunningSessionsOption::addRunningServer(const std::string& groupName, const mcsm::ServerConfigLoader* server){
+    std::string serverName = server->getServerName();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+    
+    for(auto& g : this->runningGroups){
+        std::string gn = g->group->getName();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
+        if(gn == groupName){
+            std::vector<const mcsm::ServerConfigLoader*> rsg = getRunningServersOfGroup(groupName);
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
+
+            for(auto& v : rsg){
+                std::string sn = v->getServerName();
+                if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                    std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                    mcsm::Result res(resp.first, resp.second);
+                    return res;
+                }
+
+                if(sn == serverName){
+                    return {mcsm::ResultType::MCSM_FAIL, {"Same server \"" + serverName + "\" in group \"" + groupName + "\" already running"}};
+                }
+            }
+
+            g->running.push_back(std::make_unique<mcsm::ServerConfigLoader>(*server));
+            return this->save();
+        }
+    }
+    return {mcsm::ResultType::MCSM_FAIL, {"No running group \"" + groupName + "\" found"}};
+}
+
+mcsm::Result mcsm::RunningSessionsOption::removeRunningGroup(std::unique_ptr<mcsm::RunningGroup> group){
+
+}
+
+mcsm::Result mcsm::RunningSessionsOption::removeRunningServer(const std::string& groupName, const mcsm::ServerConfigLoader* server){
+
 }
