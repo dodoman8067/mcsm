@@ -9,6 +9,23 @@ mcsm::RunningSessionsOption::~RunningSessionsOption(){
     
 }
 
+
+/** example json format
+ * running_sessions_do_not_edit_this.json
+ * {
+ *     "running": [
+ *         {
+ *             "group_path": "/group/path1",
+ *             "running_servers": [ "/path/to/server", "path/to/server2" ]
+ *         },
+ *         {
+ *             "group_path": "/group/path2",
+ *             "running_servers": [ "/path/to/server3", "path/to/server4" ]
+ *         }
+ *     ]
+ * }
+ * 
+*/
 mcsm::Result mcsm::RunningSessionsOption::load(){
     this->handle = std::make_unique<mcsm::GlobalOption>("", "running_sessions_do_not_edit_this");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -43,7 +60,7 @@ mcsm::Result mcsm::RunningSessionsOption::load(){
         return res;
     }
 
-    //need to implement importing runninggroup from json. this class is designed to have multiple instance created
+    //need to implement importing runninggroup from json. this class is designed to have multiple instance created(not to do)
     for(nlohmann::json& v : arr){
         if(!v.is_object()){
             mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"running\"", "object")});
