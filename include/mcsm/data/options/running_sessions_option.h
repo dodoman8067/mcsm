@@ -4,6 +4,8 @@
 #include <mcsm/data/options/server_group_loader.h>
 
 namespace mcsm {
+    // screen session name: (group).(servername)
+    // not 100% sure if this class will be used.
     struct RunningGroup {
         RunningGroup& operator=(RunningGroup&& other) noexcept {
             if(this != &other){

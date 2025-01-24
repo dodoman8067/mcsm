@@ -211,10 +211,12 @@ mcsm::Result mcsm::RunningSessionsOption::addRunningServer(const std::string& gr
     return {mcsm::ResultType::MCSM_FAIL, {"No running group \"" + groupName + "\" found"}};
 }
 
+// this doesn't actually stop the server, call ServerGroupManager#stop instead
 mcsm::Result mcsm::RunningSessionsOption::removeRunningGroup(std::unique_ptr<mcsm::RunningGroup> group){
 
 }
 
+// this doesn't actually stop the server, call ServerGroupManager#stop instead
 mcsm::Result mcsm::RunningSessionsOption::removeRunningServer(const std::string& groupName, const mcsm::ServerConfigLoader* server){
 
 }
