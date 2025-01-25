@@ -85,7 +85,7 @@ const mcsm::Option* mcsm::ServerGroupLoader::getHandle() const {
     return this->handle.get();
 }
 
-const bool mcsm::ServerGroupLoader::isLoaded() const {
+bool mcsm::ServerGroupLoader::isLoaded() const {
     return this->loaded;
 }
 

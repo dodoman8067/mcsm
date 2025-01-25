@@ -19,7 +19,7 @@ namespace mcsm {
 
         const mcsm::Option* getHandle() const;
 
-        const bool isLoaded() const; 
+        bool isLoaded() const; 
 
         std::string getName() const;
         mcsm::Result setName(const std::string& name);

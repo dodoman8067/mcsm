@@ -9,7 +9,7 @@ mcsm::ServerGroupManager::~ServerGroupManager(){
 }
 
 mcsm::Result mcsm::ServerGroupManager::start(){
-
+    return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}}; // temp
 }
 
 mcsm::Result mcsm::ServerGroupManager::start(const std::string& serverName){
@@ -75,7 +75,7 @@ mcsm::Result mcsm::ServerGroupManager::start(const std::string& serverName){
 }
 
 mcsm::Result mcsm::ServerGroupManager::stop(){
-
+    return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}}; // temp
 }
 
 mcsm::Result mcsm::ServerGroupManager::stop(const std::string& /* serverName */){
