@@ -11,6 +11,7 @@ namespace mcsm {
         std::string command; // will sh -c {command}
         std::string screenPath;
     public:
+        ScreenSession(const std::string& name);
         ScreenSession(const std::string& name, const std::string& command);
         ~ScreenSession() = default;
 

@@ -1,6 +1,8 @@
 #include <mcsm/util/cli/screen_session.h>
 #include <mcsm/data/options/general_option.h>
 
+mcsm::ScreenSession::ScreenSession(const std::string& name) : mcsm::ScreenSession(name, ""){}
+
 mcsm::ScreenSession::ScreenSession(const std::string& name, const std::string& command) : name(name), command(command){
     this->screenPath = mcsm::GeneralOption::getGeneralOption().screenBinPathProperty();
 }
