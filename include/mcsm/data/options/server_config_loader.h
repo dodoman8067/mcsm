@@ -8,6 +8,10 @@ namespace mcsm {
     class ServerConfigLoader {
     public:
         explicit ServerConfigLoader(const std::string& path);
+        ServerConfigLoader(const ServerConfigLoader& other)
+            : configPath(other.configPath),
+              optionHandle(other.optionHandle ? std::make_unique<mcsm::Option>(*other.optionHandle) : nullptr),
+              isLoaded(other.isLoaded){}
         ~ServerConfigLoader();
 
         mcsm::Result loadConfig();
@@ -75,7 +79,7 @@ namespace mcsm {
         bool doesAutoUpdate() const;
         mcsm::Result setAutoUpdate(const bool& update);
 
-        std::unique_ptr<mcsm::Option>& getHandle();
+        mcsm::Option* getHandle() const;
 
         bool isFullyLoaded() const;
 

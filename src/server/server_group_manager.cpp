@@ -55,6 +55,12 @@ mcsm::Result mcsm::ServerGroupManager::start(const std::string& serverName){
             }
 
             if(serverName == groupServerName){
+                std::error_code ec;
+                std::filesystem::current_path(server->getHandle()->getPath(), ec);
+                if(ec){
+                    return {mcsm::ResultType::MCSM_FAIL, {"Server starting failed with reason: " + ec.message()}}; 
+                }
+
                 mcsm::ScreenSession session(groupName + "." + groupServerName, "{mcsm start(gonna replace this with argv[0] or something)} -__mcsm__Internal_Group_Start \"" + groupPath + "\"");
                 // StartServerCommand will handle the rest
                 return session.start();
@@ -65,12 +71,13 @@ mcsm::Result mcsm::ServerGroupManager::start(const std::string& serverName){
     }else{
         // TODO
     }
+    return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}}; // temp
 }
 
 mcsm::Result mcsm::ServerGroupManager::stop(){
 
 }
 
-mcsm::Result mcsm::ServerGroupManager::stop(const std::string& serverName){
-
+mcsm::Result mcsm::ServerGroupManager::stop(const std::string& /* serverName */){
+    return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}}; // temp
 }

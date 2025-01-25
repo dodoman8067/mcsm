@@ -446,8 +446,8 @@ mcsm::Result mcsm::ServerConfigLoader::setAutoUpdate(const bool& update){
     return this->optionHandle->save();
 }
 
-std::unique_ptr<mcsm::Option>& mcsm::ServerConfigLoader::getHandle(){
-    return this->optionHandle;
+mcsm::Option* mcsm::ServerConfigLoader::getHandle() const {
+    return this->optionHandle.get();
 }
 
 bool mcsm::ServerConfigLoader::isFullyLoaded() const {

@@ -110,6 +110,10 @@ mcsm::Result mcsm::RunningSessionsOption::load(){
     }
 }
 
+mcsm::Result mcsm::RunningSessionsOption::save(){
+    return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
+}
+
 std::vector<const mcsm::RunningGroup*> mcsm::RunningSessionsOption::getRunningGroups() const {
     std::vector<const mcsm::RunningGroup*> rtv;
     for(auto& v : this->runningGroups){
@@ -212,11 +216,11 @@ mcsm::Result mcsm::RunningSessionsOption::addRunningServer(const std::string& gr
 }
 
 // this doesn't actually stop the server, call ServerGroupManager#stop instead
-mcsm::Result mcsm::RunningSessionsOption::removeRunningGroup(std::unique_ptr<mcsm::RunningGroup> group){
+mcsm::Result mcsm::RunningSessionsOption::removeRunningGroup(std::unique_ptr<mcsm::RunningGroup> /* group */){
 
 }
 
 // this doesn't actually stop the server, call ServerGroupManager#stop instead
-mcsm::Result mcsm::RunningSessionsOption::removeRunningServer(const std::string& groupName, const mcsm::ServerConfigLoader* server){
+mcsm::Result mcsm::RunningSessionsOption::removeRunningServer(const std::string& /* groupName */, const mcsm::ServerConfigLoader* /* server */){
 
 }
