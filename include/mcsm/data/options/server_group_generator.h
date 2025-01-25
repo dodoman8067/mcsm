@@ -11,6 +11,10 @@ namespace mcsm {
         std::unique_ptr<mcsm::Option> handle;
     public:
         ServerGroupGenerator(const std::string& name, const std::string& path);
+        ServerGroupGenerator(const mcsm::ServerGroupGenerator& other)
+            : name(other.name),
+              path(other.path),
+              handle(other.handle ? std::make_unique<mcsm::Option>(*other.handle) : nullptr){}
         ~ServerGroupGenerator();
 
         // fails if group file already configured

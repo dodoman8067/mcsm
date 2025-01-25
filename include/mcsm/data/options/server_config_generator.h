@@ -8,6 +8,9 @@ namespace mcsm {
     class ServerConfigGenerator {
     public:
         explicit ServerConfigGenerator(const std::string& path);
+        ServerConfigGenerator(const mcsm::ServerConfigGenerator& other)
+            : configPath(other.configPath),
+              optionHandle(other.optionHandle ? std::make_unique<mcsm::Option>(*other.optionHandle) : nullptr){}
         ~ServerConfigGenerator();
 
         mcsm::Result generate(const std::string& version, mcsm::Server* server, mcsm::ServerDataOption* sDataOpt, const std::string& name, mcsm::JvmOption& defaultOption);
