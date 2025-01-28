@@ -65,6 +65,8 @@ namespace mcsm {
     void getInput(std::string& input, std::function<void(std::vector<std::string>)> beforeInputFunction, std::function<void(std::vector<std::string>)> invalidInputFunction, std::function<bool(std::vector<std::string>)> checkValid);
 
     bool isDebug();
+
+    std::string getExecutablePath();
 }
 
 #endif // __MCSM_CLI_UTILS_H__
