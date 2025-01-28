@@ -184,7 +184,7 @@ std::string mcsm::getExecutablePath(){
     }
 
     buf[len] = '\0';
-    return std::string(buf);
+    return "\"" + std::string(buf) + "\"";
 #elif defined(_WIN32)
     char buf[MAX_PATH];
     DWORD len = GetModuleFileNameA(NULL, buf, MAX_PATH);
@@ -194,7 +194,7 @@ std::string mcsm::getExecutablePath(){
         return "";
     }
 
-    return std::string(buf);
+    return "\"" + std::string(buf) + "\"";
 #else
     mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Unsupported platform for getExecutablePath."}});
     return "";
