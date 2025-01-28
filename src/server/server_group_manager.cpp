@@ -1,4 +1,10 @@
 #include <mcsm/server/server_group_manager.h>
+#ifdef __linux__
+    #include <unistd.h>
+#endif
+#ifdef _WIN32
+    #include <windows.h>
+#endif
 
 mcsm::ServerGroupManager::ServerGroupManager(std::unique_ptr<mcsm::ServerGroupLoader> group){
     this->group = std::move(group);
@@ -157,6 +163,7 @@ int mcsm::ServerGroupManager::getRunningSessions() const {
                 return -1;
             }
 
+            mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
             count++;
         }
 
@@ -166,4 +173,43 @@ int mcsm::ServerGroupManager::getRunningSessions() const {
     }
 
     return -1;
+}
+
+std::vector<const mcsm::ServerConfigLoader*> mcsm::ServerGroupManager::getRunningServers() const {
+    std::string mode = this->group->getMode();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
+    std::vector<const mcsm::ServerConfigLoader*> vec;
+
+    if(mode == "screen"){
+        std::string groupName = this->group->getName();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
+
+        std::vector<const mcsm::ServerConfigLoader*> servers = this->group->getServers();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
+
+        for(const mcsm::ServerConfigLoader* server : servers){
+            if(server == nullptr){
+                mcsm::Result res(mcsm::ResultType::MCSM_FAIL, {"Null server config loader found in ServerGroupLoader's servers.", "Please report this to Github and explain how did you get this message."});
+                return {};
+            }
+
+            std::string groupServerName = server->getServerName();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
+            
+            mcsm::ScreenSession session(groupName + "." + groupServerName);
+            if(!session.isRunning()){
+                mcsm::Result res(mcsm::ResultType::MCSM_FAIL, {"Cannot stop a session not running. ID: " + session.getFullSessionName()});
+                return {};
+            }
+
+            vec.push_back(server);
+        }
+
+        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+        return vec;
+    }else{
+        // TODO
+    }
+
+    return {};
 }

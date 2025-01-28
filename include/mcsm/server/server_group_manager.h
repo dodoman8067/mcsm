@@ -20,6 +20,7 @@ namespace mcsm {
         mcsm::Result stop(const std::string& serverName);
 
         int getRunningSessions() const;
+        std::vector<const mcsm::ServerConfigLoader*> getRunningServers() const;
 
         inline mcsm::ServerGroupLoader* getGroupLoader() const { return this->group.get(); }
     };
