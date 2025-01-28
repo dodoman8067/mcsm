@@ -177,15 +177,15 @@ int mcsm::ServerGroupManager::getRunningSessions() const {
 
 std::vector<const mcsm::ServerConfigLoader*> mcsm::ServerGroupManager::getRunningServers() const {
     std::string mode = this->group->getMode();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
     std::vector<const mcsm::ServerConfigLoader*> vec;
 
     if(mode == "screen"){
         std::string groupName = this->group->getName();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
 
         std::vector<const mcsm::ServerConfigLoader*> servers = this->group->getServers();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
 
         for(const mcsm::ServerConfigLoader* server : servers){
             if(server == nullptr){
@@ -194,7 +194,7 @@ std::vector<const mcsm::ServerConfigLoader*> mcsm::ServerGroupManager::getRunnin
             }
 
             std::string groupServerName = server->getServerName();
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
             
             mcsm::ScreenSession session(groupName + "." + groupServerName);
             if(!session.isRunning()){
