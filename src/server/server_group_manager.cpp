@@ -19,6 +19,13 @@ mcsm::Result mcsm::ServerGroupManager::start(){
 }
 
 mcsm::Result mcsm::ServerGroupManager::start(const std::string& serverName){
+    std::string exePath = mcsm::getExecutablePath();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
     std::string mode = this->group->getMode();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -63,12 +70,14 @@ mcsm::Result mcsm::ServerGroupManager::start(const std::string& serverName){
             if(serverName == groupServerName){
                 std::error_code ec;
                 std::filesystem::current_path(server->getHandle()->getPath(), ec);
+                if(mcsm::isDebug()) mcsm::info("Work path changed to: " + server->getHandle()->getPath());
                 if(ec){
                     return {mcsm::ResultType::MCSM_FAIL, {"Server starting failed with reason: " + ec.message()}}; 
                 }
 
-                mcsm::ScreenSession session(groupName + "." + groupServerName, "{mcsm start(gonna replace this with argv[0] or something)} -__mcsm__Internal_Group_Start \"" + groupPath + "\"");
+                mcsm::ScreenSession session(groupName + "." + groupServerName, exePath + " start -__mcsm__Internal_Group_Start \"" + groupPath + "\"");
                 // StartServerCommand will handle the rest
+                if(mcsm::isDebug()) mcsm::info("Start command: " + session.getCommand());
                 return session.start();
             }
         }
