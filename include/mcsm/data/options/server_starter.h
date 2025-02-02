@@ -2,6 +2,7 @@
 #define __MCSM_SERVER_STARTER_H__
 
 #include <mcsm/data/options/server_config_loader.h>
+#include <mcsm/data/options/server_group_loader.h>
 #include <mcsm/data/options/server_data_option.h>
 
 // I will also handle the multi-server starting feature here in the near future

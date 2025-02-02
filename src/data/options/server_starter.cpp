@@ -69,13 +69,29 @@ mcsm::Result mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const std
     return res2;
 }
 
-mcsm::Result mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::string& /* groupOptionPath */){
+mcsm::Result mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::string& groupOptionPath){
     // Doesn't do anything now.
     // Will verify if the group option is valid and if it has current server added on the list then update running sessions file
+    mcsm::ServerGroupLoader gLoader(groupOptionPath);
+    mcsm::Result gLoadRes = gLoader.load();
+    if(gLoadRes.getResult() != mcsm::ResultType::MCSM_OK && gLoadRes.getResult() != mcsm::ResultType::MCSM_SUCCESS){
+        gLoadRes.printMessage();
+        if(gLoadRes.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
 
-    mcsm::Result startRes = startServer(option, path, optionPath);
+    std::vector<const mcsm::ServerConfigLoader*> gServers = gLoader.getServers();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
 
-    // Call remove server from running sessions file here
+    for(const mcsm::ServerConfigLoader* gServer : gServers){
+        if(gServer == nullptr) continue;
+        if(gServer->getHandle()->getPath() != mcsm::getCurrentPath()) continue;
+        // add server session file
+        return startServer(option, path, optionPath);
+        // remove server session file
+    }
 
-    return startRes;
+    return {mcsm::ResultType::MCSM_FAIL, {"Failed to validate server group " + groupOptionPath}};
 }
