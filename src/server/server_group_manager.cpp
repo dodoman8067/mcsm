@@ -15,7 +15,70 @@ mcsm::ServerGroupManager::~ServerGroupManager(){
 }
 
 mcsm::Result mcsm::ServerGroupManager::start(){
-    return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}}; // temp
+    std::string exePath = mcsm::getExecutablePath();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    std::string mode = this->group->getMode();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    if(mode == "screen"){
+        std::string groupName = this->group->getName();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
+
+        std::vector<const mcsm::ServerConfigLoader*> servers = this->group->getServers();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
+
+        std::string groupPath = this->group->getHandle()->getPath();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
+
+        for(const mcsm::ServerConfigLoader* server : servers){
+            if(server == nullptr){
+                return {mcsm::ResultType::MCSM_FAIL, {"Null server config loader found in ServerGroupLoader's servers.", "Please report this to Github and explain how did you get this message."}};
+            }
+
+            std::string groupServerName = server->getServerName();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
+
+            std::error_code ec;
+            std::filesystem::current_path(server->getHandle()->getPath(), ec);
+            if(mcsm::isDebug()) mcsm::info("Work path changed to: " + server->getHandle()->getPath());
+            if(ec){
+                return {mcsm::ResultType::MCSM_FAIL, {"Server starting failed with reason: " + ec.message()}}; 
+            }
+
+            mcsm::ScreenSession session(groupName + "." + groupServerName, exePath + " start -__mcsm__Internal_Group_Start \"" + groupPath + "\"");
+            // StartServerCommand will handle the rest
+            if(mcsm::isDebug()) mcsm::info("Start command: " + session.getCommand());
+            return session.start();
+        }
+    }else{
+        // TODO
+    }
+    return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
 }
 
 mcsm::Result mcsm::ServerGroupManager::start(const std::string& serverName){
@@ -90,7 +153,52 @@ mcsm::Result mcsm::ServerGroupManager::start(const std::string& serverName){
 }
 
 mcsm::Result mcsm::ServerGroupManager::stop(){
-    return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}}; // temp
+    std::string mode = this->group->getMode();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    if(mode == "screen"){
+        std::string groupName = this->group->getName();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
+
+        std::vector<const mcsm::ServerConfigLoader*> servers = this->group->getServers();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+            mcsm::Result res(resp.first, resp.second);
+            return res;
+        }
+
+        for(const mcsm::ServerConfigLoader* server : servers){
+            if(server == nullptr){
+                return {mcsm::ResultType::MCSM_FAIL, {"Null server config loader found in ServerGroupLoader's servers.", "Please report this to Github and explain how did you get this message."}};
+            }
+
+            std::string groupServerName = server->getServerName();
+            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+                mcsm::Result res(resp.first, resp.second);
+                return res;
+            }
+
+            mcsm::ScreenSession session(groupName + "." + groupServerName);
+            if(!session.isRunning()){ // replace with runningsessionsoption#isrunning
+                return {mcsm::ResultType::MCSM_FAIL, {"Cannot stop a session not running. ID: " + session.getFullSessionName()}};
+            }
+            return session.sendCommand("stop\n");
+        }
+
+    }else{
+        // TODO
+    }
+
+    return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
 }
 
 mcsm::Result mcsm::ServerGroupManager::stop(const std::string& serverName){
@@ -130,7 +238,7 @@ mcsm::Result mcsm::ServerGroupManager::stop(const std::string& serverName){
 
             if(serverName == groupServerName){
                 mcsm::ScreenSession session(groupName + "." + groupServerName);
-                if(!session.isRunning()){
+                if(!session.isRunning()){ // replace with runningsessionsoption#isrunning
                     return {mcsm::ResultType::MCSM_FAIL, {"Cannot stop a session not running. ID: " + session.getFullSessionName()}};
                 }
                 return session.sendCommand("stop\n");
