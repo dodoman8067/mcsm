@@ -34,19 +34,14 @@ void mcsm::GroupCommand::execute(const std::vector<std::string>& args){
 
     }
     if(subc == "init"){
-        if(subArgs.empty() || subArgs.size() > 1){
+        if(subArgs.empty() || subArgs.size() > 2){
             mcsm::warning("Invalid command.");
             mcsm::warning("Type mcsm group help for more information.");
             std::exit(1);            
         }
         std::string name = subArgs[0];
-
-        if(!mcsm::isSafeString(name)){
-            mcsm::warning("The following server name contains blacklisted characters: \"" + name + "\"");
-            mcsm::warning("Please try again with a valid name.");
-            std::exit(1);
-        }
-        std::string path = mcsm::getCurrentPath(); // going to make my program able to specify where to configure the file. use subArgs[1] if implemented
+        std::string mode = subArgs[1];
+        std::string path = mcsm::getCurrentPath(); // going to make my program able to specify where to configure the file. use subArgs[2] if implemented
 
         mcsm::ServerGroupGenerator gen(name, path);
         mcsm::GroupInitSubCommand cmd(&gen);

@@ -7,9 +7,9 @@
 namespace mcsm {
     class GroupInitSubCommand {
     private:
-        mcsm::ServerGroupGenerator* loader;
+        mcsm::ServerGroupGenerator* generator;
     public:
-        GroupInitSubCommand(mcsm::ServerGroupGenerator* loader);
+        GroupInitSubCommand(mcsm::ServerGroupGenerator* generator);
         ~GroupInitSubCommand();
         void execute(const std::vector<std::string>& args);
     };
