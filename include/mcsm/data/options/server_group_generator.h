@@ -10,7 +10,7 @@ namespace mcsm {
         std::string path;
         std::unique_ptr<mcsm::Option> handle;
     public:
-        ServerGroupGenerator(const std::string& name, const std::string& path);
+        ServerGroupGenerator(const std::string& name, const std::string& path) : name(name), path(path), handle(nullptr){}
         ServerGroupGenerator(const mcsm::ServerGroupGenerator& other)
             : name(other.name),
               path(other.path),
@@ -18,8 +18,10 @@ namespace mcsm {
         ~ServerGroupGenerator();
 
         // fails if group file already configured
-        mcsm::Result generate();
-        mcsm::Result generate(const std::vector<std::unique_ptr<mcsm::ServerConfigLoader>>& servers);
+        mcsm::Result generate(const std::string& mode);
+        mcsm::Result generate(const std::string& mode, const std::vector<std::unique_ptr<mcsm::ServerConfigLoader>>& servers);
+
+        inline std::string getName() const { return this->name; } // do not call getHandle().getName(); does not return server group's name
 
         const mcsm::Option* getHandle() const;
     };
