@@ -42,14 +42,18 @@ mcsm::Result mcsm::ServerGroupGenerator::generate(const std::string& mode, const
                 if(mcsm::isDebug()) mcsm::warning("mcsm::ServerGroupGenerator::generate's servers vector contains null pointers.");
                 continue;
             }
-            std::string sName = server->getServerName();
+            if(!server->isFullyLoaded()){
+                if(mcsm::isDebug()) mcsm::warning("mcsm::ServerGroupGenerator::generate's servers vector contains unloaded servers.");
+                continue;
+            }
+            std::string sPath = server->getHandle()->getPath();
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
                 std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
                 mcsm::Result res(resp.first, resp.second);
                 return res;
             }
     
-            serversStrVec.push_back(sName);
+            serversStrVec.push_back(sPath);
         }
     }
 
