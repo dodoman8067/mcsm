@@ -20,12 +20,12 @@ void mcsm::GroupCommand::execute(const std::vector<std::string>& args){
     }
     std::string subc = args[0];
     std::vector<std::string> subArgs;
-    for(int i = 2; i < subArgs.size(); i++){
+    for(size_t i = 1; i < subArgs.size(); i++){
         subArgs.push_back(subArgs[i]);
     }
 
     // will handle string valid checks on command classes.
-    // only handle it here if not possible
+    // only handle them here if you must
     
     if(subc == "add"){
 
