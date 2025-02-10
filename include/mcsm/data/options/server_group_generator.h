@@ -15,7 +15,7 @@ namespace mcsm {
             : name(other.name),
               path(other.path),
               handle(other.handle ? std::make_unique<mcsm::Option>(*other.handle) : nullptr){}
-        ~ServerGroupGenerator();
+        ~ServerGroupGenerator() = default;
 
         // fails if group file already configured
         mcsm::Result generate(const std::string& mode);
