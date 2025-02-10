@@ -19,7 +19,7 @@ namespace mcsm {
 
         // fails if group file already configured
         mcsm::Result generate(const std::string& mode);
-        mcsm::Result generate(const std::string& mode, const std::vector<std::unique_ptr<mcsm::ServerConfigLoader>>& servers);
+        mcsm::Result generate(const std::string& mode, const std::vector<const mcsm::ServerConfigLoader*> servers);
 
         inline std::string getName() const { return this->name; } // do not call getHandle().getName(); does not return server group's name
 

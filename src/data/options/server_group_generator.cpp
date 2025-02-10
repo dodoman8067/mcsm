@@ -5,7 +5,7 @@ mcsm::Result mcsm::ServerGroupGenerator::generate(const std::string& mode){
     return generate(mode, {});
 }
 
-mcsm::Result mcsm::ServerGroupGenerator::generate(const std::string& mode, const std::vector<std::unique_ptr<mcsm::ServerConfigLoader>>& servers){
+mcsm::Result mcsm::ServerGroupGenerator::generate(const std::string& mode, const std::vector<const mcsm::ServerConfigLoader*> servers){
     if(mode != "screen" && mode != "default"){
         return {mcsm::ResultType::MCSM_FAIL, {"Invalid value of server group mode \"" + mode + "\"."}};
     }
