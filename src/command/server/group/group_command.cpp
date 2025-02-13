@@ -20,8 +20,8 @@ void mcsm::GroupCommand::execute(const std::vector<std::string>& args){
     }
     std::string subc = args[0];
     std::vector<std::string> subArgs;
-    for(size_t i = 1; i < subArgs.size(); i++){
-        subArgs.push_back(subArgs[i]);
+    for(size_t i = 1; i < args.size(); i++){
+        subArgs.push_back(args[i]);
     }
 
     // will handle string valid checks on command classes.
@@ -39,6 +39,7 @@ void mcsm::GroupCommand::execute(const std::vector<std::string>& args){
             mcsm::warning("Type mcsm group help for more information.");
             std::exit(1);            
         }
+        if(subArgs.empty()) mcsm::info("a");
         std::string name = subArgs[0];
         std::string mode = subArgs[1];
         std::string path = mcsm::getCurrentPath(); // going to make my program able to specify where to configure the file. use subArgs[2] if implemented
