@@ -10,7 +10,7 @@ mcsm::Result mcsm::ServerGroupGenerator::generate(const std::string& mode, const
         return {mcsm::ResultType::MCSM_FAIL, {"Invalid value of server group mode \"" + mode + "\"."}};
     }
 
-    this->handle = std::make_unique<mcsm::Option>(path, "mcsm_server_group");
+    this->handle = std::make_unique<mcsm::Option>(this->path, "mcsm_server_group");
 
     bool exists = this->handle->exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -23,6 +23,17 @@ mcsm::Result mcsm::ServerGroupGenerator::generate(const std::string& mode, const
         return {mcsm::ResultType::MCSM_FAIL, {"Server group file already exists at: " + this->handle->getPath()}};
     }
 
+    bool singleConfigExists = mcsm::fileExists(this->path + "/server.json");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    if(singleConfigExists){
+        return {mcsm::ResultType::MCSM_FAIL, {"Cannot create server group config file where a single server is already configured: " + this->handle->getPath()}};
+    }
+
     mcsm::Result cRes = this->handle->create();
     if(!cRes.isSuccess()) return cRes;
 
@@ -32,6 +43,9 @@ mcsm::Result mcsm::ServerGroupGenerator::generate(const std::string& mode, const
 
     mcsm::Result nameSetRes = this->handle->setValue("name", this->name);
     if(!nameSetRes.isSuccess()) return nameSetRes;
+
+    mcsm::Result modeSetRes = this->handle->setValue("mode", mode);
+    if(!modeSetRes.isSuccess()) return modeSetRes;
 
     std::vector<std::string> serversStrVec;
     if(!servers.empty()){
