@@ -14,6 +14,7 @@
 #include <mcsm/command/server/view_server_command.h>
 #include <mcsm/command/server/view_server_type_command.h>
 #include <mcsm/command/server/clear_server_command.h>
+#include <mcsm/command/server/group/group_command.h>
 
 #include <mcsm/server/type/base/vanilla_server.h>
 #include <mcsm/server/type/bukkit/paper_server.h>

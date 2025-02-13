@@ -102,6 +102,9 @@ void mcsm::init::initCommands(const std::string& version){
     std::unique_ptr<mcsm::ClearServerCommand> clearServerCommand = std::make_unique<mcsm::ClearServerCommand>("clear", "Clears the configured server's jarfile and its update history.");
     clearServerCommand->addAlias("clean");
     mcsm::CommandManager::addCommand(std::move(clearServerCommand));
+
+    std::unique_ptr<mcsm::GroupCommand> groupCommand = std::make_unique<mcsm::GroupCommand>("group", "Group command");
+    mcsm::CommandManager::addCommand(std::move(groupCommand));
 }
 
 void mcsm::init::initServers(){
