@@ -1,5 +1,7 @@
 #include <mcsm/data/options/server_group_loader.h>
 #include <mcsm/data/options/general_option.h>
+#include <unordered_set>
+#include <regex>
 
 mcsm::ServerGroupLoader::ServerGroupLoader(const std::string& path){
     this->path = path;
@@ -10,6 +12,54 @@ mcsm::ServerGroupLoader::ServerGroupLoader(const std::string& path){
 mcsm::ServerGroupLoader::~ServerGroupLoader(){
     this->loaded = false;
     this->loaders.clear();
+}
+
+std::string mcsm::ServerGroupLoader::normalizePath(const std::string& p){
+    std::string result = p;
+    // Replace multiple slashes with a single slash
+    result = std::regex_replace(result, std::regex(R"(\/+)"), "/");
+    // Remove trailing slash unless it's the root "/"
+    if(result.length() > 1 && result.back() == '/'){
+        result.pop_back();
+    }
+    return result;
+}
+
+mcsm::Result mcsm::ServerGroupLoader::removeDuplicateServers(mcsm::Option* handle) {
+    std::unordered_set<std::string> uniqueServers;
+    nlohmann::json uniqueServerList;
+
+    const nlohmann::json& existingServers = this->handle->getValue("servers");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+    if(existingServers == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"servers\"", this->handle->getName())});
+        return res;
+    }
+    if(!existingServers.is_array()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"servers\"", "array of string")});
+        return res;
+    }
+    for(auto& j : existingServers){
+        if(!j.is_string()){
+            return {mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"servers\"", "array of string")};
+        }
+    }
+    
+    for(const auto& server : existingServers){
+        std::string serverPath = normalizePath(server);
+        if(uniqueServers.insert(serverPath).second){
+            uniqueServerList.push_back(serverPath);
+        }
+    }
+    
+    mcsm::Result setRes = handle->setValue("servers", uniqueServerList);
+    if(!setRes.isSuccess()) return setRes;
+
+    return handle->save();
 }
 
 mcsm::Result mcsm::ServerGroupLoader::load() {
@@ -36,27 +86,12 @@ mcsm::Result mcsm::ServerGroupLoader::load() {
     mcsm::Result lRes = this->handle->load(advp);
     if(!lRes.isSuccess()) return lRes;
 
-    const nlohmann::json& existingServers = this->handle->getValue("servers");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
-    if(existingServers == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"servers\"", this->handle->getName())});
-        return res;
-    }
-    if(!existingServers.is_array()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"servers\"", "array of string")});
-        return res;
-    }
-    for(auto& j : existingServers){
-        if(!j.is_string()){
-            return {mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"servers\"", "array of string")};
-        }
-    }
+    mcsm::Result rmDupRes = removeDuplicateServers(this->handle.get());
+    if(!rmDupRes.isSuccess()) return rmDupRes;
 
+    const nlohmann::json& existingServers = this->handle->getValue("servers");
     // existingServers vector contains an array of server paths
+    // no need to check here. removeDuplicateServer does that
 
     std::vector<std::string> rawServersVec = existingServers;
     for(const std::string& serverStr : rawServersVec){
