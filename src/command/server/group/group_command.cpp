@@ -3,7 +3,6 @@
 #include <mcsm/command/server/group/subcommands/attach.h>
 #include <mcsm/command/server/group/subcommands/init.h>
 #include <mcsm/command/server/group/subcommands/list.h>
-#include <mcsm/command/server/group/subcommands/list_running.h>
 #include <mcsm/command/server/group/subcommands/remove.h>
 
 mcsm::GroupCommand::GroupCommand(const std::string& name, const std::string& description) : mcsm::Command(name, description){}
@@ -46,6 +45,19 @@ void mcsm::GroupCommand::execute(const std::vector<std::string>& args){
 
         mcsm::ServerGroupGenerator gen(name, path);
         mcsm::GroupInitSubCommand cmd(&gen);
+        cmd.execute(subArgs);
+    }
+    if(subc == "list"){
+        std::unique_ptr<mcsm::ServerGroupLoader> gl = std::make_unique<mcsm::ServerGroupLoader>(mcsm::getCurrentPath());
+        mcsm::Result loadRes = gl->load();
+        if(!loadRes.isSuccess()){
+            loadRes.printMessage();
+            if(loadRes.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+        }
+
+        mcsm::ServerGroupManager sm(std::move(gl));
+        
+        mcsm::GroupListSubCommand cmd(&sm);
         cmd.execute(subArgs);
     }
 }
