@@ -276,8 +276,7 @@ int mcsm::ServerGroupManager::getRunningSessions() const {
             
             mcsm::ScreenSession session(groupName + "." + groupServerName);
             if(!session.isRunning()){
-                mcsm::Result res(mcsm::ResultType::MCSM_FAIL, {"Cannot stop a session not running. ID: " + session.getFullSessionName()});
-                return -1;
+                continue;
             }
 
             mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
@@ -315,8 +314,7 @@ std::vector<const mcsm::ServerConfigLoader*> mcsm::ServerGroupManager::getRunnin
             
             mcsm::ScreenSession session(groupName + "." + groupServerName);
             if(!session.isRunning()){
-                mcsm::Result res(mcsm::ResultType::MCSM_FAIL, {"Cannot stop a session not running. ID: " + session.getFullSessionName()});
-                return {};
+                continue;
             }
 
             vec.push_back(server);
