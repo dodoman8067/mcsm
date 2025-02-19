@@ -13,7 +13,7 @@ mcsm::ServerGroupLoader::~ServerGroupLoader(){
 }
 
 mcsm::Result mcsm::ServerGroupLoader::load() {
-    this->handle = std::make_unique<mcsm::Option>(this->path, "server_group");
+    this->handle = std::make_unique<mcsm::Option>(this->path, "mcsm_server_group");
     const bool& optExists = this->handle->exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -46,9 +46,14 @@ mcsm::Result mcsm::ServerGroupLoader::load() {
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"servers\"", this->handle->getName())});
         return res;
     }
-    if(!existingServers.is_string()){
+    if(!existingServers.is_array()){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"servers\"", "array of string")});
         return res;
+    }
+    for(auto& j : existingServers){
+        if(!j.is_string()){
+            return {mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"servers\"", "array of string")};
+        }
     }
 
     // existingServers vector contains an array of server paths
