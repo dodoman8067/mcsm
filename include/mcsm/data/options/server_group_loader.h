@@ -11,7 +11,6 @@ namespace mcsm {
         std::vector<std::unique_ptr<mcsm::ServerConfigLoader>> loaders;
         bool loaded;
 
-        std::string normalizePath(const std::string& p);
         mcsm::Result removeDuplicateServers(mcsm::Option* handle);
     public: 
         ServerGroupLoader(const std::string& path);

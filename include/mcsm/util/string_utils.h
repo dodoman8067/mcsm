@@ -25,6 +25,7 @@ SOFTWARE.
 
 #include <string>
 #include <algorithm>
+#include <regex>
 
 namespace mcsm {
     /**
@@ -63,6 +64,8 @@ namespace mcsm {
     bool isSafeString(const std::string& str);
 
     bool is_number(const std::string& s);
+
+    std::string normalizePath(const std::string& p);
 }
 
 #endif

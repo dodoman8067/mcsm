@@ -76,3 +76,14 @@ bool mcsm::is_number(const std::string& s){
     while (it != s.end() && std::isdigit(*it)) ++it;
     return !s.empty() && it == s.end();
 }
+
+std::string mcsm::normalizePath(const std::string& p){
+    std::string result = p;
+    // Replace multiple slashes with a single slash
+    result = std::regex_replace(result, std::regex(R"(\/+)"), "/");
+    // Remove trailing slash unless it's the root "/"
+    if(result.length() > 1 && result.back() == '/'){
+        result.pop_back();
+    }
+    return result;
+}

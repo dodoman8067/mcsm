@@ -14,17 +14,6 @@ mcsm::ServerGroupLoader::~ServerGroupLoader(){
     this->loaders.clear();
 }
 
-std::string mcsm::ServerGroupLoader::normalizePath(const std::string& p){
-    std::string result = p;
-    // Replace multiple slashes with a single slash
-    result = std::regex_replace(result, std::regex(R"(\/+)"), "/");
-    // Remove trailing slash unless it's the root "/"
-    if(result.length() > 1 && result.back() == '/'){
-        result.pop_back();
-    }
-    return result;
-}
-
 mcsm::Result mcsm::ServerGroupLoader::removeDuplicateServers(mcsm::Option* handle) {
     std::unordered_set<std::string> uniqueServers;
     nlohmann::json uniqueServerList;
@@ -50,7 +39,7 @@ mcsm::Result mcsm::ServerGroupLoader::removeDuplicateServers(mcsm::Option* handl
     }
     
     for(const auto& server : existingServers){
-        std::string serverPath = normalizePath(server);
+        std::string serverPath = mcsm::normalizePath(server);
         if(uniqueServers.insert(serverPath).second){
             uniqueServerList.push_back(serverPath);
         }
