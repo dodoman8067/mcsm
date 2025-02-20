@@ -24,8 +24,6 @@ SOFTWARE.
 #define __MCSM_STRING_UTILS_H__
 
 #include <string>
-#include <algorithm>
-#include <regex>
 
 namespace mcsm {
     /**
