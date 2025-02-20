@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 #include <mcsm/util/string_utils.h>
+#include <filesystem>
 
 bool mcsm::startsWith(const std::string& str, const std::string& value){
     return str.rfind(value, 0) == 0;
@@ -78,10 +79,13 @@ bool mcsm::is_number(const std::string& s){
 }
 
 std::string mcsm::normalizePath(const std::string& p){
-    std::string result = p;
-    // Replace multiple slashes with a single slash
-    result = std::regex_replace(result, std::regex(R"(\/+)"), "/");
-    // Remove trailing slash unless it's the root "/"
+    if(p.empty()) return p; // Handle empty input
+
+    // Use std::filesystem for better handling of ".." and "."
+    std::filesystem::path pathObj(p);
+    std::string result = pathObj.lexically_normal().string();
+
+    // Ensure it does not end with a trailing slash unless it's root "/"
     if(result.length() > 1 && result.back() == '/'){
         result.pop_back();
     }
