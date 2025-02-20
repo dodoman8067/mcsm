@@ -75,6 +75,6 @@ void mcsm::GroupAddSubCommand::execute(const std::vector<std::string>& args){
         addedServers++;
     }
 
-    mcsm::info(std::to_string(addedServers) + "/" + std::to_string(requestedServers) + " servers added.");
+    mcsm::info(addedServers == 0 ? "No servers added." : std::to_string(addedServers) + "/" + std::to_string(requestedServers) + " servers added.");
     std::exit(addedServers > 0 ? 0 : 1);
 }
