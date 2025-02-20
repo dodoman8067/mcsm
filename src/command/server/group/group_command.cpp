@@ -27,7 +27,15 @@ void mcsm::GroupCommand::execute(const std::vector<std::string>& args){
     // only handle them here if you must
     
     if(subc == "add"){
-
+        mcsm::ServerGroupLoader gl(mcsm::getCurrentPath());
+        mcsm::Result loadRes = gl.load();
+        if(!loadRes.isSuccess()){
+            loadRes.printMessage();
+            if(loadRes.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+        }
+        
+        mcsm::GroupAddSubCommand cmd(&gl);
+        cmd.execute(subArgs);
     }
     if(subc == "attach"){
 
