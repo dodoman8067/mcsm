@@ -16,7 +16,7 @@ mcsm::ServerGroupLoader::~ServerGroupLoader(){
 
 mcsm::Result mcsm::ServerGroupLoader::removeDuplicateServers(mcsm::Option* handle) {
     std::unordered_set<std::string> uniqueServers;
-    nlohmann::json uniqueServerList;
+    nlohmann::json uniqueServerList = nlohmann::json::array();
 
     const nlohmann::json& existingServers = this->handle->getValue("servers");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -249,9 +249,16 @@ mcsm::Result mcsm::ServerGroupLoader::setServers(const std::vector<mcsm::ServerC
 }
 
 mcsm::Result mcsm::ServerGroupLoader::addServer(const std::string& path){
-    std::unique_ptr<mcsm::ServerConfigLoader> serv = std::make_unique<mcsm::ServerConfigLoader>(path);
+    std::string nPath = mcsm::normalizePath(path);
+    std::unique_ptr<mcsm::ServerConfigLoader> serv = std::make_unique<mcsm::ServerConfigLoader>(nPath);
     mcsm::Result loadRes = serv->loadConfig();
     if(!loadRes.isSuccess()) return loadRes;
+
+    for(auto& v : this->loaders){
+        if(nPath == mcsm::normalizePath(v->getHandle()->getPath())){
+            return {mcsm::ResultType::MCSM_FAIL, {"Server " + nPath + " already exists in the configuration."}};
+        }
+    }
     this->loaders.push_back(std::move(serv));
     return this->save();
 }
@@ -262,6 +269,13 @@ mcsm::Result mcsm::ServerGroupLoader::addServer(mcsm::ServerConfigLoader* server
     }
     if(!server->isFullyLoaded()){
         return {mcsm::ResultType::MCSM_FAIL, {"ServerConfigLoader instance passed without being fully loaded on ServerGroupLoader. Report this to github."}};
+    }
+
+    std::string nPath = mcsm::normalizePath(server->getHandle()->getPath());
+    for(auto& v : this->loaders){
+        if(nPath == mcsm::normalizePath(v->getHandle()->getPath())){
+            return {mcsm::ResultType::MCSM_FAIL, {"Server " + nPath + " already exists in the configuration."}};
+        }
     }
     this->loaders.push_back(std::make_unique<mcsm::ServerConfigLoader>(*server));
     return this->save();
@@ -274,6 +288,13 @@ mcsm::Result mcsm::ServerGroupLoader::addServer(std::unique_ptr<mcsm::ServerConf
     if(!server->isFullyLoaded()){
         return {mcsm::ResultType::MCSM_FAIL, {"ServerConfigLoader instance passed without being fully loaded on ServerGroupLoader. Report this to github."}};
     }
+
+    std::string nPath = mcsm::normalizePath(server->getHandle()->getPath());
+    for(auto& v : this->loaders){
+        if(nPath == mcsm::normalizePath(v->getHandle()->getPath())){
+            return {mcsm::ResultType::MCSM_FAIL, {"Server " + nPath + " already exists in the configuration."}};
+        }
+    }
     this->loaders.push_back(std::move(server));
     return this->save();
 }
@@ -285,6 +306,12 @@ mcsm::Result mcsm::ServerGroupLoader::addServer(const std::vector<std::unique_pt
         }
         if(!serv->isFullyLoaded()){
             return {mcsm::ResultType::MCSM_FAIL, {"ServerConfigLoader instance passed without being fully loaded on ServerGroupLoader. Report this to github."}};
+        }
+        std::string nPath = mcsm::normalizePath(serv->getHandle()->getPath());
+        for(auto& v : this->loaders){
+            if(nPath == mcsm::normalizePath(v->getHandle()->getPath())){
+                return {mcsm::ResultType::MCSM_FAIL, {"Server " + nPath + " already exists in the configuration."}};
+            }
         }
         this->loaders.push_back(std::make_unique<mcsm::ServerConfigLoader>(*serv));
     }
