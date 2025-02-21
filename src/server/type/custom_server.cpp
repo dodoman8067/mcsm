@@ -77,6 +77,38 @@ mcsm::Result mcsm::CustomServer::setFileLocation(mcsm::Option* option, const std
     return option->save();
 }
 
+std::string mcsm::CustomServer::getCustomStartCommand(const std::string& optionPath) const {
+    mcsm::Option option(optionPath, "server");
+    bool exists = option.exists();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    if(!exists){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
+        return "";
+    }
+
+    option.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+
+    if(option.getValue("custom_run_command") == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"custom_run_command\"", "server.json")});
+        return "";
+    }
+    if(!option.getValue("custom_run_command").is_string()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"custom_run_command\"", "string")});
+        return "";
+    }
+    std::string value = option.getValue("custom_run_command");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+
+    return value;
+}
+
+mcsm::Result mcsm::CustomServer::setCustomStartCommand(mcsm::Option* option, const std::string& command){
+    mcsm::Result setRes = option->setValue("custom_run_command", command);
+    if(!setRes.isSuccess()) return setRes;
+    return option->save();
+}
+
 mcsm::Result mcsm::CustomServer::setupServerJarFile(const std::string& path, const std::string& optionPath){
     std::string location = getFileLocation(optionPath);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -150,7 +182,7 @@ mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOpti
     return generate(name, option, path, version, autoUpdate, extraValues.find("server file location (url/filepath)")->second, extraValues);
 }
 
-mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& /* version */, const bool& /* autoUpdate */, const std::string& fileLocation, const std::map<std::string, std::string>& /* extraValues */){
+mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& /* version */, const bool& /* autoUpdate */, const std::string& fileLocation, const std::map<std::string, std::string>& extraValues){
     mcsm::ServerConfigGenerator serverOption(path);
     mcsm::ServerDataOption sDOpt(path);
 
@@ -159,8 +191,13 @@ mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOpti
     mcsm::Result sRes = serverOption.generate("ignored", this, &sDOpt, name, option, false);
     if(!sRes.isSuccess()) return sRes;
 
-    mcsm::Result fileRes = setFileLocation(&(*serverOption.getHandle()), fileLocation);
+    mcsm::Result fileRes = setFileLocation(serverOption.getHandle().get(), fileLocation);
     if(!fileRes.isSuccess()) return fileRes;
+
+    std::string customCommand = extraValues.find("custom run command. Overrides server JVM profile based start system.")->second;
+
+    mcsm::Result cRCRes = setCustomStartCommand(serverOption.getHandle().get(), customCommand);
+    if(!cRCRes.isSuccess()) return cRCRes;
 
     mcsm::ServerConfigLoader loader(path);
     
@@ -170,7 +207,13 @@ mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOpti
     mcsm::success("Custom configured server's information : ");
     mcsm::info("Server name : " + mcsm::safeString(name));
     mcsm::info("Server type : custom");
-    mcsm::info("Server JVM launch profile : " + option.getProfileName());
+    if(!mcsm::isWhitespaceOrEmpty(customCommand)){
+        mcsm::info("Server run command : " + customCommand);
+        mcsm::warning("This overrides JVM launch profile based server launch system.");
+        mcsm::warning("Please leave it empty if you don't know what you're doing.");
+    }else{
+        mcsm::info("Server JVM launch profile : " + option.getProfileName());
+    }
     mcsm::warning("NOTE: Custom servers are currently in beta state.");
     mcsm::warning("We are not responsible for the consequences of using beta features.");
 
@@ -180,6 +223,30 @@ mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOpti
 
 mcsm::Result mcsm::CustomServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
     // ServerOption class handles the data file stuff
+
+    std::string customCommand = getCustomStartCommand(loader->getHandle()->getPath());
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return res;
+    }
+
+    if(!mcsm::isWhitespaceOrEmpty(customCommand)){
+        mcsm::info("NOTE: JVM profile based launch system is currently overrided by \"custom_run_command\" value inside server.json.");
+        mcsm::info("Leave it empty to use default launch system.");
+        mcsm::info("Running command : " + customCommand);
+        int result = mcsm::runCommand(customCommand);
+        if(result != 0){
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
+                "Server exited with error code : " + std::to_string(result)
+            }});
+            return res;
+        }
+        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {
+            "Server exited with error code : 0"
+        }});
+        return res;
+    }
     
     std::string jar = loader->getServerJarFile();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -239,7 +306,8 @@ const std::map<std::string, std::string> mcsm::CustomServer::getRequiredValues()
         {"default JVM launch profile search path (current/global)", "current"},
         {"default JVM launch profile name", ""},
         {"server jarfile name", "custom.jar"},
-        {"server file location (url/filepath)", ""}
+        {"server file location (url/filepath)", ""},
+        {"custom run command. Overrides server JVM profile based start system.", ""}
     };
 }
 

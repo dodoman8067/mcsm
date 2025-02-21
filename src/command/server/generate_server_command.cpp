@@ -81,6 +81,12 @@ bool mcsm::GenerateServerCommand::checkValid(const std::string& key, std::string
         }
         return true;
     }
+    if(key == "custom run command. Overrides server JVM profile based start system."){
+        if(mcsm::isWhitespaceOrEmpty(value)){
+            value = defaultValue;
+        }
+        return true;
+    }
     return !mcsm::isWhitespaceOrEmpty(value);
 }
 
