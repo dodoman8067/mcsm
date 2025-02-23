@@ -57,6 +57,21 @@ void mcsm::GroupAddSubCommand::execute(const std::vector<std::string>& args){
             continue;
         }
 
+        std::string serverName = sl->getServerName();
+        mcsm::Result sNGRes({mcsm::getLastResult().first, mcsm::getLastResult().second});
+        if(!sNGRes.isSuccess()){
+            if(strict){
+                mcsm::error("Failed to load server's name on \"" + arg + "\".");
+                mcsm::error("Below lines are the output from the interal system.");
+                mcsm::error("");
+                sNGRes.printMessage();
+                mcsm::warning("NOTE: Strict mode is currently enabled.");
+                std::exit(1);
+            }
+            mcsm::warning("Failed to load server's name on \"" + arg + "\". Run with --strict flag for more information.");
+            continue;
+        }
+
         mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}}); // clear result
 
         mcsm::Result addRes = this->loader->addServer(std::move(sl));
@@ -72,9 +87,12 @@ void mcsm::GroupAddSubCommand::execute(const std::vector<std::string>& args){
             mcsm::warning("Failed to add server on \"" + arg + "\". Run with --strict flag for more information.");
             continue;
         }
+        if(requestedServers < 15){
+            mcsm::info("Server " + serverName + " on \"" + arg + "\" added.");
+        }
         addedServers++;
     }
 
-    mcsm::info(addedServers == 0 ? "No servers added." : std::to_string(addedServers) + "/" + std::to_string(requestedServers) + " servers added.");
+    mcsm::info(addedServers == 0 ? "No servers added." : std::to_string(addedServers) + "/" + std::to_string(requestedServers) + " server(s) added.");
     std::exit(addedServers > 0 ? 0 : 1);
 }
