@@ -24,7 +24,7 @@ SOFTWARE.
 #include <mcsm/data/option.h>
 
 mcsm::Option::Option(const std::string& path, const std::string& name){
-    this->path = path;
+    this->path = mcsm::normalizePath(path);
 
     std::string name1 = name;
     mcsm::replaceAll(name1, "..", "__");

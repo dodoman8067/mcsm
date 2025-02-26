@@ -24,7 +24,7 @@ SOFTWARE.
 #include <mcsm/data/global_option.h>
 
 mcsm::GlobalOption::GlobalOption(const std::string& path, const std::string& name){
-    this->path = getDataPathPerOS() + path;
+    this->path = mcsm::normalizePath(getDataPathPerOS() + path);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
 
     std::string name1 = name;
