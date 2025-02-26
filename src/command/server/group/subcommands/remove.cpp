@@ -22,7 +22,7 @@ void mcsm::GroupRemoveSubCommand::execute(const std::vector<std::string>& args){
 
     if(serverArgs.empty()){
         mcsm::warning("No servers to remove.");
-        mcsm::warning("Example usage: mcsm group add /path/to/server1 /path/to/server2");
+        mcsm::warning("Example usage: mcsm group remove /path/to/server1 /path/to/server2 your_server_name");
         std::exit(1);
     }
 
