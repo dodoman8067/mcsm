@@ -37,6 +37,17 @@ void mcsm::GroupCommand::execute(const std::vector<std::string>& args){
         mcsm::GroupAddSubCommand cmd(&gl);
         cmd.execute(subArgs);
     }
+    if(subc == "remove"){
+        mcsm::ServerGroupLoader gl(mcsm::getCurrentPath());
+        mcsm::Result loadRes = gl.load();
+        if(!loadRes.isSuccess()){
+            loadRes.printMessage();
+            if(loadRes.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+        }
+        
+        mcsm::GroupRemoveSubCommand cmd(&gl);
+        cmd.execute(subArgs); 
+    }
     if(subc == "attach"){
 
     }
