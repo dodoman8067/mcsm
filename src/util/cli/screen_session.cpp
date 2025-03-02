@@ -68,21 +68,11 @@ std::string trim(const std::string& str) {
 }
 
 bool mcsm::ScreenSession::isRunning() const {
-    std::string checkCommand = this->screenPath + " -ls";
-    std::FILE* pipe = popen(checkCommand.c_str(), "r");
-    if (!pipe) return false;
+    std::string sessionName = getFullSessionName();
+    std::string checkCommand = this->screenPath + " -ls | grep -w \"" + sessionName + "\" > /dev/null";
 
-    char buffer[128];
-    while(std::fgets(buffer, sizeof(buffer), pipe)){
-        std::string line = trim(buffer);
-        if(line.find(getFullSessionName()) != std::string::npos){
-            pclose(pipe);
-            return true;
-        }
-    }
-
-    pclose(pipe);
-    return false;
+    int exitCode = std::system(checkCommand.c_str());
+    return exitCode == 0;
 }
 
 bool mcsm::ScreenSession::tryReconnect(){
