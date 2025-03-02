@@ -29,7 +29,6 @@ void mcsm::GroupStartSubCommand::execute(const std::vector<std::string>& args){
     this->loader = this->manager->getGroupLoader();
 
     int startedServers = 0;
-    size_t requestedServers = serverArgs.size();
 
     std::unordered_map<std::string, std::vector<std::string>> namePathMap; // pair of name and multiple path
 
@@ -80,6 +79,7 @@ void mcsm::GroupStartSubCommand::execute(const std::vector<std::string>& args){
                     if(choice == "all"){
                         pathsToStart.insert(pathsToStart.end(), it->second.begin(), it->second.end());
                     }else{
+                        if(!mcsm::is_number(choice)){ mcsm::warning("Invalid selection. Skipping..."); continue; }
                         int index = std::stoi(choice) - 1;
                         if(index >= 0 && index < static_cast<int>(it->second.size())){
                             pathsToStart.push_back(it->second[index]);
@@ -93,6 +93,8 @@ void mcsm::GroupStartSubCommand::execute(const std::vector<std::string>& args){
             }
         }
     }
+
+    size_t requestedServers = pathsToStart.size();
     
     for(const std::string& path : pathsToStart){
         mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}}); // clear result
