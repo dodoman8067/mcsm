@@ -69,9 +69,9 @@ std::string trim(const std::string& str) {
 
 bool mcsm::ScreenSession::isRunning() const {
     std::string sessionName = getFullSessionName();
-    std::string checkCommand = this->screenPath + " -ls | grep -w \"" + sessionName + "\" > /dev/null";
+    std::string checkCommand = this->screenPath + " -ls | grep -w \"" + sessionName + "\"";
 
-    int exitCode = std::system(checkCommand.c_str());
+    int exitCode = mcsm::runCommandQuietly(checkCommand.c_str());
     return exitCode == 0;
 }
 
