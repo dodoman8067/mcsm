@@ -14,10 +14,10 @@ namespace mcsm {
         ~ServerGroupManager();
 
         mcsm::Result start(); // starts all the servers in the group
-        mcsm::Result start(const std::string& serverName); // searches a registered server 'serverName' on the group and starts it
+        mcsm::Result start(const std::string& serverPath); // searches a registered server 'serverName' on the group and starts it
 
         mcsm::Result stop();
-        mcsm::Result stop(const std::string& serverName);
+        mcsm::Result stop(const std::string& serverPath);
 
         int getRunningSessions() const;
         std::vector<const mcsm::ServerConfigLoader*> getRunningServers() const;
