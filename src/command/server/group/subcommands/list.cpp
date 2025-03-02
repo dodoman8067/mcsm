@@ -37,10 +37,13 @@ void mcsm::GroupListSubCommand::execute(const std::vector<std::string>& args){
                 if(mcsm::isDebug()) mcsm::warning("Null server config on manager->getRunningServers() detected.");
                 continue;
             }
-            running = runningLoader->getHandle()->getPath() == path;
+            if(runningLoader->getHandle()->getPath() == path){
+                running = true;
+                break;
+            }
         }
 
-        strmap.insert({name + " on " + path, running});
+        strmap.emplace(name + " on " + path, running);
     }
 
     mcsm::info(running ? "List of servers (running): " : "List of servers: ");
