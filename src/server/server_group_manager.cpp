@@ -211,7 +211,7 @@ mcsm::Result mcsm::ServerGroupManager::stop(){
     return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
 }
 
-mcsm::Result mcsm::ServerGroupManager::stop(const std::string& serverName){
+mcsm::Result mcsm::ServerGroupManager::stop(const std::string& serverPath){
     std::string mode = this->group->getMode();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -239,7 +239,7 @@ mcsm::Result mcsm::ServerGroupManager::stop(const std::string& serverName){
                 return {mcsm::ResultType::MCSM_FAIL, {"Null server config loader found in ServerGroupLoader's servers.", "Please report this to Github and explain how did you get this message."}};
             }
 
-            std::string groupServerPath = server->getServerName();
+            std::string groupServerPath = server->getHandle()->getPath();
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
                 std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
                 mcsm::Result res(resp.first, resp.second);
@@ -248,7 +248,7 @@ mcsm::Result mcsm::ServerGroupManager::stop(const std::string& serverName){
 
             std::string modified = mcsm::safeString(groupServerPath);
 
-            if(serverName == groupServerPath){
+            if(serverPath == groupServerPath){
                 mcsm::ScreenSession session(groupName + "." + modified);
                 if(!session.isRunning()){ // replace with runningsessionsoption#isrunning
                     return {mcsm::ResultType::MCSM_FAIL, {"Cannot stop a session not running. ID: " + session.getFullSessionName()}};
@@ -257,7 +257,7 @@ mcsm::Result mcsm::ServerGroupManager::stop(const std::string& serverName){
             }
         }
 
-        return {mcsm::ResultType::MCSM_WARN, {"Server named \"" + serverName + "\" on group not found."}};
+        return {mcsm::ResultType::MCSM_WARN, {"Server on \"" + serverPath + "\" not found on current group configuration."}};
     }else{
         // TODO
     }
