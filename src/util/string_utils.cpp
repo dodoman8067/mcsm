@@ -91,3 +91,29 @@ std::string mcsm::normalizePath(const std::string& p){
     }
     return result;
 }
+
+std::string mcsm::formatPrompt(const std::string &key){
+    std::string formatted = key;
+    size_t pos = 0;
+    while ((pos = formatted.find('_', pos)) != std::string::npos){
+        formatted.replace(pos, 1, " ");
+        pos++;
+    }
+    formatted[0] = toupper(formatted[0]); // Capitalize
+    if(key == "custom_run_command"){
+        formatted = formatted + ". Overrides server JVM profile based start system.";
+    }
+    if(key == "default_jvm_launch_profile_search_path"){
+        formatted = formatted + " (current/global)";
+    }
+    if(key == "server_file_location"){
+        formatted = formatted + " (url/filepath)";
+    }
+    if(key == "auto_server_jar_update"){
+        formatted = "if server should update the server jarfile automatically";
+    }
+    if(key == "sponge_api_search_recommended_versions"){
+        formatted = "if the server search on recommended versions api";
+    }
+    return formatted;
+}

@@ -64,6 +64,9 @@ namespace mcsm {
     bool is_number(const std::string& s);
 
     std::string normalizePath(const std::string& p);
+
+    // used on formatting "jvm_version" to "Jvm version"
+    std::string formatPrompt(const std::string& key);
 }
 
 #endif
