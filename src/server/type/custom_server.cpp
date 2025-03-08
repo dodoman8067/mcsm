@@ -179,7 +179,7 @@ mcsm::Result mcsm::CustomServer::obtainJarFile(const std::string& /* version */,
 }
 
 mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues){
-    return generate(name, option, path, version, autoUpdate, extraValues.find("server file location (url/filepath)")->second, extraValues);
+    return generate(name, option, path, version, autoUpdate, extraValues.find("server_file_location")->second, extraValues);
 }
 
 mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& /* version */, const bool& /* autoUpdate */, const std::string& fileLocation, const std::map<std::string, std::string>& extraValues){
@@ -194,7 +194,7 @@ mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOpti
     mcsm::Result fileRes = setFileLocation(serverOption.getHandle().get(), fileLocation);
     if(!fileRes.isSuccess()) return fileRes;
 
-    std::string customCommand = extraValues.find("custom run command. Overrides server JVM profile based start system.")->second;
+    std::string customCommand = extraValues.find("custom_run_command")->second;
 
     mcsm::Result cRCRes = setCustomStartCommand(serverOption.getHandle().get(), customCommand);
     if(!cRCRes.isSuccess()) return cRCRes;
@@ -303,11 +303,11 @@ bool mcsm::CustomServer::isURL(const std::string& location) const {
 const std::map<std::string, std::string> mcsm::CustomServer::getRequiredValues() const {
     return {
         {"name", "" },
-        {"default JVM launch profile search path (current/global)", "current"},
-        {"default JVM launch profile name", ""},
-        {"server jarfile name", "custom.jar"},
-        {"server file location (url/filepath)", ""},
-        {"custom run command. Overrides server JVM profile based start system.", ""}
+        {"default_jvm_launch_profile_search_path", "current"}, // (current/global)
+        {"default_jvm_launch_profile_name", ""},
+        {"server_jarfile_name", "custom.jar"},
+        {"server_file_location", ""}, // (url/filepath)
+        {"custom_run_command", ""} // Overrides server JVM profile based start system.
     };
 }
 

@@ -162,11 +162,11 @@ bool mcsm::Server::isBasedAs(const std::string& input) const {
 const std::map<std::string, std::string> mcsm::Server::getRequiredValues() const {
     return {
         {"name", "" },
-        {"Minecraft version", ""},
-        {"default JVM launch profile search path (current/global)", "current"},
-        {"default JVM launch profile name", ""},
-        {"server jarfile name", getTypeAsString() + ".jar"},
-        {"server build version", "latest"},
-        {"if server should update the server jarfile automatically", "true"}
+        {"minecraft_version", ""},
+        {"default_jvm_launch_profile_search_path", "current"},
+        {"default_jvm_launch_profile_name", ""},
+        {"server_jarfile_name", getTypeAsString() + ".jar"},
+        {"server_build_version", "latest"},
+        {"auto_server_jar_update", "true"}
     };
 }
