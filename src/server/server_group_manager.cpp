@@ -63,7 +63,7 @@ mcsm::Result mcsm::ServerGroupManager::start(){
                 return res;
             }
 
-            std::string modified = mcsm::safeString(groupServerPath);
+            std::string modified = mcsm::safeString(groupServerPath); // session names are groupname.(server path with / replaced by .))
 
             std::error_code ec;
             std::filesystem::current_path(server->getHandle()->getPath(), ec);
@@ -84,7 +84,7 @@ mcsm::Result mcsm::ServerGroupManager::start(){
 }
 
 mcsm::Result mcsm::ServerGroupManager::start(const std::string& serverPath){
-    std::string exePath = mcsm::getExecutablePath();
+    std::string exePath = mcsm::getExecutablePath(); // to execute mcsm start later
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -120,6 +120,7 @@ mcsm::Result mcsm::ServerGroupManager::start(const std::string& serverPath){
             return res;
         }
 
+        // iterates through servers and starts the requested server
         for(const mcsm::ServerConfigLoader* server : servers){
             if(server == nullptr){
                 return {mcsm::ResultType::MCSM_FAIL, {"Null server config loader found in ServerGroupLoader's servers.", "Please report this to Github and explain how did you get this message."}};
@@ -132,9 +133,9 @@ mcsm::Result mcsm::ServerGroupManager::start(const std::string& serverPath){
                 return res;
             }
             
-            std::string modified = mcsm::safeString(groupServerPath);
+            std::string modified = mcsm::safeString(groupServerPath); // session names are groupname.(server path with / replaced by .))
 
-            if(serverPath == groupServerPath){
+            if(serverPath == groupServerPath){ // true means this is the requested server
                 std::error_code ec;
                 std::filesystem::current_path(server->getHandle()->getPath(), ec);
                 if(mcsm::isDebug()) mcsm::info("[DEBUG] Work path changed to: " + server->getHandle()->getPath());
@@ -195,7 +196,7 @@ mcsm::Result mcsm::ServerGroupManager::stop(){
                 return res;
             }
 
-            std::string modified = mcsm::safeString(groupServerPath);
+            std::string modified = mcsm::safeString(groupServerPath); // session names are groupname.(server path with / replaced by .))
 
             mcsm::ScreenSession session(groupName + "." + modified);
             if(!session.isRunning()){ // replace with runningsessionsoption#isrunning
@@ -245,12 +246,11 @@ mcsm::Result mcsm::ServerGroupManager::stop(const std::string& serverPath){
                 mcsm::Result res(resp.first, resp.second);
                 return res;
             }
-
-            std::string modified = mcsm::safeString(groupServerPath);
+            std::string modified = mcsm::safeString(groupServerPath); // session names are groupname.(server path with / replaced by .))
 
             if(serverPath == groupServerPath){
                 mcsm::ScreenSession session(groupName + "." + modified);
-                if(!session.isRunning()){ // replace with runningsessionsoption#isrunning
+                if(!session.isRunning()){ // todo: replace with runningsessionsoption#isrunning
                     return {mcsm::ResultType::MCSM_FAIL, {"Cannot stop a session not running. ID: " + session.getFullSessionName()}};
                 }
                 return session.sendCommand("stop\n");
@@ -276,7 +276,8 @@ int mcsm::ServerGroupManager::getRunningSessions() const {
 
         std::vector<const mcsm::ServerConfigLoader*> servers = this->group->getServers();
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
-
+        
+        // checks running sessions (session names are groupname.(server path with / replaced by .)) and increases count.
         for(const mcsm::ServerConfigLoader* server : servers){
             if(server == nullptr){
                 mcsm::Result res(mcsm::ResultType::MCSM_FAIL, {"Null server config loader found in ServerGroupLoader's servers.", "Please report this to Github and explain how did you get this message."});
@@ -315,6 +316,7 @@ std::vector<const mcsm::ServerConfigLoader*> mcsm::ServerGroupManager::getRunnin
         std::vector<const mcsm::ServerConfigLoader*> servers = this->group->getServers();
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
 
+        // checks running sessions (session names are groupname.(server path with / replaced by .)) and adds them to vec.
         for(const mcsm::ServerConfigLoader* server : servers){
             if(server == nullptr){
                 mcsm::Result res(mcsm::ResultType::MCSM_FAIL, {"Null server config loader found in ServerGroupLoader's servers.", "Please report this to Github and explain how did you get this message."});

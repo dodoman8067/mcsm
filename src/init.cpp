@@ -44,9 +44,9 @@ void mcsm::init::initMCSM(const std::string& version){
     curl_global_init(CURL_GLOBAL_DEFAULT);
     if(!mcsm::curl_holder::init().isSuccess()) return;
     initCommands(version);
-    initServers();
+    initServers(); // hanles server registry for singleton server instances
 
-    mcsm::Result res = mcsm::GeneralOption::getGeneralOption().initialize();
+    mcsm::Result res = mcsm::GeneralOption::getGeneralOption().initialize(); // initializes global configurations
     if(!res.isSuccess()){
         res.printMessage();
         return;
