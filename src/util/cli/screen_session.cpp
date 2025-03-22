@@ -31,7 +31,7 @@ mcsm::Result mcsm::ScreenSession::stop(){
 
 mcsm::Result mcsm::ScreenSession::attach(){
     if(!isRunning()){
-        return {mcsm::ResultType::MCSM_FAIL, {"Cannot send command to a non-existent session: " + this->name + ".mcsm"}};
+        return {mcsm::ResultType::MCSM_FAIL, {"Cannot send command to a session that is not running: " + this->name + ".mcsm"}};
     }
     std::string attachCommand = this->screenPath + " -r " + getFullSessionName();
     if(mcsm::runCommandQuietly(attachCommand) != 0){
