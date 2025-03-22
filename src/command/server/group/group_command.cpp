@@ -51,10 +51,20 @@ void mcsm::GroupCommand::execute(const std::vector<std::string>& args){
         cmd.execute(subArgs); 
     }
     if(subc == "attach"){
+        std::unique_ptr<mcsm::ServerGroupLoader> gl = std::make_unique<mcsm::ServerGroupLoader>(mcsm::getCurrentPath());
+        mcsm::Result loadRes = gl->load();
+        if(!loadRes.isSuccess()){
+            loadRes.printMessage();
+            if(loadRes.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+        }
 
+        mcsm::ServerGroupManager sm(std::move(gl));
+        
+        mcsm::GroupAttachSubCommand cmd(&sm);
+        cmd.execute(subArgs);
     }
     if(subc == "init"){
-        if(subArgs.empty() || subArgs.size() > 2){
+        if(subArgs.empty() || subArgs.size() > 2 || subArgs.size() < 2){
             mcsm::warning("Invalid command.");
             mcsm::warning("Type mcsm group help for more information.");
             std::exit(1);            

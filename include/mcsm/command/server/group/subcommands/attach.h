@@ -3,15 +3,16 @@
 
 #include <mcsm/command/base/command.h>
 #include <mcsm/util/cli/screen_session.h>
-#include <mcsm/data/options/server_group_loader.h>
+#include <mcsm/server/server_group_manager.h>
 
 namespace mcsm {
     class GroupAttachSubCommand {
     private:
+        mcsm::ServerGroupManager* manager;
         mcsm::ServerGroupLoader* loader;
     public:
-        GroupAttachSubCommand(mcsm::ServerGroupLoader* loader);
-        ~GroupAttachSubCommand();
+        GroupAttachSubCommand(mcsm::ServerGroupManager* manager);
+        ~GroupAttachSubCommand() = default;
         void execute(const std::vector<std::string>& args);
     };
 }
