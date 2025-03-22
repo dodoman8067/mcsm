@@ -22,6 +22,8 @@ void mcsm::ClearServerCommand::execute(const std::vector<std::string>& /* args *
         if(loadRes.getResultPair().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
     }
 
+    // we need server jarfile's name and validate if the file is actually present
+
     const std::string& jarName = loader.getServerJarFile();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         mcsm::printResultMessage();
@@ -42,7 +44,7 @@ void mcsm::ClearServerCommand::execute(const std::vector<std::string>& /* args *
         }
     }else mcsm::info(jarName + " file not found; skipping...");
 
-    const std::string& type = loader.getServerType();
+    const std::string& type = loader.getServerType(); // fabric servers require additional steps to remove jarfile which is why i need to get the server's type
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         mcsm::printResultMessage();
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
@@ -60,6 +62,8 @@ void mcsm::ClearServerCommand::execute(const std::vector<std::string>& /* args *
             mcsm::printResultMessage();
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
         }
+
+        // reset all server launch related datas
 
         mcsm::Result fLoadRes = option->load(advp);
         if(!fLoadRes.isSuccess()){
