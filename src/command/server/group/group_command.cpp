@@ -27,7 +27,6 @@ void mcsm::GroupCommand::execute(const std::vector<std::string>& args){
 
     // will handle string valid checks on command classes.
     // only handle them here if you must
-    
     if(subc == "add"){
         mcsm::ServerGroupLoader gl(mcsm::getCurrentPath());
         mcsm::Result loadRes = gl.load();
@@ -69,7 +68,6 @@ void mcsm::GroupCommand::execute(const std::vector<std::string>& args){
             mcsm::warning("Type mcsm group help for more information.");
             std::exit(1);            
         }
-        if(subArgs.empty()) mcsm::info("a");
         std::string name = subArgs[0];
         std::string mode = subArgs[1];
         std::string path = mcsm::getCurrentPath(); // going to make my program able to specify where to configure the file. use subArgs[2] if implemented
@@ -117,4 +115,73 @@ void mcsm::GroupCommand::execute(const std::vector<std::string>& args){
         mcsm::GroupStopSubCommand cmd(&sm);
         cmd.execute(subArgs);
     }
+    if(subc == "help"){
+        if(subArgs.empty()){
+            std::cout << "Available Commands:\n\n";
+    
+            std::cout << "mcsm group add [server1] [server2] ...\n";
+            std::cout << "  - Adds servers to a group.\n";
+            std::cout << "  Example: mcsm group add /path/to/server1 /path/to/server2\n\n";
+    
+            std::cout << "mcsm group remove [server1] [server2] ... [server_name]\n";
+            std::cout << "  - Removes servers from a group.\n";
+            std::cout << "  Example: mcsm group remove /path/to/server1 /path/to/server2 random_server_name\n\n";
+    
+            std::cout << "mcsm group list (--running)\n";
+            std::cout << "  - Lists all groups, optionally filtered by '--running'.\n";
+            std::cout << "  Example: mcsm group list --running\n\n";
+    
+            std::cout << "mcsm group start [server1] [server2] ... [server_name]\n";
+            std::cout << "  - Starts specified servers in a group.\n";
+            std::cout << "  Example: mcsm group start /path/to/server1 /path/to/server2 random_server_name\n\n";
+    
+            std::cout << "mcsm group stop [server1] [server2] ... [server_name]\n";
+            std::cout << "  - Stops specified servers in a group.\n";
+            std::cout << "  Example: mcsm group stop /path/to/server1 /path/to/server2 random_server_name\n\n";
+    
+            std::cout << "mcsm group init [screen/default] [server_name]\n";
+            std::cout << "  - Initializes a new group. You must specify the mode (screen/default) and a name.\n";
+            std::cout << "  Example: mcsm group init screen my_server_group\n";
+        }
+        else{
+            std::string command = subArgs[0];
+    
+            if(command == "add"){
+                std::cout << "Usage: mcsm group add [server1] [server2] ...\n";
+                std::cout << "Adds servers to a group.\n";
+                std::cout << "Example: mcsm group add /path/to/server1 /path/to/server2\n";
+            }
+            else if(command == "remove"){
+                std::cout << "Usage: mcsm group remove [server1] [server2] ... [server_name]\n";
+                std::cout << "Removes servers from a group.\n";
+                std::cout << "Example: mcsm group remove /path/to/server1 /path/to/server2 random_server_name\n";
+            }
+            else if(command == "list"){
+                std::cout << "Usage: mcsm group list (--running)\n";
+                std::cout << "Lists all groups, optionally filtered by '--running'.\n";
+                std::cout << "Example: mcsm group list --running\n";
+            }
+            else if(command == "start"){
+                std::cout << "Usage: mcsm group start [server1] [server2] ... [server_name]\n";
+                std::cout << "Starts specified servers in a group.\n";
+                std::cout << "Example: mcsm group start /path/to/server1 /path/to/server2 random_server_name\n";
+            }
+            else if(command == "stop"){
+                std::cout << "Usage: mcsm group stop [server1] [server2] ... [server_name]\n";
+                std::cout << "Stops specified servers in a group.\n";
+                std::cout << "Example: mcsm group stop /path/to/server1 /path/to/server2 random_server_name\n";
+            }
+            else if(command == "init"){
+                std::cout << "Usage: mcsm group init [screen/default] [server_name]\n";
+                std::cout << "Initializes a new group. You must specify the mode (screen/default) and a name.\n";
+                std::cout << "Example: mcsm group init screen my_server_group\n";
+            }
+            else{
+                std::cout << "Unknown command: " << command << "\n";
+            }
+        }
+    }    
+    mcsm::warning("Invalid command.");
+    mcsm::warning("Type mcsm group help for more information.");
+    std::exit(1);
 }
