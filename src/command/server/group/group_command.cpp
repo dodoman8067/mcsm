@@ -178,9 +178,11 @@ void mcsm::GroupCommand::execute(const std::vector<std::string>& args){
             }
             else{
                 std::cout << "Unknown command: " << command << "\n";
+                std::exit(1);
             }
         }
-    }    
+        std::exit(0);
+    }
     mcsm::warning("Invalid command.");
     mcsm::warning("Type mcsm group help for more information.");
     std::exit(1);
