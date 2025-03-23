@@ -5,7 +5,7 @@ mcsm::GroupStartSubCommand::GroupStartSubCommand(mcsm::ServerGroupManager* manag
 void mcsm::GroupStartSubCommand::execute(const std::vector<std::string>& args){
     if(args.empty()){
         mcsm::warning("No servers to start.");
-        mcsm::warning("Example usage: mcsm group start /path/to/server1 /path/to/server2");
+        mcsm::warning("Example usage: mcsm group start /path/to/server1 /path/to/server2 random_server_name");
         std::exit(1);
     }
 
@@ -22,7 +22,7 @@ void mcsm::GroupStartSubCommand::execute(const std::vector<std::string>& args){
 
     if(serverArgs.empty()){
         mcsm::warning("No servers to start.");
-        mcsm::warning("Example usage: mcsm group start /path/to/server1 /path/to/server2 your_server_name");
+        mcsm::warning("Example usage: mcsm group start /path/to/server1 /path/to/server2 random_server_name");
         std::exit(1);
     }
 
