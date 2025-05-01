@@ -172,7 +172,7 @@ void mcsm::GroupCommand::execute(const std::vector<std::string>& args){
                 std::cout << "Example: mcsm group stop /path/to/server1 /path/to/server2 random_server_name\n";
             }
             else if(command == "init"){
-                std::cout << "Usage: mcsm group init [screen/default] [server_name]\n";
+                std::cout << "Usage: mcsm group init [server_name] [screen/default]\n";
                 std::cout << "Initializes a new group. You must specify the mode (screen/default) and a name.\n";
                 std::cout << "Example: mcsm group init screen my_server_group\n";
             }
