@@ -28,6 +28,55 @@ void mcsm::GroupStartSubCommand::execute(const std::vector<std::string>& args){
 
     this->loader = this->manager->getGroupLoader();
 
+    if(args[0] != "all"){
+        startWithPaths(strict, serverArgs);
+    }else{
+        startAll(strict, serverArgs);
+    }
+}
+
+void mcsm::GroupStartSubCommand::startAll(const bool& strict, const std::vector<std::string>& /* serverArgs */){ // todo: reject request if other params detected
+    int startedServers = 0;
+    for(auto* config : this->loader->getServers()){
+        std::string cPath = config->getHandle()->getPath();
+        std::string cName = config->getServerName();
+    
+        mcsm::Result sNGRes({mcsm::getLastResult().first, mcsm::getLastResult().second});
+        if(!sNGRes.isSuccess()){
+            if(strict){
+                mcsm::error("Failed to load server's name on \"" + cPath + "\".");
+                mcsm::error("Below lines are the output from the internal system.");
+                mcsm::error("");
+                sNGRes.printMessage();
+                mcsm::warning("NOTE: Strict mode is currently enabled.");
+                std::exit(1);
+            }
+            mcsm::warning("Failed to load server's name on \"" + cPath + "\". Run with --strict flag for more information.");
+            continue;
+        }
+    
+        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}}); // clear result
+        mcsm::Result stRes = this->manager->start(cPath);
+        if(!stRes.isSuccess()){
+            if(strict){
+                mcsm::error("Failed to start server \"" + cPath + "\".");
+                mcsm::error("Below lines are the output from the internal system.");
+                mcsm::error("");
+                stRes.printMessage();
+                mcsm::warning("NOTE: Strict mode is currently enabled.");
+            }
+            mcsm::warning("Starting server \"" + cPath + "\" failed. Run with --strict option for more info.");
+            continue;
+        }else{
+            startedServers++;
+        }
+    }
+
+    mcsm::info(startedServers == 0 ? "No servers started." : std::to_string(startedServers) + "/" + std::to_string(this->loader->getServers().size()) + " server(s) started.");
+    std::exit(startedServers > 0 ? 0 : 1);
+}
+
+void mcsm::GroupStartSubCommand::startWithPaths(const bool& strict, const std::vector<std::string>& serverArgs){
     int startedServers = 0;
 
     std::unordered_map<std::string, std::vector<std::string>> namePathMap; // pair of name and multiple path
