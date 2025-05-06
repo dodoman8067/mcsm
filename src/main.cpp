@@ -28,7 +28,7 @@ SOFTWARE.
 #include <thread>
 //#include <mcsm/data/options/multi_server_option.h>
 
-const std::string version = "0.4.1";
+const std::string version = "0.5";
 
 /*
 #include <mcsm/util/cli/screen_session.h>
