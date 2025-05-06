@@ -9,6 +9,8 @@ namespace mcsm {
         mcsm::ServerGroupManager* manager;
         mcsm::ServerGroupLoader* loader;
         std::unordered_map<std::string, std::vector<std::string>> getServerNameToPathMap(mcsm::ServerGroupLoader* loader) const;
+        void stopWithPaths(const bool& strict, const std::vector<std::string>& serverArgs);
+        void stopAll(const bool& strict);
     public:
         GroupStopSubCommand(mcsm::ServerGroupManager* manager);
         ~GroupStopSubCommand() = default;
