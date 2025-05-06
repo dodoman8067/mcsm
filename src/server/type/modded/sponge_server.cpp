@@ -630,7 +630,7 @@ mcsm::Result mcsm::SpongeServer::generate(const std::string& name, mcsm::JvmOpti
 
     bool skipCheck = propertyValue;
 
-    std::string apib = extraValues.find("if the server search on recommended versions api")->second;
+    std::string apib = extraValues.find("sponge_api_search_recommended_versions")->second;
     if(apib != "false" && apib != "true"){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Invalid value"}});
         return res;
@@ -659,7 +659,7 @@ mcsm::Result mcsm::SpongeServer::generate(const std::string& name, mcsm::JvmOpti
 
     // No need to call opt.load() here. create() in ServerDataOption will call it eventually
 
-    mcsm::Result res = configure(version, this, &opt, path, name, option, autoUpdate, extraValues.find("server build version")->second);
+    mcsm::Result res = configure(version, this, &opt, path, name, option, autoUpdate, extraValues.find("server_build_version")->second);
     if(!res.isSuccess()) return res;
 
     mcsm::Option sOpt(mcsm::getCurrentPath(), "server");
@@ -695,17 +695,17 @@ const std::map<std::string, std::string> mcsm::SpongeServer::getRequiredValues()
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return {
         {"name", "" },
-        {"Minecraft version", ""},
-        {"default JVM launch profile search path (current/global)", "current"},
-        {"default JVM launch profile name", ""},
-        {"server jarfile name", getTypeAsString() + ".jar"},
-        {"server build version", "latest"},
-        {"if server should update the server jarfile automatically", "true"},
-        {"if the server search on recommended versions api", strV}
+        {"minecraft_version", ""},
+        {"default_jvm_launch_profile_search_path", "current"},
+        {"default_jvm_launch_profile_name", ""},
+        {"server_jarfile_name", getTypeAsString() + ".jar"},
+        {"server_build_version", "latest"},
+        {"auto_server_jar_update", "true"},
+        {"sponge_api_search_recommended_versions", strV}
     };
 }
 
-bool mcsm::SpongeServer::hasVersion(const std::string& version){
+bool mcsm::SpongeServer::hasVersion(const std::string& version) const {
     return getVersion(version) != "";
 }
 

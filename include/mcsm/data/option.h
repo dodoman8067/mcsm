@@ -49,24 +49,26 @@ namespace mcsm {
         */
         ~Option();
 
-        mcsm::Result load() const;
+        mcsm::Result create();
 
-        mcsm::Result load(const bool& advancedParse) const;
+        mcsm::Result load();
+
+        mcsm::Result load(const bool& advancedParse);
 
         nlohmann::json& getData() const;
 
         /**
          * @brief No mcsm::Result needed
         */
-        std::string getPath();
+        std::string getPath() const;
 
         /**
          * @brief No mcsm::Result needed
         */
-        std::string getName();
+        std::string getName() const;
 
         nlohmann::json getValue(const std::string& key) const;
-        mcsm::Result setValue(const std::string& key, const nlohmann::json& value) const;
+        mcsm::Result setValue(const std::string& key, const nlohmann::json& value);
         bool hasValue(const std::string& key) const;
 
         bool exists() const override;
@@ -76,11 +78,11 @@ namespace mcsm {
         */
         bool isGlobal() const override;
 
-        mcsm::Result save() const;
+        mcsm::Result save();
 
-        mcsm::Result save(const nlohmann::json& json) const;
+        mcsm::Result save(const nlohmann::json& json);
         
-        mcsm::Result reset() const;
+        mcsm::Result reset();
     };
 }
 

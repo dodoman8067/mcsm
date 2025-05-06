@@ -57,6 +57,20 @@ mcsm::Result mcsm::GeneralOption::load(){
 
     this->advp = propertyValue;
 
+    auto* property1 = getProperty("screen_binary_path");
+    if(property1 == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFoundPlusFix("screen_binary_path", "general option", "\"screen_binary_path\": \"/usr/bin/screen\"")});
+        return res;
+    }
+
+    const nlohmann::json& propertyValue1 = property1->getCurrentValue();
+    if(!propertyValue1.is_string()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongTypePlusFix("screen_binary_path", "general option", "string", "\"/usr/bin/screen\"")});
+        return res;
+    }
+
+    this->sbp = propertyValue1;
+
     return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
 }
 
@@ -121,6 +135,10 @@ std::vector<mcsm::GeneralProperty*>& mcsm::GeneralOption::getProperties() const 
 
 bool mcsm::GeneralOption::advancedParseEnabled() const {
     return instance.advp;
+}
+
+std::string mcsm::GeneralOption::screenBinPathProperty() const {
+    return instance.sbp;
 }
 
 mcsm::GeneralOption& mcsm::GeneralOption::getGeneralOption(){

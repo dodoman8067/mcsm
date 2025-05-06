@@ -21,6 +21,7 @@ SOFTWARE.
 */
 
 #include <mcsm/command/server/start_server_command.h>
+#include <mcsm/data/options/server_group_loader.h>
 
 const std::vector<std::string> availableOptions = {
     "--profile",
@@ -51,6 +52,44 @@ void mcsm::StartServerCommand::execute(const std::vector<std::string>& args){
         mcsm::warning("Task aborted.");
         std::exit(1);
     }
+
+    bool isGroup = false;
+    std::string groupPath;
+    for(size_t i = 0; i < args.size(); ++i){
+        std::string_view arg = args[i];
+        if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
+            if(!(arg == "-__mcsm__Internal_Group_Start")) continue;
+            if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-'){
+                groupPath = mcsm::safeString(args[i + 1]);
+                if(!std::filesystem::exists(groupPath)){
+                    mcsm::warning("Invalid group path: " + groupPath);
+                    std::exit(1);
+                }
+                mcsm::ServerGroupLoader gLoader(groupPath);
+                mcsm::Result gLoadRes = gLoader.load();
+                if(gLoadRes.getResult() != mcsm::ResultType::MCSM_OK && gLoadRes.getResult() != mcsm::ResultType::MCSM_SUCCESS){
+                    gLoadRes.printMessage();
+                    if(gLoadRes.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+                }
+
+                std::vector<const mcsm::ServerConfigLoader*> gServers = gLoader.getServers();
+                if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+                    mcsm::printResultMessage();
+                    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+                }
+
+                for(const mcsm::ServerConfigLoader* gServer : gServers){
+                    if(gServer == nullptr) continue;
+                    if(gServer->getHandle()->getPath() != mcsm::getCurrentPath()) continue;
+                    isGroup = true;
+                    break;
+                }
+                mcsm::warning("Group validation failed. If you're seeing this it's likely a bug. Report this at Github.");
+                break;
+            }
+        }
+    }
+
     mcsm::ServerConfigLoader loader(mcsm::getCurrentPath());
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         mcsm::printResultMessage();
@@ -66,7 +105,11 @@ void mcsm::StartServerCommand::execute(const std::vector<std::string>& args){
     std::unique_ptr<mcsm::JvmOption> jvmOpt = searchOption(args, &loader);
 
     mcsm::ServerStarter starter(&loader);
-    starter.startServer(*jvmOpt, mcsm::getCurrentPath(), mcsm::getCurrentPath());
+    if(isGroup){
+        starter.startServer(*jvmOpt, mcsm::getCurrentPath(), mcsm::getCurrentPath(), groupPath);
+    }else{
+        starter.startServer(*jvmOpt, mcsm::getCurrentPath(), mcsm::getCurrentPath());
+    }
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         mcsm::printResultMessage();
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);

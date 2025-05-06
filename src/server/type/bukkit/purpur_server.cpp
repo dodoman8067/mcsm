@@ -455,10 +455,10 @@ mcsm::Result mcsm::PurpurServer::generate(const std::string& name, mcsm::JvmOpti
 
     // No need to call opt.load() here. create() in ServerDataOption will call it eventually
 
-    return configure(version, this, &opt, path, name, option, autoUpdate, extraValues.find("server build version")->second);
+    return configure(version, this, &opt, path, name, option, autoUpdate, extraValues.find("server_build_version")->second);
 }
 
-bool mcsm::PurpurServer::hasVersion(const std::string& version){
+bool mcsm::PurpurServer::hasVersion(const std::string& version) const {
     return getVersion(version) != -1;
 }
 

@@ -26,6 +26,7 @@ SOFTWARE.
 #include <mcsm/data/options/general/skip_version_check_property.h>
 #include <mcsm/data/options/general/advanced_json_errors_property.h>
 #include <mcsm/data/options/general/sponge_api_search_recommended_versions_property.h>
+#include <mcsm/data/options/general/screen_bin_path_property.h>
 
 mcsm::init::init(){
     this->initialized = new bool(false);
@@ -33,8 +34,8 @@ mcsm::init::init(){
 
 mcsm::init::~init(){
     mcsm::CommandManager::cleanup();
-    curl_global_cleanup();
     mcsm::curl_holder::cleanup();
+    curl_global_cleanup();
     delete this->initialized;
     this->initialized = nullptr;
 }
@@ -43,9 +44,9 @@ void mcsm::init::initMCSM(const std::string& version){
     curl_global_init(CURL_GLOBAL_DEFAULT);
     if(!mcsm::curl_holder::init().isSuccess()) return;
     initCommands(version);
-    initServers();
+    initServers(); // hanles server registry for singleton server instances
 
-    mcsm::Result res = mcsm::GeneralOption::getGeneralOption().initialize();
+    mcsm::Result res = mcsm::GeneralOption::getGeneralOption().initialize(); // initializes global configurations
     if(!res.isSuccess()){
         res.printMessage();
         return;
@@ -101,6 +102,9 @@ void mcsm::init::initCommands(const std::string& version){
     std::unique_ptr<mcsm::ClearServerCommand> clearServerCommand = std::make_unique<mcsm::ClearServerCommand>("clear", "Clears the configured server's jarfile and its update history.");
     clearServerCommand->addAlias("clean");
     mcsm::CommandManager::addCommand(std::move(clearServerCommand));
+
+    std::unique_ptr<mcsm::GroupCommand> groupCommand = std::make_unique<mcsm::GroupCommand>("group", "Group command");
+    mcsm::CommandManager::addCommand(std::move(groupCommand));
 }
 
 void mcsm::init::initServers(){
@@ -135,6 +139,9 @@ void mcsm::init::initServers(){
 
     std::unique_ptr<mcsm::SpongeAPISearchRecommendedVersionsProperty> p3 = std::make_unique<mcsm::SpongeAPISearchRecommendedVersionsProperty>("sponge_api_search_recommended_versions");
     sr.registerGeneralProperty("sponge_api_search_recommended_versions", std::move(p3));
+
+    std::unique_ptr<mcsm::ScreenBinPathProperty> p4 = std::make_unique<mcsm::ScreenBinPathProperty>("screen_binary_path");
+    sr.registerGeneralProperty("screen_binary_path", std::move(p4));
 }
 
 bool mcsm::init::isInitialized() const {

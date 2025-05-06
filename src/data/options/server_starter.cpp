@@ -68,3 +68,28 @@ mcsm::Result mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const std
     mcsm::Result res2 = server->start(this->loader, option, path, optionPath);
     return res2;
 }
+
+mcsm::Result mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::string& groupOptionPath){
+    mcsm::ServerGroupLoader gLoader(groupOptionPath);
+    mcsm::Result gLoadRes = gLoader.load();
+    if(gLoadRes.getResult() != mcsm::ResultType::MCSM_OK && gLoadRes.getResult() != mcsm::ResultType::MCSM_SUCCESS){
+        gLoadRes.printMessage();
+        if(gLoadRes.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+
+    std::vector<const mcsm::ServerConfigLoader*> gServers = gLoader.getServers();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        mcsm::printResultMessage();
+        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    }
+
+    for(const mcsm::ServerConfigLoader* gServer : gServers){
+        if(gServer == nullptr) continue;
+        if(gServer->getHandle()->getPath() != mcsm::getCurrentPath()) continue;
+        // add server session file
+        return startServer(option, path, optionPath);
+        // remove server session file
+    }
+
+    return {mcsm::ResultType::MCSM_FAIL, {"Failed to validate server group " + groupOptionPath}};
+}

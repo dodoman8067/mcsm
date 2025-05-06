@@ -172,3 +172,31 @@ bool mcsm::isDebug(){
         return false;
     #endif
 }
+
+std::string mcsm::getExecutablePath(){
+#ifdef __linux__
+    char buf[PATH_MAX];
+    ssize_t len = readlink("/proc/self/exe", buf, sizeof(buf) - 1);
+
+    if (len == -1) {
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"readlink failed."}});
+        return "";
+    }
+
+    buf[len] = '\0';
+    return "\"" + std::string(buf) + "\"";
+#elif defined(_WIN32)
+    char buf[MAX_PATH];
+    DWORD len = GetModuleFileNameA(NULL, buf, MAX_PATH);
+
+    if(len == 0 || len == MAX_PATH){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"GetModuleFileName failed."}});
+        return "";
+    }
+
+    return "\"" + std::string(buf) + "\"";
+#else
+    mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Unsupported platform for getExecutablePath."}});
+    return "";
+#endif
+}

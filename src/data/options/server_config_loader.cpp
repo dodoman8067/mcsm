@@ -41,44 +41,44 @@ mcsm::Result mcsm::ServerConfigLoader::loadConfig(){
 }
 
 template <>
-nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<int>(){
+nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<int>() const {
     return nlohmann::json::value_t::number_integer;
 }   
 
 template <>
-nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<unsigned int>(){
+nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<unsigned int>() const {
     return nlohmann::json::value_t::number_unsigned;
 }   
 
 template <>
-nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<float>(){
+nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<float>() const {
     return nlohmann::json::value_t::number_float;
 }   
 
 template <>
-nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<double>(){
+nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<double>() const {
     return nlohmann::json::value_t::number_float;
 }
 
 template <>
-nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<bool>(){
+nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<bool>() const {
     return nlohmann::json::value_t::boolean;
 }
 
 template <>
-nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<std::string>(){
+nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<std::string>() const {
     return nlohmann::json::value_t::string;
 }
 
 // use json.is_array to get arrays
 
 template <>
-nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<nlohmann::json>(){
+nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<nlohmann::json>() const {
     return nlohmann::json::value_t::object;
 }
 
 template <>
-nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<std::vector<nlohmann::json>>(){
+nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<std::vector<nlohmann::json>>() const {
     return nlohmann::json::value_t::object;
 }
 
@@ -446,8 +446,8 @@ mcsm::Result mcsm::ServerConfigLoader::setAutoUpdate(const bool& update){
     return this->optionHandle->save();
 }
 
-std::unique_ptr<mcsm::Option>& mcsm::ServerConfigLoader::getHandle(){
-    return this->optionHandle;
+mcsm::Option* mcsm::ServerConfigLoader::getHandle() const {
+    return this->optionHandle.get();
 }
 
 bool mcsm::ServerConfigLoader::isFullyLoaded() const {

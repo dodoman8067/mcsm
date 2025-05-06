@@ -42,44 +42,57 @@ mcsm::SearchTarget mcsm::GenerateServerCommand::getSearchTarget(const std::strin
 }
 
 bool mcsm::GenerateServerCommand::checkValid(const std::string& key, std::string& value, const std::string& defaultValue){
-    if(key == "default JVM launch profile search path (current/global)"){
+    if(key == "default_jvm_launch_profile_search_path"){
         if(mcsm::isWhitespaceOrEmpty(value)){
             value = defaultValue;
             return true;
         }
         return !(value != "global" && value != "current");
     }
-    if(key == "if server should update the server jarfile automatically"){
+    if(key == "auto_server_jar_update"){
         if(mcsm::isWhitespaceOrEmpty(value)){
             value = defaultValue;
             return true;
         }
         return !(value != "true" && value != "false");
     }
-    if(key == "server jarfile name"){
+    if(key == "server_jarfile_name"){
+        if(mcsm::isWhitespaceOrEmpty(value)){
+            value = defaultValue;
+            return true;
+        }
+        return true;
+    }
+    if(key == "server_build_version"){
+        if(mcsm::isWhitespaceOrEmpty(value)){
+            value = defaultValue;
+        }
+        return true;
+    }
+    if(key == "server_installer_version"){
+        if(mcsm::isWhitespaceOrEmpty(value)){
+            value = defaultValue;
+        }
+        return true;
+    }
+    if(key == "server_loader_version"){
+        if(mcsm::isWhitespaceOrEmpty(value)){
+            value = defaultValue;
+        }
+        return true;
+    }
+    if(key == "custom_run_command"){
+        if(mcsm::isWhitespaceOrEmpty(value)){
+            value = defaultValue;
+        }
+        return true;
+    }
+    if(key == "sponge_api_search_recommended_versions"){
         if(mcsm::isWhitespaceOrEmpty(value)){
             value = defaultValue;
             return true;
         }
         return !(value != "true" && value != "false");
-    }
-    if(key == "server build version"){
-        if(mcsm::isWhitespaceOrEmpty(value)){
-            value = defaultValue;
-        }
-        return true;
-    }
-    if(key == "server installer version"){
-        if(mcsm::isWhitespaceOrEmpty(value)){
-            value = defaultValue;
-        }
-        return true;
-    }
-    if(key == "server loader version"){
-        if(mcsm::isWhitespaceOrEmpty(value)){
-            value = defaultValue;
-        }
-        return true;
     }
     return !mcsm::isWhitespaceOrEmpty(value);
 }
@@ -88,9 +101,9 @@ void mcsm::GenerateServerCommand::handle(const std::string& key, std::map<std::s
     std::string typedInput;
     while(true){
         if(!mcsm::isWhitespaceOrEmpty(defaultValue)){
-            std::cout << "Enter " << key << "(default : " << defaultValue << ") : ";
+            std::cout << "Enter " << mcsm::formatPrompt(key) << "(default : " << defaultValue << ") : ";
         }else{
-            std::cout << "Enter " << key << " : ";
+            std::cout << "Enter " << mcsm::formatPrompt(key) << " : ";
         }
         
         std::getline(std::cin, typedInput);
@@ -132,20 +145,20 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& /
     }
 
     std::string name = extras["name"];
-    std::string version = extras["Minecraft version"];
-    std::string update = extras["if server should update the server jarfile automatically"];
+    std::string version = extras["minecraft_version"];
+    std::string update = extras["auto_server_jar_update"];
     bool bUpdate = false;
     if(!mcsm::isWhitespaceOrEmpty(update)){
         bUpdate = update == "true" ? true : false;
     }
 
-    mcsm::SearchTarget t = getSearchTarget(extras["default JVM launch profile search path (current/global)"]);
+    mcsm::SearchTarget t = getSearchTarget(extras["default_jvm_launch_profile_search_path"]);
     if(t == mcsm::SearchTarget::ALL){
         mcsm::error("default JVM launch profile search path (current/global) invalid value detected");
         std::exit(1);
     }
  
-    mcsm::JvmOption defaultProfile(extras["default JVM launch profile name"], t);
+    mcsm::JvmOption defaultProfile(extras["default_jvm_launch_profile_name"], t);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         mcsm::printResultMessage();
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);

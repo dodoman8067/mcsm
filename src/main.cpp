@@ -25,16 +25,65 @@ SOFTWARE.
 #include <mcsm/init.h>
 #include <mcsm/util/cli/signal_handler.h>
 #include <new>
+#include <thread>
 //#include <mcsm/data/options/multi_server_option.h>
 
-const std::string version = "0.4.1";
+const std::string version = "0.5";
+
+/*
+#include <mcsm/util/cli/screen_session.h>
+
+void testScreenSession() {
+    mcsm::ScreenSession session("test", "./mcsm start");
+
+    // Test starting the session
+    auto startResult = session.start();
+    if (startResult.getResultPair().first == mcsm::ResultType::MCSM_SUCCESS) {
+        std::cout << "Session started successfully: " << session.getName() << std::endl;
+    } else {
+        std::cerr << "Failed to start session: " << startResult.getMessage()[0] << std::endl;
+        return;
+    }
+
+    // Test isRunning
+    if (session.isRunning()) {
+        std::cout << "Session is running: " << session.getFullSessionName() << std::endl;
+    } else {
+        std::cerr << "Session is not running after start." << std::endl;
+    }
+
+    // Test sending a command (this won't do much since sleep ignores input, but it's for testing)
+    auto sendResult = session.sendCommand("say Hello from ScreenSession");
+    if (sendResult.getResultPair().first == mcsm::ResultType::MCSM_SUCCESS) {
+        std::cout << "Command sent successfully to session: " << session.getFullSessionName() << std::endl;
+    } else {
+        std::cerr << "Failed to send command: " << sendResult.getMessage()[0] << std::endl;
+    }
+
+
+    while(1){
+    // Wait a few seconds to simulate activity
+    std::this_thread::sleep_for(std::chrono::seconds(20));
+
+    // Test isRunning after stop
+    if (!session.isRunning()) {
+        std::cout << "Session is no longer running: " << session.getFullSessionName() << std::endl;
+        break;
+    } else {
+        std::cerr << "Session is still running after stop!" << std::endl;
+    }
+    }
+}
+*/
 
 int main(int argc, char *argv[]){
     std::set_new_handler(mcsm::signal_handler::new_handle);
     std::signal(SIGSEGV, mcsm::signal_handler::handle);
     std::signal(SIGFPE, mcsm::signal_handler::handle);
     std::signal(SIGILL, mcsm::signal_handler::handle);
-    std::signal(SIGBUS, mcsm::signal_handler::handle);
+    #ifdef SIGBUS
+        std::signal(SIGBUS, mcsm::signal_handler::handle);
+    #endif
     std::signal(SIGTERM, mcsm::signal_handler::handle);
     std::signal(SIGINT, mcsm::signal_handler::handle);
     /**
@@ -64,6 +113,8 @@ int main(int argc, char *argv[]){
     if(argc < 2){
         std::cout << "Welcome to MCSM (Minecraft Server Manager).\n";
         std::cout << "Type \"mcsm help\" for a list of commands.\n";
+
+        //testScreenSession();
 
         /*
         mcsm::MultiServerOption a(mcsm::getCurrentPath());

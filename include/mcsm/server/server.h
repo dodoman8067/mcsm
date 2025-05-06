@@ -93,13 +93,15 @@ namespace mcsm {
         virtual std::string getGitHub() const = 0;
 
         /**
-         * Starts the configured server with following launch profile `option`
+         * Starts the configured server with following launch profile `option`.
+         * Called by `ServerStarter#start`
          * @param option JVM launch profile
         */
         virtual mcsm::Result start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option);
 
         /**
-         * Starts the configured server in `optionPath` with following launch profile `option`
+         * Starts the configured server in `optionPath` with following launch profile `option`.
+         * Called by `ServerStarter#start`
          * @param option JVM launch profile
          * @param optionPath server.json path
         */

@@ -74,7 +74,7 @@ namespace mcsm {
          * @param version version of the server
          * @return true when version exists, otherwise false
          */
-        virtual bool hasVersion(const std::string& version) = 0;
+        virtual bool hasVersion(const std::string& version) const = 0;
     };
 }
 

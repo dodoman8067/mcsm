@@ -8,12 +8,16 @@ namespace mcsm {
     class ServerConfigLoader {
     public:
         explicit ServerConfigLoader(const std::string& path);
+        ServerConfigLoader(const ServerConfigLoader& other)
+            : configPath(other.configPath),
+              optionHandle(other.optionHandle ? std::make_unique<mcsm::Option>(*other.optionHandle) : nullptr),
+              isLoaded(other.isLoaded){}
         ~ServerConfigLoader();
 
         mcsm::Result loadConfig();
 
         template <typename T>
-        inline T get(const std::string& key){
+        inline T get(const std::string& key) const{
             if(!this->isLoaded){
                 mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
                     "ServerConfigLoader function called without loadConfig.",
@@ -75,7 +79,7 @@ namespace mcsm {
         bool doesAutoUpdate() const;
         mcsm::Result setAutoUpdate(const bool& update);
 
-        std::unique_ptr<mcsm::Option>& getHandle();
+        mcsm::Option* getHandle() const;
 
         bool isFullyLoaded() const;
 
@@ -87,7 +91,7 @@ namespace mcsm {
         bool isLoaded;
 
         template <typename T>
-        nlohmann::json::value_t getJsonType();
+        nlohmann::json::value_t getJsonType() const;
     };
 }
 

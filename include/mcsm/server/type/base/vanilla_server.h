@@ -60,7 +60,7 @@ namespace mcsm {
         mcsm::Result start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option) override;
         mcsm::Result start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
         
-        bool hasVersion(const std::string& version) override;
+        bool hasVersion(const std::string& version) const override;
 
         const std::map<std::string, std::string> getRequiredValues() const override;
 

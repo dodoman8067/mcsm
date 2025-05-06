@@ -23,6 +23,7 @@ SOFTWARE.
 */
 
 #include <mcsm/util/string_utils.h>
+#include <filesystem>
 
 bool mcsm::startsWith(const std::string& str, const std::string& value){
     return str.rfind(value, 0) == 0;
@@ -75,4 +76,44 @@ bool mcsm::is_number(const std::string& s){
     std::string::const_iterator it = s.begin();
     while (it != s.end() && std::isdigit(*it)) ++it;
     return !s.empty() && it == s.end();
+}
+
+std::string mcsm::normalizePath(const std::string& p){
+    if(p.empty()) return p; // Handle empty input
+
+    // Use std::filesystem for better handling of ".." and "."
+    std::filesystem::path pathObj(p);
+    std::string result = pathObj.lexically_normal().string();
+
+    // Ensure it does not end with a trailing slash unless it's root "/"
+    if(result.length() > 1 && result.back() == '/'){
+        result.pop_back();
+    }
+    return result;
+}
+
+std::string mcsm::formatPrompt(const std::string &key){
+    std::string formatted = key;
+    size_t pos = 0;
+    while ((pos = formatted.find('_', pos)) != std::string::npos){
+        formatted.replace(pos, 1, " ");
+        pos++;
+    }
+    formatted[0] = toupper(formatted[0]); // Capitalize
+    if(key == "custom_run_command"){
+        formatted = formatted + ". Overrides server JVM profile based start system.";
+    }
+    if(key == "default_jvm_launch_profile_search_path"){
+        formatted = formatted + " (current/global)";
+    }
+    if(key == "server_file_location"){
+        formatted = formatted + " (url/filepath)";
+    }
+    if(key == "auto_server_jar_update"){
+        formatted = "if server should update the server jarfile automatically";
+    }
+    if(key == "sponge_api_search_recommended_versions"){
+        formatted = "if the server search on recommended versions api";
+    }
+    return formatted;
 }
