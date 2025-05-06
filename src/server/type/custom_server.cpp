@@ -291,8 +291,6 @@ bool mcsm::CustomServer::isFile(const std::string& location) const {
     return isRegularFile;
 }
 
-
-//TODO: Update regex. the program thinks url is a file rn
 bool mcsm::CustomServer::isURL(const std::string& location) const {
     std::regex urlPattern(
         R"(^https?://[0-9a-z\.-]+(:[1-9][0-9]*)?(/[^\s]*)*$)"
