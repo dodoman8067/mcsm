@@ -25,7 +25,6 @@ SOFTWARE.
 
 #include <vector>
 #include <mutex>
-#include <mcsm/util/cli/logging.h>
 
 namespace mcsm {
     enum class ResultType {

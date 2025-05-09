@@ -2,6 +2,7 @@
 #define __MCSM_TEXT_COLOR_H__
 
 #include <iostream>
+#include <mcsm/http/holder.h> // have to include this to avoid winsock issues in mingw
 
 namespace mcsm {
     enum class TextColor {
@@ -15,7 +16,6 @@ namespace mcsm {
     };
     
     #ifdef _WIN32
-    #include <windows.h>
     inline void setcol(TextColor color) {
         HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
         WORD attr = 0;
