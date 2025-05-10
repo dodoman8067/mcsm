@@ -85,6 +85,7 @@ if(CMAKE_BUILD_TYPE MATCHES Release)
     endif()
 
     if(STRIP_TOOL)
+        message("-- Found strip: ${STRIP_TOOL}")
         add_custom_command(TARGET mcsm POST_BUILD
             COMMAND ${STRIP_TOOL} $<TARGET_FILE:mcsm>
             COMMENT "Stripping symbols to reduce binary size"
