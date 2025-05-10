@@ -24,14 +24,7 @@ SOFTWARE.
 #define __MCSM_LOGGING_H__
 
 #include <mcsm/util/string_utils.h>
-/*
- I know this file does not use libcurl functions.
- But the files that include this header does, and that causes windows header issue(winsock2.h included before windows.h)
-*/
-#include <curl/curl.h>
-#ifdef CURLINC_CURL_H
-    #include <termcolor/termcolor.hpp>
-#endif
+#include <mcsm/util/cli/text_color.h>
 
 namespace mcsm {
     extern bool log; // means defined elsewhere
@@ -59,7 +52,9 @@ namespace mcsm {
         if(!log) return;
         std::string msg = message;
         if(!mcsm::endsWith(msg, "\n")) msg += "\n";
-        std::cout << termcolor::bright_green << "[mcsm/INFO] " << msg << termcolor::reset;
+        mcsm::setcol(mcsm::TextColor::GREEN);
+        std::cout << "[mcsm/INFO] " << msg;
+        mcsm::setcol(mcsm::TextColor::RESET);
     }
 
     /**
@@ -70,7 +65,9 @@ namespace mcsm {
         if(!log) return;
         std::string msg = message;
         if(!mcsm::endsWith(msg, "\n")) msg += "\n";
-        std::cerr << termcolor::bright_yellow << "[mcsm/WARN] " << msg << termcolor::reset;
+        mcsm::setcol(mcsm::TextColor::BRIGHT_YELLOW);
+        std::cerr << "[mcsm/WARN] " << msg;
+        mcsm::setcol(mcsm::TextColor::RESET);
     }
 
     /**
@@ -81,7 +78,9 @@ namespace mcsm {
         if(!log) return;
         std::string msg = message;
         if(!mcsm::endsWith(msg, "\n")) msg += "\n";
-        std::cerr << termcolor::bright_red << "[mcsm/ERROR] " << msg << termcolor::reset;
+        mcsm::setcol(mcsm::TextColor::RED);
+        std::cerr << "[mcsm/ERROR] " << msg;
+        mcsm::setcol(mcsm::TextColor::RESET);
     }
 }
 

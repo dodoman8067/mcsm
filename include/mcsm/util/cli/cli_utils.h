@@ -32,6 +32,7 @@ SOFTWARE.
 #include <mcsm/util/cli/result.h>
 #include <mcsm/util/cli/logging.h>
 #include <any>
+#include <climits>
 #ifdef __linux__
     #include <sys/wait.h>
 #endif

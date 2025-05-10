@@ -21,7 +21,6 @@ endif()
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
 
 # Find dependencies 
-find_package(termcolor REQUIRED)
 find_package(CURL REQUIRED CONFIG)
 find_package(nlohmann_json REQUIRED)
 include(Findlibgit2)
@@ -96,7 +95,6 @@ endif()
 # Link dependencies
 target_link_libraries(mcsm PRIVATE CURL::libcurl)
 target_link_libraries(mcsm PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(mcsm PRIVATE termcolor::termcolor)
 
 # Some dependencies for libgit2 in Windows
 if(WIN32)
