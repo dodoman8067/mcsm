@@ -25,6 +25,7 @@ SOFTWARE.
 
 #include <vector>
 #include <mutex>
+#include <string>
 
 namespace mcsm {
     enum class ResultType {
