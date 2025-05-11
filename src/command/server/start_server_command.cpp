@@ -39,19 +39,29 @@ const std::vector<std::string> availableOptions = {
     "--global",
     "-global",
     "-g",
-    "--g"
+    "--g",
+    "--serverpath",
+    "-serverpath",
+    "--sp",
+    "-sp"
 };
+
+static std::string executionPath;
 
 mcsm::StartServerCommand::StartServerCommand(const std::string& name, const std::string& description) : mcsm::Command(name, description) {}
 
 mcsm::StartServerCommand::~StartServerCommand() {}
 
 void mcsm::StartServerCommand::execute(const std::vector<std::string>& args){
+    executionPath = getServerPath(args);
+    if(mcsm::isWhitespaceOrEmpty(executionPath)) executionPath = mcsm::getCurrentPath();
     if(!isConfigured()){
-        mcsm::warning("Server not configured.");
+        mcsm::warning("Server not configured in " + executionPath);
         mcsm::warning("Task aborted.");
         std::exit(1);
     }
+
+    mcsm::info(executionPath);
 
     bool isGroup = false;
     std::string groupPath;
@@ -90,7 +100,7 @@ void mcsm::StartServerCommand::execute(const std::vector<std::string>& args){
         }
     }
 
-    mcsm::ServerConfigLoader loader(mcsm::getCurrentPath());
+    mcsm::ServerConfigLoader loader(executionPath);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         mcsm::printResultMessage();
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
@@ -108,7 +118,7 @@ void mcsm::StartServerCommand::execute(const std::vector<std::string>& args){
     if(isGroup){
         starter.startServer(*jvmOpt, mcsm::getCurrentPath(), mcsm::getCurrentPath(), groupPath);
     }else{
-        starter.startServer(*jvmOpt, mcsm::getCurrentPath(), mcsm::getCurrentPath());
+        starter.startServer(*jvmOpt, executionPath, executionPath);
     }
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         mcsm::printResultMessage();
@@ -125,7 +135,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const st
     for(size_t i = 0; i < args.size(); ++i){
         std::string_view arg = args[i];
         if(std::find(availableOptions.begin(), availableOptions.end(), arg) != availableOptions.end()){
-            if(!(arg == "-profile" || arg == "--profile" || arg == "-p" || arg == "--p" || arg == "-jvmprofile" || arg == "--jvmprofile" || arg == "-jp" || "--jp")) continue;
+            if(!(arg == "-profile" || arg == "--profile" || arg == "-p" || arg == "--p" || arg == "-jvmprofile" || arg == "--jvmprofile" || arg == "-jp" || arg == "--jp")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-'){
                 std::string pName = mcsm::safeString(args[i + 1]);
                 mcsm::SearchTarget target = getSearchTarget(args);
@@ -162,7 +172,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const mc
         if(opt->exists()) return opt;
     }
     if(target == mcsm::SearchTarget::CURRENT || target == mcsm::SearchTarget::ALL){
-        std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(name, mcsm::SearchTarget::CURRENT);
+        std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(name, mcsm::SearchTarget::CURRENT, executionPath);
         if(opt->exists()) return opt;
     }
     return nullptr;
@@ -177,14 +187,30 @@ mcsm::SearchTarget mcsm::StartServerCommand::getSearchTarget(const std::vector<s
     return mcsm::SearchTarget::ALL;
 }
 
+std::string mcsm::StartServerCommand::getServerPath(const std::vector<std::string> &args){
+    std::string path;
+    for(size_t i = 0; i < args.size(); ++i){
+        std::string_view arg = args[i];
+        if(!(arg == "--serverpath" || arg == "-serverpath" || arg == "-sp" || arg == "--sp")) continue;
+        if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
+            path = args[i + 1];
+            if(path.empty()) return path;
+
+            std::filesystem::path pathObj = std::filesystem::absolute(path).lexically_normal();  // <- absolute first!
+            std::string result = pathObj.string();
+
+            if(result.length() > 1 && (result.back() == '/' || result.back() == '\\')){
+                result.pop_back();
+            }
+
+            return result;
+        }
+    }
+    return "";
+}
 
 inline bool mcsm::StartServerCommand::isConfigured(){
-    std::string path = mcsm::getCurrentPath();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        mcsm::printResultMessage();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-    }
-    bool fileExists = mcsm::fileExists(path + "/server.json");
+    bool fileExists = mcsm::fileExists(executionPath + "/server.json");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         mcsm::printResultMessage();
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
