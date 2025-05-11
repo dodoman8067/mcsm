@@ -247,7 +247,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerConfigLoader::getDefaultOption() co
         }});
         return nullptr;
     }
-    std::unique_ptr<mcsm::JvmOption> jvmOption = std::make_unique<mcsm::JvmOption>(profileObj["name"], target);
+    std::unique_ptr<mcsm::JvmOption> jvmOption = std::make_unique<mcsm::JvmOption>(profileObj["name"], target, this->configPath);
     if(!jvmOption->exists() || jvmOption == nullptr){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "Invalid default launch profile.",
