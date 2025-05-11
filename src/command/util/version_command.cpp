@@ -31,7 +31,11 @@ mcsm::VersionCommand::~VersionCommand(){
 }
 
 void mcsm::VersionCommand::execute(const std::vector<std::string>& /* args */){
-    std::cout << "MCSM version : " << version << "\n";
+    #ifdef MCSM_DEBUG
+        std::cout << "MCSM version : " << version << " (DEBUG)\n";
+    #else
+        std::cout << "MCSM version : " << version << "\n";
+    #endif
     std::cout << "cURL version : " << curl_version() << "\n";
     #ifdef MCSM_NLOHMANN_VER
         std::cout << "nlohmann::json version : " << MCSM_NLOHMANN_VER << "\n";
