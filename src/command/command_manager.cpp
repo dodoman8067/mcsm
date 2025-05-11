@@ -54,7 +54,7 @@ void mcsm::CommandManager::cleanup(){
 
 void mcsm::CommandManager::addCommand(std::unique_ptr<mcsm::Command> command){
     if(hasCommand(command->getName())) return;
-   commands->push_back(std::move(command));
+    commands->push_back(std::move(command));
 }
 
 const std::vector<std::unique_ptr<mcsm::Command>>& mcsm::CommandManager::getCommands(){

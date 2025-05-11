@@ -37,7 +37,8 @@ namespace mcsm {
         mcsm::SearchTarget getSearchTarget(const std::vector<std::string>& args);
         std::unique_ptr<mcsm::JvmOption> searchOption(const std::vector<std::string>& args, mcsm::ServerConfigLoader* loader);
         std::unique_ptr<mcsm::JvmOption> searchOption(const mcsm::SearchTarget& target, const std::string& name);
-        void detectServer(const std::vector<std::string>& args);
+        std::string getServerPath(const std::vector<std::string> &args);
+        void detectServer(const std::vector<std::string> &args);
         inline bool isConfigured();
     public:
         StartServerCommand(const std::string& name, const std::string& description);

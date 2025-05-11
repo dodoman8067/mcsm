@@ -57,7 +57,9 @@ void mcsm::GroupListSubCommand::execute(const std::vector<std::string>& args){
     }else{
         for(auto& [serverstr, isRunning] : strmap){
             if(isRunning){
-                std::cout << termcolor::green << " * " + serverstr + " (running)" << termcolor::reset << "\n";
+                mcsm::setcol(mcsm::TextColor::GREEN);
+                std::cout << " * " + serverstr + " (running)\n";
+                mcsm::setcol(mcsm::TextColor::RESET);
             }else{
                 std::cout << " * " + serverstr << "\n";
             }

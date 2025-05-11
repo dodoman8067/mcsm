@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include <mcsm/util/cli/logging.h>  // have to include this to avoid winsock issues in mingw
 #include <mcsm/util/cli/result.h>
 
 static std::mutex res_mutex;
