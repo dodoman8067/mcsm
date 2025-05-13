@@ -26,9 +26,15 @@ SOFTWARE.
 #include <vector>
 #include <mutex>
 #include <string>
+#include <tl/expected.hpp>
 
 namespace mcsm {
-    enum class ResultType {
+    void info(const std::string &message);
+    void success(const std::string &message);
+    void warning(const std::string &message);
+    void error(const std::string &message); 
+
+    enum class ResultType{
         MCSM_SUCCESS,
         MCSM_OK,
         MCSM_WARN,
@@ -37,35 +43,85 @@ namespace mcsm {
         MCSM_UNKNOWN
     };
 
-    enum class ResultCode {
-        JSON_WRONG_TYPE,
-        JSON_WRONG_TYPE_CAN_BE_FIXED,
-        JSON_NOT_FOUND,
-        JSON_NOT_FOUND_CAN_BE_FIXED,
-        JSON_PARSE_FAILED,
-        JSON_PARSE_FAILED_CANNOT_BE_FIXED,
-        SERVER_ALREADY_CONFIGURED,
-        SERVER_NOT_CONFIGURED,
-        SERVER_DATA_NOT_CONFIGURED,
-        SERVER_DATA_ALREADY_CONFIGURED,
-        SERVER_WRONG_INSTANCE_GENERATED,
-        SERVER_UNSUPPORTED_VERSION,
-        SERVER_DEFAULT_JVM_PROFILE_NOT_FOUND,
-        SERVER_DEFAULT_JVM_PROFILE_NAME_NOT_FOUND,
-        JVM_PROFILE_NOT_FOUND,
-        JAVA_NOT_FOUND,
-        FILE_CREATION_FAILED,
-        FILE_SAVING_FAILED,
-        FILE_READING_FAILED,
-        FILE_NOT_FOUND,
-        CURL_INIT_FAILED,
-        HTTP_GET_REQUEST_FAILED,
-        HTTP_DOWNLOAD_REQUEST_FAILED,
-        HTTP_DOWNLOAD_TARGET_NOT_TEXT,
-        PLATFORM_NOT_SUPPORTED,
-        SUCCESS,
-        OTHER
+    enum class ErrorStatus {
+        OK,
+        WARNING,
+        WARNING_NOEXIT,
+        ERROR
     };
+
+    struct ErrorTemplate {
+        int code;
+        std::string message;   // e.g., "File %s not found"
+        std::string solution;  // e.g., "Check if the file exists"
+    };
+
+    // The full error structure
+    struct Error {
+        ErrorStatus status;
+        int code;
+        std::string message;              // Template string
+        std::vector<std::string> params;  // Params to replace in %s
+        std::string solution;             // Optional help text
+    };
+
+    inline Error makeError(ErrorStatus status, const ErrorTemplate& tmpl, std::vector<std::string> params = {}) {
+        return Error{status, tmpl.code, tmpl.message, std::move(params), tmpl.solution};
+    }
+
+    inline std::string formatError(const Error& err){
+        std::string formatted;
+        size_t pos = 0;
+        size_t paramIndex = 0;
+        formatted = err.message;
+
+        while((pos = formatted.find("%s")) != std::string::npos && paramIndex < err.params.size()){
+            formatted.replace(pos, 2, err.params[paramIndex++]);
+        }
+
+        if(paramIndex < err.params.size()){
+            formatted += " [extra: ";
+            for(size_t i = paramIndex; i < err.params.size(); i++){
+                formatted += err.params[i];
+                if(i < err.params.size() - 1) formatted += ", ";
+            }
+            formatted += "]";
+        }
+
+        return formatted;
+    }
+
+    inline void printError(const Error& err) {
+        if(err.status == mcsm::ErrorStatus::ERROR){
+            mcsm::error(formatError(err));
+        }
+        if(err.status == mcsm::ErrorStatus::WARNING || err.status == mcsm::ErrorStatus::WARNING_NOEXIT){
+            mcsm::warning(formatError(err));
+        }
+        if(err.status == mcsm::ErrorStatus::OK){
+            mcsm::info(formatError(err));
+        }
+
+        if(!err.solution.empty()){
+            if(err.status == mcsm::ErrorStatus::ERROR){
+                mcsm::error(err.solution);
+            }
+            if(err.status == mcsm::ErrorStatus::WARNING || err.status == mcsm::ErrorStatus::WARNING_NOEXIT){
+                mcsm::warning(err.solution);
+            }
+            if(err.status == mcsm::ErrorStatus::OK){
+                mcsm::info(err.solution);
+            }
+        }
+    }
+
+    // === RESULT ALIASES ===
+    //template<typename T>
+    //using Result = std::expected<T, Error>;
+
+    using VoidResult = tl::expected<void, Error>;
+    using StringResult = tl::expected<std::string, Error>;
+    using BoolResult = tl::expected<bool, Error>;
 
     class Result {
     private:
@@ -310,5 +366,178 @@ namespace mcsm {
     void printResultMessage(const std::pair<mcsm::ResultType, std::vector<std::string>> res);
 }
 
+namespace mcsm::errors {
+
+    // ================================
+    // 10X: File and OS Errors
+    // ================================
+    inline const ErrorTemplate FILE_NOT_FOUND = {
+        100,
+        "File %s cannot be found.",
+        "Make sure the file exists at the specified path."
+    };
+
+    inline const ErrorTemplate FILE_OPEN_FAILED = {
+        101,
+        "Failed to open file %s.",
+        "Check if the file exists and has proper permissions."
+    };
+
+    inline const ErrorTemplate FILE_CREATE_FAILED = {
+        102,
+        "Cannot create file %s.",
+        "This may be due to permissions or invalid file name."
+    };
+
+    inline const ErrorTemplate FILE_SAVE_FAILED = {
+        103,
+        "Failed to save file %s.",
+        "Check file permissions or if the file path is valid."
+    };
+
+    inline const ErrorTemplate CURL_INIT_FAILED = {
+        104,
+        "Unable to initialize curl.",
+        "Try re-running the program, reboot your machine, or reinstall."
+    };
+
+    // ================================
+    // 20X: JSON Errors
+    // ================================
+    inline const ErrorTemplate JSON_WRONG_TYPE = {
+        200,
+        "Value %s has to be a(n) %s, but it's not.",
+        "Manually editing the file might have caused this issue."
+    };
+
+    inline const ErrorTemplate JSON_WRONG_TYPE_PLUS_FIX = {
+        201,
+        "Value %s option in %s must be a(n) %s.",
+        ""
+    };
+
+    inline const ErrorTemplate JSON_NOT_FOUND = {
+        202,
+        "No %s value found in %s.",
+        "Make sure the field is defined in the config file."
+    };
+
+    inline const ErrorTemplate JSON_PARSE_FAILED = {
+        203,
+        "Failed to parse json %s.",
+        "Check for comments, unclosed brackets, trailing commas, or incorrect escape sequences."
+    };
+
+    inline const ErrorTemplate JSON_PARSE_FAILED_CANNOT_BE_MODIFIED = {
+        204,
+        "Failed to parse json.",
+        "This error cannot be resolved by editing the file."
+    };
+
+    // ================================
+    // 30X: HTTP Errors
+    // ================================
+    inline const ErrorTemplate GET_REQUEST_FAILED = {
+        300,
+        "Failed to perform GET request for %s with reason: %s.",
+        "Check your internet connection or try again later."
+    };
+
+    inline const ErrorTemplate DOWNLOAD_REQUEST_FAILED = {
+        301,
+        "Failed to download the file from %s with reason: %s.",
+        "Check your internet connection or verify the URL."
+    };
+
+    inline const ErrorTemplate DOWNLOAD_TARGET_NOT_TEXT = {
+        302,
+        "Failed to verify if URL %s returns a text, reason: %s.",
+        "Ensure the target is a valid text-based resource."
+    };
+
+    // ================================
+    // 40X: Server Config Errors
+    // ================================
+    inline const ErrorTemplate SERVER_ALREADY_CONFIGURED = {
+        400,
+        "Server is already configured in %s.",
+        "Please try again in another directory."
+    };
+
+    inline const ErrorTemplate SERVER_NOT_CONFIGURED = {
+        401,
+        "Server isn't configured in %s.",
+        "Run \"mcsm init\" to configure a server."
+    };
+
+    inline const ErrorTemplate SERVER_DATA_ALREADY_CONFIGURED = {
+        402,
+        "Server data config already exists in this directory.",
+        "Try again in a different directory."
+    };
+
+    inline const ErrorTemplate SERVER_DATA_NOT_CONFIGURED = {
+        403,
+        "Server data not configured in this directory.",
+        "Make sure .mcsm folder is intact."
+    };
+
+    inline const ErrorTemplate SERVER_WRONG_INSTANCE_GENERATED = {
+        404,
+        "Generated server path is not a valid instance for %s servers.",
+        "Check your server setup and try again."
+    };
+
+    inline const ErrorTemplate SERVER_UNSUPPORTED_VERSION = {
+        405,
+        "Unsupported version detected: %s.",
+        "Please try again with a valid version."
+    };
+
+    inline const ErrorTemplate SERVER_DEFAULT_PROFILE_NOT_FOUND = {
+        406,
+        "No default launch profile found in file %s.",
+        "Ensure the profile is properly defined."
+    };
+
+    inline const ErrorTemplate SERVER_DEFAULT_PROFILE_NAME_NOT_FOUND = {
+        407,
+        "No default profile name specified in %s.",
+        "Please verify the profile name in the file."
+    };
+
+    inline const ErrorTemplate SERVER_UNSUPPORTED_VERSION_CUSTOM = {
+        408,
+        "Unsupported version: %s.",
+        "Try a different version or check the build."
+    };
+
+    inline const ErrorTemplate JVM_PROFILE_NOT_FOUND = {
+        409,
+        "JVM profile %s does not exist.",
+        "Check the profile definition or create a new one."
+    };
+
+    inline const ErrorTemplate JVM_DETECTION_FAILED = {
+        410,
+        "JVM detection failed.",
+        "Set the JAVA_HOME environment variable and try again."
+    };
+
+    // ================================
+    // Misc Errors
+    // ================================
+    inline const ErrorTemplate PLATFORM_NOT_SUPPORTED = {
+        500,
+        "Operating system is not supported.",
+        "Please report this issue on GitHub."
+    };
+
+    inline const ErrorTemplate UNSAFE_STRING = {
+        501,
+        "String contains unsafe characters: %s.",
+        "Please remove or escape the unsafe characters."
+    };
+}
 
 #endif // __MCSM_RESULT_H__
