@@ -23,6 +23,7 @@ SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Mo
 # Find dependencies 
 find_package(CURL REQUIRED CONFIG)
 find_package(nlohmann_json REQUIRED)
+find_package(tl-expected REQUIRED)
 include(Findlibgit2)
 if(LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
     find_package(Backward REQUIRED)
@@ -95,6 +96,7 @@ endif()
 # Link dependencies
 target_link_libraries(mcsm PRIVATE CURL::libcurl)
 target_link_libraries(mcsm PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(mcsm PRIVATE tl::expected)
 
 # Some dependencies for libgit2 in Windows
 if(WIN32)
