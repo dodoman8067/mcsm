@@ -26,6 +26,7 @@ SOFTWARE.
 #include <mcsm/util/cli/signal_handler.h>
 #include <new>
 #include <thread>
+#include <mcsm/util/git/clone_utils.h>
 
 const std::string version = "0.5.1";
 
@@ -66,6 +67,21 @@ int main(int argc, char *argv[]){
     if(argc < 2){
         std::cout << "Welcome to MCSM (Minecraft Server Manager).\n";
         std::cout << "Type \"mcsm help\" for a list of commands.\n";
+/*
+        mcsm::VoidResult res = mcsm::cloneRepo("https://github.com/dodoman8067/advancedmonsters.git", "c1");
+        if(!res){
+            mcsm::printError(res.error());
+            mcsm::exitIfFail(res.error());
+        }
+        mcsm::info("Clone 1ddone");
+
+        mcsm::VoidResult res1 = mcsm::cloneRepo("https://github.com/dodoman8067/advancedmonsters123123.git", "c2");
+        if(!res1){
+            mcsm::printError(res1.error());
+            mcsm::exitIfFail(res1.error());
+        }
+        mcsm::info("Clone 2ddone");
+*/
         return 0;
     }
 

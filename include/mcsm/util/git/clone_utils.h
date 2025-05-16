@@ -31,8 +31,8 @@ SOFTWARE.
 #include <git2/clone.h>
 
 namespace mcsm {
-    mcsm::Result cloneRepo(const std::string& url);
-    mcsm::Result cloneRepo(const std::string& url, const std::string& path);
+    mcsm::VoidResult cloneRepo(const std::string& url);
+    mcsm::VoidResult cloneRepo(const std::string& url, const std::string& path);
 }
 
 #endif // __MCSM_CLONE_UTILS_H__
