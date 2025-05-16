@@ -58,18 +58,18 @@ namespace mcsm {
 
     // The full error structure
     struct Error {
-        ErrorStatus status;
+        mcsm::ErrorStatus status;
         int code;
         std::string message;              // Template string
         std::vector<std::string> params;  // Params to replace in %s
         std::string solution;             // Optional help text
     };
 
-    inline Error makeError(ErrorStatus status, const ErrorTemplate& tmpl, std::vector<std::string> params = {}) {
-        return Error{status, tmpl.code, tmpl.message, std::move(params), tmpl.solution};
+    inline mcsm::Error makeError(mcsm::ErrorStatus status, const mcsm::ErrorTemplate& tmpl, std::vector<std::string> params = {}) {
+        return mcsm::Error{status, tmpl.code, tmpl.message, std::move(params), tmpl.solution};
     }
 
-    inline std::string formatError(const Error& err){
+    inline std::string formatError(const mcsm::Error& err){
         std::string formatted;
         size_t pos = 0;
         size_t paramIndex = 0;
@@ -91,7 +91,7 @@ namespace mcsm {
         return formatted;
     }
 
-    inline void printError(const Error& err) {
+    inline void printError(const mcsm::Error& err) {
         if(err.status == mcsm::ErrorStatus::ERROR){
             mcsm::error(formatError(err));
         }
@@ -112,6 +112,12 @@ namespace mcsm {
             if(err.status == mcsm::ErrorStatus::OK){
                 mcsm::info(err.solution);
             }
+        }
+    }
+
+    inline void exitIfFail(const mcsm::Error& err) {
+        if(err.status != mcsm::ErrorStatus::OK && err.status != mcsm::ErrorStatus::WARNING_NOEXIT){
+            std::exit(1);
         }
     }
 
@@ -537,6 +543,12 @@ namespace mcsm::errors {
         501,
         "String contains unsafe characters: %s.",
         "Please remove or escape the unsafe characters."
+    };
+
+    inline const ErrorTemplate GIT_CLONE_FAILED = {
+        502,
+        "Failed to clone a git repository %s with the following reason : %s",
+        ""
     };
 }
 
