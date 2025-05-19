@@ -125,9 +125,10 @@ namespace mcsm {
     //template<typename T>
     //using Result = std::expected<T, Error>;
 
-    using VoidResult = tl::expected<void, Error>;
-    using StringResult = tl::expected<std::string, Error>;
-    using BoolResult = tl::expected<bool, Error>;
+    using VoidResult = tl::expected<void, mcsm::Error>;
+    using StringResult = tl::expected<std::string, mcsm::Error>;
+    using BoolResult = tl::expected<bool, mcsm::Error>;
+    using IntResult = tl::expected<int, mcsm::Error>;
 
     class Result {
     private:

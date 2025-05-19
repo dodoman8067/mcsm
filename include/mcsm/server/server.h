@@ -52,14 +52,14 @@ namespace mcsm {
          * Returns the name of the server's jarfile.
          * @return jarfile name
         */
-        virtual std::string getJarFile() const;
+        virtual mcsm::StringResult getJarFile() const;
 
         /**
          * Returns the name of the server's jarfile.
          * @param checkDir checking directory
          * @return jarfile name
         */
-        virtual std::string getJarFile(const std::string& checkDir) const;
+        virtual mcsm::StringResult getJarFile(const std::string& checkDir) const;
 
         /**
          * Returns the earliest Minecraft version supported by this server.
@@ -97,7 +97,7 @@ namespace mcsm {
          * Called by `ServerStarter#start`
          * @param option JVM launch profile
         */
-        virtual mcsm::Result start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option);
+        virtual mcsm::VoidResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option);
 
         /**
          * Starts the configured server in `optionPath` with following launch profile `option`.
@@ -105,15 +105,15 @@ namespace mcsm {
          * @param option JVM launch profile
          * @param optionPath server.json path
         */
-        virtual mcsm::Result start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath);
+        virtual mcsm::VoidResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath);
 
-        virtual const std::map<std::string, std::string> getRequiredValues() const;
+        virtual const tl::expected<std::map<std::string, std::string>, mcsm::Error> getRequiredValues() const;
 
         /**
          * Obtains jar file. (Will compile the server jarfile or download if downloadable server)
          * 
          */
-        virtual mcsm::Result obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) = 0;
+        virtual mcsm::VoidResult obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) = 0;
 
         /**
          * Obtains jar file. (Will compile the server jarfile or download if downloadable server)
@@ -121,11 +121,11 @@ namespace mcsm {
          */
         //virtual mcsm::Result obtainJarFile(const std::string version, const std::string workingPath, const std::string outputPath);
 
-        virtual mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues) = 0;
+        virtual mcsm::VoidResult generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues) = 0;
 
-        mcsm::Result configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate);
+        mcsm::VoidResult configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate);
 
-        mcsm::Result configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate, const std::string& build);
+        mcsm::VoidResult configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate, const std::string& build);
     };
 }
 

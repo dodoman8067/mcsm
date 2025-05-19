@@ -26,7 +26,7 @@ mcsm::PurpurServer::PurpurServer() {}
 
 mcsm::PurpurServer::~PurpurServer() {}
 
-int mcsm::PurpurServer::getVersion(const std::string& ver) const {
+mcsm::IntResult mcsm::PurpurServer::getVersion(const std::string& ver) const {
     if(!mcsm::isSafeString(ver)){
         return -1;
     }
@@ -47,7 +47,7 @@ int mcsm::PurpurServer::getVersion(const std::string& ver) const {
     }
 }
 
-int mcsm::PurpurServer::getVersion(const std::string& ver, const std::string& build) const {
+mcsm::IntResult mcsm::PurpurServer::getVersion(const std::string& ver, const std::string& build) const {
     if(!mcsm::isSafeString(build)){
         return -1;
     }
@@ -94,7 +94,7 @@ std::string mcsm::PurpurServer::getGitHub() const {
     return "https://github.com/PurpurMC/Purpur";
 }
 
-mcsm::Result mcsm::PurpurServer::download(const std::string& version){
+mcsm::VoidResult mcsm::PurpurServer::download(const std::string& version){
     std::string path = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -112,7 +112,7 @@ mcsm::Result mcsm::PurpurServer::download(const std::string& version){
     return download(version, path, jar, path);
 }
 
-mcsm::Result mcsm::PurpurServer::download(const std::string& version, const std::string& path){
+mcsm::VoidResult mcsm::PurpurServer::download(const std::string& version, const std::string& path){
     std::string path1 = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -130,7 +130,7 @@ mcsm::Result mcsm::PurpurServer::download(const std::string& version, const std:
     return download(version, path, jar, path1);
 }
 
-mcsm::Result mcsm::PurpurServer::download(const std::string& version, const std::string& path, const std::string& name){
+mcsm::VoidResult mcsm::PurpurServer::download(const std::string& version, const std::string& path, const std::string& name){
     std::string path1 = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -141,7 +141,7 @@ mcsm::Result mcsm::PurpurServer::download(const std::string& version, const std:
     return download(version, path, name, path1);
 }
 
-mcsm::Result mcsm::PurpurServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
+mcsm::VoidResult mcsm::PurpurServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
     mcsm::Option opt(optionPath, "server");
     bool optExists = opt.exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -249,11 +249,11 @@ mcsm::Result mcsm::PurpurServer::download(const std::string& version, const std:
     }
 }
 
-mcsm::Result mcsm::PurpurServer::obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
+mcsm::VoidResult mcsm::PurpurServer::obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
     return download(version, path, name, optionPath);
 }
 
-mcsm::Result mcsm::PurpurServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
+mcsm::VoidResult mcsm::PurpurServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
     std::string cPath = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -264,7 +264,7 @@ mcsm::Result mcsm::PurpurServer::start(mcsm::ServerConfigLoader* loader, mcsm::J
     return start(loader, option, cPath, cPath);
 }
 
-mcsm::Result mcsm::PurpurServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
+mcsm::VoidResult mcsm::PurpurServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
     // ServerOption class handles the data file stuff
     
     std::string jar = loader->getServerJarFile();
@@ -308,7 +308,7 @@ mcsm::Result mcsm::PurpurServer::start(mcsm::ServerConfigLoader* loader, mcsm::J
     return Server::start(loader, option, path, optionPath);
 }
 
-mcsm::Result mcsm::PurpurServer::update(){
+mcsm::VoidResult mcsm::PurpurServer::update(){
     std::string path = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -319,7 +319,7 @@ mcsm::Result mcsm::PurpurServer::update(){
     return update(path, path);
 }
 
-mcsm::Result mcsm::PurpurServer::update(const std::string& optionPath){
+mcsm::VoidResult mcsm::PurpurServer::update(const std::string& optionPath){
     std::string path = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -330,7 +330,7 @@ mcsm::Result mcsm::PurpurServer::update(const std::string& optionPath){
     return update(path, optionPath);
 }
 
-mcsm::Result mcsm::PurpurServer::update(const std::string& path, const std::string& optionPath){
+mcsm::VoidResult mcsm::PurpurServer::update(const std::string& path, const std::string& optionPath){
     // Program won't downgrade server jarfiles automatically. This is an intented feature.
     mcsm::info("Checking updates...");
     mcsm::ServerDataOption sDataOpt(optionPath);
@@ -420,7 +420,7 @@ mcsm::Result mcsm::PurpurServer::update(const std::string& path, const std::stri
     return download(version, path, jar, optionPath);
 }
 
-mcsm::Result mcsm::PurpurServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues){
+mcsm::VoidResult mcsm::PurpurServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues){
     mcsm::GeneralProperty* property = mcsm::GeneralOption::getGeneralOption().getProperty("skip_version_check_while_configuring");
 
     if(property == nullptr){
@@ -458,7 +458,7 @@ mcsm::Result mcsm::PurpurServer::generate(const std::string& name, mcsm::JvmOpti
     return configure(version, this, &opt, path, name, option, autoUpdate, extraValues.find("server_build_version")->second);
 }
 
-bool mcsm::PurpurServer::hasVersion(const std::string& version) const {
+mcsm::BoolResult mcsm::PurpurServer::hasVersion(const std::string& version) const {
     return getVersion(version) != -1;
 }
 

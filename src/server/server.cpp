@@ -23,11 +23,11 @@ SOFTWARE.
 #include <mcsm/server/server.h>
 #include <mcsm/data/options/general_option.h>
 
-mcsm::Result mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
+mcsm::VoidResult mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
     return start(loader, option, mcsm::getCurrentPath(), mcsm::getCurrentPath());
 }
 
-mcsm::Result mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
+mcsm::VoidResult mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
     std::string jvmOpt = " ";
     auto jArgs = option.getJvmArguments();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -92,11 +92,11 @@ mcsm::Result mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOpti
     return res;
 }
 
-mcsm::Result mcsm::Server::configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate){
+mcsm::VoidResult mcsm::Server::configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate){
     return configure(version, server, sDataOpt, path, name, option, autoUpdate, "latest");
 }
 
-mcsm::Result mcsm::Server::configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate, const std::string& build){
+mcsm::VoidResult mcsm::Server::configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate, const std::string& build){
     mcsm::ServerConfigGenerator serverOption(path);
     
     mcsm::Result sRes = serverOption.generate(version, server, sDataOpt, name, option, autoUpdate, build);
@@ -119,13 +119,13 @@ mcsm::Result mcsm::Server::configure(const std::string &version, mcsm::Server* s
     return res;
 }
 
-std::string mcsm::Server::getJarFile() const {
+mcsm::StringResult mcsm::Server::getJarFile() const {
     std::string path = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     return getJarFile(path);
 }
 
-std::string mcsm::Server::getJarFile(const std::string& checkDir) const {
+mcsm::StringResult mcsm::Server::getJarFile(const std::string& checkDir) const {
     //this method is usually for getting the configured server's jarfile.
     mcsm::Option opt(checkDir, "server");
     bool exists = opt.exists();
@@ -159,7 +159,7 @@ bool mcsm::Server::isBasedAs(const std::string& input) const {
     return getBasedServer() == input;
 }
 
-const std::map<std::string, std::string> mcsm::Server::getRequiredValues() const {
+const tl::expected<std::map<std::string, std::string>, mcsm::Error> mcsm::Server::getRequiredValues() const {
     return {
         {"name", "" },
         {"minecraft_version", ""},

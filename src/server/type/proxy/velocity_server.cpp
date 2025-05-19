@@ -31,7 +31,7 @@ mcsm::VelocityServer::~VelocityServer(){}
 // VelocityServer provides a method that returns the 'ver' required in getVersion method as users don't usually type versions like 3.3.0-SNAPSHOT
 // it is something like a method that returns latest mc version
 
-int mcsm::VelocityServer::getVersion(const std::string& ver) const {
+mcsm::IntResult mcsm::VelocityServer::getVersion(const std::string& ver) const {
     std::string res = mcsm::get("https://api.papermc.io/v2/projects/velocity/versions/" + ver);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
@@ -51,7 +51,7 @@ int mcsm::VelocityServer::getVersion(const std::string& ver) const {
 }
 
 // used for checking if versions with specific build exists
-int mcsm::VelocityServer::getVersion(const std::string& ver, const std::string& build) const {
+mcsm::IntResult mcsm::VelocityServer::getVersion(const std::string& ver, const std::string& build) const {
     std::string res = mcsm::get("https://api.papermc.io/v2/projects/velocity/versions/" + ver + "/builds/" + build);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
     nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
@@ -111,7 +111,7 @@ std::string mcsm::VelocityServer::getGitHub() const {
     return "https://github.com/PaperMC/Velocity";
 }
 
-mcsm::Result mcsm::VelocityServer::download(const std::string& version){
+mcsm::VoidResult mcsm::VelocityServer::download(const std::string& version){
     std::string path = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -129,7 +129,7 @@ mcsm::Result mcsm::VelocityServer::download(const std::string& version){
     return download(version, path, jar, path);
 }
 
-mcsm::Result mcsm::VelocityServer::download(const std::string& version, const std::string& path){
+mcsm::VoidResult mcsm::VelocityServer::download(const std::string& version, const std::string& path){
     std::string path1 = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -147,7 +147,7 @@ mcsm::Result mcsm::VelocityServer::download(const std::string& version, const st
     return download(version, path, jar, path1);
 }
 
-mcsm::Result mcsm::VelocityServer::download(const std::string& version, const std::string& path, const std::string& name){
+mcsm::VoidResult mcsm::VelocityServer::download(const std::string& version, const std::string& path, const std::string& name){
     std::string path1 = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -158,7 +158,7 @@ mcsm::Result mcsm::VelocityServer::download(const std::string& version, const st
     return download(version, path, name, path1);
 }
 
-mcsm::Result mcsm::VelocityServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
+mcsm::VoidResult mcsm::VelocityServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
     mcsm::Option opt(optionPath, "server");
     bool optExists = opt.exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -263,11 +263,11 @@ mcsm::Result mcsm::VelocityServer::download(const std::string& version, const st
     }
 }
 
-mcsm::Result mcsm::VelocityServer::obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
+mcsm::VoidResult mcsm::VelocityServer::obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
     return download(version, path, name, optionPath);
 }
 
-mcsm::Result mcsm::VelocityServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
+mcsm::VoidResult mcsm::VelocityServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
     // ServerOption class handles the data file stuff
     std::string cPath = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -279,7 +279,7 @@ mcsm::Result mcsm::VelocityServer::start(mcsm::ServerConfigLoader* loader, mcsm:
     return start(loader, option, cPath, cPath);
 }
 
-mcsm::Result mcsm::VelocityServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
+mcsm::VoidResult mcsm::VelocityServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
     // ServerOption class handles the data file stuff
 
     std::string jar = loader->getServerJarFile();
@@ -323,7 +323,7 @@ mcsm::Result mcsm::VelocityServer::start(mcsm::ServerConfigLoader* loader, mcsm:
     return Server::start(loader, option, path, optionPath);
 }
 
-mcsm::Result mcsm::VelocityServer::update(){
+mcsm::VoidResult mcsm::VelocityServer::update(){
     std::string path = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -334,7 +334,7 @@ mcsm::Result mcsm::VelocityServer::update(){
     return update(path, path);
 }
 
-mcsm::Result mcsm::VelocityServer::update(const std::string& optionPath){
+mcsm::VoidResult mcsm::VelocityServer::update(const std::string& optionPath){
     std::string path = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -345,7 +345,7 @@ mcsm::Result mcsm::VelocityServer::update(const std::string& optionPath){
     return update(path, optionPath);
 }
 
-mcsm::Result mcsm::VelocityServer::update(const std::string& path, const std::string& optionPath){
+mcsm::VoidResult mcsm::VelocityServer::update(const std::string& path, const std::string& optionPath){
     // Program won't downgrade server jarfiles automatically. This is an intented feature.
     mcsm::info("Checking updates...");
     mcsm::ServerDataOption sDataOpt(optionPath);
@@ -432,7 +432,7 @@ mcsm::Result mcsm::VelocityServer::update(const std::string& path, const std::st
     return download(version, path, jar, optionPath);
 }
 
-mcsm::Result mcsm::VelocityServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues){
+mcsm::VoidResult mcsm::VelocityServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues){
     mcsm::GeneralProperty* property = mcsm::GeneralOption::getGeneralOption().getProperty("skip_version_check_while_configuring");
 
     if(property == nullptr){
@@ -468,7 +468,7 @@ mcsm::Result mcsm::VelocityServer::generate(const std::string& name, mcsm::JvmOp
     return configure(version, this, &opt, path, name, option, autoUpdate, extraValues.find("server_build_version")->second);
 }
 
-bool mcsm::VelocityServer::hasVersion(const std::string& version) const {
+mcsm::BoolResult mcsm::VelocityServer::hasVersion(const std::string& version) const {
     return getVersion(version) != -1;
 }
 

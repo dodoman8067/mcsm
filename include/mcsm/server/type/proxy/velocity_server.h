@@ -38,10 +38,10 @@ namespace mcsm {
         VelocityServer();
         ~VelocityServer();
 
-        int getVersion(const std::string& ver) const;
-        int getVersion(const std::string& ver, const std::string& build) const;
+        mcsm::IntResult getVersion(const std::string& ver) const;
+        mcsm::IntResult getVersion(const std::string& ver, const std::string& build) const;
 
-        std::string getLatestVersion() const;
+        mcsm::StringResult getLatestVersion() const;
 
         std::vector<std::string> getAvailableVersions() override;
 
@@ -53,15 +53,15 @@ namespace mcsm {
         
         std::string getGitHub() const override;
 
-        mcsm::Result start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option) override;
-        mcsm::Result start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
+        mcsm::VoidResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option) override;
+        mcsm::VoidResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
 
-        mcsm::Result download(const std::string& version) override;
-        mcsm::Result download(const std::string& version, const std::string& path) override;
-        mcsm::Result download(const std::string& version, const std::string& path, const std::string& name) override;
-        mcsm::Result download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
+        mcsm::VoidResult download(const std::string& version) override;
+        mcsm::VoidResult download(const std::string& version, const std::string& path) override;
+        mcsm::VoidResult download(const std::string& version, const std::string& path, const std::string& name) override;
+        mcsm::VoidResult download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
 
-        mcsm::Result obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
+        mcsm::VoidResult obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
 
         bool hasVersion(const std::string& version) const override;
 
@@ -69,11 +69,11 @@ namespace mcsm {
         
         std::string getTypeAsString() const override;
 
-        mcsm::Result update();
-        mcsm::Result update(const std::string& optionPath);
-        mcsm::Result update(const std::string& path, const std::string& optionPath);
+        mcsm::VoidResult update();
+        mcsm::VoidResult update(const std::string& optionPath);
+        mcsm::VoidResult update(const std::string& path, const std::string& optionPath);
 
-        mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues) override;
+        mcsm::VoidResult generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues) override;
     };
 }
 

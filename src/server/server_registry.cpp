@@ -40,7 +40,7 @@ void mcsm::ServerRegistry::registerGeneralProperty(const std::string& name, std:
     this->generalProperties[name] = std::move(property);
 }
 
-mcsm::GeneralProperty* mcsm::ServerRegistry::getGeneralProperty(const std::string& name){
+tl::expected<mcsm::GeneralProperty*, mcsm::Error> mcsm::ServerRegistry::getGeneralProperty(const std::string& name){
     auto it = this->generalProperties.find(name);
     if(it != this->generalProperties.end()){
         mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, { "Success" }});
@@ -59,7 +59,7 @@ std::vector<mcsm::GeneralProperty*> mcsm::ServerRegistry::getRegisteredPropertie
     return properties;
 }
 
-mcsm::Server* mcsm::ServerRegistry::getServer(const std::string& name) const {
+tl::expected<mcsm::Server*, mcsm::Error> mcsm::ServerRegistry::getServer(const std::string& name) const {
     auto it = this->serverFactories.find(name);
     if(it != this->serverFactories.end()){
         mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, { "Success" }});
@@ -69,7 +69,7 @@ mcsm::Server* mcsm::ServerRegistry::getServer(const std::string& name) const {
     return nullptr;
 }
 
-std::string mcsm::ServerRegistry::getServerTypeString(const mcsm::ServerType& type) const {
+mcsm::StringResult mcsm::ServerRegistry::getServerTypeString(const mcsm::ServerType& type) const {
     for(const auto&[id, server]: serverFactories){
         if(server->getType() == type){
             mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, { "Success" }});

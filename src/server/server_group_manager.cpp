@@ -14,7 +14,7 @@ mcsm::ServerGroupManager::~ServerGroupManager(){
 
 }
 
-mcsm::Result mcsm::ServerGroupManager::start(){
+mcsm::VoidResult mcsm::ServerGroupManager::start(){
     std::string exePath = mcsm::getExecutablePath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -83,7 +83,7 @@ mcsm::Result mcsm::ServerGroupManager::start(){
     return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
 }
 
-mcsm::Result mcsm::ServerGroupManager::start(const std::string& serverPath){
+mcsm::VoidResult mcsm::ServerGroupManager::start(const std::string& serverPath){
     std::string exePath = mcsm::getExecutablePath(); // to execute mcsm start later
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -161,7 +161,7 @@ mcsm::Result mcsm::ServerGroupManager::start(const std::string& serverPath){
     return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
 }
 
-mcsm::Result mcsm::ServerGroupManager::stop(){
+mcsm::VoidResult mcsm::ServerGroupManager::stop(){
     std::string mode = this->group->getMode();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -212,7 +212,7 @@ mcsm::Result mcsm::ServerGroupManager::stop(){
     return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
 }
 
-mcsm::Result mcsm::ServerGroupManager::stop(const std::string& serverPath){
+mcsm::VoidResult mcsm::ServerGroupManager::stop(const std::string& serverPath){
     std::string mode = this->group->getMode();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -265,7 +265,7 @@ mcsm::Result mcsm::ServerGroupManager::stop(const std::string& serverPath){
     return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
 }
 
-int mcsm::ServerGroupManager::getRunningSessions() const {
+mcsm::IntResult mcsm::ServerGroupManager::getRunningSessions() const {
     std::string mode = this->group->getMode();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
     int count = 0;
@@ -304,7 +304,7 @@ int mcsm::ServerGroupManager::getRunningSessions() const {
     return -1;
 }
 
-std::vector<const mcsm::ServerConfigLoader*> mcsm::ServerGroupManager::getRunningServers() const {
+tl::expected<std::vector<const mcsm::ServerConfigLoader*>, mcsm::Error> mcsm::ServerGroupManager::getRunningServers() const {
     std::string mode = this->group->getMode();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
     std::vector<const mcsm::ServerConfigLoader*> vec;

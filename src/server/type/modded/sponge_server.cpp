@@ -36,7 +36,7 @@ mcsm::SpongeServer::~SpongeServer(){}
 //ver: mc version
 
 // Note: limit more than one will have to return keys[keys.size() - 1]
-std::string mcsm::SpongeServer::getVersion(const std::string& ver) const {
+mcsm::StringResult mcsm::SpongeServer::getVersion(const std::string& ver) const {
     if(!mcsm::isSafeString(ver)){
         return "";
     }
@@ -105,7 +105,7 @@ std::string mcsm::SpongeServer::getVersion(const std::string& ver) const {
     return keys[0];
 }
 
-std::string mcsm::SpongeServer::getVersion(const std::string& ver, const bool& apiSearchRecommended) const {
+mcsm::StringResult mcsm::SpongeServer::getVersion(const std::string& ver, const bool& apiSearchRecommended) const {
     if(!mcsm::isSafeString(ver)){
         return "";
     }
@@ -157,7 +157,7 @@ std::string mcsm::SpongeServer::getVersion(const std::string& ver, const bool& a
 
 // Note: The actual list position and release numbers don't match.
 // The offset calculation is based on the list position, not the release number.
-std::string mcsm::SpongeServer::getVersion(const std::string& ver, const std::string& build, const bool& /* apiSearchRecommended */) const {
+mcsm::StringResult mcsm::SpongeServer::getVersion(const std::string& ver, const std::string& build, const bool& /* apiSearchRecommended */) const {
     if(!mcsm::isSafeString(ver)){
         return "";
     }
@@ -256,7 +256,7 @@ std::string mcsm::SpongeServer::getGitHub() const {
     return "https://github.com/SpongePowered/Sponge";
 }
 
-mcsm::Result mcsm::SpongeServer::download(const std::string& version){
+mcsm::VoidResult mcsm::SpongeServer::download(const std::string& version){
     std::string path = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -274,7 +274,7 @@ mcsm::Result mcsm::SpongeServer::download(const std::string& version){
     return download(version, path, jar, path);
 }
 
-mcsm::Result mcsm::SpongeServer::download(const std::string& version, const std::string& path){
+mcsm::VoidResult mcsm::SpongeServer::download(const std::string& version, const std::string& path){
     std::string path1 = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -292,7 +292,7 @@ mcsm::Result mcsm::SpongeServer::download(const std::string& version, const std:
     return download(version, path, jar, path1);
 }
 
-mcsm::Result mcsm::SpongeServer::download(const std::string& version, const std::string& path, const std::string& name){
+mcsm::VoidResult mcsm::SpongeServer::download(const std::string& version, const std::string& path, const std::string& name){
     std::string path1 = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -303,7 +303,7 @@ mcsm::Result mcsm::SpongeServer::download(const std::string& version, const std:
     return download(version, path, name, path1);
 }
 
-mcsm::Result mcsm::SpongeServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
+mcsm::VoidResult mcsm::SpongeServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
     mcsm::Option opt(optionPath, "server");
     bool optExists = opt.exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -419,7 +419,7 @@ mcsm::Result mcsm::SpongeServer::download(const std::string& version, const std:
     return res;
 }
 
-mcsm::Result mcsm::SpongeServer::obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
+mcsm::VoidResult mcsm::SpongeServer::obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
     return download(version, path, name, optionPath);
 }
 
@@ -448,7 +448,7 @@ std::string mcsm::SpongeServer::getDownloadLink(const std::string& build) const 
     return "";
 }
 
-mcsm::Result mcsm::SpongeServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
+mcsm::VoidResult mcsm::SpongeServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
     // ServerOption class handles the data file stuff
     std::string cPath = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -460,7 +460,7 @@ mcsm::Result mcsm::SpongeServer::start(mcsm::ServerConfigLoader* loader, mcsm::J
     return start(loader, option, cPath, cPath);
 }
 
-mcsm::Result mcsm::SpongeServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
+mcsm::VoidResult mcsm::SpongeServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
     // ServerOption class handles the data file stuff
 
     std::string jar = loader->getServerJarFile();
@@ -504,7 +504,7 @@ mcsm::Result mcsm::SpongeServer::start(mcsm::ServerConfigLoader* loader, mcsm::J
     return Server::start(loader, option, path, optionPath);
 }
 
-mcsm::Result mcsm::SpongeServer::update(){
+mcsm::VoidResult mcsm::SpongeServer::update(){
     std::string path = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -515,7 +515,7 @@ mcsm::Result mcsm::SpongeServer::update(){
     return update(path, path);
 }
 
-mcsm::Result mcsm::SpongeServer::update(const std::string& optionPath){
+mcsm::VoidResult mcsm::SpongeServer::update(const std::string& optionPath){
     std::string path = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -526,7 +526,7 @@ mcsm::Result mcsm::SpongeServer::update(const std::string& optionPath){
     return update(path, optionPath);
 }
 
-mcsm::Result mcsm::SpongeServer::update(const std::string& path, const std::string& optionPath){
+mcsm::VoidResult mcsm::SpongeServer::update(const std::string& path, const std::string& optionPath){
     // Program won't downgrade server jarfiles automatically. This is an intented feature.
     mcsm::info("Checking updates...");
     mcsm::ServerDataOption sDataOpt(optionPath);
@@ -616,7 +616,7 @@ mcsm::Result mcsm::SpongeServer::update(const std::string& path, const std::stri
     return download(version, path, jar, optionPath);
 }
 
-mcsm::Result mcsm::SpongeServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues){
+mcsm::VoidResult mcsm::SpongeServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues){
     mcsm::GeneralProperty* property = mcsm::GeneralOption::getGeneralOption().getProperty("skip_version_check_while_configuring");
 
     if(property == nullptr){
@@ -677,7 +677,7 @@ mcsm::Result mcsm::SpongeServer::generate(const std::string& name, mcsm::JvmOpti
     return sOpt.save();
 }
 
-const std::map<std::string, std::string> mcsm::SpongeServer::getRequiredValues() const {
+const tl::expected<std::map<std::string, std::string>, mcsm::Error> mcsm::SpongeServer::getRequiredValues() const {
     auto* property1 = mcsm::GeneralOption::getGeneralOption().getProperty("sponge_api_search_recommended_versions");
     if(property1 == nullptr){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Failed to get property \"sponge_api_search_recommended_versions\".", "Report this to the developer of this project."}});
@@ -705,7 +705,7 @@ const std::map<std::string, std::string> mcsm::SpongeServer::getRequiredValues()
     };
 }
 
-bool mcsm::SpongeServer::hasVersion(const std::string& version) const {
+mcsm::BoolResult mcsm::SpongeServer::hasVersion(const std::string& version) const {
     return getVersion(version) != "";
 }
 

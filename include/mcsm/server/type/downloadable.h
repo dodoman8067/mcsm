@@ -43,14 +43,14 @@ namespace mcsm {
          * Downloads the server jarfile in the current directory.
          * @param version version of the server
          */
-        virtual mcsm::Result download(const std::string& version) = 0;
+        virtual mcsm::VoidResult download(const std::string& version) = 0;
 
         /**
          * Downloads the server jarfile in the specified directory.
          * @param version version of the server
          * @param path file's path
          */
-        virtual mcsm::Result download(const std::string& version, const std::string& path) = 0;
+        virtual mcsm::VoidResult download(const std::string& version, const std::string& path) = 0;
 
         /**
          * Downloads the server jarfile in the specified directory with the following name.
@@ -58,7 +58,7 @@ namespace mcsm {
          * @param path file's path
          * @param name file's name
          */
-        virtual mcsm::Result download(const std::string& version, const std::string& path, const std::string& name) = 0;
+        virtual mcsm::VoidResult download(const std::string& version, const std::string& path, const std::string& name) = 0;
 
         /**
          * Downloads the server jarfile in the specified directory with the following name.
@@ -67,14 +67,14 @@ namespace mcsm {
          * @param name file's name
          * @param optionPath server config to check in
          */
-        virtual mcsm::Result download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) = 0;
+        virtual mcsm::VoidResult download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) = 0;
 
         /**
          * Returns if the following server has this version.
          * @param version version of the server
          * @return true when version exists, otherwise false
          */
-        virtual bool hasVersion(const std::string& version) const = 0;
+        virtual mcsm::BoolResult hasVersion(const std::string& version) const = 0;
     };
 }
 

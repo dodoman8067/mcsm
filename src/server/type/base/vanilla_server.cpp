@@ -26,7 +26,7 @@ mcsm::VanillaServer::VanillaServer(){}
 
 mcsm::VanillaServer::~VanillaServer(){}
 
-std::string mcsm::VanillaServer::getVersionObject(const std::string& ver) const {
+mcsm::StringResult mcsm::VanillaServer::getVersionObject(const std::string& ver) const {
     if(!mcsm::isSafeString(ver)){
         return "";
     }
@@ -98,7 +98,7 @@ std::string mcsm::VanillaServer::getVersionObject(const std::string& ver) const 
     return "";
 }
 
-std::string mcsm::VanillaServer::getServerJarURL(const std::string& ver) const {
+mcsm::StringResult mcsm::VanillaServer::getServerJarURL(const std::string& ver) const {
     std::string versionJson = getVersionObject(ver);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     if(mcsm::isWhitespaceOrEmpty(versionJson)){
@@ -224,7 +224,7 @@ std::vector<std::string> mcsm::VanillaServer::getAvailableVersions(){
     return vector;
 }
 
-mcsm::Result mcsm::VanillaServer::download(const std::string& version){
+mcsm::VoidResult mcsm::VanillaServer::download(const std::string& version){
     std::string path = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -242,7 +242,7 @@ mcsm::Result mcsm::VanillaServer::download(const std::string& version){
     return download(version, path, jar, path);
 }
 
-mcsm::Result mcsm::VanillaServer::download(const std::string& version, const std::string& path){
+mcsm::VoidResult mcsm::VanillaServer::download(const std::string& version, const std::string& path){
     std::string path1 = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -260,7 +260,7 @@ mcsm::Result mcsm::VanillaServer::download(const std::string& version, const std
     return download(version, path, jar, path1);
 }
 
-mcsm::Result mcsm::VanillaServer::download(const std::string& version, const std::string& path, const std::string& name){
+mcsm::VoidResult mcsm::VanillaServer::download(const std::string& version, const std::string& path, const std::string& name){
     bool hasVer = hasVersion(version);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -287,15 +287,15 @@ mcsm::Result mcsm::VanillaServer::download(const std::string& version, const std
     return mcsm::download(name, url, path);
 }
 
-mcsm::Result mcsm::VanillaServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& /* optionPath */){
+mcsm::VoidResult mcsm::VanillaServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& /* optionPath */){
     return download(version, path, name);
 }
 
-mcsm::Result mcsm::VanillaServer::obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& /* optionPath */){
+mcsm::VoidResult mcsm::VanillaServer::obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& /* optionPath */){
     return download(version, path, name);
 }
 
-mcsm::Result mcsm::VanillaServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
+mcsm::VoidResult mcsm::VanillaServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
     std::string cPath = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -306,7 +306,7 @@ mcsm::Result mcsm::VanillaServer::start(mcsm::ServerConfigLoader* loader, mcsm::
     return start(loader, option, cPath, cPath);
 }
 
-mcsm::Result mcsm::VanillaServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
+mcsm::VoidResult mcsm::VanillaServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
     // ServerOption class handles the data file stuff
 
     std::string jar = loader->getServerJarFile();
@@ -338,7 +338,7 @@ mcsm::Result mcsm::VanillaServer::start(mcsm::ServerConfigLoader* loader, mcsm::
     return Server::start(loader, option, path, optionPath);
 }
 
-mcsm::Result mcsm::VanillaServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& /* extraValues */){
+mcsm::VoidResult mcsm::VanillaServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& /* extraValues */){
     mcsm::GeneralProperty* property = mcsm::GeneralOption::getGeneralOption().getProperty("skip_version_check_while_configuring");
 
     if(property == nullptr){
@@ -374,13 +374,13 @@ mcsm::Result mcsm::VanillaServer::generate(const std::string& name, mcsm::JvmOpt
     return configure(version, this, &opt, path, name, option, autoUpdate, "ignored");
 }
 
-bool mcsm::VanillaServer::hasVersion(const std::string& version) const {
+mcsm::BoolResult mcsm::VanillaServer::hasVersion(const std::string& version) const {
     std::string ver = getVersionObject(version);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return false;
     return !mcsm::isWhitespaceOrEmpty(ver);
 }
 
-const std::map<std::string, std::string> mcsm::VanillaServer::getRequiredValues() const {
+const tl::expected<std::map<std::string, std::string>, mcsm::Error> mcsm::VanillaServer::getRequiredValues() const {
     return {
         {"name", "" },
         {"Minecraft version", ""},

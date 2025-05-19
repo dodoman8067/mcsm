@@ -39,12 +39,12 @@ namespace mcsm {
         mcsm::ServerType getType() const override;
         std::string getTypeAsString() const override;
 
-        std::string getFileLocation(const std::string& optionPath) const;
-        mcsm::Result setFileLocation(mcsm::Option* option, const std::string& location);
-        mcsm::Result setupServerJarFile(const std::string& path, const std::string& optionPath);
+        mcsm::StringResult getFileLocation(const std::string& optionPath) const;
+        mcsm::VoidResult setFileLocation(mcsm::Option* option, const std::string& location);
+        mcsm::VoidResult setupServerJarFile(const std::string& path, const std::string& optionPath);
 
-        std::string getCustomStartCommand(const std::string& optionPath) const;
-        mcsm::Result setCustomStartCommand(mcsm::Option* option, const std::string& command);
+        mcsm::StringResult getCustomStartCommand(const std::string& optionPath) const;
+        mcsm::VoidResult setCustomStartCommand(mcsm::Option* option, const std::string& command);
 
         std::string getSupportedVersions() const override;
 
@@ -54,14 +54,14 @@ namespace mcsm {
         std::string getWebSite() const override;
         std::string getGitHub() const override;
 
-        mcsm::Result obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
+        mcsm::VoidResult obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
 
-        mcsm::Result start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
+        mcsm::VoidResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
 
-        const std::map<std::string, std::string> getRequiredValues() const override;
+        const tl::expected<std::map<std::string, std::string>, mcsm::Error> getRequiredValues() const override;
 
-        mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues) override;
-        mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::string& fileLocation, const std::map<std::string, std::string>& extraValues);
+        mcsm::VoidResult generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues) override;
+        mcsm::VoidResult generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::string& fileLocation, const std::map<std::string, std::string>& extraValues);
     };
 }
 
