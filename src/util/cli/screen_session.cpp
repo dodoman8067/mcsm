@@ -7,7 +7,7 @@ mcsm::ScreenSession::ScreenSession(const std::string& name, const std::string& c
     this->screenPath = mcsm::GeneralOption::getGeneralOption().screenBinPathProperty();
 }
 
-mcsm::Result mcsm::ScreenSession::start(){
+mcsm::VoidResult mcsm::ScreenSession::start(){
     if(isRunning()){
         return {mcsm::ResultType::MCSM_FAIL, {"A screen session with the same name already exists."}};
     }
@@ -18,7 +18,7 @@ mcsm::Result mcsm::ScreenSession::start(){
     return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
 }
 
-mcsm::Result mcsm::ScreenSession::stop(){
+mcsm::VoidResult mcsm::ScreenSession::stop(){
     if(!isRunning()){
         return {mcsm::ResultType::MCSM_FAIL, {"No running session with name " + this->name + ".mcsm to stop."}};
     }
@@ -29,7 +29,7 @@ mcsm::Result mcsm::ScreenSession::stop(){
     return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
 }
 
-mcsm::Result mcsm::ScreenSession::attach(){
+mcsm::VoidResult mcsm::ScreenSession::attach(){
     if(!isRunning()){
         return {mcsm::ResultType::MCSM_FAIL, {"Cannot send command to a session that is not running: " + this->name + ".mcsm"}};
     }
@@ -40,7 +40,7 @@ mcsm::Result mcsm::ScreenSession::attach(){
     return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
 }
 
-mcsm::Result mcsm::ScreenSession::sendCommand(const std::string& str){
+mcsm::VoidResult mcsm::ScreenSession::sendCommand(const std::string& str){
     if(!isRunning()){
         return {mcsm::ResultType::MCSM_FAIL, {"Cannot send command to a non-existent session: " + this->name + ".mcsm"}};
     }

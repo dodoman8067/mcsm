@@ -22,7 +22,7 @@ SOFTWARE.
 
 #include <mcsm/util/cli/cli_utils.h>
 
-int mcsm::runCommandQuietly(const std::string& command){
+mcsm::IntResult mcsm::runCommandQuietly(const std::string& command){
     if(mcsm::getCurrentOS() == mcsm::OS::WINDOWS){
         std::string cmd = command + " > NUL 2>&1";
         mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
@@ -47,7 +47,7 @@ int mcsm::runCommandQuietly(const std::string& command){
     }
 }
 
-int mcsm::runCommand(const std::string& command){
+mcsm::IntResult mcsm::runCommand(const std::string& command){
     if(mcsm::getCurrentOS() == mcsm::OS::WINDOWS){
         mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return std::system(command.c_str());
@@ -70,7 +70,7 @@ int mcsm::runCommand(const std::string& command){
     }
 }
 
-std::string mcsm::getCurrentPath(){
+mcsm::StringResult mcsm::getCurrentPath(){
     std::error_code ec;
     std::string path = std::filesystem::current_path(ec).string();
     if(ec){
@@ -109,7 +109,7 @@ std::string mcsm::asGlobalConfigPath(const std::string& value){
     return mcsm::normalizePath(getDataPathPerOS() + value);
 }
 
-bool mcsm::fileExists(const std::string& path){
+mcsm::BoolResult mcsm::fileExists(const std::string& path){
     std::error_code ec;
     bool exists = std::filesystem::exists(path, ec);
     if(ec){
@@ -123,7 +123,7 @@ bool mcsm::fileExists(const std::string& path){
     return exists;
 }
 
-bool mcsm::removeFile(const std::string& path){
+mcsm::BoolResult mcsm::removeFile(const std::string& path){
     if(!fileExists(path)) return false;
     std::error_code ec;
     bool success = std::filesystem::remove(path, ec);
@@ -198,7 +198,7 @@ bool mcsm::isDebug(){
     #endif
 }
 
-std::string mcsm::getExecutablePath(){
+mcsm::StringResult mcsm::getExecutablePath(){
 #ifdef __linux__
     char buf[PATH_MAX];
     ssize_t len = readlink("/proc/self/exe", buf, sizeof(buf) - 1);

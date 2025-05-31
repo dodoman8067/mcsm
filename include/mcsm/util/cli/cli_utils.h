@@ -42,17 +42,17 @@ namespace mcsm {
      * Runs a console command without printing the output.
      * @param command string to run as a command
     */
-    int runCommandQuietly(const std::string& command);
+    mcsm::IntResult runCommandQuietly(const std::string& command);
 
     /**
      * Runs a console command.
      * @param command string to run as a command
     */
-    int runCommand(const std::string& command);
+    mcsm::IntResult runCommand(const std::string& command);
 
-    std::string getCurrentPath();
-    bool fileExists(const std::string& path);
-    bool removeFile(const std::string& path);
+    mcsm::StringResult getCurrentPath();
+    mcsm::BoolResult fileExists(const std::string& path);
+    mcsm::BoolResult removeFile(const std::string& path);
     bool mkdir(const std::string& dirName);
 
     /**
@@ -71,7 +71,7 @@ namespace mcsm {
 
     std::string asGlobalConfigPath(const std::string &value);
 
-    std::string getExecutablePath();
+    mcsm::StringResult getExecutablePath();
 }
 
 #endif // __MCSM_CLI_UTILS_H__
