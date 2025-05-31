@@ -36,22 +36,22 @@ mcsm::JvmOption::JvmOption(const std::string& name, const mcsm::SearchTarget& ta
     this->workingDir = workingPath;
     switch (target){
         case mcsm::SearchTarget::ALL: {
-            mcsm::GlobalOption globalOption("/jvm/profiles", name);
+            mcsm::Option globalOption(mcsm::asGlobalConfigPath("/jvm/profiles"), name);
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
             if(globalOption.exists()){
                 if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
-                this->option.reset(new mcsm::GlobalOption(globalOption));
+                this->option.reset(new mcsm::Option(globalOption));
             }else{
-                this->option.reset(new mcsm::Option(mcsm::getCurrentPath() + "/.mcsm/jvm/profiles", name));
+                this->option.reset(new mcsm::Option(workingPath + "/.mcsm/jvm/profiles", name));
             }
             break;
         }
         case mcsm::SearchTarget::GLOBAL: {
-            mcsm::GlobalOption globalOption("/jvm/profiles", name);
+            mcsm::Option globalOption(mcsm::asGlobalConfigPath("/jvm/profiles"), name);
             if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
             if(globalOption.exists()){
                 if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
-                this->option.reset(new mcsm::GlobalOption(globalOption));
+                this->option.reset(new mcsm::Option(globalOption));
             }
             break;
         }
@@ -66,7 +66,7 @@ mcsm::JvmOption::JvmOption(const std::string& name, const mcsm::SearchTarget& ta
     mcsm::Result res({mcsm::ResultType::MCSM_OK, {"Success"}});
 }
 
-mcsm::Result mcsm::JvmOption::create(){
+mcsm::VoidResult mcsm::JvmOption::create(){
     std::string jvm = mcsm::detectJava();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -91,7 +91,7 @@ mcsm::Result mcsm::JvmOption::create(){
 
 // Reason why the program takes SearchTarget as a parameter (was taken in the constructor) is because there's chance that constructor's specified SearchTarget might be ALL.
 
-mcsm::Result mcsm::JvmOption::create(const std::string& jvmPath, const mcsm::SearchTarget& target){
+mcsm::VoidResult mcsm::JvmOption::create(const std::string& jvmPath, const mcsm::SearchTarget& target){
     std::vector<std::string> jvmArgs = {
         "-Xms2G",
         "-Xmx2G",
@@ -103,14 +103,14 @@ mcsm::Result mcsm::JvmOption::create(const std::string& jvmPath, const mcsm::Sea
     return create(jvmPath, jvmArgs, serverArgs, target);
 }
 
-mcsm::Result mcsm::JvmOption::create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions, const mcsm::SearchTarget& target){
+mcsm::VoidResult mcsm::JvmOption::create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions, const mcsm::SearchTarget& target){
     std::vector<std::string> serverArgs = {
         "nogui"
     };
     return create(jvmPath, jvmOptions, serverArgs, target);
 }
 
-mcsm::Result mcsm::JvmOption::create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions, const std::vector<std::string>& serverOptions, const mcsm::SearchTarget& target){
+mcsm::VoidResult mcsm::JvmOption::create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions, const std::vector<std::string>& serverOptions, const mcsm::SearchTarget& target){
     std::string filePath;
     std::string optionName;
 
@@ -124,7 +124,7 @@ mcsm::Result mcsm::JvmOption::create(const std::string& jvmPath, const std::vect
         filePath = option.getPath();
         optionName = option.getName();
     }else{
-        mcsm::GlobalOption globalOption("./jvm/profiles", this->name);
+        mcsm::Option globalOption(mcsm::asGlobalConfigPath("/jvm/profiles"), this->name);
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
             std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
             mcsm::Result res(resp.first, resp.second);
@@ -178,7 +178,7 @@ mcsm::Result mcsm::JvmOption::create(const std::string& jvmPath, const std::vect
         mcsm::Result res({mcsm::ResultType::MCSM_OK, {"Success"}});
         return res;
     }
-    mcsm::GlobalOption* opt = new mcsm::GlobalOption("/jvm/profiles", optionName);
+    mcsm::Option* opt = new mcsm::Option(mcsm::asGlobalConfigPath("/jvm/profiles"), optionName);
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -213,98 +213,58 @@ mcsm::Result mcsm::JvmOption::create(const std::string& jvmPath, const std::vect
     return res;
 }
 
-mcsm::Result mcsm::JvmOption::reset(){
-    if(this->option->isGlobal()){
-        mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
-        return opt->reset();
-    }else{
-        mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
-        return opt2->reset();
-    }
+mcsm::VoidResult mcsm::JvmOption::reset(){
+    return this->option->reset();
 }
 
-bool mcsm::JvmOption::exists(){
+mcsm::BoolResult mcsm::JvmOption::exists(){
     if(this->option.get() == nullptr) return false;
     return this->option->exists();
 }
 
-std::vector<std::string> mcsm::JvmOption::getJvmArguments(){
+tl::expected<std::vector<std::string>, mcsm::Error> mcsm::JvmOption::getJvmArguments(){
     bool profileExists = exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
     if(!profileExists){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jvmProfileNotFound()});
         return {};
     }
-    if(this->option->isGlobal()){
-        mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
 
-        bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-            mcsm::Result res(resp.first, resp.second);
-            return {};
-        }
-        
-        mcsm::Result loadRes = opt->load(advp);
-        if(!loadRes.isSuccess()) return {};
-        
-        const nlohmann::json& value = opt->getValue("args");
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
-        
-        if(value == nullptr){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"args\"", opt->getName())});
-            return {};
-        }
-        if(!value.is_array()){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"args\"", "array of string")});
-            return {};
-        }
-        for(auto& v : value){
-            if(!v.is_string()){
-                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"args\"", "array of string")});
-                return {};
-            }
-        }
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-        const std::vector<std::string>& args = value;
-        return args;
-    }else{
-        mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
+    mcsm::Option* opt2 = this->option.get();
 
-        bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-            mcsm::Result res(resp.first, resp.second);
-            return {};
-        }
-        
-        mcsm::Result loadRes = opt2->load(advp);
-        if(!loadRes.isSuccess()) return {};
-        
-        const nlohmann::json& value = opt2->getValue("args");
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
-        
-        if(value == nullptr){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"args\"", opt2->getName())});
-            return {};
-        }
-        if(!value.is_array()){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"args\"", "array of string")});
-            return {};
-        }
-        for(auto& v : value){
-            if(!v.is_string()){
-                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"args\"", "array of string")});
-                return {};
-            }
-        }
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-        const std::vector<std::string>& args = value;
-        return args;
+    bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return {};
     }
+    
+    mcsm::Result loadRes = opt2->load(advp);
+    if(!loadRes.isSuccess()) return {};
+    
+    const nlohmann::json& value = opt2->getValue("args");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
+    
+    if(value == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"args\"", opt2->getName())});
+        return {};
+    }
+    if(!value.is_array()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"args\"", "array of string")});
+        return {};
+    }
+    for(auto& v : value){
+        if(!v.is_string()){
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"args\"", "array of string")});
+            return {};
+        }
+    }
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    const std::vector<std::string>& args = value;
+    return args;    
 }
 
-mcsm::Result mcsm::JvmOption::setJvmArguments(const std::vector<std::string>& jvmArgs){
+mcsm::VoidResult mcsm::JvmOption::setJvmArguments(const std::vector<std::string>& jvmArgs){
     bool profileExists = exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         mcsm::Result res({mcsm::getLastResult().first, mcsm::getLastResult().second});
@@ -314,88 +274,51 @@ mcsm::Result mcsm::JvmOption::setJvmArguments(const std::vector<std::string>& jv
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jvmProfileNotFound()});
         return res;
     }
-    if(this->option->isGlobal()){
-        mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
-        mcsm::Result lRes = opt->load();
-        if(!lRes.isSuccess()) return lRes;
-        mcsm::Result sRes = opt->setValue("args", jvmArgs);
-        if(!sRes.isSuccess()) return sRes;
-        return opt->save();
-    }else{
-        mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
-        mcsm::Result lRes = opt2->load();
-        if(!lRes.isSuccess()) return lRes;
-        mcsm::Result sRes = opt2->setValue("args", jvmArgs);
-        if(!sRes.isSuccess()) return sRes;
-        return opt2->save();
-    }
+
+    mcsm::Option* opt2 = this->option.get();
+    mcsm::Result lRes = opt2->load();
+    if(!lRes.isSuccess()) return lRes;
+    mcsm::Result sRes = opt2->setValue("args", jvmArgs);
+    if(!sRes.isSuccess()) return sRes;
+    return opt2->save();
 }
 
-std::string mcsm::JvmOption::getJvmPath(){
+mcsm::StringResult mcsm::JvmOption::getJvmPath(){
     bool profileExists = exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     if(!profileExists){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jvmProfileNotFound()});
         return "";
     }
-    if(this->option->isGlobal()){
-        mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
-
-        bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-            mcsm::Result res(resp.first, resp.second);
-            return "";
-        }
-        
-        mcsm::Result loadRes = opt->load(advp);
-        if(!loadRes.isSuccess()) return "";
-        
-        const nlohmann::json& value = opt->getValue("path");
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-        
-        if(value == nullptr){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"path\"", opt->getName())});
-            return "";
-        }
-        if(!value.is_string()){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"path\"", "string")});
-            return "";
-        }
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-        const std::string& path = value;
-        return path;
-    }else{
-        mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
-        
-        bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-            mcsm::Result res(resp.first, resp.second);
-            return "";
-        }
-
-        mcsm::Result loadRes = opt2->load(advp);
-        if(!loadRes.isSuccess()) return "";
-
-        const nlohmann::json& value = opt2->getValue("path");
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
-        
-        if(value == nullptr){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"path\"", opt2->getName())});
-            return "";
-        }
-        if(!value.is_string()){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"path\"", "string")});
-            return "";
-        }
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-        const std::string& path = value;
-        return path;
+    mcsm::Option* opt2 = this->option.get();
+    
+    bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return "";
     }
+
+    mcsm::Result loadRes = opt2->load(advp);
+    if(!loadRes.isSuccess()) return "";
+
+    const nlohmann::json& value = opt2->getValue("path");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
+    
+    if(value == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"path\"", opt2->getName())});
+        return "";
+    }
+    if(!value.is_string()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"path\"", "string")});
+        return "";
+    }
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    const std::string& path = value;
+    return path;
 }
 
-mcsm::Result mcsm::JvmOption::setJvmPath(const std::string& jvmPath){
+mcsm::VoidResult mcsm::JvmOption::setJvmPath(const std::string& jvmPath){
     bool profileExists = exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         mcsm::Result res({mcsm::getLastResult().first, mcsm::getLastResult().second});
@@ -405,100 +328,56 @@ mcsm::Result mcsm::JvmOption::setJvmPath(const std::string& jvmPath){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jvmProfileNotFound()});
         return res;
     }
-    if(this->option->isGlobal()){
-        mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
-        mcsm::Result lRes = opt->load();
-        if(!lRes.isSuccess()) return lRes;
-        mcsm::Result sRes = opt->setValue("path", jvmPath);
-        if(!sRes.isSuccess()) return sRes;
-        return opt->save();
-    }else{
-        mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
-        mcsm::Result lRes = opt2->load();
-        if(!lRes.isSuccess()) return lRes;
-        mcsm::Result sRes = opt2->setValue("path", jvmPath);
-        if(!sRes.isSuccess()) return sRes;
-        return opt2->save();
-    }
+    mcsm::Option* opt2 = this->option.get();
+    mcsm::Result lRes = opt2->load();
+    if(!lRes.isSuccess()) return lRes;
+    mcsm::Result sRes = opt2->setValue("path", jvmPath);
+    if(!sRes.isSuccess()) return sRes;
+    return opt2->save();
 }
 
-std::vector<std::string> mcsm::JvmOption::getServerArguments(){
+tl::expected<std::vector<std::string>, mcsm::Error> mcsm::JvmOption::getServerArguments(){
     bool profileExists = exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
     if(!profileExists){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jvmProfileNotFound()});
         return {};
     }
-    if(this->option->isGlobal()){
-        mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
+    mcsm::Option* opt2 = this->option.get();
 
-        bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-            mcsm::Result res(resp.first, resp.second);
-            return {};
-        }
-        
-        mcsm::Result loadRes = opt->load(advp);
-        if(!loadRes.isSuccess()) return {};
-        
-        const nlohmann::json& value = opt->getValue("server_args");
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
-        
-        if(value == nullptr){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"server_args\"", opt->getName())});
-            return {};
-        }
-        if(!value.is_array()){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"server_args\"", "array of string")});
-            return {};
-        }
-        for(auto& v : value){
-            if(!v.is_string()){
-                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"server_args\"", "array of string")});
-                return {};         
-            }
-        }
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-        const std::vector<std::string>& args = value;
-        return args;
-    }else{
-        mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
-
-        bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-            mcsm::Result res(resp.first, resp.second);
-            return {};
-        }
-
-        mcsm::Result loadRes = opt2->load(advp);
-        if(!loadRes.isSuccess()) return {};
-
-        const nlohmann::json& value = opt2->getValue("server_args");
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
-
-        if(value == nullptr){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"server_args\"", opt2->getName())});
-            return {};
-        }
-        if(!value.is_array()){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"server_args\"", "array of string")});
-            return {};
-        }
-        for(auto& v : value){
-            if(!v.is_string()){
-                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"server_args\"", "array of string")});
-                return {};
-            }
-        }
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-        const std::vector<std::string>& args = value;
-        return args;
+    bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
+        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
+        mcsm::Result res(resp.first, resp.second);
+        return {};
     }
+
+    mcsm::Result loadRes = opt2->load(advp);
+    if(!loadRes.isSuccess()) return {};
+
+    const nlohmann::json& value = opt2->getValue("server_args");
+    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return {};
+
+    if(value == nullptr){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"server_args\"", opt2->getName())});
+        return {};
+    }
+    if(!value.is_array()){
+        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"server_args\"", "array of string")});
+        return {};
+    }
+    for(auto& v : value){
+        if(!v.is_string()){
+            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"server_args\"", "array of string")});
+            return {};
+        }
+    }
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    const std::vector<std::string>& args = value;
+    return args;
 }
 
-mcsm::Result mcsm::JvmOption::setServerArguments(const std::vector<std::string>& serverArgs){
+mcsm::VoidResult mcsm::JvmOption::setServerArguments(const std::vector<std::string>& serverArgs){
     bool profileExists = exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         mcsm::Result res({mcsm::getLastResult().first, mcsm::getLastResult().second});
@@ -508,21 +387,12 @@ mcsm::Result mcsm::JvmOption::setServerArguments(const std::vector<std::string>&
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jvmProfileNotFound()});
         return res;
     }
-    if(this->option->isGlobal()){
-        mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
-        mcsm::Result lRes = opt->load();
-        if(!lRes.isSuccess()) return lRes;
-        mcsm::Result sRes = opt->setValue("server_args", serverArgs);
-        if(!sRes.isSuccess()) return sRes;
-        return opt->save();
-    }else{
-        mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
-        mcsm::Result lRes = opt2->load();
-        if(!lRes.isSuccess()) return lRes;
-        mcsm::Result sRes = opt2->setValue("server_args", serverArgs);
-        if(!sRes.isSuccess()) return sRes;
-        return opt2->save();
-    }
+    mcsm::Option* opt2 = this->option.get();
+    mcsm::Result lRes = opt2->load();
+    if(!lRes.isSuccess()) return lRes;
+    mcsm::Result sRes = opt2->setValue("server_args", serverArgs);
+    if(!sRes.isSuccess()) return sRes;
+    return opt2->save();
 }
 
 std::string mcsm::JvmOption::getProfileName() const {
@@ -531,25 +401,14 @@ std::string mcsm::JvmOption::getProfileName() const {
 }
 
 std::string mcsm::JvmOption::getProfilePath() const {
-    if(this->option->isGlobal()){
-        mcsm::GlobalOption* opt = static_cast<mcsm::GlobalOption*>(this->option.get());
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-        return opt->getPath();
-    }else{
-        mcsm::Option* opt2 = static_cast<mcsm::Option*>(this->option.get());
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-        return opt2->getPath();
-    }
+    mcsm::Option* opt2 = this->option.get();
+    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    return opt2->getPath();
 }
 
 mcsm::SearchTarget mcsm::JvmOption::getSearchTarget() const {
-    if(this->option->isGlobal()){
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-        return mcsm::SearchTarget::GLOBAL;
-    }else{
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-        return mcsm::SearchTarget::CURRENT;
-    }
+    mcsm::Option* opt2 = this->option.get();
+    return mcsm::startsWith(opt2->getPath(), mcsm::getDataPathPerOS()) ? mcsm::SearchTarget::GLOBAL : mcsm::SearchTarget::CURRENT;
 }
 
 mcsm::JvmOption::~JvmOption(){

@@ -40,7 +40,7 @@ mcsm::Option::~Option(){
     this->data = nullptr;
 }
 
-bool mcsm::Option::createDirectories(const std::string &dirName, std::error_code &err) const{
+bool mcsm::Option::createDirectories(const std::string &dirName, std::error_code &err) const { // TODO: Return boolresult and not clear error code
     err.clear();
     if(!std::filesystem::create_directories(dirName, err)){
         if(std::filesystem::exists(dirName)){
@@ -154,7 +154,7 @@ bool mcsm::Option::exists() const {
 }
 
 bool mcsm::Option::isGlobal() const {
-    return false;
+    return mcsm::startsWith(this->path, mcsm::getDataPathPerOS());
 }
 
 mcsm::Result mcsm::Option::setValue(const std::string& key, const nlohmann::json& value){

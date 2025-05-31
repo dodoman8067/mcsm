@@ -4,7 +4,7 @@ static auto& instance = mcsm::GeneralOption::getGeneralOption();
 static bool init = false;
 
 // loads poperties vector from json
-mcsm::Result mcsm::GeneralOption::load(){
+mcsm::VoidResult mcsm::GeneralOption::load(){
     instance.properties.reserve(3);
     mcsm::Result jLoadRes = instance.optionHandle->load();
     if(!jLoadRes.isSuccess()) return jLoadRes;
@@ -75,7 +75,7 @@ mcsm::Result mcsm::GeneralOption::load(){
 }
 
 // saves current properties vector value to json
-mcsm::Result mcsm::GeneralOption::save(){
+mcsm::VoidResult mcsm::GeneralOption::save(){
     nlohmann::json json;
 
     for(auto* v : mcsm::ServerRegistry::getServerRegistry().getRegisteredProperties()){
@@ -87,7 +87,7 @@ mcsm::Result mcsm::GeneralOption::save(){
     return saveRes;
 }
 
-mcsm::Result mcsm::GeneralOption::initialize(){
+mcsm::VoidResult mcsm::GeneralOption::initialize(){
     if(init){
         return {mcsm::ResultType::MCSM_FAIL, {
             "GeneralOption::initialize() called more than once.",
@@ -96,7 +96,7 @@ mcsm::Result mcsm::GeneralOption::initialize(){
     }
     init = true;
     
-    instance.optionHandle = std::make_unique<mcsm::GlobalOption>("/", "general_options");
+    instance.optionHandle = std::make_unique<mcsm::Option>(mcsm::asGlobalConfigPath("/"), "general_options");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
         mcsm::Result res(resp.first, resp.second);
@@ -115,7 +115,7 @@ mcsm::GeneralProperty* mcsm::GeneralOption::getProperty(const std::string& prope
     return nullptr;
 }
 
-mcsm::Result mcsm::GeneralOption::setProperty(const std::string& propertyName, nlohmann::json newValue){
+mcsm::VoidResult mcsm::GeneralOption::setProperty(const std::string& propertyName, nlohmann::json newValue){
     for(auto& v : instance.properties){
         if(v->getName() == propertyName){
             v->setCurrentValue(newValue);
@@ -125,7 +125,7 @@ mcsm::Result mcsm::GeneralOption::setProperty(const std::string& propertyName, n
     return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
 }
 
-mcsm::GlobalOption* mcsm::GeneralOption::getOption(){
+mcsm::Option* mcsm::GeneralOption::getOption(){
     return &(*instance.optionHandle);
 }
 

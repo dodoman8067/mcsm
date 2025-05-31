@@ -84,6 +84,31 @@ std::string mcsm::getCurrentPath(){
     return path;
 }
 
+std::string mcsm::getDataPathPerOS(){
+    std::string returnPath;
+    switch (mcsm::getCurrentOS()){
+        case mcsm::OS::WINDOWS: {
+            std::string windowsPath = getenv("USERPROFILE");
+            windowsPath.append("/AppData/Local/mcsm");
+            mcsm::replaceAll(windowsPath, "\\", "/");
+            returnPath = std::move(windowsPath);
+            break;
+        }
+
+        case mcsm::OS::LINUX: {
+            std::string linuxPath = getenv("HOME");
+            linuxPath.append("/.local/share/mcsm");
+            returnPath = std::move(linuxPath);
+            break;
+        }
+    }
+    return returnPath;
+}
+
+std::string mcsm::asGlobalConfigPath(const std::string& value){
+    return mcsm::normalizePath(getDataPathPerOS() + value);
+}
+
 bool mcsm::fileExists(const std::string& path){
     std::error_code ec;
     bool exists = std::filesystem::exists(path, ec);

@@ -33,15 +33,13 @@ SOFTWARE.
 #include <mcsm/util/cli/cli_utils.h>
 
 namespace mcsm {
-    class GlobalOption : public mcsm::Configurable {
+    class GlobalOption {
     private:
         std::string path;
         std::string name;
         mutable nlohmann::json data;
 
         bool createDirectories(std::string const &dirName, std::error_code &err) const;
-
-        std::string getDataPathPerOS();
     public:
         GlobalOption(const std::string& path, const std::string& name);
         /**
@@ -71,12 +69,12 @@ namespace mcsm {
         mcsm::Result setValue(const std::string& key, const nlohmann::json& value);
         bool hasValue(const std::string& key) const;
 
-        bool exists() const override;
+        bool exists() const;
 
         /**
          * @brief No mcsm::Result needed
         */
-        bool isGlobal() const override;
+        bool isGlobal() const;
 
         mcsm::Result save();
 

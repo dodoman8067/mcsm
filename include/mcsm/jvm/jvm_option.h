@@ -38,7 +38,7 @@ namespace mcsm {
 
     class JvmOption {
     private:
-        std::unique_ptr<mcsm::Configurable> option;
+        std::unique_ptr<mcsm::Option> option;
         std::string name;
         std::string workingDir;
     public:
@@ -47,23 +47,23 @@ namespace mcsm {
         JvmOption(const std::string& name, const SearchTarget& target, const std::string& workingPath);
         ~JvmOption();
 
-        mcsm::Result create();
-        mcsm::Result create(const std::string& jvmPath, const SearchTarget& target);
-        mcsm::Result create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions, const SearchTarget& target);
-        mcsm::Result create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions, const std::vector<std::string>& serverOptions, const SearchTarget& target);
+        mcsm::VoidResult create();
+        mcsm::VoidResult create(const std::string& jvmPath, const SearchTarget& target);
+        mcsm::VoidResult create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions, const SearchTarget& target);
+        mcsm::VoidResult create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions, const std::vector<std::string>& serverOptions, const SearchTarget& target);
 
-        mcsm::Result reset();
+        mcsm::VoidResult reset();
 
-        bool exists();
+        mcsm::BoolResult exists();
 
-        std::string getJvmPath();
-        mcsm::Result setJvmPath(const std::string& jvmPath);
+        mcsm::StringResult getJvmPath();
+        mcsm::VoidResult setJvmPath(const std::string& jvmPath);
 
-        std::vector<std::string> getJvmArguments();
-        mcsm::Result setJvmArguments(const std::vector<std::string>& jvmArgs);
+        tl::expected<std::vector<std::string>, mcsm::Error> getJvmArguments();
+        mcsm::VoidResult setJvmArguments(const std::vector<std::string>& jvmArgs);
 
-        std::vector<std::string> getServerArguments();
-        mcsm::Result setServerArguments(const std::vector<std::string>& serverArgs);
+        tl::expected<std::vector<std::string>, mcsm::Error> getServerArguments();
+        mcsm::VoidResult setServerArguments(const std::vector<std::string>& serverArgs);
 
         std::string getProfileName() const;
 
