@@ -44,7 +44,7 @@ mcsm::ServerDataOption::~ServerDataOption(){
 
 }
 
-mcsm::Result mcsm::ServerDataOption::load(){
+mcsm::VoidResult mcsm::ServerDataOption::load(){
     bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -55,11 +55,11 @@ mcsm::Result mcsm::ServerDataOption::load(){
     return this->option->load(advp);
 }
 
-mcsm::Result mcsm::ServerDataOption::load(const bool& advp){
+mcsm::VoidResult mcsm::ServerDataOption::load(const bool& advp){
     return this->option->load(advp);
 }
 
-mcsm::Result mcsm::ServerDataOption::create(const std::string& lastTimeLaunched){
+mcsm::VoidResult mcsm::ServerDataOption::create(const std::string& lastTimeLaunched){
     if(!mcsm::isSafeString(lastTimeLaunched)){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(lastTimeLaunched)});
         return res;
@@ -93,11 +93,11 @@ mcsm::Result mcsm::ServerDataOption::create(const std::string& lastTimeLaunched)
     return this->option->save();
 }
 
-mcsm::Result mcsm::ServerDataOption::reset(){
+mcsm::VoidResult mcsm::ServerDataOption::reset(){
     return this->option->reset();
 }
 
-std::string mcsm::ServerDataOption::getLastTimeLaunched() const {
+mcsm::StringResult mcsm::ServerDataOption::getLastTimeLaunched() const {
     bool optExists = this->option->exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     if(!optExists){
@@ -126,7 +126,7 @@ std::string mcsm::ServerDataOption::getLastTimeLaunched() const {
     return value;
 }
 
-mcsm::Result mcsm::ServerDataOption::updateLastTimeLaunched(){
+mcsm::VoidResult mcsm::ServerDataOption::updateLastTimeLaunched(){
     char buffer[80];
 
     auto currentTimePoint = std::chrono::system_clock::now();
@@ -140,7 +140,7 @@ mcsm::Result mcsm::ServerDataOption::updateLastTimeLaunched(){
     return this->option->save();
 }
 
-std::string mcsm::ServerDataOption::getServerTimeCreated() const {
+mcsm::StringResult mcsm::ServerDataOption::getServerTimeCreated() const {
     bool optExists = this->option->exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     if(!optExists){
@@ -169,7 +169,7 @@ std::string mcsm::ServerDataOption::getServerTimeCreated() const {
     return value;
 }
 
-mcsm::Result mcsm::ServerDataOption::updateServerTimeCreated(){
+mcsm::VoidResult mcsm::ServerDataOption::updateServerTimeCreated(){
     char buffer[80];
 
     auto currentTimePoint = std::chrono::system_clock::now();
@@ -183,7 +183,7 @@ mcsm::Result mcsm::ServerDataOption::updateServerTimeCreated(){
     return this->option->save();
 }
 
-std::string mcsm::ServerDataOption::getLastDownloadedBuild() const {
+mcsm::StringResult mcsm::ServerDataOption::getLastDownloadedBuild() const {
     bool optExists = this->option->exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     if(!optExists){
@@ -212,7 +212,7 @@ std::string mcsm::ServerDataOption::getLastDownloadedBuild() const {
     return value;
 }
 
-mcsm::Result mcsm::ServerDataOption::updateLastDownloadedBuild(const std::string& build){
+mcsm::VoidResult mcsm::ServerDataOption::updateLastDownloadedBuild(const std::string& build){
     if(!mcsm::isSafeString(build)){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(build)});
         return res;
@@ -223,6 +223,6 @@ mcsm::Result mcsm::ServerDataOption::updateLastDownloadedBuild(const std::string
     return this->option->save();
 }
 
-bool mcsm::ServerDataOption::exists() const {
+mcsm::BoolResult mcsm::ServerDataOption::exists() const {
     return this->option->exists();
 }

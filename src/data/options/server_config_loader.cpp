@@ -12,7 +12,7 @@ mcsm::ServerConfigLoader::~ServerConfigLoader(){
     this->isLoaded = false;
 }
 
-mcsm::Result mcsm::ServerConfigLoader::loadConfig(){
+mcsm::VoidResult mcsm::ServerConfigLoader::loadConfig(){
     this->optionHandle = std::make_unique<mcsm::Option>(this->configPath, "server");
     const bool& optExists = this->optionHandle->exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -84,7 +84,7 @@ nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<std::vector<nlohma
 
 // isLoaded won't be "true" if the option does not exist which is why I don't check the existence of the option file.
 
-std::string mcsm::ServerConfigLoader::getServerName() const {
+mcsm::StringResult mcsm::ServerConfigLoader::getServerName() const {
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
@@ -113,7 +113,7 @@ std::string mcsm::ServerConfigLoader::getServerName() const {
     return value;
 }
 
-mcsm::Result mcsm::ServerConfigLoader::setServerName(const std::string& name){
+mcsm::VoidResult mcsm::ServerConfigLoader::setServerName(const std::string& name){
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
@@ -131,7 +131,7 @@ mcsm::Result mcsm::ServerConfigLoader::setServerName(const std::string& name){
     return this->optionHandle->save();
 }
 
-std::string mcsm::ServerConfigLoader::getServerVersion() const {
+mcsm::StringResult mcsm::ServerConfigLoader::getServerVersion() const {
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
@@ -160,7 +160,7 @@ std::string mcsm::ServerConfigLoader::getServerVersion() const {
     return value;
 }
 
-mcsm::Result mcsm::ServerConfigLoader::setServerVersion(const std::string& version){
+mcsm::VoidResult mcsm::ServerConfigLoader::setServerVersion(const std::string& version){
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
@@ -178,7 +178,7 @@ mcsm::Result mcsm::ServerConfigLoader::setServerVersion(const std::string& versi
     return this->optionHandle->save();
 }
 
-std::unique_ptr<mcsm::JvmOption> mcsm::ServerConfigLoader::getDefaultOption() const {
+tl::expected<std::unique_ptr<mcsm::JvmOption>, mcsm::Error> mcsm::ServerConfigLoader::getDefaultOption() const {
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
@@ -261,7 +261,7 @@ std::unique_ptr<mcsm::JvmOption> mcsm::ServerConfigLoader::getDefaultOption() co
     return jvmOption;
 }
 
-mcsm::Result mcsm::ServerConfigLoader::setDefaultOption(mcsm::JvmOption& jvmOption){
+mcsm::VoidResult mcsm::ServerConfigLoader::setDefaultOption(mcsm::JvmOption& jvmOption){
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
@@ -282,7 +282,7 @@ mcsm::Result mcsm::ServerConfigLoader::setDefaultOption(mcsm::JvmOption& jvmOpti
     return this->optionHandle->save();
 }
 
-std::string mcsm::ServerConfigLoader::getServerType() const {
+mcsm::StringResult mcsm::ServerConfigLoader::getServerType() const {
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
@@ -311,7 +311,7 @@ std::string mcsm::ServerConfigLoader::getServerType() const {
     return value;
 }
 
-std::string mcsm::ServerConfigLoader::getServerJarFile() const {
+mcsm::StringResult mcsm::ServerConfigLoader::getServerJarFile() const {
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
@@ -341,7 +341,7 @@ std::string mcsm::ServerConfigLoader::getServerJarFile() const {
     return value;
 }
 
-mcsm::Result mcsm::ServerConfigLoader::setServerJarFile(const std::string& name){
+mcsm::VoidResult mcsm::ServerConfigLoader::setServerJarFile(const std::string& name){
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
@@ -359,7 +359,7 @@ mcsm::Result mcsm::ServerConfigLoader::setServerJarFile(const std::string& name)
     return this->optionHandle->save();
 }
 
-std::string mcsm::ServerConfigLoader::getServerJarBuild() const {
+mcsm::StringResult mcsm::ServerConfigLoader::getServerJarBuild() const {
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
@@ -389,7 +389,7 @@ std::string mcsm::ServerConfigLoader::getServerJarBuild() const {
     return value;
 }
 
-mcsm::Result mcsm::ServerConfigLoader::setServerJarBuild(const std::string& build){
+mcsm::VoidResult mcsm::ServerConfigLoader::setServerJarBuild(const std::string& build){
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
@@ -407,7 +407,7 @@ mcsm::Result mcsm::ServerConfigLoader::setServerJarBuild(const std::string& buil
     return this->optionHandle->save();
 }
 
-bool mcsm::ServerConfigLoader::doesAutoUpdate() const {
+mcsm::BoolResult mcsm::ServerConfigLoader::doesAutoUpdate() const {
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
@@ -432,7 +432,7 @@ bool mcsm::ServerConfigLoader::doesAutoUpdate() const {
     return value;
 }
 
-mcsm::Result mcsm::ServerConfigLoader::setAutoUpdate(const bool& update){
+mcsm::VoidResult mcsm::ServerConfigLoader::setAutoUpdate(const bool& update){
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",
@@ -454,7 +454,7 @@ bool mcsm::ServerConfigLoader::isFullyLoaded() const {
     return this->isLoaded;
 }
 
-mcsm::Server* mcsm::ServerConfigLoader::getServerInstance(){
+tl::expected<mcsm::Server*, mcsm::Error> mcsm::ServerConfigLoader::getServerInstance(){
     if(!this->isLoaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerConfigLoader function called without loadConfig.",

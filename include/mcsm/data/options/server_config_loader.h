@@ -14,10 +14,10 @@ namespace mcsm {
               isLoaded(other.isLoaded){}
         ~ServerConfigLoader();
 
-        mcsm::Result loadConfig();
+        mcsm::VoidResult loadConfig();
 
         template <typename T>
-        inline T get(const std::string& key) const{
+        inline tl::expected<T, mcsm::Error> get(const std::string& key) const{
             if(!this->isLoaded){
                 mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
                     "ServerConfigLoader function called without loadConfig.",
@@ -59,31 +59,31 @@ namespace mcsm {
             return value.get<T>();
         }
 
-        std::string getServerName() const;
-        mcsm::Result setServerName(const std::string& name);
+        mcsm::StringResult getServerName() const;
+        mcsm::VoidResult setServerName(const std::string& name);
 
-        std::string getServerVersion() const;
-        mcsm::Result setServerVersion(const std::string& version);
+        mcsm::StringResult getServerVersion() const;
+        mcsm::VoidResult setServerVersion(const std::string& version);
 
-        std::unique_ptr<mcsm::JvmOption> getDefaultOption() const;
-        mcsm::Result setDefaultOption(mcsm::JvmOption& jvmOption);
+        tl::expected<std::unique_ptr<mcsm::JvmOption>, mcsm::Error> getDefaultOption() const;
+        mcsm::VoidResult setDefaultOption(mcsm::JvmOption& jvmOption);
 
-        std::string getServerType() const;
+        mcsm::StringResult getServerType() const;
 
-        std::string getServerJarFile() const;
-        mcsm::Result setServerJarFile(const std::string& name);
+        mcsm::StringResult getServerJarFile() const;
+        mcsm::VoidResult setServerJarFile(const std::string& name);
 
-        std::string getServerJarBuild() const;
-        mcsm::Result setServerJarBuild(const std::string& build);
+        mcsm::StringResult getServerJarBuild() const;
+        mcsm::VoidResult setServerJarBuild(const std::string& build);
 
-        bool doesAutoUpdate() const;
-        mcsm::Result setAutoUpdate(const bool& update);
+        mcsm::BoolResult doesAutoUpdate() const;
+        mcsm::VoidResult setAutoUpdate(const bool& update);
 
         mcsm::Option* getHandle() const;
 
         bool isFullyLoaded() const;
 
-        mcsm::Server* getServerInstance();
+        tl::expected<mcsm::Server*, mcsm::Error> getServerInstance();
         
     private:
         std::string configPath;

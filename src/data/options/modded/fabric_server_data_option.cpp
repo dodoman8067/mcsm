@@ -6,7 +6,7 @@ mcsm::FabricServerDataOption::FabricServerDataOption(const std::string& path) : 
 
 mcsm::FabricServerDataOption::~FabricServerDataOption(){}
 
-std::string mcsm::FabricServerDataOption::getLoaderVersion() const {
+mcsm::StringResult mcsm::FabricServerDataOption::getLoaderVersion() const {
     bool optExists = this->option->exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     if(!optExists){
@@ -30,7 +30,7 @@ std::string mcsm::FabricServerDataOption::getLoaderVersion() const {
     return mcsm::safeString(value);
 }
 
-mcsm::Result mcsm::FabricServerDataOption::updateLoaderVersion(const std::string& version){
+mcsm::VoidResult mcsm::FabricServerDataOption::updateLoaderVersion(const std::string& version){
     if(!mcsm::isSafeString(version)){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(version)});
         return res;
@@ -41,7 +41,7 @@ mcsm::Result mcsm::FabricServerDataOption::updateLoaderVersion(const std::string
     return this->option->save();
 }
 
-std::string mcsm::FabricServerDataOption::getInstallerVersion() const {
+mcsm::StringResult mcsm::FabricServerDataOption::getInstallerVersion() const {
     bool optExists = this->option->exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
     if(!optExists){
@@ -65,7 +65,7 @@ std::string mcsm::FabricServerDataOption::getInstallerVersion() const {
     return mcsm::safeString(value);
 }
 
-mcsm::Result mcsm::FabricServerDataOption::updateInstallerVersion(const std::string& version){
+mcsm::VoidResult mcsm::FabricServerDataOption::updateInstallerVersion(const std::string& version){
     mcsm::Result res = this->option->setValue("last_downloaded_installer_version", mcsm::safeString(version));
     if(!res.isSuccess()) return res;
 

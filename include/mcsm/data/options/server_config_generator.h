@@ -16,19 +16,19 @@ namespace mcsm {
         /**
          * Called by `Server#configure` which is called by `Server#generate`.
          */
-        mcsm::Result generate(const std::string& version, mcsm::Server* server, mcsm::ServerDataOption* sDataOpt, const std::string& name, mcsm::JvmOption& defaultOption);
+        mcsm::VoidResult generate(const std::string& version, mcsm::Server* server, mcsm::ServerDataOption* sDataOpt, const std::string& name, mcsm::JvmOption& defaultOption);
         
         /**
          * Called by `Server#configure` which is called by `Server#generate`.
          */
-        mcsm::Result generate(const std::string& version, mcsm::Server* server, mcsm::ServerDataOption* sDataOpt, const std::string& name, mcsm::JvmOption& defaultOption, const bool& update);
+        mcsm::VoidResult generate(const std::string& version, mcsm::Server* server, mcsm::ServerDataOption* sDataOpt, const std::string& name, mcsm::JvmOption& defaultOption, const bool& update);
         
         /**
          * Called by `Server#configure` which is called by `Server#generate`.
          */
-        mcsm::Result generate(const std::string& version, mcsm::Server* server, mcsm::ServerDataOption* sDataOpt, const std::string& name, mcsm::JvmOption& defaultOption, const bool& update, const std::string& build);
+        mcsm::VoidResult generate(const std::string& version, mcsm::Server* server, mcsm::ServerDataOption* sDataOpt, const std::string& name, mcsm::JvmOption& defaultOption, const bool& update, const std::string& build);
 
-        std::unique_ptr<mcsm::Option>& getHandle();
+        mcsm::Option* getHandle();
 
         std::string getPath() const;
 

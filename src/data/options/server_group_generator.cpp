@@ -1,11 +1,11 @@
 #include <mcsm/data/options/server_group_generator.h>
 #include <mcsm/data/options/general_option.h>
 
-mcsm::Result mcsm::ServerGroupGenerator::generate(const std::string& mode){
+mcsm::VoidResult mcsm::ServerGroupGenerator::generate(const std::string& mode){
     return generate(mode, {});
 }
 
-mcsm::Result mcsm::ServerGroupGenerator::generate(const std::string& mode, const std::vector<const mcsm::ServerConfigLoader*> servers){
+mcsm::VoidResult mcsm::ServerGroupGenerator::generate(const std::string& mode, const std::vector<const mcsm::ServerConfigLoader*> servers){
     if(mode != "screen" && mode != "default"){
         return {mcsm::ResultType::MCSM_FAIL, {"Invalid value of server group mode \"" + mode + "\"."}};
     }

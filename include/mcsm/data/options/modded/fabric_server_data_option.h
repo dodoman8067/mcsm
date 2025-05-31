@@ -10,11 +10,11 @@ namespace mcsm {
         FabricServerDataOption(const std::string& path);
         ~FabricServerDataOption();
 
-        std::string getLoaderVersion() const;
-        mcsm::Result updateLoaderVersion(const std::string& version);
+        mcsm::StringResult getLoaderVersion() const;
+        mcsm::VoidResult updateLoaderVersion(const std::string& version);
         
-        std::string getInstallerVersion() const;
-        mcsm::Result updateInstallerVersion(const std::string& version);
+        mcsm::StringResult getInstallerVersion() const;
+        mcsm::VoidResult updateInstallerVersion(const std::string& version);
     };
 }
 

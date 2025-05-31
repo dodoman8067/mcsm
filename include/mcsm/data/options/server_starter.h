@@ -14,12 +14,12 @@ namespace mcsm {
         /**
          * Calls `Server#start`.
          */
-        mcsm::Result startServer(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath);
+        mcsm::VoidResult startServer(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath);
         
         /**
          * Calls `Server#start`.
          */
-        mcsm::Result startServer(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::string& groupOptionPath);
+        mcsm::VoidResult startServer(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::string& groupOptionPath);
     private:
         mcsm::ServerConfigLoader* loader;
     };

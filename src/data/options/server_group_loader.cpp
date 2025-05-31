@@ -14,7 +14,7 @@ mcsm::ServerGroupLoader::~ServerGroupLoader(){
     this->loaders.clear();
 }
 
-mcsm::Result mcsm::ServerGroupLoader::removeDuplicateServers(mcsm::Option* handle) {
+mcsm::VoidResult mcsm::ServerGroupLoader::removeDuplicateServers(mcsm::Option* handle) {
     std::unordered_set<std::string> uniqueServers;
     nlohmann::json uniqueServerList = nlohmann::json::array();
 
@@ -51,7 +51,7 @@ mcsm::Result mcsm::ServerGroupLoader::removeDuplicateServers(mcsm::Option* handl
     return handle->save();
 }
 
-mcsm::Result mcsm::ServerGroupLoader::load() {
+mcsm::VoidResult mcsm::ServerGroupLoader::load() {
     this->handle = std::make_unique<mcsm::Option>(this->path, "mcsm_server_group");
     const bool& optExists = this->handle->exists();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -95,7 +95,7 @@ mcsm::Result mcsm::ServerGroupLoader::load() {
 }
 
 // call this instead of handle->save() when the function modifies and saves this->loaders
-mcsm::Result mcsm::ServerGroupLoader::save(){
+mcsm::VoidResult mcsm::ServerGroupLoader::save(){
     std::vector<std::string> strVec;
     for(auto& v : this->loaders){
         if(v == nullptr){
@@ -118,7 +118,7 @@ bool mcsm::ServerGroupLoader::isLoaded() const {
     return this->loaded;
 }
 
-std::string mcsm::ServerGroupLoader::getName() const {
+mcsm::StringResult mcsm::ServerGroupLoader::getName() const {
     if(!this->loaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerGroupLoader function called without load.",
@@ -147,7 +147,7 @@ std::string mcsm::ServerGroupLoader::getName() const {
     return value;
 }
 
-mcsm::Result mcsm::ServerGroupLoader::setName(const std::string& name){
+mcsm::VoidResult mcsm::ServerGroupLoader::setName(const std::string& name){
     if(!this->loaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerGroupLoader function called without load.",
@@ -165,7 +165,7 @@ mcsm::Result mcsm::ServerGroupLoader::setName(const std::string& name){
     return this->handle->save();
 }
 
-std::string mcsm::ServerGroupLoader::getMode() const {
+mcsm::StringResult mcsm::ServerGroupLoader::getMode() const {
     if(!this->loaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerGroupLoader function called without load.",
@@ -198,7 +198,7 @@ std::string mcsm::ServerGroupLoader::getMode() const {
     return value;
 }
 
-mcsm::Result mcsm::ServerGroupLoader::setMode(const std::string& mode){
+mcsm::VoidResult mcsm::ServerGroupLoader::setMode(const std::string& mode){
     if(!this->loaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerGroupLoader function called without load.",
@@ -224,7 +224,7 @@ std::vector<const mcsm::ServerConfigLoader*> mcsm::ServerGroupLoader::getServers
     return servec;
 }
 
-mcsm::Result mcsm::ServerGroupLoader::setServers(const std::vector<mcsm::ServerConfigLoader*>& servers){
+mcsm::VoidResult mcsm::ServerGroupLoader::setServers(const std::vector<mcsm::ServerConfigLoader*>& servers){
     if(!this->loaded){
         mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
             "ServerGroupLoader function called without load.",
@@ -248,7 +248,7 @@ mcsm::Result mcsm::ServerGroupLoader::setServers(const std::vector<mcsm::ServerC
     return this->save();
 }
 
-mcsm::Result mcsm::ServerGroupLoader::addServer(const std::string& path){
+mcsm::VoidResult mcsm::ServerGroupLoader::addServer(const std::string& path){
     std::string nPath = mcsm::normalizePath(path);
     std::unique_ptr<mcsm::ServerConfigLoader> serv = std::make_unique<mcsm::ServerConfigLoader>(nPath);
     mcsm::Result loadRes = serv->loadConfig();
@@ -263,7 +263,7 @@ mcsm::Result mcsm::ServerGroupLoader::addServer(const std::string& path){
     return this->save();
 }
 
-mcsm::Result mcsm::ServerGroupLoader::addServer(mcsm::ServerConfigLoader* server){
+mcsm::VoidResult mcsm::ServerGroupLoader::addServer(mcsm::ServerConfigLoader* server){
     if(server == nullptr){
         return {mcsm::ResultType::MCSM_FAIL, {"Null serverconfigloader instance detected on servergrouploader. Report this to github."}};
     }
@@ -281,7 +281,7 @@ mcsm::Result mcsm::ServerGroupLoader::addServer(mcsm::ServerConfigLoader* server
     return this->save();
 }
 
-mcsm::Result mcsm::ServerGroupLoader::addServer(std::unique_ptr<mcsm::ServerConfigLoader> server){
+mcsm::VoidResult mcsm::ServerGroupLoader::addServer(std::unique_ptr<mcsm::ServerConfigLoader> server){
     if(server == nullptr){
         return {mcsm::ResultType::MCSM_FAIL, {"Null serverconfigloader instance detected on servergrouploader. Report this to github."}};
     }
@@ -299,7 +299,7 @@ mcsm::Result mcsm::ServerGroupLoader::addServer(std::unique_ptr<mcsm::ServerConf
     return this->save();
 }
 
-mcsm::Result mcsm::ServerGroupLoader::addServer(const std::vector<std::unique_ptr<mcsm::ServerConfigLoader>>& servers){
+mcsm::VoidResult mcsm::ServerGroupLoader::addServer(const std::vector<std::unique_ptr<mcsm::ServerConfigLoader>>& servers){
     for(auto& serv : servers){
         if(serv == nullptr){
             return {mcsm::ResultType::MCSM_FAIL, {"Null serverconfigloader instance detected on servergrouploader. Report this to github."}};
@@ -318,7 +318,7 @@ mcsm::Result mcsm::ServerGroupLoader::addServer(const std::vector<std::unique_pt
     return this->save();
 }
 
-mcsm::Result mcsm::ServerGroupLoader::removeServer(const std::string& path){
+mcsm::VoidResult mcsm::ServerGroupLoader::removeServer(const std::string& path){
     for(size_t i = 0; i<this->loaders.size(); i++){
         if(this->loaders[i]->getHandle()->getPath() == path){
             this->loaders.erase(this->loaders.begin() + i);
@@ -331,7 +331,7 @@ mcsm::Result mcsm::ServerGroupLoader::removeServer(const std::string& path){
     }};
 }
 
-mcsm::Result mcsm::ServerGroupLoader::removeServer(mcsm::ServerConfigLoader* server){
+mcsm::VoidResult mcsm::ServerGroupLoader::removeServer(mcsm::ServerConfigLoader* server){
     for(size_t i = 0; i<this->loaders.size(); i++){
         if(this->loaders[i]->getHandle()->getPath() == server->getHandle()->getPath()){
             this->loaders.erase(this->loaders.begin() + i);
@@ -344,7 +344,7 @@ mcsm::Result mcsm::ServerGroupLoader::removeServer(mcsm::ServerConfigLoader* ser
     }};
 }
 
-mcsm::Result mcsm::ServerGroupLoader::removeServer(const std::vector<mcsm::ServerConfigLoader*>& servers){
+mcsm::VoidResult mcsm::ServerGroupLoader::removeServer(const std::vector<mcsm::ServerConfigLoader*>& servers){
     bool removedAny = false;
 
     for(const auto& server : servers){
