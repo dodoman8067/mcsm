@@ -63,6 +63,8 @@ int main(int argc, char *argv[]){
 
     bool commandFound = false;
 
+    std::cout << "Warning: Error system is experiencing a huge backend change.\nProgram is very unstable and bugs may occur. Please report it to GitHub if you find any.\n\n";
+
     //Prints default message when no arguments
     if(argc < 2){
         std::cout << "Welcome to MCSM (Minecraft Server Manager).\n";

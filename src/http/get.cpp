@@ -28,7 +28,7 @@ static size_t writeFunction(void* contents, size_t size, size_t nmemb, std::stri
     return totalSize;
 }
 
-const std::string mcsm::get(const std::string& url){
+const mcsm::StringResult mcsm::get(const std::string& url){
     CURL *curl = mcsm::curl_holder::curl;
 
     std::string response;

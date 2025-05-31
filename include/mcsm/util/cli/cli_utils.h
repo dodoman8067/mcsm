@@ -67,6 +67,10 @@ namespace mcsm {
 
     bool isDebug();
 
+    std::string getDataPathPerOS();
+
+    std::string asGlobalConfigPath(const std::string &value);
+
     std::string getExecutablePath();
 }
 

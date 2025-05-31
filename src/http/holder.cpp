@@ -3,7 +3,7 @@
 CURL* mcsm::curl_holder::curl = nullptr;
 std::mutex mcsm::curl_holder::curl_mutex;
 
-mcsm::Result mcsm::curl_holder::init(){
+mcsm::VoidResult mcsm::curl_holder::init(){
     std::lock_guard<std::mutex> lock(curl_mutex);
     if(!curl){
         curl = curl_easy_init();

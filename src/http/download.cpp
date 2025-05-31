@@ -66,7 +66,7 @@ static int xferinfoCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow,
     return progressCallback(clientp, dltotal, dlnow, ultotal, ulnow);
 }
 
-mcsm::Result mcsm::download(const std::string& name, const std::string& url){
+mcsm::VoidResult mcsm::download(const std::string& name, const std::string& url){
     const std::string& path = mcsm::getCurrentPath();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -77,11 +77,11 @@ mcsm::Result mcsm::download(const std::string& name, const std::string& url){
     return download(name, url, path);
 }
 
-mcsm::Result mcsm::download(const std::string& name, const std::string& url, const std::string& path){
+mcsm::VoidResult mcsm::download(const std::string& name, const std::string& url, const std::string& path){
     return download(name, url, path, false);
 }
 
-mcsm::Result mcsm::download(const std::string& name, const std::string& url, const std::string& path, const bool& percentages){
+mcsm::VoidResult mcsm::download(const std::string& name, const std::string& url, const std::string& path, const bool& percentages){
     CURL* curl = mcsm::curl_holder::curl;
     CURLcode res;
     std::FILE* file;
@@ -120,7 +120,7 @@ mcsm::Result mcsm::download(const std::string& name, const std::string& url, con
     return result;
 }
 
-bool mcsm::isText(const std::string& url){
+mcsm::BoolResult mcsm::isText(const std::string& url){
     CURL* curl = mcsm::curl_holder::curl;
     char *contentType = nullptr;
     bool isText = false;
