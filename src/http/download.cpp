@@ -67,12 +67,8 @@ static int xferinfoCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow,
 }
 
 mcsm::VoidResult mcsm::download(const std::string& name, const std::string& url){
-    const std::string& path = mcsm::getCurrentPath();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto path = mcsm::getCurrentPath();
+    if(!path) return tl::unexpected(path.error());
 
     return download(name, url, path);
 }
@@ -92,7 +88,7 @@ mcsm::VoidResult mcsm::download(const std::string& name, const std::string& url,
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl/8.10.0");
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, curl_version());
     curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
     curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
     curl_easy_setopt(curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2TLS);
@@ -108,16 +104,15 @@ mcsm::VoidResult mcsm::download(const std::string& name, const std::string& url,
     if(percentages) std::cout << "\n";
 
     if(res != CURLE_OK){
-        mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::downloadRequestFailed(url, curl_easy_strerror(res))});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::DOWNLOAD_REQUEST_FAILED, {url, curl_easy_strerror(res)});
         std::fclose(file);
         curl_easy_reset(curl);
-        return result;
+        return tl::unexpected(err);
     }
 
     std::fclose(file);
     curl_easy_reset(curl);
-    mcsm::Result result({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return result;
+    return {};
 }
 
 mcsm::BoolResult mcsm::isText(const std::string& url){
@@ -136,9 +131,9 @@ mcsm::BoolResult mcsm::isText(const std::string& url){
     res = curl_easy_perform(curl);
 
     if(res != CURLE_OK){
-        mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::getRequestFailed(url, curl_easy_strerror(res))});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {url, curl_easy_strerror(res)});
         curl_easy_reset(curl);
-        return false;
+        return tl::unexpected(err);
     }
 
     res = curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &contentType);
@@ -146,12 +141,11 @@ mcsm::BoolResult mcsm::isText(const std::string& url){
         const std::string& contentTypeStr = contentType;
         isText = contentTypeStr.find("text") == 0 || contentTypeStr.find("json") != std::string::npos;
     }else{
-        mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::getRequestFailed(url, curl_easy_strerror(res))});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {url, curl_easy_strerror(res)});
         curl_easy_reset(curl);
-        return false;
+        return tl::unexpected(err);
     }
 
     curl_easy_reset(curl);
-    mcsm::Result result({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return isText;
 }

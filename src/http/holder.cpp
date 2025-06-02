@@ -8,10 +8,11 @@ mcsm::VoidResult mcsm::curl_holder::init(){
     if(!curl){
         curl = curl_easy_init();
         if(!curl){
-            return {mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::curlInitFailed()};
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::CURL_INIT_FAILED, {});
+            return tl::unexpected(err);
         }
     }
-    return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
+    return {};
 }
 
 void mcsm::curl_holder::cleanup(){

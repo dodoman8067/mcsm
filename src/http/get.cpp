@@ -46,12 +46,11 @@ const mcsm::StringResult mcsm::get(const std::string& url){
     CURLcode res = curl_easy_perform(curl);
 
     if(res != CURLE_OK){
-        mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::getRequestFailed(url, curl_easy_strerror(res))});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {url, curl_easy_strerror(res)});
         curl_easy_reset(curl);
-        return "";
+        return tl::unexpected(err);
     }
 
     curl_easy_reset(curl);
-    mcsm::Result result({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return response;
 }
