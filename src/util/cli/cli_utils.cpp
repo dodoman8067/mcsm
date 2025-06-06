@@ -25,7 +25,6 @@ SOFTWARE.
 mcsm::IntResult mcsm::runCommandQuietly(const std::string& command){
     if(mcsm::getCurrentOS() == mcsm::OS::WINDOWS){
         std::string cmd = command + " > NUL 2>&1";
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return std::system(cmd.c_str());
     }else if(mcsm::getCurrentOS() == mcsm::OS::LINUX){
         std::string cmd = command + " > /dev/null 2>&1";
@@ -33,7 +32,6 @@ mcsm::IntResult mcsm::runCommandQuietly(const std::string& command){
             int code = std::system(cmd.c_str());
             if(WIFEXITED(code)){
                 int finalCode = WEXITSTATUS(code);
-                mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
                 return finalCode;
             }else{
                 return 1;
@@ -42,21 +40,19 @@ mcsm::IntResult mcsm::runCommandQuietly(const std::string& command){
             return 1;
         #endif
     }else{
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"This platform is not supported. Please use Windows or Linux."}});
-        return 1;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSUPPORTED_OS, {});
+        return tl::unexpected(err);
     }
 }
 
 mcsm::IntResult mcsm::runCommand(const std::string& command){
     if(mcsm::getCurrentOS() == mcsm::OS::WINDOWS){
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return std::system(command.c_str());
     }else if(mcsm::getCurrentOS() == mcsm::OS::LINUX){
         #ifdef __linux__
             int code = std::system(command.c_str());
             if(WIFEXITED(code)){
                 int finalCode = WEXITSTATUS(code);
-                mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
                 return finalCode;
             }else{
                 return 1;
@@ -65,8 +61,8 @@ mcsm::IntResult mcsm::runCommand(const std::string& command){
             return 1;
         #endif
     }else{
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"This platform is not supported. Please use Windows or Linux."}});
-        return 1;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSUPPORTED_OS, {});
+        return tl::unexpected(err);
     }
 }
 
@@ -74,13 +70,9 @@ mcsm::StringResult mcsm::getCurrentPath(){
     std::error_code ec;
     std::string path = std::filesystem::current_path(ec).string();
     if(ec){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Getting current path operation failed : " + ec.message(), 
-            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
-            }});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::CURRENT_PATH_UNCATCHABLE, {ec.message()});
+        return tl::unexpected(err);
     }
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return path;
 }
 
@@ -113,13 +105,9 @@ mcsm::BoolResult mcsm::fileExists(const std::string& path){
     std::error_code ec;
     bool exists = std::filesystem::exists(path, ec);
     if(ec){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Checking if file/directory " + path + "operation failed : " + ec.message(), 
-            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
-            }});
-        return false;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::FILE_EXIST_CHECK_FAILED, {path, ec.message()});
+        return tl::unexpected(err);
     }
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return exists;
 }
 
@@ -128,13 +116,9 @@ mcsm::BoolResult mcsm::removeFile(const std::string& path){
     std::error_code ec;
     bool success = std::filesystem::remove(path, ec);
     if(ec){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Removing file " + path + "operation failed : " + ec.message(), 
-            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
-            }});
-        return false;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::FILE_EXIST_CHECK_FAILED, {path, ec.message()});
+        return tl::unexpected(err);
     }
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return success; 
 }
 
@@ -144,12 +128,10 @@ bool mcsm::mkdir(const std::string& dirName){
     if(!std::filesystem::create_directories(dirName, ec)){
         if(std::filesystem::exists(dirName)){
             ec.clear();
-            mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
             return true;
         }
         return false;
     }
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return true;
 }
 
@@ -203,9 +185,9 @@ mcsm::StringResult mcsm::getExecutablePath(){
     char buf[PATH_MAX];
     ssize_t len = readlink("/proc/self/exe", buf, sizeof(buf) - 1);
 
-    if (len == -1) {
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"readlink failed."}});
-        return "";
+    if(len == -1){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED, {"readlink", "unknown"});
+        return tl::unexpected(err);
     }
 
     buf[len] = '\0';
@@ -215,13 +197,13 @@ mcsm::StringResult mcsm::getExecutablePath(){
     DWORD len = GetModuleFileNameA(NULL, buf, MAX_PATH);
 
     if(len == 0 || len == MAX_PATH){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"GetModuleFileName failed."}});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED, {"GetModuleFileName", "unknown"});
+        return tl::unexpected(err);
     }
 
     return "\"" + std::string(buf) + "\"";
 #else
-    mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Unsupported platform for getExecutablePath."}});
-    return "";
+    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSUPPORTED_OS, {});
+    return tl::unexpected(err);
 #endif
 }
