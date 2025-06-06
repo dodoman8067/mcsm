@@ -37,15 +37,15 @@ static int progressCallback(void * /* clientp */, curl_off_t dltotal, curl_off_t
         int progress = static_cast<int>(barWidth * percentage / 100.0);
 
         if(progress < 4)
-            mcsm::setcol(mcsm::TextColor::DARK_RED);
+            mcsm::setcol(mcsm::NamedColor::DARK_RED);
         else if(progress < 10)
-            mcsm::setcol(mcsm::TextColor::RED);
+            mcsm::setcol(mcsm::NamedColor::RED);
         else if(progress < 16)
-            mcsm::setcol(mcsm::TextColor::YELLOW);
+            mcsm::setcol(mcsm::NamedColor::YELLOW);
         else if(progress < 20)
-            mcsm::setcol(mcsm::TextColor::GREEN);
+            mcsm::setcol(mcsm::NamedColor::GREEN);
         else
-            mcsm::setcol(mcsm::TextColor::BLUE);
+            mcsm::setcol(mcsm::NamedColor::BLUE);
 
         std::cout << "\r[";
         for(int i = 0; i < barWidth; i++){
@@ -57,7 +57,7 @@ static int progressCallback(void * /* clientp */, curl_off_t dltotal, curl_off_t
         std::cout << std::fixed << std::setprecision(1) << percentage << "%";
         std::cout.flush();
 
-        mcsm::setcol(mcsm::TextColor::RESET);
+        mcsm::resetcol();
     }
     return 0;
 }

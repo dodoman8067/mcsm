@@ -52,9 +52,9 @@ namespace mcsm {
         if(!log) return;
         std::string msg = message;
         if(!mcsm::endsWith(msg, "\n")) msg += "\n";
-        mcsm::setcol(mcsm::TextColor::GREEN);
+        mcsm::setcol(mcsm::NamedColor::GREEN);
         std::cout << "[mcsm/INFO] " << msg;
-        mcsm::setcol(mcsm::TextColor::RESET);
+        mcsm::resetcol();
     }
 
     /**
@@ -65,9 +65,9 @@ namespace mcsm {
         if(!log) return;
         std::string msg = message;
         if(!mcsm::endsWith(msg, "\n")) msg += "\n";
-        mcsm::setcol(mcsm::TextColor::BRIGHT_YELLOW);
+        mcsm::setcol(mcsm::NamedColor::BRIGHT_YELLOW);
         std::cerr << "[mcsm/WARN] " << msg;
-        mcsm::setcol(mcsm::TextColor::RESET);
+        mcsm::resetcol();
     }
 
     /**
@@ -78,9 +78,9 @@ namespace mcsm {
         if(!log) return;
         std::string msg = message;
         if(!mcsm::endsWith(msg, "\n")) msg += "\n";
-        mcsm::setcol(mcsm::TextColor::RED);
+        mcsm::setcol(mcsm::NamedColor::RED);
         std::cerr << "[mcsm/ERROR] " << msg;
-        mcsm::setcol(mcsm::TextColor::RESET);
+        mcsm::resetcol();
     }
 }
 
