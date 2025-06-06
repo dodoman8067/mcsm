@@ -390,22 +390,34 @@ namespace mcsm::errors {
         "Check if the file exists and has proper permissions."
     };
 
-    inline const ErrorTemplate FILE_CREATE_FAILED = {
+    inline const ErrorTemplate FILE_EXIST_CHECK_FAILED = {
         102,
+        "Checking if file/directory %s operation failed with reason: %s",
+        "Check if the file exists and has proper permissions."
+    };
+
+    inline const ErrorTemplate FILE_CREATE_FAILED = {
+        103,
         "Cannot create file %s.",
         "This may be due to permissions or invalid file name."
     };
 
     inline const ErrorTemplate FILE_SAVE_FAILED = {
-        103,
+        104,
         "Failed to save file %s.",
         "Check file permissions or if the file path is valid."
     };
 
-    inline const ErrorTemplate CURL_INIT_FAILED = {
-        104,
-        "Unable to initialize curl.",
-        "Try re-running the program, reboot your machine, or reinstall."
+    inline const ErrorTemplate FILE_REMOVE_FAILED = {
+        105,
+        "Failed to remove file %s for reason: %s",
+        "Check file permissions or if the file path is valid."
+    };
+
+    inline const ErrorTemplate UNSUPPORTED_OS = {
+        106,
+        "The current OS is not supported.",
+        "We recommend to use Windows or Linux."
     };
 
     // ================================
@@ -444,20 +456,26 @@ namespace mcsm::errors {
     // ================================
     // 30X: HTTP Errors
     // ================================
-    inline const ErrorTemplate GET_REQUEST_FAILED = {
+    inline const ErrorTemplate CURL_INIT_FAILED = {
         300,
+        "Unable to initialize curl.",
+        "Try re-running the program, reboot your machine, or reinstall."
+    };
+
+    inline const ErrorTemplate GET_REQUEST_FAILED = {
+        301,
         "Failed to perform GET request for %s with reason: %s.",
         "Check your internet connection or try again later."
     };
 
     inline const ErrorTemplate DOWNLOAD_REQUEST_FAILED = {
-        301,
+        302,
         "Failed to download the file from %s with reason: %s.",
         "Check your internet connection or verify the URL."
     };
 
     inline const ErrorTemplate DOWNLOAD_TARGET_NOT_TEXT = {
-        302,
+        303,
         "Failed to verify if URL %s returns a text, reason: %s.",
         "Ensure the target is a valid text-based resource."
     };
@@ -548,7 +566,19 @@ namespace mcsm::errors {
 
     inline const ErrorTemplate GIT_CLONE_FAILED = {
         502,
-        "Failed to clone a git repository %s with the following reason : %s",
+        "Failed to clone a git repository %s with the following reason: %s",
+        ""
+    };
+
+    inline const ErrorTemplate CURRENT_PATH_UNCATCHABLE = {
+        503,
+        "Getting current path operation failed with the following reason: %s",
+        ""
+    };
+
+    inline const ErrorTemplate INTERNAL_FUNC_EXECUTION_FAILED = {
+        504,
+        "Executing function %s failed with the following reason: %s",
         ""
     };
 }
