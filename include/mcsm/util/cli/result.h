@@ -581,6 +581,15 @@ namespace mcsm::errors {
         "Executing function %s failed with the following reason: %s",
         ""
     };
+
+    // ================================
+    // Screen Session Errors
+    // ================================
+    inline const ErrorTemplate SCREEN_SESSION = {
+        600,
+        "Screen task performation failed with the following reason: %s",
+        ""
+    };
 }
 
 #endif // __MCSM_RESULT_H__
