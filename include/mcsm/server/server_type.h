@@ -74,7 +74,7 @@ namespace mcsm {
      * @param type enum value to convert it to a string
      * @return string version of server type
     */
-    std::string getServerType(const mcsm::ServerType& type);
+    mcsm::StringResult getServerType(const mcsm::ServerType& type);
 }
 
 #endif

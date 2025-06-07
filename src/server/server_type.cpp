@@ -43,10 +43,7 @@ mcsm::ServerType mcsm::getServerType(const std::string& name){
     }
 }
 
-std::string mcsm::getServerType(const mcsm::ServerType& type){
-    std::string typeS = mcsm::ServerRegistry::getServerRegistry().getServerTypeString(type);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+mcsm::StringResult mcsm::getServerType(const mcsm::ServerType& type){
+    auto typeS = mcsm::ServerRegistry::getServerRegistry().getServerTypeString(type);
     return typeS;
 }
