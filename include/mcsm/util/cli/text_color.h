@@ -7,7 +7,7 @@
 namespace mcsm {
     struct Color {
         int r, g, b;
-        Color(int r, int g, int b) : r(r), g(g), b(b) {}
+        constexpr Color(int r, int g, int b) : r(r), g(g), b(b) {}
     };
 
 #ifdef _WIN32
