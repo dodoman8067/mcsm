@@ -27,7 +27,7 @@ const std::vector<std::string> availableOptions = {
     "--jvmpath",
     "-jp",
     "--jp",
-    "--global"
+    "--global",
     "-global",
     "-g",
     "--g",
