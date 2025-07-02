@@ -221,59 +221,37 @@ mcsm::VoidResult mcsm::CustomServer::generate(const std::string& name, mcsm::Jvm
     return res;
 }
 
-mcsm::VoidResult mcsm::CustomServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
+mcsm::StringResult mcsm::CustomServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
     // ServerOption class handles the data file stuff
 
-    std::string customCommand = getCustomStartCommand(loader->getHandle()->getPath());
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    mcsm::StringResult customCommand = getCustomStartCommand(loader->getHandle()->getPath());
+    if(!customCommand) return customCommand;
 
-    if(!mcsm::isWhitespaceOrEmpty(customCommand)){
+    if(!mcsm::isWhitespaceOrEmpty(customCommand.value())){
         mcsm::info("NOTE: JVM profile based launch system is currently overrided by \"custom_run_command\" value inside server.json.");
         mcsm::info("Leave it empty to use default launch system.");
-        mcsm::info("Running command : " + customCommand);
-        int result = mcsm::runCommand(customCommand);
+        mcsm::info("Running command : " + customCommand.value());
+        int result = mcsm::runCommand(customCommand.value());
         if(result != 0){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-                "Server exited with error code : " + std::to_string(result)
-            }});
-            return res;
+            return "\033[38;2;255;0;0mServer exited with error code : " + std::to_string(result);
         }
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {
-            "Server exited with error code : 0"
-        }});
-        return res;
+        return "\033[38;2;0;255;0mServer exited with error code : 0";
     }
     
-    std::string jar = loader->getServerJarFile();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    mcsm::StringResult jar = loader->getServerJarFile();
+    if(!jar) return jar;
 
-    bool fileExists = mcsm::fileExists(path + "/" + jar);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    mcsm::BoolResult fileExists = mcsm::fileExists(path + "/" + jar.value());
+    if(!fileExists) return tl::unexpected(fileExists.error());
 
-    if(!fileExists){
-        mcsm::info("Setting up " + jar + "...");
+    if(!fileExists.value()){
+        mcsm::info("Setting up " + jar.value() + "...");
         mcsm::info("\"server_jar_name\" will be used as the copied/downloaded file name. Make sure you don't have characters like \"/\".");
-        std::string sVer = loader->getServerVersion();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-            mcsm::Result res(resp.first, resp.second);
-            return res;
-        }
+        mcsm::StringResult sVer = loader->getServerVersion();
+        if(!sVer) return sVer;
 
-        mcsm::Result res = setupServerJarFile(path, optionPath);
-        if(!res.isSuccess()) return res;
+        mcsm::VoidResult res = setupServerJarFile(path, optionPath);
+        if(!res) return res;
     }
     return Server::start(loader, option, path, optionPath);
 }

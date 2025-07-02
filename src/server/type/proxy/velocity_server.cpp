@@ -269,55 +269,34 @@ mcsm::VoidResult mcsm::VelocityServer::obtainJarFile(const std::string& version,
 
 mcsm::VoidResult mcsm::VelocityServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
     // ServerOption class handles the data file stuff
-    std::string cPath = mcsm::getCurrentPath();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
-
-    return start(loader, option, cPath, cPath);
+    mcsm::StringResult cPath = mcsm::getCurrentPath();
+    if(!cPath) return cPath;
+    return start(loader, option, cPath.value(), cPath.value());
 }
 
-mcsm::VoidResult mcsm::VelocityServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
+mcsm::StringResult mcsm::VelocityServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
     // ServerOption class handles the data file stuff
+    
+    mcsm::StringResult jar = loader->getServerJarFile();
+    if(!jar) return jar;
 
-    std::string jar = loader->getServerJarFile();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    mcsm::BoolResult fileExists = mcsm::fileExists(path + "/" + jar);
+    if(!fileExists) return tl::unexpected(fileExists.error());
 
-    bool fileExists = mcsm::fileExists(path + "/" + jar);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
-
-    if(!fileExists){
+    if(!fileExists.value()){
         mcsm::info("Downloading " + jar + "...");
-        std::string sVer = loader->getServerVersion();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-            mcsm::Result res(resp.first, resp.second);
-            return res;
-        }
+        mcsm::StringResult sVer = loader->getServerVersion();
+        if(!sVer) return sVer;
 
-        mcsm::Result res = download(sVer, path, jar, optionPath);
-        if(!res.isSuccess()) return res;
+        mcsm::VoidResult res = download(sVer.value(), path, jar.value(), optionPath);
+        if(!res) return res;
     }else{
-        bool doesUpdate = loader->doesAutoUpdate();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-            mcsm::Result res(resp.first, resp.second);
-            return res;
-        }
-        
-        if(doesUpdate){
-            mcsm::Result res = update(path, optionPath);
-            if(!res.isSuccess()) return res;
+        mcsm::BoolResult doesUpdate = loader->doesAutoUpdate();
+        if(!doesUpdate) return doesUpdate;
+
+        if(doesUpdate.value()){
+            mcsm::VoidResult res = update(path, optionPath);
+            if(!res) return res;
         }
     }
     return Server::start(loader, option, path, optionPath);

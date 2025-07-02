@@ -50,8 +50,8 @@ namespace mcsm {
 
         std::string getGitHub() const override;
 
-        mcsm::VoidResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option) override;
-        mcsm::VoidResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
+        mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option) override;
+        mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
 
         mcsm::VoidResult download(const std::string& version) override;
         mcsm::VoidResult download(const std::string& version, const std::string& path) override;

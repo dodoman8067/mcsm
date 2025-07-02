@@ -97,7 +97,7 @@ namespace mcsm {
          * Called by `ServerStarter#start`
          * @param option JVM launch profile
         */
-        virtual mcsm::VoidResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option);
+        virtual mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option);
 
         /**
          * Starts the configured server in `optionPath` with following launch profile `option`.
@@ -105,7 +105,7 @@ namespace mcsm {
          * @param option JVM launch profile
          * @param optionPath server.json path
         */
-        virtual mcsm::VoidResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath);
+        virtual mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath);
 
         virtual const tl::expected<std::map<std::string, std::string>, mcsm::Error> getRequiredValues() const;
 
