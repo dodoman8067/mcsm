@@ -659,19 +659,18 @@ mcsm::VoidResult mcsm::SpongeServer::generate(const std::string& name, mcsm::Jvm
 const tl::expected<std::map<std::string, std::string>, mcsm::Error> mcsm::SpongeServer::getRequiredValues() const {
     auto* property1 = mcsm::GeneralOption::getGeneralOption().getProperty("sponge_api_search_recommended_versions");
     if(property1 == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Failed to get property \"sponge_api_search_recommended_versions\".", "Report this to the developer of this project."}});
-        return {};
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"\"sponge_api_search_recommended_versions\"", "general config"});
+        return tl::unexpected(err);
     }
 
     const nlohmann::json& v = property1->getCurrentValue();
     if(!v.is_boolean()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"sponge_api_search_recommended_versions\"", "boolean")});
-        return {};
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"sponge_api_search_recommended_versions\"", "boolean"});
+        return tl::unexpected(err);
     }
 
     std::string strV = v.get<bool>() ? "true" : "false";
 
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return {
         {"name", "" },
         {"minecraft_version", ""},
