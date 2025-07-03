@@ -57,13 +57,13 @@ mcsm::StringResult mcsm::SpongeServer::getVersion(const std::string& ver) const 
         auto loadRes = opt.load(advp);
         if(!loadRes) return tl::unexpected(loadRes.error());
         
-        auto nRecommended = opt.getValue("api_serch_recommended");
+        auto nRecommended = opt.getValue("api_search_recommended");
         if(!nRecommended) return tl::unexpected(nRecommended.error());
         if(nRecommended.value() == nullptr){
             bRecommended = false;
         }else{
             if(!nRecommended.value().is_boolean()){
-                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"api_serch_recommended\"", "boolean"});
+                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"api_search_recommended\"", "boolean"});
                 return tl::unexpected(err);
             }
             bRecommended = nRecommended.value();
@@ -199,14 +199,14 @@ mcsm::StringResult mcsm::SpongeServer::getVersion(const std::string& ver, const 
     auto opLoadRes = opt.load(advp);
     if(!opLoadRes) return tl::unexpected(opLoadRes.error());
 
-    auto nRecommended = opt.getValue("api_serch_recommended");
+    auto nRecommended = opt.getValue("api_search_recommended");
     if(!nRecommended) return tl::unexpected(nRecommended.error());
     if(nRecommended.value() == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"\"api_serch_recommended\"", opt.getName()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"\"api_search_recommended\"", opt.getName()});
         return tl::unexpected(err);
     }
     if(!nRecommended.value().is_boolean()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"api_serch_recommended\"", "boolean"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"api_search_recommended\"", "boolean"});
         return tl::unexpected(err);
     }
 
@@ -685,7 +685,7 @@ mcsm::VoidResult mcsm::SpongeServer::generate(const std::string& name, mcsm::Jvm
         return res;
     }
 
-    mcsm::Result setRes = sOpt.setValue("api_serch_recommended", bApi);
+    mcsm::Result setRes = sOpt.setValue("api_search_recommended", bApi);
     if(!setRes.isSuccess()) return setRes;
 
     return sOpt.save();
