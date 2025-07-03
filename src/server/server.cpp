@@ -123,7 +123,6 @@ mcsm::StringResult mcsm::Server::getJarFile(const std::string& checkDir) const {
 
         if(!value.value().is_string()){
             mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"server_jar_name\"", "string"});
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"server_jar_name\"", "string")});
             return tl::unexpected(err);
         }
         return value.get<std::string>();
