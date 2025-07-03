@@ -28,46 +28,52 @@ mcsm::PaperServer::~PaperServer() {}
 
 mcsm::IntResult mcsm::PaperServer::getVersion(const std::string& ver) const {
     if(!mcsm::isSafeString(ver)){
-        return -1;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {ver});
+        return tl::unexpected(err);
     }
     std::string res = mcsm::get("https://api.papermc.io/v2/projects/paper/versions/" + ver);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
-    nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
+    if(!res) return tl::unexpected(res.error());
+    nlohmann::json json = nlohmann::json::parse(res.value(), nullptr, false);
     if(json.is_discarded()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
-        return -1;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://api.papermc.io/v2/projects/paper/versions/" + ver, "Invalid API json responce"});
+        return tl::unexpected(err);
     }
-    if(json["builds"] == nullptr) return -1;
+    if(json["builds"] == nullptr){
+        return -1; // keep it this way; otherwise it returns invalid get error instead of unsupported version error
+    }
     if(json["builds"].is_array()){
         nlohmann::json builds = json["builds"];
         if(builds[json["builds"].size() - 1] == nullptr || !builds[json["builds"].size() - 1].is_number_integer()) return -1;
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return builds[json["builds"].size() - 1];
     }else{
-        return -1;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://api.papermc.io/v2/projects/paper/versions/" + ver, "Invalid API json responce on property \"builds\""});
+        return tl::unexpected(err);
     }
 }
 
 // used for checking if versions with specific build exists
 mcsm::IntResult mcsm::PaperServer::getVersion(const std::string& ver, const std::string& build) const {
     if(!mcsm::isSafeString(build)){
-        return -1;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {build});
+        return tl::unexpected(err);
     }
     if(!mcsm::isSafeString(ver)){
-        return -1;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {ver});
+        return tl::unexpected(err);
     }
-    std::string res = mcsm::get("https://api.papermc.io/v2/projects/paper/versions/" + ver + "/builds/" + build);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
-    nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
+    auto res = mcsm::get("https://api.papermc.io/v2/projects/paper/versions/" + ver + "/builds/" + build);
+    if(!res) return tl::unexpected(res.error());
+    nlohmann::json json = nlohmann::json::parse(res.value(), nullptr, false);
     if(json.is_discarded()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
-        return -1;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://api.papermc.io/v2/projects/paper/versions/" + ver + "/builds/" + build, "Invalid API json responce"});
+        return tl::unexpected(err);
     }
 
-    if(json["build"] == nullptr || !json["build"].is_number_integer()){
-        return -1;
+    if(json["build"] == nullptr) return -1;  // keep it this way; otherwise it returns invalid get error instead of unsupported version error
+    if(!json["build"].is_number_integer()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://api.papermc.io/v2/projects/paper/versions/" + ver + "/builds/" + build, "Invalid API json responce on property \"build\""});
+        return tl::unexpected(err);
     }else{
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return json["build"];
     }
 }

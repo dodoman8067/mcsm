@@ -32,20 +32,20 @@ mcsm::FabricServer::~FabricServer() {}
  */
 mcsm::StringResult mcsm::FabricServer::getVersion(const std::string& ver) const {
     if(!mcsm::isSafeString(ver)){
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {ver});
+        return tl::unexpected(err);
     }
-    std::string res = mcsm::get("https://meta.fabricmc.net/v2/versions/loader/" + ver);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-    nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
+    auto res = mcsm::get("https://meta.fabricmc.net/v2/versions/loader/" + ver);
+    if(!res) return res;
+    nlohmann::json json = nlohmann::json::parse(res.value(), nullptr, false);
     if(json.is_discarded()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://meta.fabricmc.net/v2/versions/loader/" + ver, "Invalid API json responce"});
+        return tl::unexpected(err);
     }
     if(json.is_array() && !json.empty()){
         nlohmann::json firstLoader = json[0]["loader"];
         if(firstLoader == nullptr || firstLoader["version"] == nullptr || !firstLoader["version"].is_string()) return "";
         std::string version = firstLoader["version"];
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return version;
     }else{
         return "";
@@ -56,18 +56,17 @@ mcsm::StringResult mcsm::FabricServer::getVersion(const std::string& ver) const 
  * Returns fabric installer version.
  */
 mcsm::StringResult mcsm::FabricServer::getVersion() const {
-    std::string res = mcsm::get("https://meta.fabricmc.net/v2/versions/installer");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-    nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
+    auto res = mcsm::get("https://meta.fabricmc.net/v2/versions/installer");
+    if(!res) return res;
+    nlohmann::json json = nlohmann::json::parse(res.value(), nullptr, false);
     if(json.is_discarded()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://meta.fabricmc.net/v2/versions/installer", "Invalid API json responce"});
+        return tl::unexpected(err);
     }
     if(json.is_array() && !json.empty()){
         nlohmann::json first = json[0];
         if(first == nullptr || first["version"] == nullptr || !first["version"].is_string()) return "";
         std::string version = first["version"];
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return version;
     }else{
         return "";

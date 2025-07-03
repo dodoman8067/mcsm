@@ -32,57 +32,73 @@ mcsm::VelocityServer::~VelocityServer(){}
 // it is something like a method that returns latest mc version
 
 mcsm::IntResult mcsm::VelocityServer::getVersion(const std::string& ver) const {
-    std::string res = mcsm::get("https://api.papermc.io/v2/projects/velocity/versions/" + ver);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
-    nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
-    if(json.is_discarded()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
-        return -1;
+    if(!mcsm::isSafeString(ver)){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {ver});
+        return tl::unexpected(err);
     }
-    if(json["builds"] == nullptr) return -1;
+    auto res = mcsm::get("https://api.papermc.io/v2/projects/velocity/versions/" + ver);
+    if(!res) return tl::unexpected(res.error());
+    nlohmann::json json = nlohmann::json::parse(res.value(), nullptr, false);
+    if(json.is_discarded()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_PARSE_FAILED_CANNOT_BE_MODIFIED, {});
+        return tl::unexpected(err);
+    }
+    if(json["builds"] == nullptr){
+        return -1; // keep it this way; otherwise it returns invalid get error instead of unsupported version error
+    }
     if(json["builds"].is_array()){
         nlohmann::json builds = json["builds"];
         if(builds[json["builds"].size() - 1] == nullptr || !builds[json["builds"].size() - 1].is_number_integer()) return -1;
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return builds[json["builds"].size() - 1];
     }else{
-        return -1;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://api.papermc.io/v2/projects/velocity/versions/" + ver, "Invalid API json responce type on property \"builds\""});
+        return tl::unexpected(err);
     }
 }
 
 // used for checking if versions with specific build exists
 mcsm::IntResult mcsm::VelocityServer::getVersion(const std::string& ver, const std::string& build) const {
-    std::string res = mcsm::get("https://api.papermc.io/v2/projects/velocity/versions/" + ver + "/builds/" + build);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
-    nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
+    if(!mcsm::isSafeString(build)){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {build});
+        return tl::unexpected(err);
+    }
+    if(!mcsm::isSafeString(ver)){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {ver});
+        return tl::unexpected(err);
+    }
+    auto res = mcsm::get("https://api.papermc.io/v2/projects/velocity/versions/" + ver + "/builds/" + build);
+    if(!res) return tl::unexpected(res.error());
+    nlohmann::json json = nlohmann::json::parse(res.value(), nullptr, false);
     if(json.is_discarded()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
-        return -1;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_PARSE_FAILED_CANNOT_BE_MODIFIED, {});
+        return tl::unexpected(err);
     }
 
-    if(json["build"] == nullptr || !json["build"].is_number_integer()){
-        return -1;
+    if(json["build"] == nullptr) return -1; // keep it this way; otherwise it returns invalid get error instead of unsupported version error
+
+    if(!json["build"].is_number_integer()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://api.papermc.io/v2/projects/velocity/versions/" + ver, "Invalid API json responce on property \"build\""});
+        return tl::unexpected(err);
     }else{
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return json["build"];
     }
 }
 
 std::string mcsm::VelocityServer::getLatestVersion() const {
-    std::string res = mcsm::get("https://api.papermc.io/v2/projects/velocity");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-    nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
+    auto res = mcsm::get("https://api.papermc.io/v2/projects/velocity");
+    if(!res) return tl::unexpected(res.error());
+    nlohmann::json json = nlohmann::json::parse(res.value(), nullptr, false);
     if(json.is_discarded()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_PARSE_FAILED_CANNOT_BE_MODIFIED, {});
+        return tl::unexpected(err);
     }
 
     if(json["versions"] == nullptr || !json["versions"].is_array()){
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://api.papermc.io/v2/projects/velocity", "Invalid API json responce on property \"versions\""});
+        return tl::unexpected(err);
     }else{
         nlohmann::json builds = json["versions"];
         if(builds[json["versions"].size() - 1] == nullptr || !builds[json["versions"].size() - 1].is_string()) return "";
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return builds[json["versions"].size() - 1];
     }
 }

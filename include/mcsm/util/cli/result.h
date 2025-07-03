@@ -449,7 +449,7 @@ namespace mcsm::errors {
 
     inline const ErrorTemplate JSON_PARSE_FAILED_CANNOT_BE_MODIFIED = {
         204,
-        "Failed to parse json.",
+        "Failed to parse json. Likely an invalid JSON responce was recieved from curl requests.",
         "This error cannot be resolved by editing the file."
     };
 
@@ -560,8 +560,8 @@ namespace mcsm::errors {
 
     inline const ErrorTemplate UNSAFE_STRING = {
         501,
-        "String contains unsafe characters: %s.",
-        "Please remove or escape the unsafe characters."
+        "String contains illegal() characters: %s.",
+        "Please remove them and try again."
     };
 
     inline const ErrorTemplate GIT_CLONE_FAILED = {

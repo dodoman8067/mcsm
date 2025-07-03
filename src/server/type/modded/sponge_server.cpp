@@ -38,45 +38,47 @@ mcsm::SpongeServer::~SpongeServer(){}
 // Note: limit more than one will have to return keys[keys.size() - 1]
 mcsm::StringResult mcsm::SpongeServer::getVersion(const std::string& ver) const {
     if(!mcsm::isSafeString(ver)){
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {ver});
+        return tl::unexpected(err);
     }
-    mcsm::Option opt(mcsm::getCurrentPath(), "server");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    auto cPath = mcsm::getCurrentPath();
+    if(!cPath) return cPath;
+
+    mcsm::Option opt(cPath.value(), "server");
 
     bool bRecommended = false;
     
-    bool optExists = opt.exists();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    auto optExists = opt.exists();
+    if(!optExists) return tl::unexpected(optExists.error());
 
-    if(optExists){
+    if(optExists.value()){
         bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
 
-        opt.load(advp);
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+        auto loadRes = opt.load(advp);
+        if(!loadRes) return tl::unexpected(loadRes.error());
         
-        nlohmann::json nRecommended = opt.getValue("api_serch_recommended");
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-        if(nRecommended == nullptr){
+        auto nRecommended = opt.getValue("api_serch_recommended");
+        if(!nRecommended) return tl::unexpected(nRecommended.error());
+        if(nRecommended.value() == nullptr){
             bRecommended = false;
         }else{
-            if(!nRecommended.is_boolean()){
-                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"api_serch_recommended\"", "boolean")});
-                return "";
+            if(!nRecommended.value().is_boolean()){
+                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"api_serch_recommended\"", "boolean"});
+                return tl::unexpected(err);
             }
-            bRecommended = nRecommended;
+            bRecommended = nRecommended.value();
         }
     }else{
         auto* property = mcsm::GeneralOption::getGeneralOption().getProperty("sponge_api_search_recommended_versions");
         if(property == nullptr){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Failed to get property \"sponge_api_search_recommended_versions\".", "Report this to the developer of this project."}});
-            return "";
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"\"sponge_api_search_recommended_versions\"", "general config"});
+            return tl::unexpected(err);
         }
 
         const nlohmann::json& v = property->getCurrentValue();
         if(!v.is_boolean()){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"sponge_api_search_recommended_versions\"", "boolean")});
-            return "";
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE {"\"sponge_api_search_recommended_versions\"", "boolean"});
+            return tl::unexpected(err);
         }
 
         bRecommended = property->getCurrentValue().get<bool>();
@@ -84,17 +86,24 @@ mcsm::StringResult mcsm::SpongeServer::getVersion(const std::string& ver) const 
 
     std::string recommended = bRecommended ? "true" : "false";
 
-    std::string res = mcsm::get("https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver + "&limit=1&recommended=" + recommended);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-    nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
+    auto res = mcsm::get("https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver + "&limit=1&recommended=" + recommended);
+    if(!res) return res;
+
+    nlohmann::json json = nlohmann::json::parse(res.value(), nullptr, false);
     if(json.is_discarded()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver + "&limit=1&recommended=" + recommended, "Invalid API json responce"});
+        return tl::unexpected(err);
     }
 
     nlohmann::json artifacts = json["artifacts"];
-    if(artifacts == nullptr) return ""; // has to exist
-    if(!artifacts.is_object()) return ""; // has to be an object
+    if(artifacts == nullptr){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver + "&limit=1&recommended=" + recommended, "Invalid API json responce on property \"artifacts\""});
+        return tl::unexpected(err);
+    }
+    if(!artifacts.is_object()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver + "&limit=1&recommended=" + recommended, "Invalid API json responce on property \"artifacts\""});
+        return tl::unexpected(err);
+    }
 
     std::vector<std::string> keys;
     for(nlohmann::json::iterator it = artifacts.begin(); it != artifacts.end(); it++){
@@ -107,41 +116,50 @@ mcsm::StringResult mcsm::SpongeServer::getVersion(const std::string& ver) const 
 
 mcsm::StringResult mcsm::SpongeServer::getVersion(const std::string& ver, const bool& apiSearchRecommended) const {
     if(!mcsm::isSafeString(ver)){
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {ver});
+        return tl::unexpected(err);
     }
-    mcsm::Option opt(mcsm::getCurrentPath(), "server");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    auto cPath = mcsm::getCurrentPath();
+    if(!cPath) return cPath;
+
+    mcsm::Option opt(cPath.value(), "server");
     
-    bool optExists = opt.exists();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    auto optExists = opt.exists();
+    if(!optExists) return tl::unexpected(optExists.error());
 
-    if(optExists){
+    if(optExists.value()){
         bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
 
-        opt.load(advp);
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+        auto loadRes = opt.load(advp);
+        if(!loadRes) return tl::unexpected(loadRes.error());
     }else{
         auto* property = mcsm::GeneralOption::getGeneralOption().getProperty("sponge_api_search_recommended_versions");
         if(property == nullptr){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Failed to get property \"sponge_api_search_recommended_versions\".", "Report this to the developer of this project."}});
-            return "";
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"\"sponge_api_search_recommended_versions\"", "general config"});
+            return tl::unexpected(err);
         }
     }
 
     std::string recommended = apiSearchRecommended ? "true" : "false";
 
-    std::string res = mcsm::get("https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver + "&limit=1&recommended=" + recommended);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-    nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
+    auto res = mcsm::get("https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver + "&limit=1&recommended=" + recommended);
+    if(!res) return res;
+
+    nlohmann::json json = nlohmann::json::parse(res.value(), nullptr, false);
     if(json.is_discarded()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver + "&limit=1&recommended=" + recommended, "Invalid API json responce"});
+        return tl::unexpected(err);
     }
 
     nlohmann::json artifacts = json["artifacts"];
-    if(artifacts == nullptr) return ""; // has to exist
-    if(!artifacts.is_object()) return ""; // has to be an object
+    if(artifacts == nullptr){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver + "&limit=1&recommended=" + recommended, "Invalid API json responce on property \"artifacts\""});
+        return tl::unexpected(err);
+    }
+    if(!artifacts.is_object()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver + "&limit=1&recommended=" + recommended, "Invalid API json responce on property \"artifacts\""});
+        return tl::unexpected(err);
+    }
 
     std::vector<std::string> keys;
     for(nlohmann::json::iterator it = artifacts.begin(); it != artifacts.end(); it++){
@@ -159,50 +177,61 @@ mcsm::StringResult mcsm::SpongeServer::getVersion(const std::string& ver, const 
 // The offset calculation is based on the list position, not the release number.
 mcsm::StringResult mcsm::SpongeServer::getVersion(const std::string& ver, const std::string& build, const bool& /* apiSearchRecommended */) const {
     if(!mcsm::isSafeString(ver)){
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {ver});
+        return tl::unexpected(err);
     }
     if(!mcsm::isSafeString(build)){
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {build});
+        return tl::unexpected(err);
     }
     if(!mcsm::is_number(build)) return "";
 
     int buildNo = std::stoi(build); 
 
-    mcsm::Option opt(mcsm::getCurrentPath(), "server");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    auto cPathRes = mcsm::getCurrentPath();
+    if(!cPathRes) return cPathRes;
+    auto cPath = cPathRes.value();
+
+    mcsm::Option opt(cPath, "server");
 
     bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
 
-    opt.load(advp);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    auto opLoadRes = opt.load(advp);
+    if(!opLoadRes) return tl::unexpected(opLoadRes.error());
 
-    nlohmann::json nRecommended = opt.getValue("api_serch_recommended");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-    if(nRecommended == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"api_serch_recommended\"", opt.getName())});
-        return "";
+    auto nRecommended = opt.getValue("api_serch_recommended");
+    if(!nRecommended) return tl::unexpected(nRecommended.error());
+    if(nRecommended.value() == nullptr){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"\"api_serch_recommended\"", opt.getName()});
+        return tl::unexpected(err);
     }
-    if(!nRecommended.is_boolean()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"api_serch_recommended\"", "boolean")});
-        return "";
+    if(!nRecommended.value().is_boolean()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"api_serch_recommended\"", "boolean"});
+        return tl::unexpected(err);
     }
 
-    bool bRecommended = nRecommended;
+    bool bRecommended = nRecommended.value();
 
     std::string recommended = bRecommended ? "true" : "false";
 
-    std::string sizeRes = mcsm::get("https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver + "&limit=1&recommended=" + recommended);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-    nlohmann::json json1 = nlohmann::json::parse(sizeRes, nullptr, false);
+    auto sizeRes = mcsm::get("https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver + "&limit=1&recommended=" + recommended);
+    if(!sizeRes) return sizeRes;
+
+    nlohmann::json json1 = nlohmann::json::parse(sizeRes.value(), nullptr, false);
     if(json1.is_discarded()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver + "&limit=1&recommended=" + recommended, "Invalid API json responce"});
+        return tl::unexpected(err);
     }
 
     nlohmann::json jSize = json1["size"];
-    if(jSize == nullptr) return ""; // has to exist
-    if(!jSize.is_number_integer()) return "";
+    if(jSize == nullptr){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver + "&limit=1&recommended=" + recommended, "Invalid API json responce on property \"size\""});
+        return tl::unexpected(err);
+    }
+    if(!jSize.is_number_integer()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver + "&limit=1&recommended=" + recommended, "Invalid API json responce on property \"size\""});
+        return tl::unexpected(err);
+    }
 
     int totalSize = jSize;
 
@@ -210,18 +239,24 @@ mcsm::StringResult mcsm::SpongeServer::getVersion(const std::string& ver, const 
     // if you send the request like &limit=25, 1 should be replaced with 25
     int offset = std::max(0, (totalSize - 1) - std::max(0, buildNo - 1));
 
-    std::string res = mcsm::get("https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver + "&limit=1&offset=" + std::to_string(offset) + "&recommended=" + recommended);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-    
-    nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
+    auto res = mcsm::get("https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver + "&limit=1&offset=" + std::to_string(offset) + "&recommended=" + recommended);
+    if(!res) return res;
+
+    nlohmann::json json = nlohmann::json::parse(res.value(), nullptr, false);
     if(json.is_discarded()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver + "&limit=1&offset=" + std::to_string(offset) + "&recommended=" + recommended, "Invalid API json responce"});
+        return tl::unexpected(err);
     }
 
     nlohmann::json artifacts = json["artifacts"];
-    if(artifacts == nullptr) return ""; // has to exist
-    if(!artifacts.is_object()) return ""; // has to be an object
+    if(artifacts == nullptr){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver + "&limit=1&offset=" + std::to_string(offset) + "&recommended=" + recommended, "Invalid API json responce on property \"artifacts\""});
+        return tl::unexpected(err);
+    }
+    if(!artifacts.is_object()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions?tags=,minecraft:" + ver + "&limit=1&offset=" + std::to_string(offset) + "&recommended=" + recommended, "Invalid API json responce on property \"artifacts\""});
+        return tl::unexpected(err);
+    }
 
     std::vector<std::string> keys;
     for(nlohmann::json::iterator it = artifacts.begin(); it != artifacts.end(); it++){

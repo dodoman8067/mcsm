@@ -28,68 +28,50 @@ mcsm::VanillaServer::~VanillaServer(){}
 
 mcsm::StringResult mcsm::VanillaServer::getVersionObject(const std::string& ver) const {
     if(!mcsm::isSafeString(ver)){
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {ver});
+        return tl::unexpected(err);
     }
-    std::string jsonData = mcsm::get("https://launchermeta.mojang.com/mc/game/version_manifest.json");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    auto jsonData = mcsm::get("https://launchermeta.mojang.com/mc/game/version_manifest.json");
+    if(!jsonData) return jsonData;
     
-    nlohmann::json data = nlohmann::json::parse(jsonData);
+    nlohmann::json data = nlohmann::json::parse(jsonData.value(), nullptr, false);
     if(data.is_discarded()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Parse of json failed. (Vanilla version manifest)",
-            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
-        }});
-        return "";  
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://launchermeta.mojang.com/mc/game/version_manifest.json", "Invalid API json responce"});
+        return tl::unexpected(err);
     }
 
     // Check if "versions" array exists
     if(!data.contains("versions")){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "No \"versions\" array exists in vanilla server version manifest.",
-            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
-        }});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://launchermeta.mojang.com/mc/game/version_manifest.json", "No \"versions\" array exists in vanilla server version manifest."});
+        return tl::unexpected(err);
     }
 
     auto& versions = data["versions"];
     if(!versions.is_array()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Value \"versions\" is not an array.",
-            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
-        }});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://launchermeta.mojang.com/mc/game/version_manifest.json", "Value \"versions\" is not an array."});
+        return tl::unexpected(err);
     }
 
     // Search for entry with given ID
     for(const auto& entry : versions){
         // Check if the entry is an object
         if(!entry.is_object()){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-                "Entry in vanilla server API request is not an object.",
-                "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
-            }});
-            return "";
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://launchermeta.mojang.com/mc/game/version_manifest.json", "Entry in vanilla server API request is not an object."});
+            return tl::unexpected(err);
         }
 
         // Check if "id" field exists and matches the given ID
         if(!entry.contains("id")){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-                "Value \"id\" in vanilla server API request is not a string | not found.",
-                "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
-            }});
-            return "";
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://launchermeta.mojang.com/mc/game/version_manifest.json", "Value \"id\" in vanilla server API request is not a string | not found."});
+            return tl::unexpected(err);
         }
 
         if(!entry["id"].is_string()){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-                "Value \"id\" in vanilla server API request is not a string.",
-                "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
-            }});
-            return "";
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://launchermeta.mojang.com/mc/game/version_manifest.json", "Value \"id\" in vanilla server API request is not a string."});
+            return tl::unexpected(err);
         }
 
         if(entry["id"] == ver){
-            mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
             return entry.dump();
         }
     }
@@ -99,119 +81,81 @@ mcsm::StringResult mcsm::VanillaServer::getVersionObject(const std::string& ver)
 }
 
 mcsm::StringResult mcsm::VanillaServer::getServerJarURL(const std::string& ver) const {
-    std::string versionJson = getVersionObject(ver);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-    if(mcsm::isWhitespaceOrEmpty(versionJson)){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion(ver)});
-        return "";
+    auto versionJson = getVersionObject(ver);
+    if(!versionJson) return versionJson;
+    if(mcsm::isWhitespaceOrEmpty(versionJson.value())){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {ver});
+        return tl::unexpected(err);
     }
-    nlohmann::json version = nlohmann::json::parse(versionJson, nullptr, false);
+    nlohmann::json version = nlohmann::json::parse(versionJson.value(), nullptr, false);
     if(version.is_discarded()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Parse of json failed. (Vanilla version object)",
-            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
-        }});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://launchermeta.mojang.com/mc/game/version_manifest.json", "Invalid API json responce"});
+        return tl::unexpected(err);
     }
     if(version["type"] == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Value \"type\" not found. (Vanilla version object)",
-            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
-        }});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://launchermeta.mojang.com/mc/game/version_manifest.json", "Value \"type\" not found. (Vanilla version object)"});
+        return tl::unexpected(err);
     }
     if(version["url"] == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Value \"url\" not found. (Vanilla version object)",
-            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
-        }});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://launchermeta.mojang.com/mc/game/version_manifest.json", "Value \"url\" not found. (Vanilla version object)"});
+        return tl::unexpected(err);
     }
     if(!version["type"].is_string()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Value \"type\" is not string. (Vanilla version object)",
-            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
-        }});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://launchermeta.mojang.com/mc/game/version_manifest.json", "Value \"type\" is not a string. (Vanilla version object)"});
+        return tl::unexpected(err);
     }
     if(!version["url"].is_string()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Value \"url\" is not string. (Vanilla version object)",
-            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
-        }});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://launchermeta.mojang.com/mc/game/version_manifest.json", "Value \"url\" is not a string. (Vanilla version object)"});
+        return tl::unexpected(err);
     }
 
     if(version["type"] == "old_beta" || version["type"] == "old_alpha"){
-        mcsm::Result res({mcsm::ResultType::MCSM_WARN, {
-            "No plans to support beta and alpha versions.",
-            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue."
-        }});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://launchermeta.mojang.com/mc/game/version_manifest.json", "No plans to support beta and alpha versions."});
+        return tl::unexpected(err);
     }
 
     std::string url = version["url"];
-    std::string serverJson = mcsm::get(url);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-    if(mcsm::isWhitespaceOrEmpty(versionJson)){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion(ver)});
-        return "";
+    auto serverJson = mcsm::get(url);
+    if(!serverJson) return serverJson;
+
+    if(mcsm::isWhitespaceOrEmpty(serverJson.value())){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {ver});
+        return tl::unexpected(err);
     }
 
-    nlohmann::json serverData = nlohmann::json::parse(serverJson);
+    nlohmann::json serverData = nlohmann::json::parse(serverJson.value(), nullptr, false);
     if(serverData.is_discarded()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Parse of json failed. (Vanilla version.json file).",
-            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
-        }});
-        return "";  
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {url, "Invalid API JSON responce"});
+        return tl::unexpected(err);
     }
     nlohmann::json downloadsValue = serverData["downloads"];
     if(downloadsValue == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Value \"downloads\" not found. (Vanilla version.json file)",
-            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
-        }});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {url, "Value \"downloads\" not found."});
+        return tl::unexpected(err);
     }
     if(!downloadsValue.is_object()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Value \"downloads\" not a json object. (Vanilla version.json file)",
-            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
-        }});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {url, "Value \"downloads\" not a json object."});
+        return tl::unexpected(err);
     }
 
     nlohmann::json serverValue = downloadsValue["server"];
     if(serverValue == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Value \"server\" not found. (Vanilla version.json file)",
-            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
-        }});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {url, "Value \"server\" not found."});
+        return tl::unexpected(err);
     }
     if(!serverValue.is_object()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Value \"server\" not a json object. (Vanilla version.json file)",
-            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
-        }});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {url, "Value \"server\" not a json object."});
+        return tl::unexpected(err);
     }
 
     nlohmann::json serverJarURL = serverValue["url"];
     if(serverJarURL == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Value \"url\" not found. (Vanilla version.json file)",
-            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
-        }});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {url, "Value \"url\" not found."});
+        return tl::unexpected(err);
     }
     if(!serverJarURL.is_string()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Value \"url\" not a string. (Vanilla version.json file)",
-            "Please report this to Github(https://github.com/dodoman8067/mcsm) if you believe that this is a software issue." 
-        }});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {url, "Value \"url\" not a string."});
+        return tl::unexpected(err);
     }
 
     std::string finalReturnValue = serverJarURL;

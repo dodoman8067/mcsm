@@ -28,44 +28,45 @@ mcsm::PurpurServer::~PurpurServer() {}
 
 mcsm::IntResult mcsm::PurpurServer::getVersion(const std::string& ver) const {
     if(!mcsm::isSafeString(ver)){
-        return -1;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {ver});
+        return tl::unexpected(err);
     }
-    std::string res = mcsm::get("https://api.purpurmc.org/v2/purpur/" + ver);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
-    nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
+    auto res = mcsm::get("https://api.purpurmc.org/v2/purpur/" + ver);
+    if(!res) return tl::unexpected(res.error());
+    nlohmann::json json = nlohmann::json::parse(res.value(), nullptr, false);
     if(json.is_discarded()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
-        return -1;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://api.purpurmc.org/v2/purpur/" + ver, "Invalid API json responce"});
+        return tl::unexpected(err);
     }
     if(json["builds"] != nullptr){
         nlohmann::json builds = json["builds"];
         if(builds["latest"] == nullptr) return -1;
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return std::stoi(builds["latest"].get<std::string>());
     }else{
-        return -1;
+        return -1; // keep it this way; otherwise it returns invalid get error instead of unsupported version error
     }
 }
 
 mcsm::IntResult mcsm::PurpurServer::getVersion(const std::string& ver, const std::string& build) const {
     if(!mcsm::isSafeString(build)){
-        return -1;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {build});
+        return tl::unexpected(err);
     }
     if(!mcsm::isSafeString(ver)){
-        return -1;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {ver});
+        return tl::unexpected(err);
     }
-    std::string res = mcsm::get("https://api.purpurmc.org/v2/purpur/" + ver + "/" +  build);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return -1;
-    nlohmann::json json = nlohmann::json::parse(res, nullptr, false);
+    auto res = mcsm::get("https://api.purpurmc.org/v2/purpur/" + ver + "/" +  build);
+    if(!res) return tl::unexpected(res.error());
+    nlohmann::json json = nlohmann::json::parse(res.value(), nullptr, false);
     if(json.is_discarded()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonParseFailedCannotBeModified()});
-        return -1;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://api.purpurmc.org/v2/purpur/" + ver + "/" + build, "Invalid API json responce"});
+        return tl::unexpected(err);
     }
 
     if(json["build"] == nullptr){
-        return -1;
+        return -1; // keep it this way; otherwise it returns invalid get error instead of unsupported version error
     }else{
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return std::stoi(json["build"].get<std::string>());
     }
 }
