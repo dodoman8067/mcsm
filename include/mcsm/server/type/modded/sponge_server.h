@@ -65,7 +65,7 @@ namespace mcsm {
 
         mcsm::StringResult getDownloadLink(const std::string& build) const;
 
-        bool hasVersion(const std::string& version) const override;
+        mcsm::BoolResult hasVersion(const std::string &version) const override;
 
         mcsm::ServerType getType() const override;
         

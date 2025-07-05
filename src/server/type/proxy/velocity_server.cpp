@@ -431,40 +431,38 @@ mcsm::VoidResult mcsm::VelocityServer::generate(const std::string& name, mcsm::J
     mcsm::GeneralProperty* property = mcsm::GeneralOption::getGeneralOption().getProperty("skip_version_check_while_configuring");
 
     if(property == nullptr){
-        return {mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFoundPlusFix("skip_version_check_while_configuring", "general option", "\"skip_version_check_while_configuring\": false")};
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"skip_version_check_while_configuring", "general option", "\"skip_version_check_while_configuring\": false"});
+        return tl::unexpected(err);
     }
 
     const nlohmann::json& propertyValue = property->getCurrentValue();
     if(!propertyValue.is_boolean()){
-        return {mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongTypePlusFix("skip_version_check_while_configuring", "general option", "boolean", "false or true")};
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"skip_version_check_while_configuring", "general option", "boolean", "false or true"});
+        return tl::unexpected(err);
     }
 
     bool skipCheck = propertyValue;
 
     if(!skipCheck){
-        bool vExists = this->hasVersion(version);
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-            mcsm::Result res(resp.first, resp.second);
-            return res;
-        }
+        auto vExists = this->hasVersion(version);
         if(!vExists){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
-            return res;
+            return tl::unexpected(vExists.error());
+        }
+        if(!vExists.value()){
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {});
+            return tl::unexpected(err);
         }
     }
     mcsm::ServerDataOption opt(path);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    
     // No need to call opt.load() here. create() in ServerDataOption will call it eventually
     return configure(version, this, &opt, path, name, option, autoUpdate, extraValues.find("server_build_version")->second);
 }
 
 mcsm::BoolResult mcsm::VelocityServer::hasVersion(const std::string& version) const {
-    return getVersion(version) != -1;
+    auto vRes = getVersion(version);
+    if(!vRes) return tl::unexpected(vRes.error());
+    return vRes.value() != -1;
 }
 
 mcsm::ServerType mcsm::VelocityServer::getType() const {
@@ -472,6 +470,5 @@ mcsm::ServerType mcsm::VelocityServer::getType() const {
 }
 
 std::string mcsm::VelocityServer::getTypeAsString() const {
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "velocity";
 }
