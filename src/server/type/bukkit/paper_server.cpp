@@ -411,12 +411,14 @@ mcsm::VoidResult mcsm::PaperServer::generate(const std::string& name, mcsm::JvmO
     mcsm::GeneralProperty* property = mcsm::GeneralOption::getGeneralOption().getProperty("skip_version_check_while_configuring");
 
     if(property == nullptr){
-        return {mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFoundPlusFix("skip_version_check_while_configuring", "general option", "\"skip_version_check_while_configuring\": false")};
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"skip_version_check_while_configuring", "general option", "\"skip_version_check_while_configuring\": false"});
+        return tl::unexpected(err);
     }
 
     const nlohmann::json& propertyValue = property->getCurrentValue();
     if(!propertyValue.is_boolean()){
-        return {mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongTypePlusFix("skip_version_check_while_configuring", "general option", "boolean", "false or true")};
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"skip_version_check_while_configuring", "general option", "boolean", "false or true"});
+        return tl::unexpected(err);
     }
 
     bool skipCheck = propertyValue;
