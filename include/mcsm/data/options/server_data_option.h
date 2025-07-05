@@ -31,7 +31,9 @@ namespace mcsm {
     class ServerDataOption {
     protected:
         std::string path;
+        bool loaded = false;
         std::unique_ptr<mcsm::Option> option;
+
     public:
         ServerDataOption();
         ServerDataOption(const std::string& path);

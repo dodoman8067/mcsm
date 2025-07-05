@@ -26,18 +26,7 @@ SOFTWARE.
 mcsm::ServerDataOption::ServerDataOption() : ServerDataOption(mcsm::getCurrentPath()){}
 
 mcsm::ServerDataOption::ServerDataOption(const std::string& path){
-    bool fileExists = mcsm::fileExists(path);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return;
-
-    if(!fileExists){
-        if(!mcsm::mkdir(path)){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::fileCreateFailed(path)});
-            return;
-        }
-    }
-    this->option = std::make_unique<mcsm::Option>(path + "/.mcsm/", "server_datas");
-
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    this->path = path;
 }
 
 mcsm::ServerDataOption::~ServerDataOption(){
@@ -45,14 +34,28 @@ mcsm::ServerDataOption::~ServerDataOption(){
 }
 
 mcsm::VoidResult mcsm::ServerDataOption::load(){
-    bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
+    if(this->loaded){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_DATA_ALREADY_CONFIGURED, {});
+        return tl::unexpected(err);
     }
+    auto fileExists = mcsm::fileExists(path);
+    if(!fileExists) return tl::unexpected(fileExists.error());
 
-    return this->option->load(advp);
+    if(!fileExists.value()){
+        if(!mcsm::mkdir(path)){
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::FILE_CREATE_FAILED, {path});
+            return tl::unexpected(err);
+        }
+    }
+    this->option = std::make_unique<mcsm::Option>(path + "/.mcsm/", "server_datas");
+
+    bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
+
+    auto optLRes = this->option->load(advp);
+    if(!optLRes) return optLRes;
+    
+    this->loaded = true;
+    return {};
 }
 
 mcsm::VoidResult mcsm::ServerDataOption::load(const bool& advp){
