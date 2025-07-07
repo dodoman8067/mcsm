@@ -330,101 +330,60 @@ mcsm::VoidResult mcsm::VelocityServer::update(){
 }
 
 mcsm::VoidResult mcsm::VelocityServer::update(const std::string& optionPath){
-    std::string path = mcsm::getCurrentPath();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto path = mcsm::getCurrentPath();
+    if(!path) return tl::unexpected(path.error());
 
-    return update(path, optionPath);
+    return update(path.value(), optionPath);
 }
 
 mcsm::VoidResult mcsm::VelocityServer::update(const std::string& path, const std::string& optionPath){
     // Program won't downgrade server jarfiles automatically. This is an intented feature.
     mcsm::info("Checking updates...");
     mcsm::ServerDataOption sDataOpt(optionPath);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
 
     mcsm::ServerConfigLoader loader(optionPath);
     mcsm::Result loadRes = loader.loadConfig();
     if(!loadRes.isSuccess()) return loadRes;
 
-    std::string build = loader.getServerJarBuild();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto build = loader.getServerJarBuild();
+    if(!build) return tl::unexpected(build.error());
 
-    if(build != "latest"){
+    if(build.value() != "latest"){
         mcsm::warning("This server won't update to the latest build.");
         mcsm::warning("Change server.json into \"server_build\": \"latest\" for automatic download.");
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {
-            "Update passed"
-        }});
-        return res;
+        return {};
     }
 
-    std::string version = loader.getServerVersion();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto version = loader.getServerVersion();
+    if(!version) return tl::unexpected(version.error());
     
-    int ver = getVersion(version);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto ver = getVersion(version.value());
+    if(!ver) return tl::unexpected(ver.error());
 
-    if(ver == -1){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
-        return res;
+    if(ver.value() == -1){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {});
+        return tl::unexpected(err);
     }
-    std::string lastBuild = sDataOpt.getLastDownloadedBuild();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto lastBuild = sDataOpt.getLastDownloadedBuild();
+    if(!lastBuild) return tl::unexpected(lastBuild.error());
 
-    if(lastBuild == std::to_string(ver)){
+    if(lastBuild.value() == std::to_string(ver.value())){
         mcsm::success("Server is up to date.");
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-        return res;
+        return {};
     }
-    mcsm::success("Update found : "  + std::to_string(ver) + ". Current build : " + lastBuild);
+    mcsm::success("Update found : "  + std::to_string(ver.value()) + ". Current build : " + lastBuild.value());
 
-    const std::string& jar = getJarFile(optionPath);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto jar = getJarFile(optionPath);
+    if(!jar) return tl::unexpected(jar.error());
 
-    bool fileExists = mcsm::fileExists(path + "/" + jar);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto fileExists = mcsm::fileExists(path + "/" + jar.value());
+    if(!fileExists) return tl::unexpected(fileExists.error());
 
-    if(fileExists){
-        mcsm::removeFile(path + "/" + jar);
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-            mcsm::Result res(resp.first, resp.second);
-            return res;
-        }
+    if(fileExists.value()){
+        auto rmRes = mcsm::removeFile(path + "/" + jar.value());
+        if(!rmRes) return tl::unexpected(rmRes.error());
     }
-    return download(version, path, jar, optionPath);
+    return download(version.value(), path, jar.value(), optionPath);
 }
 
 mcsm::VoidResult mcsm::VelocityServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues){
