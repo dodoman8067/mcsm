@@ -778,84 +778,60 @@ mcsm::VoidResult mcsm::FabricServer::generate(const std::string& name, mcsm::Jvm
 
     bool skipCheck = propertyValue;
 
-    bool skipCheck = propertyValue;
-
     if(!skipCheck){
-        bool vExists = this->hasVersion(version);
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-            mcsm::Result res(resp.first, resp.second);
-            return res;
-        }
+        auto vExists = this->hasVersion(version);
         if(!vExists){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
-            return res;
+            return tl::unexpected(vExists.error());
+        }
+        if(!vExists.value()){
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {});
+            return tl::unexpected(err);
         }
     }
     mcsm::FabricServerDataOption fSDOpt(path);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
 
     // No need to call fSDOpt.load() here. create() in ServerDataOption will call it eventually
 
     mcsm::ServerConfigGenerator generator(path);
-    mcsm::Result generateRes = generator.generate(version, this, &fSDOpt, name, option, autoUpdate);
-    if(!generateRes.isSuccess()) return generateRes;
+    auto generateRes = generator.generate(version, this, &fSDOpt, name, option, autoUpdate);
+    if(!generateRes) return generateRes;
 
-    std::unique_ptr<mcsm::Option>& fabricOpt = generator.getHandle();
-    mcsm::Result res9 = fabricOpt->setValue("loader_version", extraValues.find("server_loader_version")->second);
-    if(!res9.isSuccess()) return res9;
+    auto fabricOpt = generator.getHandle();
+    auto res9 = fabricOpt->setValue("loader_version", extraValues.find("server_loader_version")->second);
+    if(!res9) return res9;
 
-    mcsm::Result res10 = fabricOpt->setValue("installer_version", extraValues.find("server_installer_version")->second);
-    if(!res10.isSuccess()) return res10;
+    auto res10 = fabricOpt->setValue("installer_version", extraValues.find("server_installer_version")->second);
+    if(!res10) return res10;
     
-    mcsm::Result fSaveRes = fabricOpt->save();
-    if(!fSaveRes.isSuccess()) return fSaveRes;
+    auto fSaveRes = fabricOpt->save();
+    if(!fSaveRes) return fSaveRes;
 
     mcsm::ServerConfigLoader serverOption(path);
-    mcsm::Result loadRes = serverOption.loadConfig();
-    if(!loadRes.isSuccess()) return loadRes;
+    auto loadRes = serverOption.loadConfig();
+    if(!loadRes) return loadRes;
 
-    std::string sName = serverOption.getServerName();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto sName = serverOption.getServerName();
+    if(!sName) return tl::unexpected(sName.error());
 
-    std::string type = serverOption.getServerType();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto type = serverOption.getServerType();
+    if(!type) return tl::unexpected(type.error());
 
-    std::string sVersion = serverOption.getServerVersion();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto sVersion = serverOption.getServerVersion();
+    if(!sVersion) return tl::unexpected(sVersion.error());
 
-    std::string profile = serverOption.getDefaultOption()->getProfileName();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto profileInstanceRes = serverOption.getDefaultOption();
+    if(!profileInstanceRes) return tl::unexpected(profileInstanceRes.error());
+
+    std::string profile = profileInstanceRes.value()->getProfileName();
 
     mcsm::success("Configured server's information : ");
-    mcsm::info("Server name : " + sName);
-    mcsm::info("Server type : " + type);
-    mcsm::info("Server version : " + sVersion);
+    mcsm::info("Server name : " + sName.value());
+    mcsm::info("Server type : " + type.value());
+    mcsm::info("Server version : " + sVersion.value());
     mcsm::info("Server JVM launch profile : " + profile);
     if(!autoUpdate) mcsm::info("Automatic updates : disabled");
 
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return res;
+    return {};
 }
 
 const tl::expected<std::map<std::string, std::string>, mcsm::Error> mcsm::FabricServer::getRequiredValues() const {
@@ -872,15 +848,15 @@ const tl::expected<std::map<std::string, std::string>, mcsm::Error> mcsm::Fabric
 }
 
 mcsm::BoolResult mcsm::FabricServer::hasVersion(const std::string& version) const {
-    return !mcsm::isWhitespaceOrEmpty(getVersion(version));
+    auto verG = getVersion(version);
+    if(!verG) return tl::unexpected(verG.error());
+    return !mcsm::isWhitespaceOrEmpty(verG.value());
 }
 
 std::string mcsm::FabricServer::getTypeAsString() const {
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "fabric";
 }
 
 mcsm::ServerType mcsm::FabricServer::getType() const {
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return mcsm::ServerType::FABRIC;
 }
