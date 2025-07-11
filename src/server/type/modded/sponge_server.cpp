@@ -648,47 +648,38 @@ mcsm::VoidResult mcsm::SpongeServer::generate(const std::string& name, mcsm::Jvm
 
     std::string apib = extraValues.find("sponge_api_search_recommended_versions")->second;
     if(apib != "false" && apib != "true"){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Invalid value"}});
-        return res;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, {700, "Invalid parameter value on \"sponge_api_search_recommended_versions\"", ""});
+        return tl::unexpected(err);
     }
 
     bool bApi = apib == "true" ? true : false;
 
     if(!skipCheck){
-        bool vExists = getVersion(version, bApi) != "";
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-            mcsm::Result res(resp.first, resp.second);
-            return res;
-        }
+        mcsm::StringResult vRes = getVersion(version, bApi);
+        if(!vRes) return tl::unexpected(vRes.error());
+        bool vExists = vRes.value() != "";
         if(!vExists){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
-            return res;
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {});
+            return tl::unexpected(err);
         }
     }
     mcsm::ServerDataOption opt(path);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
 
     // No need to call opt.load() here. create() in ServerDataOption will call it eventually
 
-    mcsm::Result res = configure(version, this, &opt, path, name, option, autoUpdate, extraValues.find("server_build_version")->second);
-    if(!res.isSuccess()) return res;
+    mcsm::VoidResult res = configure(version, this, &opt, path, name, option, autoUpdate, extraValues.find("server_build_version")->second);
+    if(!res) return res;
 
-    mcsm::Option sOpt(mcsm::getCurrentPath(), "server");
+    auto cPath = mcsm::getCurrentPath();
+    if(!cPath) return tl::unexpected(cPath.error());
 
-    sOpt.load();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    mcsm::Option sOpt(cPath.value(), "server");
 
-    mcsm::Result setRes = sOpt.setValue("api_search_recommended", bApi);
-    if(!setRes.isSuccess()) return setRes;
+    auto sOptLoadRes = sOpt.load();
+    if(!sOptLoadRes) return sOptLoadRes;
+
+    auto setRes = sOpt.setValue("api_search_recommended", bApi);
+    if(!setRes) return setRes;
 
     return sOpt.save();
 }
@@ -721,7 +712,9 @@ const tl::expected<std::map<std::string, std::string>, mcsm::Error> mcsm::Sponge
 }
 
 mcsm::BoolResult mcsm::SpongeServer::hasVersion(const std::string& version) const {
-    return getVersion(version) != "";
+    auto verR = getVersion(version);
+    if(!verR) return tl::unexpected(verR.error());
+    return verR.value() != "";
 }
 
 mcsm::ServerType mcsm::SpongeServer::getType() const {
@@ -729,6 +722,5 @@ mcsm::ServerType mcsm::SpongeServer::getType() const {
 }
 
 std::string mcsm::SpongeServer::getTypeAsString() const {
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return "sponge";
 }

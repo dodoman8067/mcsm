@@ -39,9 +39,9 @@ namespace mcsm {
         SpongeServer();
         ~SpongeServer();
 
-        std::string getVersion(const std::string& ver) const;
-        std::string getVersion(const std::string& ver, const bool& apiSearchRecommended) const;
-        std::string getVersion(const std::string& ver, const std::string& build, const bool& apiSearchRecommended) const;
+        mcsm::StringResult getVersion(const std::string& ver) const;
+        mcsm::StringResult getVersion(const std::string& ver, const bool& apiSearchRecommended) const;
+        mcsm::StringResult getVersion(const std::string& ver, const std::string& build, const bool& apiSearchRecommended) const;
 
         std::vector<std::string> getAvailableVersions() override;
 
