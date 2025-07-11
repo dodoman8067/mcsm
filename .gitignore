@@ -57,6 +57,8 @@ lib/
 *.depend
 *.layout
 
+.idea/
+
 # CMake files
 CMakeFiles/
 CMakeCache.txt
