@@ -496,23 +496,23 @@ mcsm::StringResult mcsm::SpongeServer::start(mcsm::ServerConfigLoader* loader, m
     mcsm::StringResult jar = loader->getServerJarFile();
     if(!jar) return jar;
 
-    mcsm::BoolResult fileExists = mcsm::fileExists(path + "/" + jar);
+    mcsm::BoolResult fileExists = mcsm::fileExists(path + "/" + jar.value());
     if(!fileExists) return tl::unexpected(fileExists.error());
 
     if(!fileExists.value()){
-        mcsm::info("Downloading " + jar + "...");
+        mcsm::info("Downloading " + jar.value() + "...");
         mcsm::StringResult sVer = loader->getServerVersion();
         if(!sVer) return sVer;
 
         mcsm::VoidResult res = download(sVer.value(), path, jar.value(), optionPath);
-        if(!res) return res;
+        if(!res) return tl::unexpected(res.error());
     }else{
         mcsm::BoolResult doesUpdate = loader->doesAutoUpdate();
-        if(!doesUpdate) return doesUpdate;
+        if(!doesUpdate) return tl::unexpected(doesUpdate.error());
 
         if(doesUpdate.value()){
             mcsm::VoidResult res = update(path, optionPath);
-            if(!res) return res;
+            if(!res) return tl::unexpected(res.error());
         }
     }
     return Server::start(loader, option, path, optionPath);

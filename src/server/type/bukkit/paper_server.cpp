@@ -31,7 +31,7 @@ mcsm::IntResult mcsm::PaperServer::getVersion(const std::string& ver) const {
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {ver});
         return tl::unexpected(err);
     }
-    std::string res = mcsm::get("https://api.papermc.io/v2/projects/paper/versions/" + ver);
+    auto res = mcsm::get("https://api.papermc.io/v2/projects/paper/versions/" + ver);
     if(!res) return tl::unexpected(res.error());
     nlohmann::json json = nlohmann::json::parse(res.value(), nullptr, false);
     if(json.is_discarded()){
@@ -274,23 +274,23 @@ mcsm::StringResult mcsm::PaperServer::start(mcsm::ServerConfigLoader* loader, mc
     mcsm::StringResult jar = loader->getServerJarFile();
     if(!jar) return jar;
 
-    mcsm::BoolResult fileExists = mcsm::fileExists(path + "/" + jar);
+    mcsm::BoolResult fileExists = mcsm::fileExists(path + "/" + jar.value());
     if(!fileExists) return tl::unexpected(fileExists.error());
 
     if(!fileExists.value()){
-        mcsm::info("Downloading " + jar + "...");
+        mcsm::info("Downloading " + jar.value() + "...");
         mcsm::StringResult sVer = loader->getServerVersion();
         if(!sVer) return sVer;
 
         mcsm::VoidResult res = download(sVer.value(), path, jar.value(), optionPath);
-        if(!res) return res;
+        if(!res) return tl::unexpected(res.error());
     }else{
         mcsm::BoolResult doesUpdate = loader->doesAutoUpdate();
-        if(!doesUpdate) return doesUpdate;
+        if(!doesUpdate) return tl::unexpected(doesUpdate.error());
 
         if(doesUpdate.value()){
             mcsm::VoidResult res = update(path, optionPath);
-            if(!res) return res;
+            if(!res) return tl::unexpected(res.error());
         }
     }
     return Server::start(loader, option, path, optionPath);

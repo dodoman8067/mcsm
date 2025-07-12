@@ -252,16 +252,16 @@ mcsm::StringResult mcsm::VanillaServer::start(mcsm::ServerConfigLoader* loader, 
     mcsm::StringResult jar = loader->getServerJarFile();
     if(!jar) return jar;
 
-    mcsm::BoolResult fileExists = mcsm::fileExists(path + "/" + jar);
+    mcsm::BoolResult fileExists = mcsm::fileExists(path + "/" + jar.value());
     if(!fileExists) return tl::unexpected(fileExists.error());
 
     if(!fileExists.value()){
-        mcsm::info("Downloading " + jar + "...");
+        mcsm::info("Downloading " + jar.value() + "...");
         mcsm::StringResult sVer = loader->getServerVersion();
         if(!sVer) return sVer;
 
         mcsm::VoidResult res = download(sVer.value(), path, jar.value(), optionPath);
-        if(!res) return res;
+        if(!res) return tl::unexpected(res.error());
     }
     return Server::start(loader, option, path, optionPath);
 }

@@ -251,7 +251,7 @@ mcsm::StringResult mcsm::CustomServer::start(mcsm::ServerConfigLoader* loader, m
         if(!sVer) return sVer;
 
         mcsm::VoidResult res = setupServerJarFile(path, optionPath);
-        if(!res) return res;
+        if(!res) return tl::unexpected(res.error());
     }
     return Server::start(loader, option, path, optionPath);
 }

@@ -283,7 +283,7 @@ mcsm::VoidResult mcsm::VelocityServer::obtainJarFile(const std::string& version,
     return download(version, path, name, optionPath);
 }
 
-mcsm::VoidResult mcsm::VelocityServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
+mcsm::StringResult mcsm::VelocityServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
     // ServerOption class handles the data file stuff
     mcsm::StringResult cPath = mcsm::getCurrentPath();
     if(!cPath) return cPath;
@@ -296,37 +296,33 @@ mcsm::StringResult mcsm::VelocityServer::start(mcsm::ServerConfigLoader* loader,
     mcsm::StringResult jar = loader->getServerJarFile();
     if(!jar) return jar;
 
-    mcsm::BoolResult fileExists = mcsm::fileExists(path + "/" + jar);
+    mcsm::BoolResult fileExists = mcsm::fileExists(path + "/" + jar.value());
     if(!fileExists) return tl::unexpected(fileExists.error());
 
     if(!fileExists.value()){
-        mcsm::info("Downloading " + jar + "...");
+        mcsm::info("Downloading " + jar.value() + "...");
         mcsm::StringResult sVer = loader->getServerVersion();
         if(!sVer) return sVer;
 
         mcsm::VoidResult res = download(sVer.value(), path, jar.value(), optionPath);
-        if(!res) return res;
+        if(!res) return tl::unexpected(res.error());
     }else{
         mcsm::BoolResult doesUpdate = loader->doesAutoUpdate();
-        if(!doesUpdate) return doesUpdate;
+        if(!doesUpdate) return tl::unexpected(doesUpdate.error());
 
         if(doesUpdate.value()){
             mcsm::VoidResult res = update(path, optionPath);
-            if(!res) return res;
+            if(!res) return tl::unexpected(res.error());
         }
     }
     return Server::start(loader, option, path, optionPath);
 }
 
 mcsm::VoidResult mcsm::VelocityServer::update(){
-    std::string path = mcsm::getCurrentPath();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto path = mcsm::getCurrentPath();
+    if(!path) return tl::unexpected(path.error());
 
-    return update(path, path);
+    return update(path.value(), path.value());
 }
 
 mcsm::VoidResult mcsm::VelocityServer::update(const std::string& optionPath){
@@ -342,8 +338,8 @@ mcsm::VoidResult mcsm::VelocityServer::update(const std::string& path, const std
     mcsm::ServerDataOption sDataOpt(optionPath);
 
     mcsm::ServerConfigLoader loader(optionPath);
-    mcsm::Result loadRes = loader.loadConfig();
-    if(!loadRes.isSuccess()) return loadRes;
+    mcsm::VoidResult loadRes = loader.loadConfig();
+    if(!loadRes) return loadRes;
 
     auto build = loader.getServerJarBuild();
     if(!build) return tl::unexpected(build.error());
