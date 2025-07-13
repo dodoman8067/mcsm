@@ -305,18 +305,20 @@ mcsm::VoidResult mcsm::VanillaServer::generate(const std::string& name, mcsm::Jv
 }
 
 mcsm::BoolResult mcsm::VanillaServer::hasVersion(const std::string& version) const {
-    std::string ver = getVersionObject(version);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return false;
-    return !mcsm::isWhitespaceOrEmpty(ver);
+    auto ver = getVersionObject(version);
+    if(!ver) return tl::unexpected(ver.error());
+    return !mcsm::isWhitespaceOrEmpty(ver.value());
 }
 
 const tl::expected<std::map<std::string, std::string>, mcsm::Error> mcsm::VanillaServer::getRequiredValues() const {
-    return {
-        {"name", "" },
-        {"Minecraft version", ""},
-        {"default JVM launch profile search path (current/global)", "current"},
-        {"default JVM launch profile name", ""},
-        {"server jarfile name", getTypeAsString() + ".jar"}
+    return tl::expected<std::map<std::string, std::string>, mcsm::Error>{
+        std::map<std::string, std::string>{
+            {"name", "" },
+            {"Minecraft version", ""},
+            {"default JVM launch profile search path (current/global)", "current"},
+            {"default JVM launch profile name", ""},
+            {"server jarfile name", getTypeAsString() + ".jar"}
+        }
     };
 }
 

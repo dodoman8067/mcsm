@@ -84,7 +84,7 @@ mcsm::IntResult mcsm::VelocityServer::getVersion(const std::string& ver, const s
     }
 }
 
-std::string mcsm::VelocityServer::getLatestVersion() const {
+mcsm::StringResult mcsm::VelocityServer::getLatestVersion() const {
     auto res = mcsm::get("https://api.papermc.io/v2/projects/velocity");
     if(!res) return tl::unexpected(res.error());
     nlohmann::json json = nlohmann::json::parse(res.value(), nullptr, false);

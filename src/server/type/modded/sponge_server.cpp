@@ -698,16 +698,17 @@ const tl::expected<std::map<std::string, std::string>, mcsm::Error> mcsm::Sponge
     }
 
     std::string strV = v.get<bool>() ? "true" : "false";
-
-    return {
-        {"name", "" },
-        {"minecraft_version", ""},
-        {"default_jvm_launch_profile_search_path", "current"},
-        {"default_jvm_launch_profile_name", ""},
-        {"server_jarfile_name", getTypeAsString() + ".jar"},
-        {"server_build_version", "latest"},
-        {"auto_server_jar_update", "true"},
-        {"sponge_api_search_recommended_versions", strV}
+    return tl::expected<std::map<std::string, std::string>, mcsm::Error>{
+        std::map<std::string, std::string>{
+                {"name", "" },
+                {"minecraft_version", ""},
+                {"default_jvm_launch_profile_search_path", "current"},
+                {"default_jvm_launch_profile_name", ""},
+                {"server_jarfile_name", getTypeAsString() + ".jar"},
+                {"server_build_version", "latest"},
+                {"auto_server_jar_update", "true"},
+                {"sponge_api_search_recommended_versions", strV}
+        }
     };
 }
 
