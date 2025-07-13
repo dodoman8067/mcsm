@@ -24,13 +24,15 @@ SOFTWARE.
 #include <mcsm/data/options/general_option.h>
 
 mcsm::StringResult mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
-    return start(loader, option, mcsm::getCurrentPath(), mcsm::getCurrentPath());
+    auto cPath = mcsm::getCurrentPath();
+    if(!cPath) return cPath;
+    return start(loader, option, cPath.value(), cPath.value());
 }
 
 mcsm::StringResult mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
     std::string jvmOpt = " ";
     auto jArgs = option.getJvmArguments();
-    if(!jArgs) return jArgs;
+    if(!jArgs) return tl::unexpected(jArgs.error());
 
     for(auto& s : jArgs.value()){
         jvmOpt = jvmOpt + s + " ";
@@ -38,7 +40,7 @@ mcsm::StringResult mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::J
 
     std::string svrOpt = " ";
     auto sArgs = option.getServerArguments();
-    if(!sArgs) return sArgs;
+    if(!sArgs) return tl::unexpected(sArgs.error());
 
     for(auto& s : sArgs.value()){
         svrOpt = svrOpt + s + " ";
@@ -60,9 +62,10 @@ mcsm::StringResult mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::J
         return tl::unexpected(err);
     }
 
-    int result = mcsm::runCommand(command);
-    if(result != 0){
-        return "\033[38;2;255;0;0mServer exited with error code : " + std::to_string(result);
+    auto result = mcsm::runCommand(command);
+    if(!result) return tl::unexpected(result.error());
+    if(result.value() != 0){
+        return "\033[38;2;255;0;0mServer exited with error code : " + std::to_string(result.value());
     }
     return "\033[38;2;0;255;0mServer exited with error code : 0";
 }
@@ -125,7 +128,7 @@ mcsm::StringResult mcsm::Server::getJarFile(const std::string& checkDir) const {
             mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"server_jar_name\"", "string"});
             return tl::unexpected(err);
         }
-        return value.get<std::string>();
+        return value.value().get<std::string>();
     }
     return getTypeAsString() + ".jar";
 }
@@ -136,13 +139,15 @@ bool mcsm::Server::isBasedAs(const std::string& input) const {
 }
 
 const tl::expected<std::map<std::string, std::string>, mcsm::Error> mcsm::Server::getRequiredValues() const {
-    return {
-        {"name", "" },
-        {"minecraft_version", ""},
-        {"default_jvm_launch_profile_search_path", "current"},
-        {"default_jvm_launch_profile_name", ""},
-        {"server_jarfile_name", getTypeAsString() + ".jar"},
-        {"server_build_version", "latest"},
-        {"auto_server_jar_update", "true"}
+    return tl::expected<std::map<std::string, std::string>, mcsm::Error>{
+        std::map<std::string, std::string>{
+                {"name", "" },
+                {"minecraft_version", ""},
+                {"default_jvm_launch_profile_search_path", "current"},
+                {"default_jvm_launch_profile_name", ""},
+                {"server_jarfile_name", getTypeAsString() + ".jar"},
+                {"server_build_version", "latest"},
+                {"auto_server_jar_update", "true"}
+        }
     };
 }
