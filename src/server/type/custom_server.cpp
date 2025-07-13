@@ -277,13 +277,15 @@ bool mcsm::CustomServer::isURL(const std::string& location) const {
 }
 
 const tl::expected<std::map<std::string, std::string>, mcsm::Error> mcsm::CustomServer::getRequiredValues() const {
-    return {
-        {"name", "" },
-        {"default_jvm_launch_profile_search_path", "current"}, // (current/global)
-        {"default_jvm_launch_profile_name", ""},
-        {"server_jarfile_name", "custom.jar"},
-        {"server_file_location", ""}, // (url/filepath)
-        {"custom_run_command", ""} // Overrides server JVM profile based start system.
+    return tl::expected<std::map<std::string, std::string>, mcsm::Error>{
+        std::map<std::string, std::string>{
+                {"name", "" },
+                {"default_jvm_launch_profile_search_path", "current"}, // (current/global)
+                {"default_jvm_launch_profile_name", ""},
+                {"server_jarfile_name", "custom.jar"},
+                {"server_file_location", ""}, // (url/filepath)
+                {"custom_run_command", ""} // Overrides server JVM profile based start system.
+        }
     };
 }
 
