@@ -122,10 +122,10 @@ mcsm::Result mcsm::Option::load(const bool& advancedParse){
     return res;
 }
 
-nlohmann::json mcsm::Option::getValue(const std::string& key) const {
+tl::expected<nlohmann::json, mcsm::Error> mcsm::Option::getValue(const std::string& key) const {
     if(this->data == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Option's get/set function called without being loaded.", "Please report this to Github."}});
-        return nullptr;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, {700, "Option's get/set function called without being loaded.", ""}, {});
+        return tl::unexpected(err);
     }
     const nlohmann::json& jsonData = this->data;
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return nullptr;
