@@ -30,7 +30,7 @@ SOFTWARE.
 namespace mcsm {
     class CustomServer : public mcsm::Server, public std::enable_shared_from_this<CustomServer> {
     private:
-        bool isFile(const std::string& location) const;
+        mcsm::BoolResult isFile(const std::string& location) const;
         bool isURL(const std::string& location) const;
     public:
         CustomServer();

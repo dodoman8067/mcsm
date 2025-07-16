@@ -128,154 +128,109 @@ std::string mcsm::VelocityServer::getGitHub() const {
 }
 
 mcsm::VoidResult mcsm::VelocityServer::download(const std::string& version){
-    std::string path = mcsm::getCurrentPath();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
-    
-    std::string jar = getJarFile();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto path1 = mcsm::getCurrentPath();
+    if(!path1) return tl::unexpected(path1.error());
 
-    return download(version, path, jar, path);
+    auto jar = getJarFile();
+    if(!jar) return tl::unexpected(jar.error());
+
+    return download(version, path1.value(), jar.value(), path1.value());
 }
 
 mcsm::VoidResult mcsm::VelocityServer::download(const std::string& version, const std::string& path){
-    std::string path1 = mcsm::getCurrentPath();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto path1 = mcsm::getCurrentPath();
+    if(!path1) return tl::unexpected(path1.error());
 
-    std::string jar = getJarFile();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto jar = getJarFile();
+    if(!jar) return tl::unexpected(jar.error());
 
-    return download(version, path, jar, path1);
+    return download(version, path, jar.value(), path1.value());
 }
 
 mcsm::VoidResult mcsm::VelocityServer::download(const std::string& version, const std::string& path, const std::string& name){
-    std::string path1 = mcsm::getCurrentPath();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto path1 = mcsm::getCurrentPath();
+    if(!path1) return tl::unexpected(path1.error());
 
-    return download(version, path, name, path1);
+    return download(version, path, name, path1.value());
 }
 
 mcsm::VoidResult mcsm::VelocityServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
     mcsm::Option opt(optionPath, "server");
-    bool optExists = opt.exists();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto optExistsResult = opt.exists();
+    if(!optExistsResult) return tl::unexpected(optExistsResult.error());
 
+    bool optExists = optExistsResult.value();
     if(!optExists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
-        return res;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_NOT_CONFIGURED, {});
+        return tl::unexpected(err);
     }
 
-    opt.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto optLRes = opt.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
+    if(!optLRes) return optLRes;
 
     mcsm::ServerDataOption sDataOpt(optionPath);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
 
-    nlohmann::json typeValue = opt.getValue("type");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto typeValueRes = opt.getValue("type");
+    if(!typeValueRes) return tl::unexpected(typeValueRes.error());
+
+    nlohmann::json typeValue = typeValueRes.value();
 
     if(typeValue == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFoundPlusFix("\"type\"", opt.getName(), "change it into \"type\": \"[yourtype]\"")});
-        return res;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"type\"", opt.getName(), "change it into \"type\": \"[yourtype]\""});
+        return tl::unexpected(err);
     }
     if(!typeValue.is_string()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongTypePlusFix("\"type\"", opt.getName(), "string", "change it into \"type\": \"[yourtype]\"")});
-        return res;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"type\"", opt.getName(), "string", "change it into \"type\": \"[yourtype]\""});
+        return tl::unexpected(err);
     }
     if(typeValue != "velocity"){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverWrongInstanceGenerated("Velocity")});
-        return res;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_WRONG_INSTANCE_GENERATED, {"Velocity"});
+        return tl::unexpected(err);
     }
 
-    nlohmann::json serverBuildValue = opt.getValue("server_build");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto serverBuildValueRes = opt.getValue("server_build");
+    if(!serverBuildValueRes) return tl::unexpected(serverBuildValueRes.error());
+    nlohmann::json serverBuildValue = serverBuildValueRes.value();
     
     if(serverBuildValue == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFoundPlusFix("\"server_build\"", opt.getName(), "add \"server_build\": \"latest\" to server.json for automatic download")});
-        return res;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"server_build\"", opt.getName(), "add \"server_build\": \"latest\" to server.json for automatic download"});
+        return tl::unexpected(err);
     }
     if(!serverBuildValue.is_string()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongTypePlusFix("\"server_build\"", opt.getName(), "string", "change it into \"server_build\": \"latest\"")});
-        return res;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"server_build\"", opt.getName(), "string", "change it into \"server_build\": \"latest\""});
+        return tl::unexpected(err);
     }
     if(serverBuildValue != "latest"){
         std::string build = serverBuildValue.get<std::string>();
-        int ver = getVersion(version, build);
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-            mcsm::Result res(resp.first, resp.second);
-            return res;
-        }
+        auto ver = getVersion(version, build);
+        if(!ver) return tl::unexpected(ver.error());
 
-        if(ver == -1){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion(build)});
-            return res;
+        if(ver.value() == -1){
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {build});
+            return tl::unexpected(err);
         }
-        std::string strVer = std::to_string(ver);
+        std::string strVer = std::to_string(ver.value());
         std::string url = "https://api.papermc.io/v2/projects/velocity/versions/" + version + "/builds/" + strVer + "/downloads/velocity-" + version + "-" + strVer + ".jar";
         mcsm::info("URL : " + url);
-        mcsm::Result res = mcsm::download(name, url, path, true);
-        if(!res.isSuccess()) return res;
-        sDataOpt.updateLastDownloadedBuild(strVer);
-        return res;
+        auto res = mcsm::download(name, url, path, true);
+        if(!res) return res;
+        auto uptLDBRes = sDataOpt.updateLastDownloadedBuild(strVer);
+        return uptLDBRes;
     }else{
-        int ver = getVersion(version);
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-            mcsm::Result res(resp.first, resp.second);
-            return res;
-        }
+        auto ver = getVersion(version);
+        if(!ver) return tl::unexpected(ver.error());
         
-        if(ver == -1){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
-            return res;
+        if(ver.value() == -1){
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {});
+            return tl::unexpected(err);
         }
-        std::string strVer = std::to_string(ver);
+        std::string strVer = std::to_string(ver.value());
         std::string url = "https://api.papermc.io/v2/projects/velocity/versions/" + version + "/builds/" + strVer + "/downloads/velocity-" + version + "-" + strVer + ".jar";
         mcsm::info("URL : " + url);
-        mcsm::Result res = mcsm::download(name, url, path, true);
-        if(!res.isSuccess()) return res;
-        sDataOpt.updateLastDownloadedBuild(strVer);
-        return res;
+        auto res = mcsm::download(name, url, path, true);
+        if(!res) return res;
+        auto uptLDBRes = sDataOpt.updateLastDownloadedBuild(strVer);
+        return uptLDBRes;
     }
 }
 
