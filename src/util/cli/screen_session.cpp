@@ -79,8 +79,9 @@ bool mcsm::ScreenSession::isRunning() const {
     std::string sessionName = getFullSessionName();
     std::string checkCommand = this->screenPath + " -ls | grep -w \"" + sessionName + "\"";
 
-    int exitCode = mcsm::runCommandQuietly(checkCommand.c_str());
-    return exitCode == 0;
+    auto exitCode = mcsm::runCommandQuietly(checkCommand.c_str());
+    if(!exitCode) return false;
+    return exitCode.value() == 0;
 }
 
 bool mcsm::ScreenSession::tryReconnect(){
