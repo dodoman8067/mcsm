@@ -42,13 +42,13 @@ mcsm::init::~init(){
 
 void mcsm::init::initMCSM(const std::string& version){
     curl_global_init(CURL_GLOBAL_DEFAULT);
-    if(!mcsm::curl_holder::init().isSuccess()) return;
+    if(!mcsm::curl_holder::init()) return;
     initCommands(version);
     initServers(); // hanles server registry for singleton server instances
 
-    mcsm::Result res = mcsm::GeneralOption::getGeneralOption().initialize(); // initializes global configurations
-    if(!res.isSuccess()){
-        res.printMessage();
+    mcsm::VoidResult res = mcsm::GeneralOption::getGeneralOption().initialize(); // initializes global configurations
+    if(!res){
+        mcsm::printError(res.error());
         return;
     }
 
