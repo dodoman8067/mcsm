@@ -85,12 +85,12 @@ mcsm::StringResult mcsm::CustomServer::getCustomStartCommand(const std::string& 
     auto exists = option.exists();
     if(!exists) return tl::unexpected(exists.error());
     if(!exists.value()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_NOT_CONFIGURED, {});
+        return tl::unexpected(err);
     }
 
-    option.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    auto optLRes = option.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
+    if(!optLRes) return tl::unexpected(optLRes.error());
 
     auto crcRes = option.getValue("custom_run_command");
     if(!crcRes) return tl::unexpected(crcRes.error());
