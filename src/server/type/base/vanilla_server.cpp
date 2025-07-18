@@ -169,66 +169,42 @@ std::vector<std::string> mcsm::VanillaServer::getAvailableVersions(){
 }
 
 mcsm::VoidResult mcsm::VanillaServer::download(const std::string& version){
-    std::string path = mcsm::getCurrentPath();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
-    
-    std::string jar = getJarFile();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto path1 = mcsm::getCurrentPath();
+    if(!path1) return tl::unexpected(path1.error());
 
-    return download(version, path, jar, path);
+    auto jar = getJarFile();
+    if(!jar) return tl::unexpected(jar.error());
+
+    return download(version, path1.value(), jar.value(), path1.value());
 }
 
 mcsm::VoidResult mcsm::VanillaServer::download(const std::string& version, const std::string& path){
-    std::string path1 = mcsm::getCurrentPath();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto path1 = mcsm::getCurrentPath();
+    if(!path1) return tl::unexpected(path1.error());
 
-    std::string jar = getJarFile();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto jar = getJarFile();
+    if(!jar) return tl::unexpected(jar.error());
 
-    return download(version, path, jar, path1);
+    return download(version, path, jar.value(), path1.value());
 }
 
 mcsm::VoidResult mcsm::VanillaServer::download(const std::string& version, const std::string& path, const std::string& name){
-    bool hasVer = hasVersion(version);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
+    auto hasVer = hasVersion(version);
+    if(!hasVer) return tl::unexpected(hasVer.error());
+
+    if(!hasVer.value()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {});
+        return tl::unexpected(err);
+    }
+    auto url = getServerJarURL(version);
+    if(!url) return tl::unexpected(url.error());
+    if(mcsm::isWhitespaceOrEmpty(url.value())){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {});
+        return tl::unexpected(err);
     }
 
-    if(!hasVer){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
-        return res;
-    }
-    std::string url = getServerJarURL(version);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
-    if(mcsm::isWhitespaceOrEmpty(url)){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
-        return res;
-    }
-
-    mcsm::info("URL : " + url);
-    return mcsm::download(name, url, path);
+    mcsm::info("URL : " + url.value());
+    return mcsm::download(name, url.value(), path);
 }
 
 mcsm::VoidResult mcsm::VanillaServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& /* optionPath */){
@@ -283,23 +259,14 @@ mcsm::VoidResult mcsm::VanillaServer::generate(const std::string& name, mcsm::Jv
     bool skipCheck = propertyValue;
 
     if(!skipCheck){
-        bool vExists = this->hasVersion(version);
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-            mcsm::Result res(resp.first, resp.second);
-            return res;
-        }
-        if(!vExists){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverUnsupportedVersion()});
-            return res;
+        auto vExists = this->hasVersion(version);
+        if(!vExists) return tl::unexpected(vExists.error());
+        if(!vExists.value()){
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {});
+            return tl::unexpected(err);
         }
     }
     mcsm::ServerDataOption opt(path);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
 
     return configure(version, this, &opt, path, name, option, autoUpdate, "ignored");
 }
