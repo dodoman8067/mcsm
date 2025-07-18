@@ -43,11 +43,10 @@ void mcsm::ServerRegistry::registerGeneralProperty(const std::string& name, std:
 tl::expected<mcsm::GeneralProperty*, mcsm::Error> mcsm::ServerRegistry::getGeneralProperty(const std::string& name){
     auto it = this->generalProperties.find(name);
     if(it != this->generalProperties.end()){
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, { "Success" }});
         return it->second.get();
     }
-    mcsm::Result res({mcsm::ResultType::MCSM_FAIL, { "Not a registered property: " + name }});
-    return nullptr;
+    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, {700, "Not a registered property: " + name, ""});
+    return tl::unexpected(err);
 }
 
 std::vector<mcsm::GeneralProperty*> mcsm::ServerRegistry::getRegisteredProperties(){
@@ -62,20 +61,18 @@ std::vector<mcsm::GeneralProperty*> mcsm::ServerRegistry::getRegisteredPropertie
 tl::expected<mcsm::Server*, mcsm::Error> mcsm::ServerRegistry::getServer(const std::string& name) const {
     auto it = this->serverFactories.find(name);
     if(it != this->serverFactories.end()){
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, { "Success" }});
         return it->second.get();
     }
-    mcsm::Result res({mcsm::ResultType::MCSM_FAIL, { "Server type not found: " + name }});
-    return nullptr;
+    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, {700, "Server type not found: " + name, ""});
+    return tl::unexpected(err);
 }
 
 mcsm::StringResult mcsm::ServerRegistry::getServerTypeString(const mcsm::ServerType& type) const {
     for(const auto&[id, server]: serverFactories){
         if(server->getType() == type){
-            mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, { "Success" }});
             return id;
         }
     }
-    mcsm::Result res({mcsm::ResultType::MCSM_FAIL, { "Server type not found" }});
-    return "";
+    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, {700, "Server type not found(likely unregistered)", ""});
+    return tl::unexpected(err);
 }
