@@ -431,7 +431,7 @@ namespace mcsm::errors {
 
     inline const ErrorTemplate JSON_WRONG_TYPE_PLUS_FIX = {
         201,
-        "Value %s option in %s must be a(n) %s.",
+        "Value %s option in %s must be a(n) %s.\n%s",
         ""
     };
 
@@ -441,14 +441,20 @@ namespace mcsm::errors {
         "Make sure the field is defined in the config file."
     };
 
-    inline const ErrorTemplate JSON_PARSE_FAILED = {
+    inline const ErrorTemplate JSON_NOT_FOUND_PLUS_FIX = {
         203,
+        "No %s value found in %s.\n%s",
+        ""
+    };
+
+    inline const ErrorTemplate JSON_PARSE_FAILED = {
+        204,
         "Failed to parse json %s.",
         "Check for comments, unclosed brackets, trailing commas, or incorrect escape sequences."
     };
 
     inline const ErrorTemplate JSON_PARSE_FAILED_CANNOT_BE_MODIFIED = {
-        204,
+        205,
         "Failed to parse json. Likely an invalid JSON responce was recieved from curl requests.",
         "This error cannot be resolved by editing the file."
     };
