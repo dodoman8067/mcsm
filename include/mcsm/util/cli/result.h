@@ -513,44 +513,50 @@ namespace mcsm::errors {
         "Make sure .mcsm folder is intact."
     };
 
-    inline const ErrorTemplate SERVER_WRONG_INSTANCE_GENERATED = {
+    inline const ErrorTemplate SERVER_DATA_ACCESSED_WITHOUT_LOAD = {
         404,
+        "Server data loader class has accessed its data without calling the load function.",
+        "Please report this error to GitHub. (https://github.com/dodoman8067/mcsm)"
+    };
+
+    inline const ErrorTemplate SERVER_WRONG_INSTANCE_GENERATED = {
+        405,
         "Generated server path is not a valid instance for %s servers.",
         "Check your server setup and try again."
     };
 
     inline const ErrorTemplate SERVER_UNSUPPORTED_VERSION = {
-        405,
+        406,
         "Unsupported version detected: %s.",
         "Please try again with a valid version."
     };
 
     inline const ErrorTemplate SERVER_DEFAULT_PROFILE_NOT_FOUND = {
-        406,
+        407,
         "No default launch profile found in file %s.",
         "Ensure the profile is properly defined."
     };
 
     inline const ErrorTemplate SERVER_DEFAULT_PROFILE_NAME_NOT_FOUND = {
-        407,
+        408,
         "No default profile name specified in %s.",
         "Please verify the profile name in the file."
     };
 
     inline const ErrorTemplate SERVER_UNSUPPORTED_VERSION_CUSTOM = {
-        408,
+        409,
         "Unsupported version: %s.",
         "Try a different version or check the build."
     };
 
     inline const ErrorTemplate JVM_PROFILE_NOT_FOUND = {
-        409,
+        410,
         "JVM profile %s does not exist.",
         "Check the profile definition or create a new one."
     };
 
     inline const ErrorTemplate JVM_DETECTION_FAILED = {
-        410,
+        411,
         "JVM detection failed.",
         "Set the JAVA_HOME environment variable and try again."
     };
@@ -586,6 +592,12 @@ namespace mcsm::errors {
         504,
         "Executing function %s failed with the following reason: %s",
         ""
+    };
+
+    inline const ErrorTemplate ILLEGAL_PARAMETER = {
+        505,
+        "An illegal parameter value has been passed (likely nullptr). This message will likely be replaced by a more detailed description depending on the cause.",
+        "Please report this to GitHub. (https://github.com/dodoman8067/mcsm)"
     };
 
     // ================================
