@@ -35,6 +35,7 @@ SOFTWARE.
 #include <climits>
 #ifdef __linux__
     #include <sys/wait.h>
+    #include <errno.h>
 #endif
 
 namespace mcsm {

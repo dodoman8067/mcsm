@@ -186,7 +186,7 @@ mcsm::StringResult mcsm::getExecutablePath(){
     ssize_t len = readlink("/proc/self/exe", buf, sizeof(buf) - 1);
 
     if(len == -1){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED, {"readlink", "unknown"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED, {"readlink", std::string(strerror(errno))});
         return tl::unexpected(err);
     }
 
