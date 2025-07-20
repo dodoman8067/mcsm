@@ -32,7 +32,7 @@ namespace mcsm {
 
         std::string getPath() const;
 
-        bool validatePath();
+        mcsm::BoolResult validatePath();
     private:
         std::string configPath;
         std::unique_ptr<mcsm::Option> optionHandle;

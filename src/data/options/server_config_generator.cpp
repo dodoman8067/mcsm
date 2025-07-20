@@ -19,90 +19,72 @@ mcsm::VoidResult mcsm::ServerConfigGenerator::generate(const std::string& versio
 }
 
 mcsm::VoidResult mcsm::ServerConfigGenerator::generate(const std::string& version, mcsm::Server* server, mcsm::ServerDataOption* sDataOpt, const std::string& name, mcsm::JvmOption& defaultOption, const bool& update, const std::string& build){
-    bool jvmOptionExists = defaultOption.exists();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto jvmOptionExists = defaultOption.exists();
+    if(!jvmOptionExists) return tl::unexpected(jvmOptionExists.error());
 
-    if(!jvmOptionExists){
-        return {mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jvmProfileNotFound()};
+    if(!jvmOptionExists.value()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JVM_PROFILE_NOT_FOUND, {});
+        return tl::unexpected(err);
     }
     
-    bool canGenerate = validatePath();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto canGenerate = validatePath();
+    if(!canGenerate) return tl::unexpected(canGenerate.error());
 
-    if(!canGenerate){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverAlreadyConfigured(this->configPath)});
-        return res;
+    if(!canGenerate.value()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_ALREADY_CONFIGURED, {this->configPath});
+        return tl::unexpected(err);
     }
 
     this->optionHandle = std::make_unique<mcsm::Option>(this->configPath, "server");
     bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
         
-    mcsm::Result jLoadRes = this->optionHandle->load(advp);
-    if(!jLoadRes.isSuccess()) return jLoadRes;
+    mcsm::VoidResult jLoadRes = this->optionHandle->load(advp);
+    if(!jLoadRes) return jLoadRes;
 
-    mcsm::Result res1 = sDataOpt->create("none");
-    if(!res1.isSuccess()) return res1;
+    mcsm::VoidResult res1 = sDataOpt->create("none");
+    if(!res1) return res1;
 
     nlohmann::json profileObj;
     profileObj["name"] = defaultOption.getProfileName();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
-
     if(defaultOption.getSearchTarget() == mcsm::SearchTarget::GLOBAL){
         profileObj["location"] = "global";
     }else{
         profileObj["location"] = "current";
     }
     
-    mcsm::Result res2 = this->optionHandle->setValue("name", mcsm::safeString(name));
-    if(!res2.isSuccess()) return res2;
+    mcsm::VoidResult res2 = this->optionHandle->setValue("name", mcsm::safeString(name));
+    if(!res2) return res2;
     
     if(!mcsm::isSafeString(version)){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(version)});
-        return res;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {version});
+        return tl::unexpected(err);
     }
-    mcsm::Result res3 = this->optionHandle->setValue("version", version);
-    if(!res3.isSuccess()) return res3;
+    mcsm::VoidResult res3 = this->optionHandle->setValue("version", version);
+    if(!res3) return res3;
     
-    mcsm::Result res4 = this->optionHandle->setValue("default_launch_profile", profileObj);
-    if(!res4.isSuccess()) return res4;
+    mcsm::VoidResult res4 = this->optionHandle->setValue("default_launch_profile", profileObj);
+    if(!res4) return res4;
 
     std::string jarFile = server->getTypeAsString() + ".jar";
 
     if(!mcsm::isSafeString(jarFile)){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(jarFile)});
-        return res;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {jarFile});
+        return tl::unexpected(err);
     }
-    mcsm::Result res5 = this->optionHandle->setValue("server_jar_name", jarFile);
-    if(!res5.isSuccess()) return res5;
+    mcsm::VoidResult res5 = this->optionHandle->setValue("server_jar_name", jarFile);
+    if(!res5) return res5;
 
-    mcsm::Result res6 = this->optionHandle->setValue("server_build", build);
-    if(!res6.isSuccess()) return res6;
+    mcsm::VoidResult res6 = this->optionHandle->setValue("server_build", build);
+    if(!res6) return res6;
 
-    mcsm::Result res10 = this->optionHandle->setValue("auto_update", update);
-    if(!res10.isSuccess()) return res10;
+    mcsm::VoidResult res10 = this->optionHandle->setValue("auto_update", update);
+    if(!res10) return res10;
 
-    mcsm::Result res7 = this->optionHandle->setValue("type", server->getTypeAsString());
-    if(!res7.isSuccess()) return res7;
+    mcsm::VoidResult res7 = this->optionHandle->setValue("type", server->getTypeAsString());
+    if(!res7) return res7;
 
-    mcsm::Result res8 = sDataOpt->updateServerTimeCreated();
-    if(!res8.isSuccess()) return res8;
+    mcsm::VoidResult res8 = sDataOpt->updateServerTimeCreated();
+    if(!res8) return res8;
 
     return this->optionHandle->save();
 }
@@ -115,7 +97,7 @@ std::string mcsm::ServerConfigGenerator::getPath() const {
     return this->configPath;
 }
 
-bool mcsm::ServerConfigGenerator::validatePath(){
+mcsm::BoolResult mcsm::ServerConfigGenerator::validatePath(){
     mcsm::Option opt(this->configPath, "server");
     return !opt.exists();
 }
