@@ -70,7 +70,7 @@ mcsm::VoidResult mcsm::download(const std::string& name, const std::string& url)
     auto path = mcsm::getCurrentPath();
     if(!path) return tl::unexpected(path.error());
 
-    return download(name, url, path);
+    return download(name, url, path.value());
 }
 
 mcsm::VoidResult mcsm::download(const std::string& name, const std::string& url, const std::string& path){
