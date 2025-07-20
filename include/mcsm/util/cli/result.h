@@ -561,6 +561,12 @@ namespace mcsm::errors {
         "Set the JAVA_HOME environment variable and try again."
     };
 
+    inline const ErrorTemplate SERVER_GROUP_MODE_INVALID = {
+        412,
+        "Invalid value of server group mode \"%s\"",
+        ""
+    };
+
     // ================================
     // Misc Errors
     // ================================
