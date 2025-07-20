@@ -23,7 +23,7 @@ SOFTWARE.
 #include <mcsm/data/options/server_data_option.h>
 #include <mcsm/data/options/general_option.h>
 
-mcsm::ServerDataOption::ServerDataOption() : ServerDataOption(mcsm::getCurrentPath()){}
+mcsm::ServerDataOption::ServerDataOption() : ServerDataOption(mcsm::getCurrentPath().value()){}
 
 mcsm::ServerDataOption::ServerDataOption(const std::string& path){
     this->path = path;
