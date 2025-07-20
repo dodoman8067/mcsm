@@ -7,45 +7,43 @@ mcsm::VoidResult mcsm::ServerGroupGenerator::generate(const std::string& mode){
 
 mcsm::VoidResult mcsm::ServerGroupGenerator::generate(const std::string& mode, const std::vector<const mcsm::ServerConfigLoader*> servers){
     if(mode != "screen" && mode != "default"){
-        return {mcsm::ResultType::MCSM_FAIL, {"Invalid value of server group mode \"" + mode + "\"."}};
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_GROUP_MODE_INVALID, {mode});
+        return tl::unexpected(err);
     }
 
     this->handle = std::make_unique<mcsm::Option>(this->path, "mcsm_server_group");
 
-    bool exists = this->handle->exists();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
+    auto exists = this->handle->exists();
+    if(!exists) return tl::unexpected(exists.error());
+    if(exists.value()){
+        auto customTemp = mcsm::errors::SERVER_ALREADY_CONFIGURED;
+        customTemp.message = "Server group file already exists at: " + this->handle->getPath();
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {mode});
+        return tl::unexpected(err);
     }
 
-    if(exists){
-        return {mcsm::ResultType::MCSM_FAIL, {"Server group file already exists at: " + this->handle->getPath()}};
+    auto singleConfigExists = mcsm::fileExists(this->path + "/server.json");
+    if(!singleConfigExists) return tl::unexpected(singleConfigExists.error());
+
+    if(singleConfigExists.value()){
+        auto customTemp = mcsm::errors::SERVER_ALREADY_CONFIGURED;
+        customTemp.message = "Cannot create server group config file where a single server is already configured: " + this->handle->getPath();
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {mode});
+        return tl::unexpected(err);
     }
 
-    bool singleConfigExists = mcsm::fileExists(this->path + "/server.json");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
-
-    if(singleConfigExists){
-        return {mcsm::ResultType::MCSM_FAIL, {"Cannot create server group config file where a single server is already configured: " + this->handle->getPath()}};
-    }
-
-    mcsm::Result cRes = this->handle->create();
-    if(!cRes.isSuccess()) return cRes;
+    auto cRes = this->handle->create();
+    if(!cRes) return cRes;
 
     const bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
-    mcsm::Result lRes = this->handle->load(advp);
-    if(!lRes.isSuccess()) return lRes;
+    auto lRes = this->handle->load(advp);
+    if(!lRes) return lRes;
 
-    mcsm::Result nameSetRes = this->handle->setValue("name", this->name);
-    if(!nameSetRes.isSuccess()) return nameSetRes;
+    auto nameSetRes = this->handle->setValue("name", this->name);
+    if(!nameSetRes) return nameSetRes;
 
-    mcsm::Result modeSetRes = this->handle->setValue("mode", mode);
-    if(!modeSetRes.isSuccess()) return modeSetRes;
+    auto modeSetRes = this->handle->setValue("mode", mode);
+    if(!modeSetRes) return modeSetRes;
 
     std::vector<std::string> serversStrVec;
     if(!servers.empty()){
@@ -61,18 +59,12 @@ mcsm::VoidResult mcsm::ServerGroupGenerator::generate(const std::string& mode, c
                 continue;
             }
             std::string sPath = server->getHandle()->getPath();
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-                mcsm::Result res(resp.first, resp.second);
-                return res;
-            }
-    
             serversStrVec.push_back(sPath);
         }
     }
 
-    mcsm::Result serversSetRes = this->handle->setValue("servers", serversStrVec);
-    if(!serversSetRes.isSuccess()) return serversSetRes;
+    auto serversSetRes = this->handle->setValue("servers", serversStrVec);
+    if(!serversSetRes) return serversSetRes;
 
     return this->handle->save();
 }
