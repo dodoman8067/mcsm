@@ -64,34 +64,25 @@ mcsm::VoidResult mcsm::ServerDataOption::load(const bool& advp){
 
 mcsm::VoidResult mcsm::ServerDataOption::create(const std::string& lastTimeLaunched){
     if(!mcsm::isSafeString(lastTimeLaunched)){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(lastTimeLaunched)});
-        return res;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {lastTimeLaunched});
+        return tl::unexpected(err);
     }
-    bool optExists = this->option->exists();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
-    if(optExists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverAlreadyConfigured(this->option->getPath())});
-        return res;
+    auto optExists = this->option->exists();
+    if(!optExists) return tl::unexpected(optExists.error());
+    if(optExists.value()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_DATA_ALREADY_CONFIGURED, {this->option->getPath()});
+        return tl::unexpected(err);
     }
 
     bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
 
-    mcsm::Result sLoadRes = load(advp);
-    if(!sLoadRes.isSuccess()) return sLoadRes;
+    mcsm::VoidResult sLoadRes = load(advp);
+    if(!sLoadRes) return sLoadRes;
 
-    mcsm::Result res1 = this->option->setValue("last_time_launched", lastTimeLaunched);
-    if(!res1.isSuccess()) return res1;
-    mcsm::Result res2 = this->option->setValue("last_downloaded_build", "0");
-    if(!res2.isSuccess()) return res2;
+    mcsm::VoidResult res1 = this->option->setValue("last_time_launched", lastTimeLaunched);
+    if(!res1) return res1;
+    mcsm::VoidResult res2 = this->option->setValue("last_downloaded_build", "0");
+    if(!res2) return res2;
 
     return this->option->save();
 }
@@ -101,31 +92,31 @@ mcsm::VoidResult mcsm::ServerDataOption::reset(){
 }
 
 mcsm::StringResult mcsm::ServerDataOption::getLastTimeLaunched() const {
-    bool optExists = this->option->exists();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-    if(!optExists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::fileNotFound(this->option->getName())});
-        return "";
+    auto optExists = this->option->exists();
+    if(!optExists) return tl::unexpected(optExists.error());
+    if(!optExists.value()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_DATA_NOT_CONFIGURED, {this->option->getPath()});
+        return tl::unexpected(err);
     }
 
-    const nlohmann::json& value = this->option->getValue("last_time_launched");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    auto valueRes = this->option->getValue("last_time_launched");
+    if(!valueRes) return tl::unexpected(valueRes.error());
+    const nlohmann::json& value = valueRes.value();
 
     if(value == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"last_time_launched\"", this->option->getName())});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"\"last_time_launched\"", this->option->getName()});
+        return tl::unexpected(err);
     }
     if(!value.is_string()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"last_time_launched\"", "string")});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"\"last_time_launched\"", "string"});
+        return tl::unexpected(err);
     }
 
     if(!mcsm::isSafeString(value)){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {value});
+        return tl::unexpected(err);
     }
 
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return value;
 }
 
@@ -137,38 +128,38 @@ mcsm::VoidResult mcsm::ServerDataOption::updateLastTimeLaunched(){
 
     std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", std::localtime(&currentTime));
 
-    mcsm::Result setRes = this->option->setValue("last_time_launched", buffer);
-    if(!setRes.isSuccess()) return setRes;
+    mcsm::VoidResult setRes = this->option->setValue("last_time_launched", buffer);
+    if(!setRes) return setRes;
 
     return this->option->save();
 }
 
 mcsm::StringResult mcsm::ServerDataOption::getServerTimeCreated() const {
-    bool optExists = this->option->exists();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-    if(!optExists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::fileNotFound(this->option->getName())});
-        return "";
+    auto optExists = this->option->exists();
+    if(!optExists) return tl::unexpected(optExists.error());
+    if(!optExists.value()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_DATA_NOT_CONFIGURED, {this->option->getPath()});
+        return tl::unexpected(err);
     }
 
-    const nlohmann::json& value = this->option->getValue("server_time_created");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    auto valueRes = this->option->getValue("server_time_created");
+    if(!valueRes) return tl::unexpected(valueRes.error());
+    const nlohmann::json& value = valueRes.value();
 
     if(value == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"server_time_created\"", this->option->getName())});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"\"server_time_created\"", this->option->getName()});
+        return tl::unexpected(err);
     }
     if(!value.is_string()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"server_time_created\"", "string")});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"server_time_created\"", "string"});
+        return tl::unexpected(err);
     }
 
     if(!mcsm::isSafeString(value)){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {value});
+        return tl::unexpected(err);
     }
 
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return value;
 }
 
@@ -180,48 +171,48 @@ mcsm::VoidResult mcsm::ServerDataOption::updateServerTimeCreated(){
 
     std::strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", std::localtime(&currentTime));
 
-    mcsm::Result setRes = this->option->setValue("server_time_created", buffer);
-    if(!setRes.isSuccess()) return setRes;
+    mcsm::VoidResult setRes = this->option->setValue("server_time_created", buffer);
+    if(!setRes) return setRes;
 
     return this->option->save();
 }
 
 mcsm::StringResult mcsm::ServerDataOption::getLastDownloadedBuild() const {
-    bool optExists = this->option->exists();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-    if(!optExists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::fileNotFound(this->option->getName())});
-        return "";
+    auto optExists = this->option->exists();
+    if(!optExists) return tl::unexpected(optExists.error());
+    if(!optExists.value()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_DATA_NOT_CONFIGURED, {this->option->getPath()});
+        return tl::unexpected(err);
     }
 
-    const nlohmann::json& value = this->option->getValue("last_downloaded_build");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    auto valueRes = this->option->getValue("last_downloaded_build");
+    if(!valueRes) return tl::unexpected(valueRes.error());
+    const nlohmann::json& value = valueRes.value();
 
     if(value == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"last_downloaded_build\"", this->option->getName())});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"\"last_downloaded_build\"", this->option->getName()});
+        return tl::unexpected(err);
     }
     if(!value.is_string()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"last_downloaded_build\"", "string")});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"last_downloaded_build\"", "string"});
+        return tl::unexpected(err);
     }
 
     if(!mcsm::isSafeString(value)){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {value});
+        return tl::unexpected(err);
     }
 
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return value;
 }
 
 mcsm::VoidResult mcsm::ServerDataOption::updateLastDownloadedBuild(const std::string& build){
     if(!mcsm::isSafeString(build)){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(build)});
-        return res;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {build});
+        return tl::unexpected(err);
     }
-    mcsm::Result setRes = this->option->setValue("last_downloaded_build", build);
-    if(!setRes.isSuccess()) return setRes;
+    mcsm::VoidResult setRes = this->option->setValue("last_downloaded_build", build);
+    if(!setRes) return setRes;
 
     return this->option->save();
 }
