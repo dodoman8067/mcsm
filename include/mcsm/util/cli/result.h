@@ -503,13 +503,13 @@ namespace mcsm::errors {
 
     inline const ErrorTemplate SERVER_DATA_ALREADY_CONFIGURED = {
         402,
-        "Server data config already exists in this directory.",
+        "Server data config already exists in %s.",
         "Try again in a different directory."
     };
 
     inline const ErrorTemplate SERVER_DATA_NOT_CONFIGURED = {
         403,
-        "Server data not configured in this directory.",
+        "Server data not configured in %s.",
         "Make sure .mcsm folder is intact."
     };
 
