@@ -1,3 +1,5 @@
+/*
+TODO: Reimplement based on sqlite3 later
 #include <mcsm/data/options/running_sessions_option.h>
 #include <mcsm/data/options/general_option.h>
 
@@ -25,7 +27,7 @@ mcsm::RunningSessionsOption::~RunningSessionsOption(){
  *     ]
  * }
  * 
-*/
+
 mcsm::VoidResult mcsm::RunningSessionsOption::load(){
     this->handle = std::make_unique<mcsm::GlobalOption>("", "running_sessions_do_not_edit_this");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -217,11 +219,13 @@ mcsm::VoidResult mcsm::RunningSessionsOption::addRunningServer(const std::string
 }
 
 // this doesn't actually stop the server, call ServerGroupManager#stop instead
-mcsm::VoidResult mcsm::RunningSessionsOption::removeRunningGroup(std::unique_ptr<mcsm::RunningGroup> /* group */){
+mcsm::VoidResult mcsm::RunningSessionsOption::removeRunningGroup(std::unique_ptr<mcsm::RunningGroup> /* group ){
     return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
 }
 
 // this doesn't actually stop the server, call ServerGroupManager#stop instead
-mcsm::VoidResult mcsm::RunningSessionsOption::removeRunningServer(const std::string& /* groupName */, const mcsm::ServerConfigLoader* /* server */){
+mcsm::VoidResult mcsm::RunningSessionsOption::removeRunningServer(const std::string& /* groupName , const mcsm::ServerConfigLoader* /* server ){
     return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
 }
+
+*/
