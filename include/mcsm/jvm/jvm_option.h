@@ -23,7 +23,6 @@ SOFTWARE.
 #ifndef __MCSM_JVM_OPTION_H__
 #define __MCSM_JVM_OPTION_H__
 
-#include <mcsm/data/global_option.h>
 #include <mcsm/data/option.h>
 #include <mcsm/jvm/java_detection.h>
 #include <mcsm/util/string_utils.h>
@@ -41,16 +40,20 @@ namespace mcsm {
         std::unique_ptr<mcsm::Option> option;
         std::string name;
         std::string workingDir;
+        mcsm::SearchTarget target;
+        bool initialized = false;
     public:
         JvmOption(const std::string& name);
         JvmOption(const std::string& name, const SearchTarget& target);
         JvmOption(const std::string& name, const SearchTarget& target, const std::string& workingPath);
         ~JvmOption();
 
+        mcsm::VoidResult init();
+
         mcsm::VoidResult create();
-        mcsm::VoidResult create(const std::string& jvmPath, const SearchTarget& target);
-        mcsm::VoidResult create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions, const SearchTarget& target);
-        mcsm::VoidResult create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions, const std::vector<std::string>& serverOptions, const SearchTarget& target);
+        mcsm::VoidResult create(const std::string& jvmPath);
+        mcsm::VoidResult create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions);
+        mcsm::VoidResult create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions, const std::vector<std::string>& serverOptions);
 
         mcsm::VoidResult reset();
 
@@ -67,7 +70,7 @@ namespace mcsm {
 
         std::string getProfileName() const;
 
-        std::string getProfilePath() const;
+        mcsm::StringResult getProfilePath() const;
         
         mcsm::SearchTarget getSearchTarget() const;
     };
