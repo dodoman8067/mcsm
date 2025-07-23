@@ -585,6 +585,12 @@ namespace mcsm::errors {
         ""
     };
 
+    inline const ErrorTemplate JVM_PROFILE_ALREADY_CONFIGURED = {
+        416,
+        "JVM profile %s already exists in %s.",
+        "Check the profile definition or create a new one."
+    };
+
     // ================================
     // Misc Errors
     // ================================
