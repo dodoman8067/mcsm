@@ -567,6 +567,24 @@ namespace mcsm::errors {
         ""
     };
 
+    inline const ErrorTemplate SERVER_NOT_LISTED_ON_CURRENT_GROUP = {
+        413,
+        "Server on \"%s\" not found on current group configuration.",
+        ""
+    };
+
+    inline const ErrorTemplate SERVER_GROUP_CANNOT_START_SERVER = {
+        414,
+        "Server/Screen session starting failed with reason: %s",
+        ""
+    };
+
+    inline const ErrorTemplate SERVER_GROUP_CANNOT_STOP_SERVER = {
+        415,
+        "Server/Screen session stopping failed with reason: %s",
+        ""
+    };
+
     // ================================
     // Misc Errors
     // ================================
