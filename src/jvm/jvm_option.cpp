@@ -81,7 +81,7 @@ mcsm::VoidResult mcsm::JvmOption::create(){
         return tl::unexpected(err);
     }
     auto jvm = mcsm::detectJava();
-    #error "if(!jvm) return tl::unexpected(jvm.error()); uncomment this after rewriting mcsm::detectJava"
+    if(!jvm) return tl::unexpected(jvm.error());
     
     std::vector<std::string> jvmArgs = {
         "-Xms2G",
@@ -91,11 +91,11 @@ mcsm::VoidResult mcsm::JvmOption::create(){
     std::vector<std::string> serverArgs = {
         "nogui"
     };
-    if(mcsm::isWhitespaceOrEmpty(jvm)){
+    if(mcsm::isWhitespaceOrEmpty(jvm.value())){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JVM_DETECTION_FAILED, {});
         return tl::unexpected(err);
     }
-    return create(jvm, jvmArgs, serverArgs);
+    return create(jvm.value(), jvmArgs, serverArgs);
 }
 
 // Reason why the program takes SearchTarget as a parameter (was also taken in the constructor) is because there's chance that constructor's specified SearchTarget might be ALL.
