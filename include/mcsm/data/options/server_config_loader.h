@@ -19,21 +19,17 @@ namespace mcsm {
         template <typename T>
         inline tl::expected<T, mcsm::Error> get(const std::string& key) const{
             if(!this->isLoaded){
-                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-                    "ServerConfigLoader function called without loadConfig.",
-                    "High chance to be an internal issue. Please open an issue in Github."
-                }});
-                return T();
+                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
+                return tl::unexpected(err);
             }
 
-            nlohmann::json value = this->optionHandle->getValue(key);
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) {
-                return T();
-            }
+            auto valueRes = this->optionHandle->getValue(key);
+            if(!valueRes) return tl::unexpected(valueRes.error());
+            auto value = valueRes.value();
 
             if(value == nullptr){
-                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"" + key + "\"", this->optionHandle->getName())});
-                return T();
+                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"\"" + key + "\"", this->optionHandle->getName()});
+                return tl::unexpected(err);
             }
 
             if constexpr(std::is_same<T, std::vector<int>>::value ||
@@ -41,21 +37,20 @@ namespace mcsm {
                         std::is_same<T, std::vector<bool>>::value ||
                         std::is_same<T, std::vector<std::string>>::value){
                 if(value.type() != nlohmann::json::value_t::array){
-                    mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"" + key + "\"", "array")});
-                    return T();
+                    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"" + key + "\"", "array"});
+                    return tl::unexpected(err);
                 }
             }else if (value.type() != getJsonType<T>()){
-                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"" + key + "\"", value.type_name())});
-                return T();
+                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"" + key + "\"", value.type_name()});
+                return tl::unexpected(err);
             }
             if constexpr (std::is_same<T, std::string>::value){
                 if(!mcsm::isSafeString(value)){
-                    mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
-                    return T();
+                    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {value});
+                    return tl::unexpected(err);
                 }
             }
 
-            mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
             return value.get<T>();
         }
 

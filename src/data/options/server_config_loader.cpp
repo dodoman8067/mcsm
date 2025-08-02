@@ -70,7 +70,7 @@ nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<nlohmann::json>() 
 
 template <>
 nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<std::vector<nlohmann::json>>() const {
-    return nlohmann::json::value_t::object;
+    return nlohmann::json::value_t::array;
 }
 
 // isLoaded won't be "true" if the option does not exist which is why I don't check the existence of the option file.
