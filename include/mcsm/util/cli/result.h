@@ -91,6 +91,11 @@ namespace mcsm {
         return formatted;
     }
 
+    template<typename T>
+    inline void printError(const tl::expected<T, mcsm::Error>& err){
+        printError(err.error());
+    }
+
     inline void printError(const mcsm::Error& err) {
         if(err.status == mcsm::ErrorStatus::ERROR){
             mcsm::error(formatError(err));
@@ -115,9 +120,31 @@ namespace mcsm {
         }
     }
 
+    template<typename T>
+    inline void exitIfFail(const tl::expected<T, Error>& err) {
+        exitIfFail(err.error());
+    }
+
+
     inline void exitIfFail(const mcsm::Error& err) {
         if(err.status != mcsm::ErrorStatus::OK && err.status != mcsm::ErrorStatus::WARNING_NOEXIT){
             std::exit(1);
+        }
+    }
+
+    template<typename T>
+    inline T unwrapOrExit(tl::expected<T, mcsm::Error>&& result) {
+        if(!result) {
+            printError(result.error());
+            exitIfFail(result.error());
+        }
+        return std::move(result.value());
+    }
+
+    inline void unwrapOrExit(tl::expected<void, mcsm::Error>&& result) {
+        if(!result) {
+            printError(result.error());
+            exitIfFail(result.error());
         }
     }
 
