@@ -26,4 +26,4 @@ mcsm::BukkitServer::BukkitServer() {}
 
 mcsm::BukkitServer::~BukkitServer() {}
 
-mcsm::ServerType mcsm::BukkitServer::getType() const { mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}}); return mcsm::ServerType::BUKKIT; }
+mcsm::ServerType mcsm::BukkitServer::getType() const { return mcsm::ServerType::BUKKIT; }
