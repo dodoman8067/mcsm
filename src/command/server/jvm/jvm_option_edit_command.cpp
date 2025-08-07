@@ -105,16 +105,9 @@ std::string mcsm::JvmOptionEditCommand::getProfileName(const std::vector<std::st
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
                 name = mcsm::safeString(args[i + 1]);
                 mcsm::JvmOption option(name, target);
-                if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-                    mcsm::printResultMessage();
-                    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-                }
+                mcsm::unwrapOrExit(option.init());
                     
-                bool exists = option.exists();
-                if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-                    mcsm::printResultMessage();
-                    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-                }
+                bool exists = mcsm::unwrapOrExit(option.exists());
 
                 if(!exists){
                     mcsm::warning("JVM launch profile " + name + " does not exist. run \"mcsm genJvmProfile --name " + name + "\" command to generate it first.");
@@ -175,16 +168,9 @@ std::vector<std::string> mcsm::JvmOptionEditCommand::getJvmArguments(const std::
 inline void mcsm::JvmOptionEditCommand::editProfile(const std::vector<std::string>& args) {
     mcsm::SearchTarget target = getSearchTarget(args);
     mcsm::JvmOption option(getProfileName(args, target), target);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        mcsm::printResultMessage();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-    }
+    mcsm::unwrapOrExit(option.init());
                     
-    bool exists = option.exists();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        mcsm::printResultMessage();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-    }
+    bool exists = mcsm::unwrapOrExit(option.exists());
 
     if(!exists){
         mcsm::error("Profile does not exist; Task aborted.");
@@ -195,48 +181,24 @@ inline void mcsm::JvmOptionEditCommand::editProfile(const std::vector<std::strin
     std::vector<std::string> sArgs = getServerArguments(args);
     std::string jvm = getJvmPath(args);
 
-    std::vector<std::string> optJvmArgs = option.getJvmArguments();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        mcsm::printResultMessage();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-    }
-    std::vector<std::string> optServerArgs = option.getServerArguments();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        mcsm::printResultMessage();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-    }
-    std::string oldJvm = option.getJvmPath();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        mcsm::printResultMessage();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-    }
+    std::vector<std::string> optJvmArgs = mcsm::unwrapOrExit(option.getJvmArguments());
+    std::vector<std::string> optServerArgs = mcsm::unwrapOrExit(option.getServerArguments());
+    std::string oldJvm = mcsm::unwrapOrExit(option.getJvmPath());
 
     mcsm::info("Java Virtual Machine launch profile edited : ");
     mcsm::info("Profile name : " + option.getProfileName());
 
     if(oldJvm != jvm && !mcsm::isWhitespaceOrEmpty(jvm)){
         mcsm::info("JVM path : " + oldJvm + " -> " + jvm);
-        mcsm::Result res = option.setJvmPath(jvm);
-        if(!res.isSuccess()){
-            res.printMessage();
-            if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
+        mcsm::unwrapOrExit(option.setJvmPath(jvm));
     }
 
     if(!jvmArgs.empty() && optJvmArgs != jvmArgs){
-        mcsm::Result res = option.setJvmArguments(jvmArgs);
-        if(!res.isSuccess()){
-            res.printMessage();
-            if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
+        mcsm::unwrapOrExit(option.setJvmArguments(jvmArgs));
         printDifference("JVM arguments", optJvmArgs, jvmArgs);
     }
     if(!sArgs.empty()){
-        mcsm::Result res = option.setServerArguments(sArgs);
-        if(!res.isSuccess()){
-            res.printMessage();
-            if(res.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
+        mcsm::unwrapOrExit(option.setServerArguments(sArgs));
         printDifference("Server arguments", optServerArgs, sArgs);
     }
 }

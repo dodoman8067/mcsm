@@ -32,7 +32,7 @@ void mcsm::JvmOptionSearchCommand::execute(const std::vector<std::string>& args)
         std::exit(1);
     }
     std::string name = getProfileName(args);
-    std::vector<std::unique_ptr<mcsm::JvmOption>> options = search(getSearchTarget(args), std::move(name));
+    std::vector<std::unique_ptr<mcsm::JvmOption>> options = search(getSearchTarget(args), std::move(name)); // no need to call init; already called by search()
     if(options.empty()){
         mcsm::info("No JVM launch profile found in the given search target.");
         std::exit(1);
@@ -42,30 +42,10 @@ void mcsm::JvmOptionSearchCommand::execute(const std::vector<std::string>& args)
     int i = 1;
     for(std::unique_ptr<mcsm::JvmOption>& option : options){
         auto name = option->getProfileName();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            mcsm::printResultMessage();
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
-        auto path = option->getProfilePath();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            mcsm::printResultMessage();
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
-        auto jvmPath = option->getJvmPath();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            mcsm::printResultMessage();
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
-        auto jvmArgs = option->getJvmArguments();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            mcsm::printResultMessage();
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
-        auto serverArgs = option->getServerArguments();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            mcsm::printResultMessage();
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
+        auto path = mcsm::unwrapOrExit(option->getProfilePath());
+        auto jvmPath = mcsm::unwrapOrExit(option->getJvmPath());
+        auto jvmArgs = mcsm::unwrapOrExit(option->getJvmArguments());
+        auto serverArgs = mcsm::unwrapOrExit(option->getServerArguments());
 
         std::cout << "Result " << i << " : "<< "\n";
         std::cout << "Name : " << name << "\n";
@@ -94,20 +74,14 @@ std::vector<std::unique_ptr<mcsm::JvmOption>> mcsm::JvmOptionSearchCommand::sear
     std::vector<std::unique_ptr<mcsm::JvmOption>> result;
     if(target == mcsm::SearchTarget::GLOBAL || target == mcsm::SearchTarget::ALL){
         std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(name, mcsm::SearchTarget::GLOBAL);
-        bool profileExists = opt->exists();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            mcsm::printResultMessage();
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
+        mcsm::unwrapOrExit(opt->init());
+        bool profileExists = mcsm::unwrapOrExit(opt->exists());
         if(profileExists) result.push_back(std::move(opt));
     }
     if(target == mcsm::SearchTarget::CURRENT || target == mcsm::SearchTarget::ALL){
         std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(name, mcsm::SearchTarget::CURRENT);
-        bool profileExists = opt->exists();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            mcsm::printResultMessage();
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
+        mcsm::unwrapOrExit(opt->init());
+        bool profileExists = mcsm::unwrapOrExit(opt->exists());
         if(profileExists) result.push_back(std::move(opt));
     }
     return result;
