@@ -1,6 +1,8 @@
 #ifndef __MCSM_RUNNING_SESSIONS_OPTION_H__
 #define __MCSM_RUNNING_SESSIONS_OPTION_H__
 
+/*
+
 #include <mcsm/data/options/server_group_loader.h>
 
 namespace mcsm {
@@ -40,5 +42,6 @@ namespace mcsm {
         mcsm::VoidResult removeRunningServer(const std::string& groupName, const mcsm::ServerConfigLoader* server);
     };
 }
+*/
 
 #endif // __MCSM_RUNNING_SESSIONS_OPTION_H__
