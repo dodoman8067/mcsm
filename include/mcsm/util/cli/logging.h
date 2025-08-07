@@ -40,8 +40,15 @@ namespace mcsm {
     inline void info(const std::string& message){
         if(!log) return;
         std::string msg = message;
-        if(!mcsm::endsWith(msg, "\n")) msg += "\n";
-        std::cout << "[mcsm/INFO] " << msg;
+        if(!endsWith(msg, "\n")) msg += "\n";
+        std::string wrappedMsg;
+        int i = 0;
+        for(char& c : msg){
+            if(c == '\n' && i != msg.length() - 1){ wrappedMsg += "\n[mcsm/INFO] "; i++; continue; }
+            i++;
+            wrappedMsg += c;
+        }
+        std::cout << "[mcsm/INFO] " << wrappedMsg;
     }
 
     /**
@@ -52,8 +59,15 @@ namespace mcsm {
         if(!log) return;
         std::string msg = message;
         if(!mcsm::endsWith(msg, "\n")) msg += "\n";
+        std::string wrappedMsg;
+        int i = 0;
+        for(char& c : msg){
+            if(c == '\n' && i != msg.length() - 1){ wrappedMsg += "\n[mcsm/INFO] "; i++; continue; }
+            i++;
+            wrappedMsg += c;
+        }
         mcsm::setcol(mcsm::NamedColor::GREEN);
-        std::cout << "[mcsm/INFO] " << msg;
+        std::cout << "[mcsm/INFO] " << wrappedMsg;
         mcsm::resetcol();
     }
 
@@ -65,8 +79,15 @@ namespace mcsm {
         if(!log) return;
         std::string msg = message;
         if(!mcsm::endsWith(msg, "\n")) msg += "\n";
+        std::string wrappedMsg;
+        int i = 0;
+        for(char& c : msg){
+            if(c == '\n' && i != msg.length() - 1){ wrappedMsg += "\n[mcsm/WARN] "; i++; continue; }
+            i++;
+            wrappedMsg += c;
+        }
         mcsm::setcol(mcsm::NamedColor::BRIGHT_YELLOW);
-        std::cerr << "[mcsm/WARN] " << msg;
+        std::cerr << "[mcsm/WARN] " << wrappedMsg;
         mcsm::resetcol();
     }
 
@@ -78,8 +99,15 @@ namespace mcsm {
         if(!log) return;
         std::string msg = message;
         if(!mcsm::endsWith(msg, "\n")) msg += "\n";
+        std::string wrappedMsg;
+        int i = 0;
+        for(char& c : msg){
+            if(c == '\n' && i != msg.length() - 1){ wrappedMsg += "\n[mcsm/ERROR] "; i++; continue; }
+            i++;
+            wrappedMsg += c;
+        }
         mcsm::setcol(mcsm::NamedColor::RED);
-        std::cerr << "[mcsm/ERROR] " << msg;
+        std::cerr << "[mcsm/ERROR] " << wrappedMsg;
         mcsm::resetcol();
     }
 }
