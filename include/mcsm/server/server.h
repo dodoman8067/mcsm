@@ -36,6 +36,11 @@ namespace mcsm {
      */
     class Server {
     public:
+        virtual ~Server() = default;            // MUST be virtual
+
+        // (ASan-friendly) neutralize sized delete on base deletions
+        static void operator delete(void* p) noexcept { ::operator delete(p); }
+        static void operator delete(void* p, std::size_t) noexcept { ::operator delete(p); }
         /**
          * Returns the base type of server.
          * @return mcsm::ServerType enum

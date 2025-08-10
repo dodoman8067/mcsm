@@ -31,10 +31,14 @@ namespace mcsm {
     private:
         std::string name;
         std::string description;
-        std::vector<std::string>* aliases;
+        std::vector<std::string> aliases;
     public:
-        Command(const std::string& name, const std::string& description);
-        ~Command();
+        Command(const std::string &name, const std::string &description);
+        virtual ~Command() = default;
+
+        static void operator delete(void* p) noexcept { ::operator delete(p); }
+        static void operator delete(void* p, std::size_t) noexcept { ::operator delete(p); }
+
         std::string_view getName() const;
         std::string_view getDescription() const;
         void addAlias(const std::string& value);

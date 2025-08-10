@@ -10,7 +10,7 @@ namespace mcsm {
         ~AdvancedJsonErrorsProperty() = default;
         
         // virtual function; means constexpr is impossible
-        inline nlohmann::json getDefaultValue() override {
+        nlohmann::json getDefaultValue() const override {
             return false;
         }
     };

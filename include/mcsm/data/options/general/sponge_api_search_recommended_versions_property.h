@@ -11,7 +11,7 @@ namespace mcsm {
 
         // virtual function; means constexpr is impossible
         // this will set the default sponge value while configuring
-        inline nlohmann::json getDefaultValue() override {
+        inline nlohmann::json getDefaultValue() const override {
             return false;
         }
     };
