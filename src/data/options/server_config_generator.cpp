@@ -30,7 +30,7 @@ mcsm::VoidResult mcsm::ServerConfigGenerator::generate(const std::string& versio
     auto canGenerate = validatePath();
     if(!canGenerate) return tl::unexpected(canGenerate.error());
 
-    if(!canGenerate.value()){
+    if(canGenerate.value()){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_ALREADY_CONFIGURED, {this->configPath});
         return tl::unexpected(err);
     }
@@ -40,6 +40,9 @@ mcsm::VoidResult mcsm::ServerConfigGenerator::generate(const std::string& versio
         
     mcsm::VoidResult jLoadRes = this->optionHandle->load(advp);
     if(!jLoadRes) return jLoadRes;
+
+    auto loadcheck = sDataOpt->load();
+    if(!loadcheck) return tl::unexpected(loadcheck.error());
 
     mcsm::VoidResult res1 = sDataOpt->create("none");
     if(!res1) return res1;

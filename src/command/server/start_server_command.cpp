@@ -61,8 +61,6 @@ void mcsm::StartServerCommand::execute(const std::vector<std::string>& args){
         std::exit(1);
     }
 
-    mcsm::info(executionPath);
-
     bool isGroup = false;
     std::string groupPath;
     for(size_t i = 0; i < args.size(); ++i){
@@ -144,10 +142,12 @@ std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const mc
     }
     if(target == mcsm::SearchTarget::GLOBAL || target == mcsm::SearchTarget::ALL){
         std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(name, mcsm::SearchTarget::GLOBAL);
+        mcsm::unwrapOrExit(opt->init());
         if(mcsm::unwrapOrExit(opt->exists())) return opt;
     }
     if(target == mcsm::SearchTarget::CURRENT || target == mcsm::SearchTarget::ALL){
         std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(name, mcsm::SearchTarget::CURRENT, executionPath);
+        mcsm::unwrapOrExit(opt->init());
         if(mcsm::unwrapOrExit(opt->exists())) return opt;
     }
     return nullptr;

@@ -25,7 +25,6 @@ SOFTWARE.
 
 #include <mcsm/server/server.h>
 #include <mcsm/server/type/downloadable.h>
-#include <mcsm/data/global_option.h>
 #include <mcsm/http/get.h>
 #include <mcsm/http/download.h>
 #include <map>

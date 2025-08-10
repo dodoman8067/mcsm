@@ -77,7 +77,7 @@ mcsm::StringResult mcsm::SpongeServer::getVersion(const std::string& ver) const 
 
         const nlohmann::json& v = property->getCurrentValue();
         if(!v.is_boolean()){
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE {"\"sponge_api_search_recommended_versions\"", "boolean"});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"sponge_api_search_recommended_versions\"", "boolean"});
             return tl::unexpected(err);
         }
 

@@ -51,15 +51,42 @@ mcsm::VoidResult mcsm::ServerDataOption::load(){
 
     bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
 
-    auto optLRes = this->option->load(advp);
-    if(!optLRes) return optLRes;
+    auto optExists = this->option->exists();
+    if(!optExists) return tl::unexpected(optExists.error());
+    if(optExists.value()) {
+        auto optLRes = this->option->load(advp);
+        if(!optLRes) return optLRes;
+    }
     
     this->loaded = true;
     return {};
 }
 
 mcsm::VoidResult mcsm::ServerDataOption::load(const bool& advp){
-    return this->option->load(advp);
+    if(this->loaded){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_DATA_ALREADY_CONFIGURED, {});
+        return tl::unexpected(err);
+    }
+    auto fileExists = mcsm::fileExists(path);
+    if(!fileExists) return tl::unexpected(fileExists.error());
+
+    if(!fileExists.value()){
+        if(!mcsm::mkdir(path)){
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::FILE_CREATE_FAILED, {path});
+            return tl::unexpected(err);
+        }
+    }
+    this->option = std::make_unique<mcsm::Option>(path + "/.mcsm/", "server_datas");
+
+    auto optExists = this->option->exists();
+    if(!optExists) return tl::unexpected(optExists.error());
+    if(optExists.value()) {
+        auto optLRes = this->option->load(advp);
+        if(!optLRes) return optLRes;
+    }
+
+    this->loaded = true;
+    return {};
 }
 
 mcsm::VoidResult mcsm::ServerDataOption::create(const std::string& lastTimeLaunched){

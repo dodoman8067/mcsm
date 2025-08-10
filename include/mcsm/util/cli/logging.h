@@ -42,7 +42,7 @@ namespace mcsm {
         std::string msg = message;
         if(!endsWith(msg, "\n")) msg += "\n";
         std::string wrappedMsg;
-        int i = 0;
+        size_t i = 0;
         for(char& c : msg){
             if(c == '\n' && i != msg.length() - 1){ wrappedMsg += "\n[mcsm/INFO] "; i++; continue; }
             i++;
@@ -60,7 +60,7 @@ namespace mcsm {
         std::string msg = message;
         if(!mcsm::endsWith(msg, "\n")) msg += "\n";
         std::string wrappedMsg;
-        int i = 0;
+        size_t i = 0;
         for(char& c : msg){
             if(c == '\n' && i != msg.length() - 1){ wrappedMsg += "\n[mcsm/INFO] "; i++; continue; }
             i++;
@@ -80,7 +80,7 @@ namespace mcsm {
         std::string msg = message;
         if(!mcsm::endsWith(msg, "\n")) msg += "\n";
         std::string wrappedMsg;
-        int i = 0;
+        size_t i = 0;
         for(char& c : msg){
             if(c == '\n' && i != msg.length() - 1){ wrappedMsg += "\n[mcsm/WARN] "; i++; continue; }
             i++;
@@ -100,7 +100,7 @@ namespace mcsm {
         std::string msg = message;
         if(!mcsm::endsWith(msg, "\n")) msg += "\n";
         std::string wrappedMsg;
-        int i = 0;
+        size_t i = 0;
         for(char& c : msg){
             if(c == '\n' && i != msg.length() - 1){ wrappedMsg += "\n[mcsm/ERROR] "; i++; continue; }
             i++;

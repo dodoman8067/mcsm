@@ -50,7 +50,11 @@ mcsm::VoidResult mcsm::JvmOption::init(){
             auto exists = globalOption.exists();
             if(!exists) return tl::unexpected(exists.error());
             if(exists.value()){
+                // this->option->load will always create an empty "{}" file regardless of it existing which would result in an error in many jvm generation related command executions.
+                // as jvmoption doesnt provide a way to load its internal option pointer we would load it when the file is present
                 this->option = std::make_unique<mcsm::Option>(globalOption);
+                auto lRes = this->option->load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
+                if(!lRes) return lRes;
                 this->target = mcsm::SearchTarget::GLOBAL;
             }else{
                 this->option = std::make_unique<mcsm::Option>(this->workingDir + "/.mcsm/jvm/profiles", name);
@@ -60,15 +64,29 @@ mcsm::VoidResult mcsm::JvmOption::init(){
         }
         case mcsm::SearchTarget::GLOBAL: {
             this->option = std::make_unique<mcsm::Option>(mcsm::asGlobalConfigPath("/jvm/profiles"), name);
+            // this->option->load will always create an empty "{}" file regardless of it existing which would result in an error in many jvm generation related command executions.
+            // as jvmoption doesnt provide a way to load its internal option pointer we would load it when the file is present
+            auto exists = this->option->exists();
+            if(!exists) return tl::unexpected(exists.error());
+            if(exists.value()){
+                auto lRes = this->option->load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
+                if(!lRes) return lRes;
+            }
             break;
         }
         case mcsm::SearchTarget::CURRENT: {
             this->option = std::make_unique<mcsm::Option>(this->workingDir + "/.mcsm/jvm/profiles", name);
+            auto exists = this->option->exists();
+            if(!exists) return tl::unexpected(exists.error());
+            if(exists.value()){
+                // this->option->load will always create an empty "{}" file regardless of it existing which would result in an error in many jvm generation related command executions.
+                // as jvmoption doesnt provide a way to load its internal option pointer we would load it when the file is present
+                auto lRes = this->option->load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
+                if(!lRes) return lRes;
+            }
             break;
         }
     }
-    auto lRes = this->option->load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
-    if(!lRes) return lRes;
     initialized = true;
     return {};
 }

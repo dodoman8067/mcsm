@@ -24,6 +24,7 @@ SOFTWARE.
 #define __MCSM_SERVER_TYPE_H__
 
 #include <string>
+#include <mcsm/util/cli/result.h>
 
 namespace mcsm {
     // Represents an enum of Minecraft server type.

@@ -211,6 +211,9 @@ tl::expected<std::unique_ptr<mcsm::JvmOption>, mcsm::Error> mcsm::ServerConfigLo
         return tl::unexpected(err);
     }
     std::unique_ptr<mcsm::JvmOption> jvmOption = std::make_unique<mcsm::JvmOption>(profileObj["name"], target, this->configPath);
+    auto jvmInit = jvmOption->init();
+    if(!jvmInit) return tl::unexpected(jvmInit.error());
+
     auto jvmExts = jvmOption->exists();
     if(!jvmExts) return tl::unexpected(jvmExts.error());
 

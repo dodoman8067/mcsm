@@ -135,8 +135,13 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& /
     std::map<std::string, std::string> extras;
 
     auto sPtr = mcsm::unwrapOrExit(mcsm::ServerRegistry::getServerRegistry().getServer(type));
+    auto sv = sPtr->getRequiredValues();
+    if(!sv) {
+        mcsm::printError(sv);
+        mcsm::exitIfFail(sv);
+    }
 
-    for(auto&[name, defaultValue] : sPtr->getRequiredValues()){
+    for(auto&[name, defaultValue] : sv.value()){
         handle(name, extras, defaultValue);
     }
 
@@ -155,6 +160,7 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& /
     }
  
     mcsm::JvmOption defaultProfile(extras["default_jvm_launch_profile_name"], t);
+    mcsm::unwrapOrExit(defaultProfile.init());
 
     mcsm::unwrapOrExit(sPtr->generate(name, defaultProfile, mcsm::unwrapOrExit(mcsm::getCurrentPath()), version, bUpdate, extras));
     return;
