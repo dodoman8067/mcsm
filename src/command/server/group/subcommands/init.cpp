@@ -23,11 +23,7 @@ void mcsm::GroupInitSubCommand::execute(const std::vector<std::string>& args){
         std::exit(1);
     }
 
-    mcsm::Result genRes = this->generator->generate(args[1]);
-    if(!genRes.isSuccess()){
-        genRes.printMessage();
-        if(genRes.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-    }
+    mcsm::unwrapOrExit(this->generator->generate(args[1]));
     mcsm::success("Group \"" + args[0] + "\" configured with mode \"" + args[1] + "\".");
     std::exit(0);
 }

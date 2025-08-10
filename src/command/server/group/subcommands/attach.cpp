@@ -35,15 +35,14 @@ void mcsm::GroupAttachSubCommand::execute(const std::vector<std::string>& args){
     // populate namePathMap with all servers
     for(auto* config : this->loader->getServers()){
         std::string cPath = config->getHandle()->getPath();
-        std::string cName = config->getServerName();
-    
-        mcsm::Result sNGRes({mcsm::getLastResult().first, mcsm::getLastResult().second});
-        if(!sNGRes.isSuccess()){
+        auto cName = config->getServerName();
+
+        if(!cName){
             if(strict){
                 mcsm::error("Failed to load server's name on \"" + cPath + "\".");
                 mcsm::error("Below lines are the output from the internal system.");
                 mcsm::error("");
-                sNGRes.printMessage();
+                mcsm::printError(cName);
                 mcsm::warning("NOTE: Strict mode is currently enabled.");
                 std::exit(1);
             }
@@ -51,7 +50,7 @@ void mcsm::GroupAttachSubCommand::execute(const std::vector<std::string>& args){
             continue;
         }
     
-        namePathMap[cName].push_back(cPath);
+        namePathMap[cName.value()].push_back(cPath);
     }
     
     // check user inputs (serverArgs) against namePathMap
@@ -99,24 +98,18 @@ void mcsm::GroupAttachSubCommand::execute(const std::vector<std::string>& args){
         std::exit(1);
     }
 
-    std::string gName = this->manager->getGroupLoader()->getName();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        mcsm::printResultMessage();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-    }
-
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}}); // clear result
+    std::string gName = mcsm::unwrapOrExit(this->manager->getGroupLoader()->getName());
 
     std::string modifiedName = mcsm::safeString(pathsToAttach[0]);
 
     mcsm::ScreenSession session(gName + "." + modifiedName);
-    mcsm::Result stRes = session.attach();
-    if(!stRes.isSuccess()){
+    mcsm::VoidResult stRes = session.attach();
+    if(!stRes){
         if(strict){
             mcsm::error("Failed to attatch to server \"" + pathsToAttach[0] + "\".");
             mcsm::error("Below lines are the output from the internal system.");
             mcsm::error("");
-            stRes.printMessage();
+            mcsm::printError(stRes);
             mcsm::warning("NOTE: Strict mode is currently enabled.");
         }
         mcsm::warning("Starting server \"" + pathsToAttach[0] + "\" failed. Run with --strict option for more info.");

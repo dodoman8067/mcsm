@@ -34,15 +34,14 @@ void mcsm::GroupRemoveSubCommand::execute(const std::vector<std::string>& args){
     // populate namePathMap with all servers
     for(auto* config : this->loader->getServers()){
         std::string cPath = config->getHandle()->getPath();
-        std::string cName = config->getServerName();
-    
-        mcsm::Result sNGRes({mcsm::getLastResult().first, mcsm::getLastResult().second});
-        if(!sNGRes.isSuccess()){
+        auto cName = config->getServerName();
+
+        if(!cName){
             if(strict){
                 mcsm::error("Failed to load server's name on \"" + cPath + "\".");
                 mcsm::error("Below lines are the output from the internal system.");
                 mcsm::error("");
-                sNGRes.printMessage();
+                mcsm::printError(cName);
                 mcsm::warning("NOTE: Strict mode is currently enabled.");
                 std::exit(1);
             }
@@ -50,7 +49,7 @@ void mcsm::GroupRemoveSubCommand::execute(const std::vector<std::string>& args){
             continue;
         }
     
-        namePathMap[cName].push_back(cPath);
+        namePathMap[cName.value()].push_back(cPath);
     }
     
     // check user inputs (serverArgs) against namePathMap
@@ -94,13 +93,13 @@ void mcsm::GroupRemoveSubCommand::execute(const std::vector<std::string>& args){
     }
     
     for(const std::string& path : pathsToRemove){
-        mcsm::Result rmRes = this->loader->removeServer(path);
-        if(!rmRes.isSuccess()){
+        mcsm::VoidResult rmRes = this->loader->removeServer(path);
+        if(!rmRes){
             if(strict){
                 mcsm::error("Failed to remove server \"" + path + "\".");
                 mcsm::error("Below lines are the output from the internal system.");
                 mcsm::error("");
-                rmRes.printMessage();
+                mcsm::printError(rmRes);
                 mcsm::warning("NOTE: Strict mode is currently enabled.");
                 std::exit(1);
             }

@@ -1,7 +1,7 @@
 #ifndef __MCSM_SERVER_GROUP_MANAGER_H__
 #define __MCSM_SERVER_GROUP_MANAGER_H__
 
-#include <mcsm/data/options/running_sessions_option.h>
+#include <mcsm/data/options/server_group_loader.h>
 #include <mcsm/util/cli/screen_session.h>
 
 namespace mcsm {

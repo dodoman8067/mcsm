@@ -47,36 +47,31 @@ void mcsm::GroupStopSubCommand::stopAll(const bool& strict){
     int stoppedServers = 0;
     for(auto* config : this->loader->getServers()){
         std::string cPath = config->getHandle()->getPath();
-        std::string cName = config->getServerName();
-    
-        mcsm::Result sNGRes({mcsm::getLastResult().first, mcsm::getLastResult().second});
-        if(!sNGRes.isSuccess()){
+        auto cName = config->getServerName();
+
+        if(!cName){
             if(strict){
                 mcsm::error("Failed to load server's name on \"" + cPath + "\".");
                 mcsm::error("Below lines are the output from the internal system.");
                 mcsm::error("");
-                sNGRes.printMessage();
+                mcsm::printError(cName);
                 mcsm::warning("NOTE: Strict mode is currently enabled.");
                 std::exit(1);
             }
             mcsm::warning("Failed to load server's name on \"" + cPath + "\". Run with --strict flag for more information.");
-            mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}}); // clear result
             continue;
         }
 
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}}); // clear result
-
-        mcsm::Result stRes = this->manager->stop(cPath);
-        if(!stRes.isSuccess()){
+        mcsm::VoidResult stRes = this->manager->stop(cPath);
+        if(!stRes){
             if(strict){
                 mcsm::error("Failed to stop server \"" + cPath + "\".");
                 mcsm::error("Below lines are the output from the internal system.");
                 mcsm::error("");
-                stRes.printMessage();
+                mcsm::printError(stRes);
                 mcsm::warning("NOTE: Strict mode is currently enabled.");
             }
             mcsm::warning("Stopping server \"" + cPath + "\" failed. Run with --strict option for more info.");
-            mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}}); // clear result
             continue;
         }
         stoppedServers++;
@@ -94,15 +89,14 @@ void mcsm::GroupStopSubCommand::stopWithPaths(const bool& strict, const std::vec
     // populate namePathMap with all servers
     for(auto* config : this->loader->getServers()){
         std::string cPath = config->getHandle()->getPath();
-        std::string cName = config->getServerName();
-    
-        mcsm::Result sNGRes({mcsm::getLastResult().first, mcsm::getLastResult().second});
-        if(!sNGRes.isSuccess()){
+        auto cName = config->getServerName();
+
+        if(!cName){
             if(strict){
                 mcsm::error("Failed to load server's name on \"" + cPath + "\".");
                 mcsm::error("Below lines are the output from the internal system.");
                 mcsm::error("");
-                sNGRes.printMessage();
+                mcsm::printError(cName);
                 mcsm::warning("NOTE: Strict mode is currently enabled.");
                 std::exit(1);
             }
@@ -110,7 +104,7 @@ void mcsm::GroupStopSubCommand::stopWithPaths(const bool& strict, const std::vec
             continue;
         }
     
-        namePathMap[cName].push_back(cPath);
+        namePathMap[cName.value()].push_back(cPath);
     }
     
     // check user inputs (serverArgs) against namePathMap
@@ -156,14 +150,13 @@ void mcsm::GroupStopSubCommand::stopWithPaths(const bool& strict, const std::vec
     size_t requestedServers = pathsTostop.size();
     
     for(const std::string& path : pathsTostop){
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}}); // clear result
-        mcsm::Result stRes = this->manager->stop(path);
-        if(!stRes.isSuccess()){
+        mcsm::VoidResult stRes = this->manager->stop(path);
+        if(!stRes){
             if(strict){
                 mcsm::error("Failed to stop server \"" + path + "\".");
                 mcsm::error("Below lines are the output from the internal system.");
                 mcsm::error("");
-                stRes.printMessage();
+                mcsm::printError(stRes);
                 mcsm::warning("NOTE: Strict mode is currently enabled.");
             }
             mcsm::warning("Stopping server \"" + path + "\" failed. Run with --strict option for more info.");
