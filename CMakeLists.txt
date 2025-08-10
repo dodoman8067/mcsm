@@ -49,7 +49,7 @@ endif()
 # Set compiler options
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -DMCSM_NLOHMANN_VER=\\\"${nlohmann_json_VERSION}\\\"")
-    set(CMAKE_CXX_FLAGS_DEBUG "-g -DMCSM_DEBUG")
+    set(CMAKE_CXX_FLAGS_DEBUG "-g -DMCSM_DEBUG -fsanitize=address,undefined -fno-omit-frame-pointer -fsanitize-address-use-after-scope")
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffunction-sections -fdata-sections")
 endif()
 
@@ -61,7 +61,7 @@ if(BUILD_STATIC_EXE)
 endif()
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -DMCSM_DEBUG")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -DMCSM_DEBUG -fsanitize=address,undefined -D_GLIBCXX_ASSERTIONS")
 endif()
 
 if(CMAKE_BUILD_TYPE MATCHES Release)
