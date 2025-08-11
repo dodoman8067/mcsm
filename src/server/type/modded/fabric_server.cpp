@@ -562,7 +562,7 @@ mcsm::VoidResult mcsm::FabricServer::update(const std::string& path, const std::
     if(loaderVer == "latest"){
         auto gVRes = getVersion(sVer.value());
         if(!gVRes) return tl::unexpected(gVRes.error());
-        installerVer = gVRes.value();
+        loaderVer = gVRes.value();
         if(mcsm::isWhitespaceOrEmpty(loaderVer)){
             auto customTemp = mcsm::errors::SERVER_UNSUPPORTED_VERSION;
             customTemp.message = "Unsupported loader version. (Can't find a loader version for Minecraft " + sVer.value() + ")";
@@ -629,7 +629,7 @@ mcsm::VoidResult mcsm::FabricServer::generate(const std::string& name, mcsm::Jvm
             return tl::unexpected(vExists.error());
         }
         if(!vExists.value()){
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {version});
             return tl::unexpected(err);
         }
     }
