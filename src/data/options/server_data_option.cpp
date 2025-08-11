@@ -35,7 +35,7 @@ mcsm::ServerDataOption::~ServerDataOption(){
 
 mcsm::VoidResult mcsm::ServerDataOption::load(){
     if(this->loaded){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_DATA_ALREADY_CONFIGURED, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_DATA_ALREADY_CONFIGURED, {this->path});
         return tl::unexpected(err);
     }
     auto fileExists = mcsm::fileExists(path);
@@ -94,17 +94,20 @@ mcsm::VoidResult mcsm::ServerDataOption::create(const std::string& lastTimeLaunc
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {lastTimeLaunched});
         return tl::unexpected(err);
     }
+    bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
+
+    mcsm::VoidResult sLoadRes = load(advp);
+    if(!sLoadRes) return sLoadRes;
+
     auto optExists = this->option->exists();
     if(!optExists) return tl::unexpected(optExists.error());
     if(optExists.value()){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_DATA_ALREADY_CONFIGURED, {this->option->getPath()});
         return tl::unexpected(err);
+    }else {
+        auto optLoadRes = this->option->load(advp); // load doesnt call option->load if the file isnt there since option#load() creates the file
+        if(!optLoadRes) return optLoadRes;
     }
-
-    bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
-
-    mcsm::VoidResult sLoadRes = load(advp);
-    if(!sLoadRes) return sLoadRes;
 
     mcsm::VoidResult res1 = this->option->setValue("last_time_launched", lastTimeLaunched);
     if(!res1) return res1;

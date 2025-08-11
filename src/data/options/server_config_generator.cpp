@@ -41,9 +41,6 @@ mcsm::VoidResult mcsm::ServerConfigGenerator::generate(const std::string& versio
     mcsm::VoidResult jLoadRes = this->optionHandle->load(advp);
     if(!jLoadRes) return jLoadRes;
 
-    auto loadcheck = sDataOpt->load();
-    if(!loadcheck) return tl::unexpected(loadcheck.error());
-
     mcsm::VoidResult res1 = sDataOpt->create("none");
     if(!res1) return res1;
 
