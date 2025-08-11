@@ -23,7 +23,7 @@ mcsm::VoidResult mcsm::ServerConfigGenerator::generate(const std::string& versio
     if(!jvmOptionExists) return tl::unexpected(jvmOptionExists.error());
 
     if(!jvmOptionExists.value()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JVM_PROFILE_NOT_FOUND, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JVM_PROFILE_NOT_FOUND, {defaultOption.getProfileName()});
         return tl::unexpected(err);
     }
     
