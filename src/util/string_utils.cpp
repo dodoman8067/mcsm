@@ -82,7 +82,7 @@ std::string mcsm::normalizePath(const std::string& p){
     if(p.empty()) return p; // Handle empty input
 
     // Use std::filesystem for better handling of ".." and "."
-    std::filesystem::path pathObj(p);
+    std::filesystem::path pathObj = std::filesystem::absolute(p);
     std::string result = pathObj.lexically_normal().string();
 
     // Ensure it does not end with a trailing slash unless it's root "/"
