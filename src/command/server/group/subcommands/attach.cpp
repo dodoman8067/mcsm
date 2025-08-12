@@ -16,7 +16,11 @@ void mcsm::GroupAttachSubCommand::execute(const std::vector<std::string>& args){
         if(arg == "--strict" || arg == "-strict" || arg == "--s" || arg == "-s"){
             strict = true;
         }else{
-            serverArgs.push_back(mcsm::normalizePath(arg));
+            if(std::filesystem::exists(mcsm::normalizePath(arg))) {
+                serverArgs.push_back(mcsm::normalizePath(arg));
+            }else {
+                serverArgs.push_back(arg);
+            }
         }
     }
 
@@ -49,13 +53,14 @@ void mcsm::GroupAttachSubCommand::execute(const std::vector<std::string>& args){
             mcsm::warning("Failed to load server's name on \"" + cPath + "\". Run with --strict flag for more information.");
             continue;
         }
-    
+        mcsm::info("DEBUG: name: " + cName.value() + " path: " + cPath);
         namePathMap[cName.value()].push_back(cPath);
     }
     
     // check user inputs (serverArgs) against namePathMap
     std::vector<std::string> pathsToAttach;
     for(const std::string& arg : serverArgs){
+        mcsm::info(arg);
         if(std::filesystem::exists(arg)){
             pathsToAttach.push_back(arg);
         }else{
@@ -70,7 +75,7 @@ void mcsm::GroupAttachSubCommand::execute(const std::vector<std::string>& args){
                     for(size_t i = 0; i<it->second.size(); i++){
                         mcsm::info(std::to_string(i + 1) + ": " + it->second[i]);
                     }
-                    mcsm::info("Enter the number of the server to start:");
+                    mcsm::info("Enter the number of the server to attach: ");
     
                     std::string choice;
                     std::cin >> choice;

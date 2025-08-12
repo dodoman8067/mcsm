@@ -16,7 +16,11 @@ void mcsm::GroupStopSubCommand::execute(const std::vector<std::string>& args){
         if(arg == "--strict" || arg == "-strict" || arg == "--s" || arg == "-s"){
             strict = true;
         }else{
-            serverArgs.push_back(mcsm::normalizePath(arg));
+            if(std::filesystem::exists(mcsm::normalizePath(arg))) {
+                serverArgs.push_back(mcsm::normalizePath(arg));
+            }else {
+                serverArgs.push_back(arg);
+            }
         }
     }
 
