@@ -112,14 +112,18 @@ mcsm::BoolResult mcsm::fileExists(const std::string& path){
 }
 
 mcsm::BoolResult mcsm::removeFile(const std::string& path){
-    if(!fileExists(path)) return false;
     std::error_code ec;
-    bool success = std::filesystem::remove(path, ec);
+    const bool removed = std::filesystem::remove(path, ec);
     if(ec){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::FILE_EXIST_CHECK_FAILED, {path, ec.message()});
-        return tl::unexpected(err);
+        return tl::unexpected(mcsm::makeError(
+            mcsm::ErrorStatus::ERROR,
+            mcsm::errors::FILE_REMOVE_FAILED,
+            {path, ec.message()}
+        ));
     }
-    return success; 
+    // removed == true  -> deleted
+    // removed == false -> didn't exist
+    return removed;
 }
 
 bool mcsm::mkdir(const std::string& dirName){
