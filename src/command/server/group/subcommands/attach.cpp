@@ -53,14 +53,12 @@ void mcsm::GroupAttachSubCommand::execute(const std::vector<std::string>& args){
             mcsm::warning("Failed to load server's name on \"" + cPath + "\". Run with --strict flag for more information.");
             continue;
         }
-        mcsm::info("DEBUG: name: " + cName.value() + " path: " + cPath);
         namePathMap[cName.value()].push_back(cPath);
     }
     
     // check user inputs (serverArgs) against namePathMap
     std::vector<std::string> pathsToAttach;
     for(const std::string& arg : serverArgs){
-        mcsm::info(arg);
         if(std::filesystem::exists(arg)){
             pathsToAttach.push_back(arg);
         }else{
