@@ -281,10 +281,10 @@ const tl::expected<std::map<std::string, std::string>, mcsm::Error> mcsm::Vanill
     return tl::expected<std::map<std::string, std::string>, mcsm::Error>{
         std::map<std::string, std::string>{
             {"name", "" },
-            {"Minecraft version", ""},
-            {"default JVM launch profile search path (current/global)", "current"},
-            {"default JVM launch profile name", ""},
-            {"server jarfile name", getTypeAsString() + ".jar"}
+            {"minecraft_version", ""},
+            {"default_jvm_launch_profile_search_path", "current"},
+            {"default_jvm_launch_profile_name", ""},
+            {"server_jarfile_name", getTypeAsString() + ".jar"}
         }
     };
 }
