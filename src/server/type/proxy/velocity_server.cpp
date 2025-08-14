@@ -170,6 +170,9 @@ mcsm::VoidResult mcsm::VelocityServer::download(const std::string& version, cons
 
     mcsm::ServerDataOption sDataOpt(optionPath);
 
+    auto sdoLRes = sDataOpt.load();
+    if(!sdoLRes) return sdoLRes;
+
     auto typeValueRes = opt.getValue("type");
     if(!typeValueRes) return tl::unexpected(typeValueRes.error());
 
@@ -291,6 +294,9 @@ mcsm::VoidResult mcsm::VelocityServer::update(const std::string& path, const std
     // Program won't downgrade server jarfiles automatically. This is an intented feature.
     mcsm::info("Checking updates...");
     mcsm::ServerDataOption sDataOpt(optionPath);
+
+    auto sdoLRes = sDataOpt.load();
+    if(!sdoLRes) return sdoLRes;
 
     mcsm::ServerConfigLoader loader(optionPath);
     mcsm::VoidResult loadRes = loader.loadConfig();
