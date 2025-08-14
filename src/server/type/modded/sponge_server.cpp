@@ -332,6 +332,9 @@ mcsm::VoidResult mcsm::SpongeServer::download(const std::string& version, const 
 
     mcsm::ServerDataOption sDataOpt(optionPath);
 
+    auto sdoLRes = sDataOpt.load();
+    if(!sdoLRes) return sdoLRes;
+
     auto tVGRes = opt.getValue("type");
     if(!tVGRes) return tl::unexpected(tVGRes.error());
 
@@ -419,7 +422,7 @@ mcsm::StringResult mcsm::SpongeServer::getDownloadLink(const std::string& build)
     if(!res) return res;
     nlohmann::json json = nlohmann::json::parse(res.value(), nullptr, false);
     if(json.is_discarded()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://dl-api.spongepowered.org/v2/groups/org.spongepowered/artifacts/spongevanilla/versions/" + build, "Invalid API json responce"});
         return tl::unexpected(err);
     }
 
@@ -427,6 +430,7 @@ mcsm::StringResult mcsm::SpongeServer::getDownloadLink(const std::string& build)
     if(assets == nullptr) return "";
     if(!assets.is_array()) return "";
 
+    // >=1.15. sponge returns runnable jars as "universal" classifiers
     for(nlohmann::json& obj : assets){
         if(!obj.is_object()) return "";
         nlohmann::json classifier = obj["classifier"];
@@ -434,7 +438,18 @@ mcsm::StringResult mcsm::SpongeServer::getDownloadLink(const std::string& build)
         nlohmann::json downloadUrl = obj["downloadUrl"];
         if(downloadUrl == nullptr || !downloadUrl.is_string()) return "";
 
-        if((classifier == "universal" || classifier == "") && mcsm::endsWith(downloadUrl, ".jar")) return downloadUrl;
+        if(classifier.get<std::string>() == "universal" && mcsm::endsWith(downloadUrl.get<std::string>(), ".jar")) return downloadUrl.get<std::string>();
+    }
+
+    // <=1.12. sponge returns runnable jars as empty classifiers
+    for(nlohmann::json& obj : assets){
+        if(!obj.is_object()) return "";
+        nlohmann::json classifier = obj["classifier"];
+        if(classifier == nullptr || !classifier.is_string()) return "";
+        nlohmann::json downloadUrl = obj["downloadUrl"];
+        if(downloadUrl == nullptr || !downloadUrl.is_string()) return "";
+
+        if(classifier.get<std::string>().empty() && mcsm::endsWith(downloadUrl.get<std::string>(), ".jar")) return downloadUrl.get<std::string>();
     }
     return "";
 }
