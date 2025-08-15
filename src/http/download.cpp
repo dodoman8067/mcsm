@@ -23,7 +23,7 @@ SOFTWARE.
 
 #include <mcsm/http/download.h>
 
-static size_t writeFunction(mcsm::Result *ptr, size_t size, size_t nmemb, FILE *stream) {
+static size_t writeFunction(std::FILE *ptr, size_t size, size_t nmemb, FILE *stream) {
     size_t written;
     written = fwrite(ptr, size, nmemb, stream);
     return written;
