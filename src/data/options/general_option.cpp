@@ -63,6 +63,20 @@ mcsm::VoidResult mcsm::GeneralOption::load(){
 
     this->sbp = propertyValue1;
 
+    auto* property2 = getProperty("color_download_progress_bar");
+    if(property2 == nullptr){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"color_download_progress_bar", "general option", "Value example: true"});
+        return tl::unexpected(err);
+    }
+
+    const nlohmann::json& propertyValue2 = property2->getCurrentValue();
+    if(!propertyValue2.is_string()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"color_download_progress_bar", "general option", "string", "Value example: true"});
+        return tl::unexpected(err);
+    }
+
+    this->advpb = propertyValue2;
+
     return {};
 }
 
@@ -120,6 +134,10 @@ std::vector<mcsm::GeneralProperty*>& mcsm::GeneralOption::getProperties() const 
 
 bool mcsm::GeneralOption::advancedParseEnabled() const {
     return instance.advp;
+}
+
+bool mcsm::GeneralOption::colorDownloadProgressBar() const {
+    return instance.advpb;
 }
 
 std::string mcsm::GeneralOption::screenBinPathProperty() const {

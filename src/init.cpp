@@ -27,6 +27,7 @@ SOFTWARE.
 #include <mcsm/data/options/general/advanced_json_errors_property.h>
 #include <mcsm/data/options/general/sponge_api_search_recommended_versions_property.h>
 #include <mcsm/data/options/general/screen_bin_path_property.h>
+#include <mcsm/data/options/general/color_download_progress_bar_property.h>
 
 mcsm::init::init(){
     this->initialized = false;
@@ -144,6 +145,9 @@ void mcsm::init::initServers(){
 
     std::unique_ptr<mcsm::ScreenBinPathProperty> p4 = std::make_unique<mcsm::ScreenBinPathProperty>("screen_binary_path");
     sr.registerGeneralProperty("screen_binary_path", std::move(p4));
+
+    std::unique_ptr<mcsm::ColorDownloadProgressBarProperty> p5 = std::make_unique<mcsm::ColorDownloadProgressBarProperty>("color_download_progress_bar");
+    sr.registerGeneralProperty("color_download_progress_bar", std::move(p5));
 }
 
 bool mcsm::init::isInitialized() const {

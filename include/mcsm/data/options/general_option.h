@@ -22,6 +22,7 @@ namespace mcsm {
         mcsm::VoidResult load();
 
         bool advp;
+        bool advpb;
         std::string sbp;
     public:
         GeneralOption(const mcsm::GeneralOption&) = delete;
@@ -41,6 +42,7 @@ namespace mcsm {
         mcsm::Option* getOption();
 
         bool advancedParseEnabled() const;
+        bool colorDownloadProgressBar() const;
         std::string screenBinPathProperty() const;
     };
 }

@@ -36,16 +36,18 @@ static int progressCallback(void * /* clientp */, curl_off_t dltotal, curl_off_t
         double percentage = static_cast<double>(dlnow) / static_cast<double>(dltotal) * 100.0;
         int progress = static_cast<int>(barWidth * percentage / 100.0);
 
-        if(progress < 4)
-            mcsm::setcol(mcsm::NamedColor::DARK_RED);
-        else if(progress < 10)
-            mcsm::setcol(mcsm::NamedColor::RED);
-        else if(progress < 16)
-            mcsm::setcol(mcsm::NamedColor::YELLOW);
-        else if(progress < 20)
-            mcsm::setcol(mcsm::NamedColor::GREEN);
-        else
-            mcsm::setcol(mcsm::NamedColor::BLUE);
+        if(mcsm::GeneralOption::getGeneralOption().colorDownloadProgressBar()){
+            if(progress < 4)
+                mcsm::setcol(mcsm::NamedColor::DARK_RED);
+            else if(progress < 10)
+                mcsm::setcol(mcsm::NamedColor::RED);
+            else if(progress < 16)
+                mcsm::setcol(mcsm::NamedColor::YELLOW);
+            else if(progress < 20)
+                mcsm::setcol(mcsm::NamedColor::GREEN);
+            else
+                mcsm::setcol(mcsm::NamedColor::BLUE);
+        }
 
         std::cout << "\r[";
         for(int i = 0; i < barWidth; i++){
