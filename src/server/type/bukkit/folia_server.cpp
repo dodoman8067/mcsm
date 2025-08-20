@@ -159,8 +159,8 @@ mcsm::VoidResult mcsm::FoliaServer::download(const std::string& version, const s
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"type\"", opt.getName(), "string", "change it into \"type\": \"[yourtype]\""});
         return tl::unexpected(err);
     }
-    if(typeValue != "paper"){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_WRONG_INSTANCE_GENERATED, {"Paper"});
+    if(typeValue != "folia"){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_WRONG_INSTANCE_GENERATED, {"Folia"});
         return tl::unexpected(err);
     }
 
