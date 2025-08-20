@@ -28,7 +28,7 @@
 namespace mcsm {
     class init {
     private:
-        bool* initialized;
+        bool initialized;
 
         void initCommands(const std::string& version);
         void initServers();
@@ -36,7 +36,7 @@ namespace mcsm {
         init();
         ~init();
 
-        void initMCSM(const std::string& version);
+        mcsm::VoidResult initMCSM(const std::string& version);
         
         bool isInitialized() const;
     };

@@ -29,30 +29,29 @@ SOFTWARE.
 #include <mcsm/data/options/general/screen_bin_path_property.h>
 
 mcsm::init::init(){
-    this->initialized = new bool(false);
+    this->initialized = false;
 }
 
 mcsm::init::~init(){
     mcsm::CommandManager::cleanup();
     mcsm::curl_holder::cleanup();
     curl_global_cleanup();
-    delete this->initialized;
-    this->initialized = nullptr;
 }
 
-void mcsm::init::initMCSM(const std::string& version){
+mcsm::VoidResult mcsm::init::initMCSM(const std::string& version){
     curl_global_init(CURL_GLOBAL_DEFAULT);
-    if(!mcsm::curl_holder::init()) return;
+    auto curlInitRes = mcsm::curl_holder::init();
+    if(!curlInitRes) return curlInitRes;
     initCommands(version);
     initServers(); // hanles server registry for singleton server instances
 
     mcsm::VoidResult res = mcsm::GeneralOption::getGeneralOption().initialize(); // initializes global configurations
     if(!res){
-        mcsm::printError(res.error());
-        return;
+        return res;
     }
 
-    *this->initialized = true;
+    this->initialized = true;
+    return {};
 }
 
 void mcsm::init::initCommands(const std::string& version){
@@ -148,5 +147,5 @@ void mcsm::init::initServers(){
 }
 
 bool mcsm::init::isInitialized() const {
-    return *this->initialized;
+    return this->initialized;
 }
