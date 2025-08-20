@@ -1,0 +1,353 @@
+/*
+Copyright (c) 2023 dodoman8067
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+*/
+
+#include <mcsm/server/type/bukkit/folia_server.h>
+
+mcsm::FoliaServer::FoliaServer() {}
+
+mcsm::FoliaServer::~FoliaServer() {}
+
+mcsm::IntResult mcsm::FoliaServer::getVersion(const std::string& ver) const {
+    if(!mcsm::isSafeString(ver)){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {ver});
+        return tl::unexpected(err);
+    }
+    auto res = mcsm::get("https://api.papermc.io/v2/projects/folia/versions/" + ver);
+    if(!res) return tl::unexpected(res.error());
+    nlohmann::json json = nlohmann::json::parse(res.value(), nullptr, false);
+    if(json.is_discarded()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://api.papermc.io/v2/projects/folia/versions/" + ver, "Invalid API json responce"});
+        return tl::unexpected(err);
+    }
+    if(json["builds"] == nullptr){
+        return -1; // keep it this way; otherwise it returns invalid get error instead of unsupported version error
+    }
+    if(json["builds"].is_array()){
+        nlohmann::json builds = json["builds"];
+        if(builds[json["builds"].size() - 1] == nullptr || !builds[json["builds"].size() - 1].is_number_integer()) return -1;
+        return builds[json["builds"].size() - 1];
+    }else{
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://api.papermc.io/v2/projects/folia/versions/" + ver, "Invalid API json responce on property \"builds\""});
+        return tl::unexpected(err);
+    }
+}
+
+// used for checking if versions with specific build exists
+mcsm::IntResult mcsm::FoliaServer::getVersion(const std::string& ver, const std::string& build) const {
+    if(!mcsm::isSafeString(build)){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {build});
+        return tl::unexpected(err);
+    }
+    if(!mcsm::isSafeString(ver)){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {ver});
+        return tl::unexpected(err);
+    }
+    auto res = mcsm::get("https://api.papermc.io/v2/projects/folia/versions/" + ver + "/builds/" + build);
+    if(!res) return tl::unexpected(res.error());
+    nlohmann::json json = nlohmann::json::parse(res.value(), nullptr, false);
+    if(json.is_discarded()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://api.papermc.io/v2/projects/folia/versions/" + ver + "/builds/" + build, "Invalid API json responce"});
+        return tl::unexpected(err);
+    }
+
+    if(json["build"] == nullptr) return -1;  // keep it this way; otherwise it returns invalid get error instead of unsupported version error
+    if(!json["build"].is_number_integer()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://api.papermc.io/v2/projects/folia/versions/" + ver + "/builds/" + build, "Invalid API json responce on property \"build\""});
+        return tl::unexpected(err);
+    }else{
+        return json["build"];
+    }
+}
+
+std::vector<std::string> mcsm::FoliaServer::getAvailableVersions(){
+    std::vector<std::string> versions;
+    for(const std::string& s : mcsm::getMinecraftVersions()){
+        versions.push_back(s);
+    }
+    return versions;
+}
+
+std::string mcsm::FoliaServer::getSupportedVersions() const {
+    return "1.19~";
+}
+
+std::string mcsm::FoliaServer::getBasedServer() const {
+    return "paper";
+}
+
+std::string mcsm::FoliaServer::getWebSite() const {
+    return "https://papermc.io";
+}
+
+std::string mcsm::FoliaServer::getGitHub() const {
+    return "https://github.com/PaperMC/Folia";
+}
+
+mcsm::VoidResult mcsm::FoliaServer::download(const std::string& version){
+    auto path1 = mcsm::getCurrentPath();
+    if(!path1) return tl::unexpected(path1.error());
+    
+    auto jar = getJarFile();
+    if(!jar) return tl::unexpected(jar.error());
+
+    return download(version, path1.value(), jar.value(), path1.value());
+}
+
+mcsm::VoidResult mcsm::FoliaServer::download(const std::string& version, const std::string& path){
+    auto path1 = mcsm::getCurrentPath();
+    if(!path1) return tl::unexpected(path1.error());
+
+    auto jar = getJarFile();
+    if(!jar) return tl::unexpected(jar.error());
+
+    return download(version, path, jar.value(), path1.value());
+}
+
+mcsm::VoidResult mcsm::FoliaServer::download(const std::string& version, const std::string& path, const std::string& name){
+    auto path1 = mcsm::getCurrentPath();
+    if(!path1) return tl::unexpected(path1.error());
+
+    return download(version, path, name, path1.value());
+}
+
+mcsm::VoidResult mcsm::FoliaServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
+    mcsm::Option opt(optionPath, "server");
+    auto optExists = opt.exists();
+    if(!optExists) return tl::unexpected(optExists.error());
+    if(!optExists.value()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_NOT_CONFIGURED, {});
+        return tl::unexpected(err);
+    }
+
+    auto optLRes1 = opt.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
+    if(!optLRes1) return optLRes1;
+
+    mcsm::ServerDataOption sDataOpt(optionPath);
+
+    auto sLoadRes = sDataOpt.load();
+    if(!sLoadRes) return sLoadRes;
+
+    auto tVRes = opt.getValue("type");
+    if(!tVRes) return tl::unexpected(tVRes.error());
+
+    nlohmann::json typeValue = tVRes.value();
+
+    if(typeValue == nullptr){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"type\"", opt.getName(), "change it into \"type\": \"[yourtype]\""});
+        return tl::unexpected(err);
+    }
+    if(!typeValue.is_string()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"type\"", opt.getName(), "string", "change it into \"type\": \"[yourtype]\""});
+        return tl::unexpected(err);
+    }
+    if(typeValue != "paper"){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_WRONG_INSTANCE_GENERATED, {"Paper"});
+        return tl::unexpected(err);
+    }
+
+    auto sBVRes = opt.getValue("server_build");
+    if(!sBVRes) return tl::unexpected(sBVRes.error());
+
+    nlohmann::json serverBuildValue = sBVRes.value();
+    
+    if(serverBuildValue == nullptr){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"server_build\"", opt.getName(), "add \"server_build\": \"latest\" to server.json for automatic download"});
+        return tl::unexpected(err);
+    }
+    if(!serverBuildValue.is_string()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"server_build\"", opt.getName(), "string", "change it into \"server_build\": \"latest\""});
+        return tl::unexpected(err);
+    }
+    if(serverBuildValue != "latest"){
+        std::string build = serverBuildValue.get<std::string>();
+        auto ver = getVersion(version, build);
+        if(!ver) return tl::unexpected(ver.error());
+
+        if(ver.value() == -1){
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {build});
+            return tl::unexpected(err);
+        }
+        std::string strVer = std::to_string(ver.value());
+        std::string url = "https://api.papermc.io/v2/projects/folia/versions/" + version + "/builds/" + strVer + "/downloads/folia-" + version + "-" + strVer + ".jar";
+        mcsm::info("URL : " + url);
+        auto res = mcsm::download(name, url, path, true);
+        if(!res) return res;
+        return sDataOpt.updateLastDownloadedBuild(strVer);
+    }else{
+        auto ver = getVersion(version);
+        if(!ver) return tl::unexpected(ver.error());
+
+        if(ver.value() == -1){
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {});
+            return tl::unexpected(err);
+        }
+        std::string strVer = std::to_string(ver.value());
+        std::string url = "https://api.papermc.io/v2/projects/folia/versions/" + version + "/builds/" + strVer + "/downloads/folia-" + version + "-" + strVer + ".jar";
+        mcsm::info("URL : " + url);
+        auto res = mcsm::download(name, url, path, true);
+        if(!res) return res;
+        return sDataOpt.updateLastDownloadedBuild(strVer);
+    }
+}
+
+mcsm::VoidResult mcsm::FoliaServer::obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
+    return download(version, path, name, optionPath);
+}
+
+mcsm::StringResult mcsm::FoliaServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
+    // ServerOption class handles the data file stuff
+    mcsm::StringResult cPath = mcsm::getCurrentPath();
+    if(!cPath) return cPath;
+    return start(loader, option, cPath.value(), cPath.value());
+}
+
+mcsm::StringResult mcsm::FoliaServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
+    // ServerOption class handles the data file stuff
+    
+    mcsm::StringResult jar = loader->getServerJarFile();
+    if(!jar) return jar;
+
+    mcsm::BoolResult fileExists = mcsm::fileExists(path + "/" + jar.value());
+    if(!fileExists) return tl::unexpected(fileExists.error());
+
+    if(!fileExists.value()){
+        mcsm::info("Downloading " + jar.value() + "...");
+        mcsm::StringResult sVer = loader->getServerVersion();
+        if(!sVer) return sVer;
+
+        mcsm::VoidResult res = download(sVer.value(), path, jar.value(), optionPath);
+        if(!res) return tl::unexpected(res.error());
+    }else{
+        mcsm::BoolResult doesUpdate = loader->doesAutoUpdate();
+        if(!doesUpdate) return tl::unexpected(doesUpdate.error());
+
+        if(doesUpdate.value()){
+            mcsm::VoidResult res = update(path, optionPath);
+            if(!res) return tl::unexpected(res.error());
+        }
+    }
+    return Server::start(loader, option, path, optionPath);
+}
+
+mcsm::VoidResult mcsm::FoliaServer::update(){
+    auto path = mcsm::getCurrentPath();
+    if(!path) return tl::unexpected(path.error());
+
+    return update(path.value(), path.value());
+}
+
+mcsm::VoidResult mcsm::FoliaServer::update(const std::string& optionPath){
+    auto path = mcsm::getCurrentPath();
+    if(!path) return tl::unexpected(path.error());
+
+    return update(path.value(), optionPath);
+}
+
+mcsm::VoidResult mcsm::FoliaServer::update(const std::string& path, const std::string& optionPath){
+    // Program won't downgrade server jarfiles automatically. This is an intented feature.
+    mcsm::info("Checking updates...");
+    mcsm::ServerDataOption sDataOpt(optionPath);
+
+    mcsm::VoidResult sLoadRes = sDataOpt.load();
+    if(!sLoadRes) return sLoadRes;
+
+    mcsm::ServerConfigLoader loader(optionPath);
+    mcsm::VoidResult loadRes = loader.loadConfig();
+    if(!loadRes) return loadRes;
+
+    auto build = loader.getServerJarBuild();
+    if(!build) return tl::unexpected(build.error());
+    if(build.value() != "latest"){
+        mcsm::warning("This server won't update to the latest build.");
+        mcsm::warning("Change server.json into \"server_build\": \"latest\" for automatic download.");
+        return {}; // todo: return errorstatus::ok with reason update passed
+    }
+
+    auto version = loader.getServerVersion();
+    if(!version) return tl::unexpected(version.error());
+    
+    auto ver = getVersion(version.value());
+    if(!ver) return tl::unexpected(ver.error());
+
+    if(ver.value() == -1){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {});
+        return tl::unexpected(err);
+    }
+    auto lastBuild = sDataOpt.getLastDownloadedBuild();
+    if(!lastBuild) return tl::unexpected(lastBuild.error());
+
+    if(lastBuild.value() == std::to_string(ver.value())){
+        mcsm::success("Server is up to date.");
+        return {};
+    }
+    mcsm::success("Update found : "  + std::to_string(ver.value()) + ". Current build : " + lastBuild.value());
+
+    auto jar = getJarFile(optionPath);
+    if(!jar) return tl::unexpected(jar.error());
+
+    auto fileExists = mcsm::fileExists(path + "/" + jar.value());
+    if(!fileExists) return tl::unexpected(fileExists.error());
+
+    if(fileExists.value()){
+        auto rmfRes = mcsm::removeFile(path + "/" + jar.value());
+        if(!rmfRes) return tl::unexpected(rmfRes.error());
+    }
+    return download(version.value(), path, jar.value(), optionPath);
+}
+
+mcsm::VoidResult mcsm::FoliaServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues){
+    mcsm::GeneralProperty* property = mcsm::GeneralOption::getGeneralOption().getProperty("skip_version_check_while_configuring");
+
+    if(property == nullptr){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"skip_version_check_while_configuring", "general option", "\"skip_version_check_while_configuring\": false"});
+        return tl::unexpected(err);
+    }
+
+    const nlohmann::json& propertyValue = property->getCurrentValue();
+    if(!propertyValue.is_boolean()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"skip_version_check_while_configuring", "general option", "boolean", "false or true"});
+        return tl::unexpected(err);
+    }
+
+    bool skipCheck = propertyValue;
+
+    if(!skipCheck){
+        auto vExists = this->hasVersion(version);
+        if(!vExists) return tl::unexpected(vExists.error());
+        if(!vExists.value()){
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {});
+            return tl::unexpected(err);
+        }
+    }
+    mcsm::ServerDataOption opt(path);
+
+    // No need to call opt.load() here. create() in ServerDataOption will call it eventually
+    return configure(version, this, &opt, path, name, option, autoUpdate, extraValues.find("server_build_version")->second);
+}
+
+mcsm::BoolResult mcsm::FoliaServer::hasVersion(const std::string& version) const {
+    return getVersion(version) != -1;
+}
+
+std::string mcsm::FoliaServer::getTypeAsString() const {
+    return "folia";
+}

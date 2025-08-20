@@ -131,6 +131,9 @@ void mcsm::init::initServers(){
     auto custom = std::make_unique<mcsm::CustomServer>();
     sr.registerServer("custom", std::move(custom));
 
+    auto folia = std::make_unique<mcsm::FoliaServer>();
+    sr.registerServer("folia", std::move(folia));
+
     std::unique_ptr<mcsm::SkipVersionCheckProperty> p1 = std::make_unique<mcsm::SkipVersionCheckProperty>("skip_version_check_while_configuring");
     sr.registerGeneralProperty("skip_version_check_while_configuring", std::move(p1));
 
