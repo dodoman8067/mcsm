@@ -22,11 +22,17 @@ SOFTWARE.
 
 
 #include <mcsm/http/download.h>
+#include <mcsm/data/options/general_option.h>
 
-static size_t writeFunction(std::FILE *ptr, size_t size, size_t nmemb, FILE *stream) {
-    size_t written;
-    written = fwrite(ptr, size, nmemb, stream);
-    return written;
+static size_t writeFunction(char* ptr, size_t size, size_t nmemb, void* userdata) {
+    std::FILE* stream = static_cast<std::FILE*>(userdata);
+    return std::fwrite(ptr, size, nmemb, stream);
+}
+
+static size_t header_log(char* buf, size_t sz, size_t nm, void* /*ud*/) {
+    std::string_view h(buf, sz*nm);
+    std::cerr << "[H] " << h;   // or buffer & parse
+    return sz*nm;
 }
 
 static int progressCallback(void * /* clientp */, curl_off_t dltotal, curl_off_t dlnow, curl_off_t /* ultotal */, curl_off_t /* ulnow */) {
@@ -60,6 +66,9 @@ static int progressCallback(void * /* clientp */, curl_off_t dltotal, curl_off_t
         std::cout.flush();
 
         mcsm::resetcol();
+    }else{
+        std::cout << "\r" << (dlnow / 1024) << " KiB downloaded...";
+        std::cout.flush();
     }
     return 0;
 }
@@ -91,10 +100,12 @@ mcsm::VoidResult mcsm::download(const std::string& name, const std::string& url,
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
     curl_easy_setopt(curl, CURLOPT_USERAGENT, curl_version());
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
     curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
-    curl_easy_setopt(curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2TLS);
     curl_easy_setopt(curl, CURLOPT_DNS_CACHE_TIMEOUT, 60L);
+    /*
+    curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_log);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L); // optional for redirects/effective URL
+    */
     
     if(percentages){
         curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
