@@ -43,6 +43,12 @@ mcsm::VoidResult mcsm::init::initMCSM(const std::string& version){
     curl_global_init(CURL_GLOBAL_DEFAULT);
     auto curlInitRes = mcsm::curl_holder::init();
     if(!curlInitRes) return curlInitRes;
+
+    auto env1 = mcsm::ensureDataDir();
+    if(!env1) return tl::unexpected(env1.error());
+    auto env2 = mcsm::ensureConfigDir();
+    if(!env2) return tl::unexpected(env2.error());
+
     initCommands(version);
     initServers(); // hanles server registry for singleton server instances
 

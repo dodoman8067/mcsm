@@ -77,28 +77,39 @@ mcsm::StringResult mcsm::getCurrentPath(){
 }
 
 std::string mcsm::getDataPathPerOS(){
-    std::string returnPath;
-    switch (mcsm::getCurrentOS()){
-        case mcsm::OS::WINDOWS: {
-            std::string windowsPath = getenv("USERPROFILE");
-            windowsPath.append("/AppData/Local/mcsm");
-            mcsm::replaceAll(windowsPath, "\\", "/");
-            returnPath = std::move(windowsPath);
-            break;
-        }
+    return mcsm::normalizePath(mcsm::appSubdir(mcsm::dataRoot()));
+}
 
-        case mcsm::OS::LINUX: {
-            std::string linuxPath = getenv("HOME");
-            linuxPath.append("/.local/share/mcsm");
-            returnPath = std::move(linuxPath);
-            break;
-        }
-    }
-    return returnPath;
+std::string mcsm::getConfigPathPerOS(){
+    return mcsm::normalizePath(mcsm::appSubdir(mcsm::configRoot()));
+}
+
+std::string mcsm::asGlobalDataPath(const std::string& value){
+    const auto base = mcsm::getDataPathPerOS();
+    const auto p = std::filesystem::path(base) / std::filesystem::path(value).relative_path();
+    return mcsm::normalizePath(p.string());
 }
 
 std::string mcsm::asGlobalConfigPath(const std::string& value){
-    return mcsm::normalizePath(getDataPathPerOS() + value);
+    const auto base = mcsm::getConfigPathPerOS();
+    const auto p = std::filesystem::path(base) / std::filesystem::path(value).relative_path();
+    return mcsm::normalizePath(p.string());
+}
+
+mcsm::BoolResult mcsm::ensureDataDir() {
+    const auto dir = mcsm::getDataPathPerOS();
+    if (mcsm::mkdir(dir) && dir != ".") return true;
+    auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
+    customTemp.message = "Invalid data path set: " + dir + " \n Please make sure proper environment variables are set and directories are present.\nWindows: LOCALAPPDATA or fallback: USERPROFILE, Linux: XDG_DATA_HOME or fallback: HOME";
+    return tl::unexpected(mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {}));
+}
+
+mcsm::BoolResult mcsm::ensureConfigDir() {
+    const auto dir = mcsm::getConfigPathPerOS();
+    if (mcsm::mkdir(dir) && dir != ".") return true;
+    auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
+    customTemp.message = "Invalid config path set: " + dir + " \n Please make sure proper environment variables are set and directories are present.\nWindows: APPDATA or fallback: USERPROFILE, Linux: XDG_CONFIG_HOME or fallback: HOME";
+    return tl::unexpected(mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {}));
 }
 
 mcsm::BoolResult mcsm::fileExists(const std::string& path){

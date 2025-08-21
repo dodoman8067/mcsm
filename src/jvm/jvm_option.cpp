@@ -46,7 +46,7 @@ mcsm::VoidResult mcsm::JvmOption::init(){
     }
     switch (this->target){
         case mcsm::SearchTarget::ALL: {
-            mcsm::Option globalOption(mcsm::asGlobalConfigPath("/jvm/profiles"), name);
+            mcsm::Option globalOption(mcsm::asGlobalDataPath("/jvm/profiles"), name);
             auto exists = globalOption.exists();
             if(!exists) return tl::unexpected(exists.error());
             if(exists.value()){
@@ -63,7 +63,7 @@ mcsm::VoidResult mcsm::JvmOption::init(){
             break;
         }
         case mcsm::SearchTarget::GLOBAL: {
-            this->option = std::make_unique<mcsm::Option>(mcsm::asGlobalConfigPath("/jvm/profiles"), name);
+            this->option = std::make_unique<mcsm::Option>(mcsm::asGlobalDataPath("/jvm/profiles"), name);
             // this->option->load will always create an empty "{}" file regardless of it existing which would result in an error in many jvm generation related command executions.
             // as jvmoption doesnt provide a way to load its internal option pointer we would load it when the file is present
             auto exists = this->option->exists();
