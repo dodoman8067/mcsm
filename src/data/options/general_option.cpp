@@ -70,8 +70,8 @@ mcsm::VoidResult mcsm::GeneralOption::load(){
     }
 
     const nlohmann::json& propertyValue2 = property2->getCurrentValue();
-    if(!propertyValue2.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"color_download_progress_bar", "general option", "string", "Value example: true"});
+    if(!propertyValue2.is_boolean()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"color_download_progress_bar", "general option", "boolean", "Value example: true"});
         return tl::unexpected(err);
     }
 
