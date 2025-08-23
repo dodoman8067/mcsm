@@ -23,6 +23,7 @@ SOFTWARE.
 
 #include <mcsm/http/download.h>
 #include <mcsm/data/options/general_option.h>
+#include <cerrno>
 
 static size_t writeFunction(char* ptr, size_t size, size_t nmemb, void* userdata) {
     std::FILE* stream = static_cast<std::FILE*>(userdata);
@@ -94,6 +95,11 @@ mcsm::VoidResult mcsm::download(const std::string& name, const std::string& url,
     std::FILE* file;
     const std::string& filename = path + "/" + name;
     file = std::fopen(filename.c_str(), "wb");
+    if(file == nullptr){
+        auto reason = std::strerror(errno);
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::FILE_CREATE_FAILED, {filename, reason});
+        return tl::unexpected(err);
+    }
 
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
