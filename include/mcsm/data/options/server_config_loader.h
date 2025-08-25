@@ -65,8 +65,13 @@ namespace mcsm {
 
         mcsm::StringResult getServerType() const;
 
+        mcsm::StringResult getServerJar() const;
+        mcsm::VoidResult setServerJar(const std::string& filePath);
+
         mcsm::StringResult getServerJarFile() const;
-        mcsm::VoidResult setServerJarFile(const std::string& name);
+        //mcsm::VoidResult setServerJarFile(const std::string& name);
+
+        mcsm::StringResult getServerJarPath() const;
 
         mcsm::StringResult getServerJarBuild() const;
         mcsm::VoidResult setServerJarBuild(const std::string& build);
