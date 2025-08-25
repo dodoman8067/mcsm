@@ -229,7 +229,7 @@ mcsm::StringResult mcsm::CustomServer::start(mcsm::ServerConfigLoader* loader, m
 
     if(!fileExists.value()){
         mcsm::info("Setting up " + jar.value() + "...");
-        mcsm::info("\"server_jar_name\" will be used as the copied/downloaded file name. Make sure you don't have characters like \"/\".");
+        mcsm::info("\"server_jar\" will be used as the copied/downloaded file name. Make sure you don't have characters like \"/\".");
         mcsm::StringResult sVer = loader->getServerVersion();
         if(!sVer) return sVer;
 

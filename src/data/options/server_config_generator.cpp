@@ -71,7 +71,7 @@ mcsm::VoidResult mcsm::ServerConfigGenerator::generate(const std::string& versio
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {jarFile});
         return tl::unexpected(err);
     }
-    mcsm::VoidResult res5 = this->optionHandle->setValue("server_jar_name", jarFile);
+    mcsm::VoidResult res5 = this->optionHandle->setValue("server_jar", jarFile);
     if(!res5) return res5;
 
     mcsm::VoidResult res6 = this->optionHandle->setValue("server_build", build);
