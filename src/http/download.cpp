@@ -96,7 +96,7 @@ mcsm::VoidResult mcsm::download(const std::string& name, const std::string& url,
     const std::string& filename = path + "/" + name;
     file = std::fopen(filename.c_str(), "wb");
     if(file == nullptr){
-        auto reason = std::strerror(errno);
+        auto reason = std::string(std::strerror(errno));
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::FILE_CREATE_FAILED, {filename, reason});
         return tl::unexpected(err);
     }
