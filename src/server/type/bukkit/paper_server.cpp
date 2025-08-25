@@ -217,10 +217,7 @@ mcsm::StringResult mcsm::PaperServer::start(mcsm::ServerConfigLoader* loader, mc
     // ServerOption class handles the data file stuff
     mcsm::StringResult cPath = mcsm::getCurrentPath();
     if(!cPath) return cPath;
-
-    mcsm::StringResult cJarPath = loader->getServerJarPath();
-    if(!cJarPath) return cJarPath;
-    return start(loader, option, cJarPath.value(), cPath.value());
+    return start(loader, option, cPath.value(), cPath.value());
 }
 
 mcsm::StringResult mcsm::PaperServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){

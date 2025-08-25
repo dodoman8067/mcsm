@@ -265,87 +265,52 @@ mcsm::StringResult mcsm::ServerConfigLoader::getServerType() const {
         return tl::unexpected(err);
     }
 
-    if(!mcsm::isSafeString(value.get<std::string>())){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {value.get<std::string>()});
+    if(!mcsm::isSafeString(value)){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {value});
         return tl::unexpected(err);
     }
-    return value.get<std::string>();
+    return value;
 }
 
-static std::filesystem::path resolveAgainstConfig(const std::string& raw, const std::string& configDir){
-    std::filesystem::path p(raw);
-    if(p.is_absolute()){
-        return p.lexically_normal();
-    }
-    return (std::filesystem::path(configDir) / p).lexically_normal();
-}
-
-mcsm::StringResult mcsm::ServerConfigLoader::getServerJar() const {
+mcsm::StringResult mcsm::ServerConfigLoader::getServerJarFile() const {
     if(!this->isLoaded){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
         return tl::unexpected(err);
     }
 
-    auto valueRes = this->optionHandle->getValue("server_jar");
+    auto valueRes = this->optionHandle->getValue("server_jar_name");
     if(!valueRes) return tl::unexpected(valueRes.error());
     const nlohmann::json& value = valueRes.value();
 
     if(value == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"\"server_jar\"", this->optionHandle->getName()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"\"server_jar_name\"", this->optionHandle->getName()});
         return tl::unexpected(err);
     }
     if(!value.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"server_jar\"", "string"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"server_jar_name\"", "string"});
         return tl::unexpected(err);
     }
 
-    if(!mcsm::isSafeString(value.get<std::string>())){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {value.get<std::string>()});
+    if(!mcsm::isSafeString(value)){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {value});
         return tl::unexpected(err);
     }
-
-    auto abs = resolveAgainstConfig(value.get<std::string>(), this->configPath);
-    return abs.string();
+    return value;
 }
 
-mcsm::VoidResult mcsm::ServerConfigLoader::setServerJar(const std::string& filePath) {
+mcsm::VoidResult mcsm::ServerConfigLoader::setServerJarFile(const std::string& name){
     if(!this->isLoaded){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
         return tl::unexpected(err);
     }
-    if(!mcsm::isSafeString(mcsm::normalizePath(filePath))){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {mcsm::normalizePath(filePath)});
+    if(!mcsm::isSafeString(name)){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {name});
         return tl::unexpected(err);
     }
-    std::filesystem::path p(filePath);
-    std::string toStore = p.lexically_normal().generic_string(); // keep forward slashes in JSON
+    auto setRes = this->optionHandle->setValue("server_jar_name", name);
 
-    auto setRes = this->optionHandle->setValue("server_jar", toStore);
     if(!setRes) return setRes;
     return this->optionHandle->save();
-}
-
-mcsm::StringResult mcsm::ServerConfigLoader::getServerJarFile() const {
-    auto fileRes = this->getServerJar();
-    if(!fileRes) return fileRes;
-    std::string file = fileRes.value();
-
-    std::filesystem::path path(file);
-    if(!path.has_filename()){
-        auto customTemp = mcsm::errors::JSON_WRONG_TYPE;
-        customTemp.message = "Value \"server_jar\" in " + this->optionHandle->getName() + " does not contain valid file path: " + file;
-        customTemp.solution = "Make sure proper value is given and the file is present.";
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
-        return tl::unexpected(err);
-    }
-    return path.filename().string();
-}
-
-mcsm::StringResult mcsm::ServerConfigLoader::getServerJarPath() const {
-    auto absRes = this->getServerJar();
-    if(!absRes) return absRes;
-    std::filesystem::path abs(absRes.value());
-    return abs.parent_path().string();
 }
 
 mcsm::StringResult mcsm::ServerConfigLoader::getServerJarBuild() const {
