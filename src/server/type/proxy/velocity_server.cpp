@@ -243,9 +243,10 @@ mcsm::VoidResult mcsm::VelocityServer::obtainJarFile(const std::string& version,
 
 mcsm::StringResult mcsm::VelocityServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
     // ServerOption class handles the data file stuff
-    mcsm::StringResult cPath = mcsm::getCurrentPath();
-    if(!cPath) return cPath;
-    return start(loader, option, cPath.value(), cPath.value());
+
+    mcsm::StringResult cJarPath = loader->getServerJarPath();
+    if(!cJarPath) return cJarPath;
+    return start(loader, option, cJarPath.value(), loader->getHandle()->getPath());
 }
 
 mcsm::StringResult mcsm::VelocityServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
@@ -258,7 +259,7 @@ mcsm::StringResult mcsm::VelocityServer::start(mcsm::ServerConfigLoader* loader,
     if(!fileExists) return tl::unexpected(fileExists.error());
 
     if(!fileExists.value()){
-        mcsm::info("Downloading " + jar.value() + "...");
+        mcsm::info("Downloading " + mcsm::joinPath(path, jar.value()) + "...");
         mcsm::StringResult sVer = loader->getServerVersion();
         if(!sVer) return sVer;
 

@@ -93,13 +93,15 @@ void mcsm::StartServerCommand::execute(const std::vector<std::string>& args){
 
     mcsm::unwrapOrExit(loader.loadConfig());
 
+    auto jarPath = mcsm::unwrapOrExit(loader.getServerJarPath());
+
     std::unique_ptr<mcsm::JvmOption> jvmOpt = searchOption(args, &loader);
 
     mcsm::ServerStarter starter(&loader);
     if(isGroup){
-        mcsm::unwrapOrExit(starter.startServer(*jvmOpt, mcsm::unwrapOrExit(mcsm::getCurrentPath()), mcsm::unwrapOrExit(mcsm::getCurrentPath()), groupPath));
+        mcsm::unwrapOrExit(starter.startServer(*jvmOpt, jarPath, mcsm::unwrapOrExit(mcsm::getCurrentPath()), groupPath));
     }else{
-        mcsm::unwrapOrExit(starter.startServer(*jvmOpt, executionPath, executionPath));
+        mcsm::unwrapOrExit(starter.startServer(*jvmOpt, jarPath, executionPath));
     }
 }
 

@@ -16,12 +16,12 @@ void mcsm::ClearServerCommand::execute(const std::vector<std::string>& /* args *
 
     // we need server jarfile's name and validate if the file is actually present
 
-    const std::string& jarName = mcsm::unwrapOrExit(loader.getServerJarFile());
+    const std::string& jarName = mcsm::unwrapOrExit(loader.getServerJar());
 
-    bool file = mcsm::unwrapOrExit(mcsm::fileExists(loader.getHandle()->getPath() + "/" + jarName));
+    bool file = mcsm::unwrapOrExit(mcsm::fileExists(jarName));
 
     if(file) {
-        mcsm::unwrapOrExit(mcsm::removeFile(loader.getHandle()->getPath() + "/" + jarName));
+        mcsm::unwrapOrExit(mcsm::removeFile(jarName));
     }else mcsm::info(jarName + " file not found; skipping...");
 
     const std::string& type = mcsm::unwrapOrExit(loader.getServerType()); // fabric servers require additional steps to remove jarfile which is why i need to get the server's type
