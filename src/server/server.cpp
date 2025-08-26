@@ -71,17 +71,21 @@ mcsm::StringResult mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::J
 }
 
 mcsm::VoidResult mcsm::Server::configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate){
-    return configure(version, server, sDataOpt, path, name, option, autoUpdate, "latest");
+    return configure(version, server, sDataOpt, path, name, option, autoUpdate, "latest", path);
 }
 
 mcsm::VoidResult mcsm::Server::configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate, const std::string& build){
+    return configure(version, server, sDataOpt, path, name, option, autoUpdate, build, path);
+}
+
+mcsm::VoidResult mcsm::Server::configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate, const std::string& build, const std::string& jarPath){
     mcsm::ServerConfigGenerator serverOption(path);
-    
-    mcsm::VoidResult sRes = serverOption.generate(version, server, sDataOpt, name, option, autoUpdate, build);
+
+    mcsm::VoidResult sRes = serverOption.generate(version, server, sDataOpt, name, option, autoUpdate, build, jarPath);
     if(!sRes) return sRes;
 
     mcsm::ServerConfigLoader loader(path);
-    
+
     mcsm::VoidResult loadRes = loader.loadConfig();
     if(!loadRes) return loadRes;
 
@@ -145,7 +149,7 @@ const tl::expected<std::map<std::string, std::string>, mcsm::Error> mcsm::Server
                 {"minecraft_version", ""},
                 {"default_jvm_launch_profile_search_path", "current"},
                 {"default_jvm_launch_profile_name", ""},
-                {"server_jarfile_name", getTypeAsString() + ".jar"},
+                {"server_jarfile", getTypeAsString() + ".jar"},
                 {"server_build_version", "latest"},
                 {"auto_server_jar_update", "true"}
         }

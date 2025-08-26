@@ -243,7 +243,7 @@ mcsm::StringResult mcsm::VanillaServer::start(mcsm::ServerConfigLoader* loader, 
     return Server::start(loader, option, path, optionPath);
 }
 
-mcsm::VoidResult mcsm::VanillaServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& /* extraValues */){
+mcsm::VoidResult mcsm::VanillaServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues){
     mcsm::GeneralProperty* property = mcsm::GeneralOption::getGeneralOption().getProperty("skip_version_check_while_configuring");
 
     if(property == nullptr){
@@ -269,7 +269,7 @@ mcsm::VoidResult mcsm::VanillaServer::generate(const std::string& name, mcsm::Jv
     }
     mcsm::ServerDataOption opt(path);
 
-    return configure(version, this, &opt, path, name, option, autoUpdate, "ignored");
+    return configure(version, this, &opt, path, name, option, autoUpdate, "ignored", extraValues.find("server_jarfile")->second);
 }
 
 mcsm::BoolResult mcsm::VanillaServer::hasVersion(const std::string& version) const {
@@ -285,7 +285,7 @@ const tl::expected<std::map<std::string, std::string>, mcsm::Error> mcsm::Vanill
             {"minecraft_version", ""},
             {"default_jvm_launch_profile_search_path", "current"},
             {"default_jvm_launch_profile_name", ""},
-            {"server_jarfile_name", getTypeAsString() + ".jar"}
+            {"server_jarfile", getTypeAsString() + ".jar"}
         }
     };
 }

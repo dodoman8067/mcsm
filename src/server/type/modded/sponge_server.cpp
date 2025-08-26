@@ -594,7 +594,7 @@ mcsm::VoidResult mcsm::SpongeServer::generate(const std::string& name, mcsm::Jvm
 
     // No need to call opt.load() here. create() in ServerDataOption will call it eventually
 
-    mcsm::VoidResult res = configure(version, this, &opt, path, name, option, autoUpdate, extraValues.find("server_build_version")->second);
+    mcsm::VoidResult res = configure(version, this, &opt, path, name, option, autoUpdate, extraValues.find("server_build_version")->second, extraValues.find("server_jarfile")->second);
     if(!res) return res;
 
     auto cPath = mcsm::getCurrentPath();
@@ -631,7 +631,7 @@ const tl::expected<std::map<std::string, std::string>, mcsm::Error> mcsm::Sponge
                 {"minecraft_version", ""},
                 {"default_jvm_launch_profile_search_path", "current"},
                 {"default_jvm_launch_profile_name", ""},
-                {"server_jarfile_name", getTypeAsString() + ".jar"},
+                {"server_jarfile", getTypeAsString() + ".jar"},
                 {"server_build_version", "latest"},
                 {"auto_server_jar_update", "true"},
                 {"sponge_api_search_recommended_versions", strV}

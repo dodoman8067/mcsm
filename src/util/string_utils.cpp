@@ -115,5 +115,8 @@ std::string mcsm::formatPrompt(const std::string &key){
     if(key == "sponge_api_search_recommended_versions"){
         formatted = "if the server search on recommended versions api";
     }
+    if(key == "server_jarfile") {
+        formatted = "server jarfile path. Must include filename at the end not including \"/\".";
+    }
     return formatted;
 }

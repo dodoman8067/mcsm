@@ -28,6 +28,8 @@ namespace mcsm {
          */
         mcsm::VoidResult generate(const std::string& version, mcsm::Server* server, mcsm::ServerDataOption* sDataOpt, const std::string& name, mcsm::JvmOption& defaultOption, const bool& update, const std::string& build);
 
+        mcsm::VoidResult generate(const std::string& version, mcsm::Server* server, mcsm::ServerDataOption* sDataOpt, const std::string& name, mcsm::JvmOption& defaultOption, const bool& update, const std::string& build, const std::string& jarPath);
+
         mcsm::Option* getHandle();
 
         std::string getPath() const;

@@ -342,7 +342,7 @@ mcsm::VoidResult mcsm::PaperServer::generate(const std::string& name, mcsm::JvmO
     mcsm::ServerDataOption opt(path);
 
     // No need to call opt.load() here. create() in ServerDataOption will call it eventually
-    return configure(version, this, &opt, path, name, option, autoUpdate, extraValues.find("server_build_version")->second);
+    return configure(version, this, &opt, path, name, option, autoUpdate, extraValues.find("server_build_version")->second, extraValues.find("server_jarfile")->second);
 }
 
 mcsm::BoolResult mcsm::PaperServer::hasVersion(const std::string& version) const {

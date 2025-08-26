@@ -56,7 +56,7 @@ bool mcsm::GenerateServerCommand::checkValid(const std::string& key, std::string
         }
         return !(value != "true" && value != "false");
     }
-    if(key == "server_jarfile_name"){
+    if(key == "server_jarfile"){
         if(mcsm::isWhitespaceOrEmpty(value)){
             value = defaultValue;
             return true;

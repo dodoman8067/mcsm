@@ -373,7 +373,7 @@ mcsm::VoidResult mcsm::VelocityServer::generate(const std::string& name, mcsm::J
     mcsm::ServerDataOption opt(path);
     
     // No need to call opt.load() here. create() in ServerDataOption will call it eventually
-    return configure(version, this, &opt, path, name, option, autoUpdate, extraValues.find("server_build_version")->second);
+    return configure(version, this, &opt, path, name, option, autoUpdate, extraValues.find("server_build_version")->second, extraValues.find("server_jarfile")->second);
 }
 
 mcsm::BoolResult mcsm::VelocityServer::hasVersion(const std::string& version) const {

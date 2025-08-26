@@ -639,7 +639,7 @@ mcsm::VoidResult mcsm::FabricServer::generate(const std::string& name, mcsm::Jvm
     // No need to call fSDOpt.load() here. create() in ServerDataOption will call it eventually
 
     mcsm::ServerConfigGenerator generator(path);
-    auto generateRes = generator.generate(version, this, &fSDOpt, name, option, autoUpdate);
+    auto generateRes = generator.generate(version, this, &fSDOpt, name, option, autoUpdate, "ignored", extraValues.find("server_jarfile")->second);
     if(!generateRes) return generateRes;
 
     auto fabricOpt = generator.getHandle();
@@ -688,7 +688,7 @@ const tl::expected<std::map<std::string, std::string>, mcsm::Error> mcsm::Fabric
                 {"minecraft_version", ""},
                 {"default_jvm_launch_profile_search_path", "current"},
                 {"default_jvm_launch_profile_name", ""},
-                {"server_jarfile_name", getTypeAsString() + ".jar"},
+                {"server_jarfile", getTypeAsString() + ".jar"},
                 {"server_loader_version", "latest"},
                 {"server_installer_version", "latest"},
                 {"auto_server_jar_update", "true"}

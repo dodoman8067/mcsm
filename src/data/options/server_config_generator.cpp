@@ -19,6 +19,10 @@ mcsm::VoidResult mcsm::ServerConfigGenerator::generate(const std::string& versio
 }
 
 mcsm::VoidResult mcsm::ServerConfigGenerator::generate(const std::string& version, mcsm::Server* server, mcsm::ServerDataOption* sDataOpt, const std::string& name, mcsm::JvmOption& defaultOption, const bool& update, const std::string& build){
+    return generate(version, server, sDataOpt, name, defaultOption, update, build, server->getTypeAsString() + ".jar");
+}
+
+mcsm::VoidResult mcsm::ServerConfigGenerator::generate(const std::string& version, mcsm::Server* server, mcsm::ServerDataOption* sDataOpt, const std::string& name, mcsm::JvmOption& defaultOption, const bool& update, const std::string& build, const std::string& jarPath){
     auto jvmOptionExists = defaultOption.exists();
     if(!jvmOptionExists) return tl::unexpected(jvmOptionExists.error());
 
@@ -65,13 +69,7 @@ mcsm::VoidResult mcsm::ServerConfigGenerator::generate(const std::string& versio
     mcsm::VoidResult res4 = this->optionHandle->setValue("default_launch_profile", profileObj);
     if(!res4) return res4;
 
-    std::string jarFile = server->getTypeAsString() + ".jar";
-
-    if(!mcsm::isSafeString(jarFile)){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {jarFile});
-        return tl::unexpected(err);
-    }
-    mcsm::VoidResult res5 = this->optionHandle->setValue("server_jar", jarFile);
+    mcsm::VoidResult res5 = this->optionHandle->setValue("server_jar", jarPath);
     if(!res5) return res5;
 
     mcsm::VoidResult res6 = this->optionHandle->setValue("server_build", build);
