@@ -478,7 +478,9 @@ mcsm::StringResult mcsm::FabricServer::start(mcsm::ServerConfigLoader* loader, m
     mcsm::StringResult jar = loader->getServerJarFile();
     if(!jar) return jar;
 
-    mcsm::BoolResult fileExists = mcsm::fileExists(path + "/" + jar.value());
+    mcsm::info(path + " " + optionPath);
+
+    mcsm::BoolResult fileExists = mcsm::fileExists(mcsm::joinPath(path, jar.value()));
     if(!fileExists) return tl::unexpected(fileExists.error());
 
     if(!fileExists.value()){
@@ -594,7 +596,7 @@ mcsm::VoidResult mcsm::FabricServer::update(const std::string& path, const std::
         return {};
     }
 
-    auto jar = getJarFile(optionPath);
+    auto jar = loader.getServerJarFile();
     if(!jar) return tl::unexpected(jar.error());
 
     auto fileExists = mcsm::fileExists(path + "/" + jar.value());

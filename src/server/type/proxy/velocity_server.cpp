@@ -331,7 +331,7 @@ mcsm::VoidResult mcsm::VelocityServer::update(const std::string& path, const std
     }
     mcsm::success("Update found : "  + std::to_string(ver.value()) + ". Current build : " + lastBuild.value());
 
-    auto jar = getJarFile(optionPath);
+    auto jar = loader.getServerJarFile();
     if(!jar) return tl::unexpected(jar.error());
 
     auto fileExists = mcsm::fileExists(path + "/" + jar.value());

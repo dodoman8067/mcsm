@@ -299,7 +299,7 @@ mcsm::VoidResult mcsm::PurpurServer::update(const std::string& path, const std::
     }
     mcsm::success("Update found : "  + std::to_string(ver) + ". Current build : " + lastBuild);
 
-    auto jarRes = getJarFile(optionPath);
+    auto jarRes = loader.getServerJarFile();
     if(!jarRes) return tl::unexpected(jarRes.error());
     std::string jar = jarRes.value();
 
