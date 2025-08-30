@@ -41,7 +41,7 @@ namespace mcsm {
 
         mcsm::StringResult getFileLocation(const std::string& optionPath) const;
         mcsm::VoidResult setFileLocation(mcsm::Option* option, const std::string& location);
-        mcsm::VoidResult setupServerJarFile(const std::string& path, const std::string& optionPath);
+        mcsm::VoidResult setupServerJarFile(const std::string& jarName, const std::string& path, const std::string& optionPath);
 
         mcsm::StringResult getCustomStartCommand(const std::string& optionPath) const;
         mcsm::VoidResult setCustomStartCommand(mcsm::Option* option, const std::string& command);
