@@ -35,6 +35,7 @@
 build/
 bin/
 lib/
+*.jar
 
 # Visual Studio files
 .vscode/
