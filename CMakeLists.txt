@@ -21,7 +21,7 @@ endif()
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
 
 # Find dependencies 
-find_package(CURL REQUIRED CONFIG)
+find_package(CURL REQUIRED)
 find_package(nlohmann_json REQUIRED)
 find_package(tl-expected REQUIRED)
 include(Findlibgit2)
