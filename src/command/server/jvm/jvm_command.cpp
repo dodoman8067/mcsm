@@ -1,4 +1,5 @@
 #include <mcsm/command/server/jvm/jvm_command.h>
+#include <mcsm/command/server/jvm/subcommands/create.h>
 
 mcsm::JvmCommand::JvmCommand(const std::string& name, const std::string& description) : mcsm::Command(name, description){}
 
@@ -21,6 +22,8 @@ void mcsm::JvmCommand::execute(const std::vector<std::string>& args){
     // will handle string valid checks on command classes.
     // only handle them here if you must
     if(subc == "create"){
+        mcsm::JvmCreateSubCommand cmd;
+        cmd.execute(subArgs);
     }
     if(subc == "edit"){
     }

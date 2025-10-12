@@ -111,6 +111,10 @@ void mcsm::init::initCommands(const std::string& version){
 
     std::unique_ptr<mcsm::GroupCommand> groupCommand = std::make_unique<mcsm::GroupCommand>("group", "Group command");
     mcsm::CommandManager::addCommand(std::move(groupCommand));
+
+    std::unique_ptr<mcsm::JvmCommand> jvmCommand =
+        std::make_unique<mcsm::JvmCommand>("jvm", "JVM related command");
+    mcsm::CommandManager::addCommand(std::move(jvmCommand));
 }
 
 void mcsm::init::initServers(){

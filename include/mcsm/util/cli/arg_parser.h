@@ -120,21 +120,33 @@ namespace mcsm {
                     if (!matched) continue;
 
                     if(inlineVal.has_value()){
-                        return *inlineVal; // --opt=VALUE
+                        // Start with RHS after '='
+                        std::string val = *inlineVal;
+
+                        // ALSO grab spillover tokens until the next option
+                        size_t j = i + 1;
+                        while (j < tokens.size() && !isAnyOptionToken(tokens[j])){
+                            if(!val.empty()) val.push_back(' ');
+                            val += tokens[j];
+                            j++;
+                        }
+                        return val;
                     }
 
-                    // Accept the next token unless it is *actually* another known option token.
-                    if(i + 1 < tokens.size() && !isAnyOptionToken(tokens[i + 1])){
-                        return tokens[i + 1];
+                    std::string value;
+                    size_t j = i + 1;
+                    while (j < tokens.size() && !isAnyOptionToken(tokens[j])){
+                        if(!value.empty()) value.push_back(' ');
+                        value += tokens[j];
+                        j++;
                     }
-
-                    return ""; // flag present, no value
+                    return value;
                 }
             }
             return "";
         }
 
-        inline bool flagExists(const std::string& arg) {
+        inline bool flagExists(const std::string& arg) const {
             std::optional<std::string> canonical;
             for(const auto& p : options){
                 if(p.first == arg) { canonical = p.first; break; }

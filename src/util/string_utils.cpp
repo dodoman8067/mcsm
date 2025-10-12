@@ -120,3 +120,11 @@ std::string mcsm::formatPrompt(const std::string &key){
     }
     return formatted;
 }
+
+std::string mcsm::vecToString(const std::vector<std::string>& vec) {
+    std::string s;
+    for(const auto& v : vec){
+        s += v + " ";
+    }
+    return s;
+}
