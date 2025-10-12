@@ -27,7 +27,7 @@ SOFTWARE.
 
 mcsm::JvmOption::JvmOption(const std::string &path, const std::string &name){
     this->option = std::make_unique<mcsm::Option>(path, name);
-    this->workingDir = path;
+    this->name = name;
 }
 
 mcsm::JvmOption::JvmOption(std::unique_ptr<mcsm::Option> option){

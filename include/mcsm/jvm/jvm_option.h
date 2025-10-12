@@ -39,7 +39,6 @@ namespace mcsm {
     private:
         std::unique_ptr<mcsm::Option> option;
         std::string name;
-        std::string workingDir;
         bool initialized = false;
     public:
         JvmOption(const std::string& path, const std::string& name);
