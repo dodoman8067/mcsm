@@ -73,6 +73,14 @@ nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<std::vector<nlohma
     return nlohmann::json::value_t::array;
 }
 
+static std::filesystem::path resolveAgainstConfig(const std::string& raw, const std::string& configDir){
+    std::filesystem::path p(raw);
+    if(p.is_absolute()){
+        return p.lexically_normal();
+    }
+    return (std::filesystem::path(configDir) / p).lexically_normal();
+}
+
 // isLoaded won't be "true" if the option does not exist which is why I don't check the existence of the option file.
 
 mcsm::StringResult mcsm::ServerConfigLoader::getServerName() const {
@@ -169,48 +177,31 @@ tl::expected<std::unique_ptr<mcsm::JvmOption>, mcsm::Error> mcsm::ServerConfigLo
     const nlohmann::json& profileObj = pORes.value();
 
     if(profileObj == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_DEFAULT_PROFILE_NOT_FOUND, {this->optionHandle->getName()});
-        return tl::unexpected(err);
-    }
-    if(profileObj["name"] == nullptr){
         auto customTemp = mcsm::errors::JSON_NOT_FOUND;
         customTemp.message = "No default launch profile name specified in file " + this->optionHandle->getName();
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
         return tl::unexpected(err);
     }
-    if(!profileObj["name"].is_string()){
+    if(!profileObj.is_string()){
         // Don't use jsonWrongType
         auto customTemp = mcsm::errors::JSON_WRONG_TYPE;
-        customTemp.message = "Value \"name\" in \"default_launch_profile\" has to be a string, but it's not.\nManually editing the launch profile might have caused this issue.";
+        customTemp.message = "Value \"default_launch_profile\" has to be a string, but it's not.\nManually editing the launch profile might have caused this issue.";
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
         return tl::unexpected(err);
     }
-    if(profileObj["location"] == nullptr){
-        auto customTemp = mcsm::errors::JSON_NOT_FOUND;
-        customTemp.message = "No default launch location name specified in file " + this->optionHandle->getName();
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
-        return tl::unexpected(err);
-    }
-    if(!profileObj["location"].is_string()){
-        // Don't use jsonWrongType
+
+    std::filesystem::path path(profileObj.get<std::string>());
+    auto abs = resolveAgainstConfig(profileObj.get<std::string>(), this->configPath);
+    if(!abs.has_filename()){
         auto customTemp = mcsm::errors::JSON_WRONG_TYPE;
-        customTemp.message = "Value \"location\" in \"default_launch_profile\" has to be a string, but it's not.\nManually editing the launch profile might have caused this issue.";
+        customTemp.message = "Value \"default_launch_profile\" in " + this->optionHandle->getName() + " does not contain valid file path: " + profileObj.get<std::string>();
+        customTemp.solution = "Make sure proper value is given and the file is present.";
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
         return tl::unexpected(err);
     }
-    mcsm::SearchTarget target;
-    if(profileObj["location"] == "global"){
-        target = mcsm::SearchTarget::GLOBAL;
-    }else if(profileObj["location"] == "current"){
-        target = mcsm::SearchTarget::CURRENT;
-    }else{
-        // Don't use jsonWrongType
-        auto customTemp = mcsm::errors::JSON_WRONG_TYPE;
-        customTemp.message = "Value \"location\" in \"default_launch_profile\" has to be \"global\" or \"current\", but it's not.\nManually editing the launch profile might have caused this issue.";
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
-        return tl::unexpected(err);
-    }
-    std::unique_ptr<mcsm::JvmOption> jvmOption = std::make_unique<mcsm::JvmOption>(profileObj["name"], target, this->configPath);
+
+    std::unique_ptr<mcsm::Option> jsonOption = std::make_unique<mcsm::Option>(abs.parent_path().string(), abs.filename().string());
+    std::unique_ptr<mcsm::JvmOption> jvmOption = std::make_unique<mcsm::JvmOption>(std::move(jsonOption));
     auto jvmInit = jvmOption->init();
     if(!jvmInit) return tl::unexpected(jvmInit.error());
 
@@ -233,14 +224,13 @@ mcsm::VoidResult mcsm::ServerConfigLoader::setDefaultOption(mcsm::JvmOption& jvm
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
         return tl::unexpected(err);
     }
-    nlohmann::json profileObj;
-    profileObj["name"] = jvmOption.getProfileName();
-    if(jvmOption.getSearchTarget() == mcsm::SearchTarget::GLOBAL){
-        profileObj["location"] = "global";
-    }else{
-        profileObj["location"] = "current";
-    }
-    auto setRes = this->optionHandle->setValue("default_launch_profile", profileObj);
+    auto jvmpPath = jvmOption.getProfilePath();
+    if(!jvmpPath) return tl::unexpected(jvmpPath.error());
+
+    std::string jvmpLocation = mcsm::joinPath(jvmpPath.value(), jvmOption.getProfileName() + ".json");
+    std::filesystem::path p(jvmpLocation);
+    std::string toStore = p.lexically_normal().generic_string();
+    auto setRes = this->optionHandle->setValue("default_launch_profile", toStore);
 
     if(!setRes) return setRes;
     return this->optionHandle->save();
@@ -270,14 +260,6 @@ mcsm::StringResult mcsm::ServerConfigLoader::getServerType() const {
         return tl::unexpected(err);
     }
     return value.get<std::string>();
-}
-
-static std::filesystem::path resolveAgainstConfig(const std::string& raw, const std::string& configDir){
-    std::filesystem::path p(raw);
-    if(p.is_absolute()){
-        return p.lexically_normal();
-    }
-    return (std::filesystem::path(configDir) / p).lexically_normal();
 }
 
 mcsm::StringResult mcsm::ServerConfigLoader::getServerJar() const {

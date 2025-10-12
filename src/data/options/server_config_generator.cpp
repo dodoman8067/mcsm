@@ -48,13 +48,9 @@ mcsm::VoidResult mcsm::ServerConfigGenerator::generate(const std::string& versio
     mcsm::VoidResult res1 = sDataOpt->create("none");
     if(!res1) return res1;
 
-    nlohmann::json profileObj;
-    profileObj["name"] = defaultOption.getProfileName();
-    if(defaultOption.getSearchTarget() == mcsm::SearchTarget::GLOBAL){
-        profileObj["location"] = "global";
-    }else{
-        profileObj["location"] = "current";
-    }
+    auto jvmpPath = defaultOption.getProfilePath();
+    if(!jvmpPath) return tl::unexpected(jvmpPath.error());
+    std::string jvmpLocation = mcsm::joinPath(jvmpPath.value(), defaultOption.getProfileName() + ".json");
     
     mcsm::VoidResult res2 = this->optionHandle->setValue("name", mcsm::safeString(name));
     if(!res2) return res2;
@@ -66,7 +62,7 @@ mcsm::VoidResult mcsm::ServerConfigGenerator::generate(const std::string& versio
     mcsm::VoidResult res3 = this->optionHandle->setValue("version", version);
     if(!res3) return res3;
     
-    mcsm::VoidResult res4 = this->optionHandle->setValue("default_launch_profile", profileObj);
+    mcsm::VoidResult res4 = this->optionHandle->setValue("default_launch_profile", jvmpLocation);
     if(!res4) return res4;
 
     mcsm::VoidResult res5 = this->optionHandle->setValue("server_jar", jarPath);

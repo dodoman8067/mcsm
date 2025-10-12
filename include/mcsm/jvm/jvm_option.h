@@ -40,12 +40,10 @@ namespace mcsm {
         std::unique_ptr<mcsm::Option> option;
         std::string name;
         std::string workingDir;
-        mcsm::SearchTarget target;
         bool initialized = false;
     public:
-        JvmOption(const std::string& name);
-        JvmOption(const std::string& name, const SearchTarget& target);
-        JvmOption(const std::string& name, const SearchTarget& target, const std::string& workingPath);
+        JvmOption(const std::string& path, const std::string& name);
+        JvmOption(std::unique_ptr<mcsm::Option> option); 
         ~JvmOption();
 
         mcsm::VoidResult init();
@@ -71,9 +69,10 @@ namespace mcsm {
         std::string getProfileName() const;
 
         mcsm::StringResult getProfilePath() const;
-        
-        mcsm::SearchTarget getSearchTarget() const;
     };
+
+    mcsm::Result<std::unique_ptr<mcsm::Option>> jvmProfileFromSearchTarget(const std::string& name, const mcsm::SearchTarget& target, const std::string& workingPath);
+    
 }
 
 #endif

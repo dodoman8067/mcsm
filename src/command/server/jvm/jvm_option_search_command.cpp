@@ -73,13 +73,13 @@ void mcsm::JvmOptionSearchCommand::execute(const std::vector<std::string>& args)
 std::vector<std::unique_ptr<mcsm::JvmOption>> mcsm::JvmOptionSearchCommand::search(const mcsm::SearchTarget& target, const std::string& name){
     std::vector<std::unique_ptr<mcsm::JvmOption>> result;
     if(target == mcsm::SearchTarget::GLOBAL || target == mcsm::SearchTarget::ALL){
-        std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(name, mcsm::SearchTarget::GLOBAL);
+        std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(mcsm::unwrapOrExit(mcsm::jvmProfileFromSearchTarget(name, mcsm::SearchTarget::GLOBAL, mcsm::unwrapOrExit(mcsm::getCurrentPath()))));
         mcsm::unwrapOrExit(opt->init());
         bool profileExists = mcsm::unwrapOrExit(opt->exists());
         if(profileExists) result.push_back(std::move(opt));
     }
     if(target == mcsm::SearchTarget::CURRENT || target == mcsm::SearchTarget::ALL){
-        std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(name, mcsm::SearchTarget::CURRENT);
+        std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(mcsm::unwrapOrExit(mcsm::jvmProfileFromSearchTarget(name, mcsm::SearchTarget::CURRENT, mcsm::unwrapOrExit(mcsm::getCurrentPath()))));
         mcsm::unwrapOrExit(opt->init());
         bool profileExists = mcsm::unwrapOrExit(opt->exists());
         if(profileExists) result.push_back(std::move(opt));

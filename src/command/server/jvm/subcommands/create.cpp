@@ -91,7 +91,7 @@ std::string mcsm::JvmCreateSubCommand::getOptionName(const mcsm::ArgumentParser&
 
 std::string mcsm::JvmCreateSubCommand::getProfileName(const mcsm::ArgumentParser& args, const mcsm::SearchTarget& target) const {
     std::string name = getOptionName(args);
-    mcsm::JvmOption jvm(name, target);
+    mcsm::JvmOption jvm(mcsm::unwrapOrExit(mcsm::jvmProfileFromSearchTarget(name, target, mcsm::unwrapOrExit(mcsm::getCurrentPath()))));
     mcsm::unwrapOrExit(jvm.init());
 
     if(mcsm::unwrapOrExit(jvm.exists())){
@@ -102,7 +102,7 @@ std::string mcsm::JvmCreateSubCommand::getProfileName(const mcsm::ArgumentParser
 }
 
 void mcsm::JvmCreateSubCommand::createProfile(const mcsm::ArgumentParser& args, const mcsm::SearchTarget& target) {
-    mcsm::JvmOption option(getProfileName(args, target), target);
+    mcsm::JvmOption option(mcsm::unwrapOrExit(mcsm::jvmProfileFromSearchTarget(getProfileName(args, target), target, mcsm::unwrapOrExit(mcsm::getCurrentPath()))));
     mcsm::unwrapOrExit(option.init());
 
     std::vector<std::string> jvmArgs = getJvmArguments(args);

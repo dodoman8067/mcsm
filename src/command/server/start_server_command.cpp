@@ -143,12 +143,12 @@ std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const mc
         std::exit(1);
     }
     if(target == mcsm::SearchTarget::GLOBAL || target == mcsm::SearchTarget::ALL){
-        std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(name, mcsm::SearchTarget::GLOBAL);
+        std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(mcsm::unwrapOrExit(mcsm::jvmProfileFromSearchTarget(name, mcsm::SearchTarget::GLOBAL, mcsm::unwrapOrExit(mcsm::getCurrentPath()))));
         mcsm::unwrapOrExit(opt->init());
         if(mcsm::unwrapOrExit(opt->exists())) return opt;
     }
     if(target == mcsm::SearchTarget::CURRENT || target == mcsm::SearchTarget::ALL){
-        std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(name, mcsm::SearchTarget::CURRENT, executionPath);
+        std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(mcsm::unwrapOrExit(mcsm::jvmProfileFromSearchTarget(name, mcsm::SearchTarget::CURRENT, executionPath)));
         mcsm::unwrapOrExit(opt->init());
         if(mcsm::unwrapOrExit(opt->exists())) return opt;
     }

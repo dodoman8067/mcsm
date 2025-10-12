@@ -104,7 +104,7 @@ std::string mcsm::JvmOptionEditCommand::getProfileName(const std::vector<std::st
             if(!(arg == "-name" || arg == "--name" || arg == "-n" || arg == "--n")) continue;
             if(i + 1 < args.size() && !args[i + 1].empty() && args[i + 1][0] != '-') {
                 name = mcsm::safeString(args[i + 1]);
-                mcsm::JvmOption option(name, target);
+                mcsm::JvmOption option(mcsm::unwrapOrExit(mcsm::jvmProfileFromSearchTarget(name, target, mcsm::unwrapOrExit(mcsm::getCurrentPath()))));
                 mcsm::unwrapOrExit(option.init());
                     
                 bool exists = mcsm::unwrapOrExit(option.exists());
@@ -167,7 +167,7 @@ std::vector<std::string> mcsm::JvmOptionEditCommand::getJvmArguments(const std::
 
 inline void mcsm::JvmOptionEditCommand::editProfile(const std::vector<std::string>& args) {
     mcsm::SearchTarget target = getSearchTarget(args);
-    mcsm::JvmOption option(getProfileName(args, target), target);
+    mcsm::JvmOption option(mcsm::unwrapOrExit(mcsm::jvmProfileFromSearchTarget(getProfileName(args, target), target, mcsm::unwrapOrExit(mcsm::getCurrentPath()))));
     mcsm::unwrapOrExit(option.init());
                     
     bool exists = mcsm::unwrapOrExit(option.exists());

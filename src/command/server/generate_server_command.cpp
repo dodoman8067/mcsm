@@ -158,8 +158,7 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& /
         mcsm::error("default JVM launch profile search path (current/global) invalid value detected");
         std::exit(1);
     }
- 
-    mcsm::JvmOption defaultProfile(extras["default_jvm_launch_profile_name"], t);
+    mcsm::JvmOption defaultProfile(mcsm::unwrapOrExit(mcsm::jvmProfileFromSearchTarget(extras["default_jvm_launch_profile_name"], t, mcsm::unwrapOrExit(mcsm::getCurrentPath()))));
     mcsm::unwrapOrExit(defaultProfile.init());
 
     mcsm::unwrapOrExit(sPtr->generate(name, defaultProfile, mcsm::unwrapOrExit(mcsm::getCurrentPath()), version, bUpdate, extras));

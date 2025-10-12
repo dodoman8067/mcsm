@@ -203,7 +203,9 @@ mcsm::VoidResult mcsm::Option::reset(){
 }
 
 std::string mcsm::Option::getName() const {
-    return this->name;
+    std::string nameCp = this->name;
+    mcsm::replaceAll(nameCp, ".json", "");
+    return nameCp;
 }
 
 std::string mcsm::Option::getPath() const {
