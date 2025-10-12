@@ -1,5 +1,6 @@
 #include <mcsm/command/server/jvm/jvm_command.h>
 #include <mcsm/command/server/jvm/subcommands/create.h>
+#include <mcsm/command/server/jvm/subcommands/edit.h>
 
 mcsm::JvmCommand::JvmCommand(const std::string& name, const std::string& description) : mcsm::Command(name, description){}
 
@@ -26,6 +27,8 @@ void mcsm::JvmCommand::execute(const std::vector<std::string>& args){
         cmd.execute(subArgs);
     }
     if(subc == "edit"){
+        mcsm::JvmEditSubCommand cmd;
+        cmd.execute(subArgs);
     }
     if(subc == "detect-install"){
     }
