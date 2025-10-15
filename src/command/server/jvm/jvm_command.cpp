@@ -1,6 +1,7 @@
 #include <mcsm/command/server/jvm/jvm_command.h>
 #include <mcsm/command/server/jvm/subcommands/create.h>
 #include <mcsm/command/server/jvm/subcommands/edit.h>
+#include <mcsm/command/server/jvm/subcommands/search.h>
 
 mcsm::JvmCommand::JvmCommand(const std::string& name, const std::string& description) : mcsm::Command(name, description){}
 
@@ -33,6 +34,8 @@ void mcsm::JvmCommand::execute(const std::vector<std::string>& args){
     if(subc == "detect-install"){
     }
     if(subc == "search"){
+        mcsm::JvmSearchSubCommand cmd;
+        cmd.execute(subArgs);
     }
     if(subc == "import"){
     }
