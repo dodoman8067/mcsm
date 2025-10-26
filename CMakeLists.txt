@@ -44,6 +44,7 @@ endif()
 
 # --- libgit2 ---
 include(Findlibgit2)
+message("Note for Fedora: As of Fedora 42 libgit2-devel package will fail to compile due to corrupted header files. Use manually installed libgit2.")
 if(LIBGIT2_FOUND)
     add_library(git2 INTERFACE IMPORTED)
     set_target_properties(git2 PROPERTIES
