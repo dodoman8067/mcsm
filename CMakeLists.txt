@@ -10,6 +10,7 @@ endif()
 # Add options
 option(BUILD_STATIC_EXE "Build static executable" OFF)
 option(USE_SYSTEM_DEPS "Prefer system-installed libraries. Only affects nlohmann/json and tl::expected." ON)
+option(USE_SYSTEM_LIBGIT2 "prefer system-provided libgit2 if available" ON)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
@@ -43,21 +44,62 @@ if(NOT TARGET CURL::libcurl)
 endif()
 
 # --- libgit2 ---
-include(Findlibgit2)
-message("Note for Fedora: As of Fedora 42 libgit2-devel package will fail to compile due to corrupted header files. Use manually installed libgit2.")
-if(LIBGIT2_FOUND)
-    add_library(git2 INTERFACE IMPORTED)
-    set_target_properties(git2 PROPERTIES
-        INTERFACE_INCLUDE_DIRECTORIES "${LIBGIT2_INCLUDE_DIRS}"
-        INTERFACE_LINK_LIBRARIES "${LIBGIT2_LIBRARIES}")
-else()
-    find_package(LibGit2 QUIET) # some distros ship a CMake config
-    if (TARGET libgit2package OR TARGET git2)
-    # ok
-    elseif (LibGit2_FOUND AND TARGET LibGit2::LibGit2)
-        add_library(git2 ALIAS LibGit2::LibGit2)
+if(USE_SYSTEM_LIBGIT2)
+    include(Findlibgit2)
+    message("Note for Fedora: As of Fedora 42 libgit2-devel package will fail to compile due to corrupted header files. Use manually installed libgit2 or run with -DUSE_SYSTEM_LIBGIT2=OFF.")
+    if(LIBGIT2_FOUND)
+        add_library(git2 INTERFACE IMPORTED)
+        set_target_properties(git2 PROPERTIES
+            INTERFACE_INCLUDE_DIRECTORIES "${LIBGIT2_INCLUDE_DIRS}"
+            INTERFACE_LINK_LIBRARIES "${LIBGIT2_LIBRARIES}")
     else()
-        message(FATAL_ERROR "libgit2 not found. install libgit2-dev or use a package manager.")
+        find_package(LibGit2 QUIET) # some distros ship a CMake config
+        if (TARGET libgit2package OR TARGET git2)
+        # ok
+        elseif (LibGit2_FOUND AND TARGET LibGit2::LibGit2)
+            add_library(git2 ALIAS LibGit2::LibGit2)
+        else()
+            message(FATAL_ERROR "libgit2 not found. install libgit2-dev or use a package manager.")
+        endif()
+    endif()
+else()
+    # respect no-internet builds (rpm/deb builders): allow overriding source dir
+    set(FETCHCONTENT_FULLY_DISCONNECTED OFF CACHE BOOL "no network in build" FORCE)
+
+    FetchContent_Declare(libgit2_src
+        GIT_REPOSITORY https://github.com/libgit2/libgit2.git
+        GIT_TAG        v1.9.1
+    )
+
+    # libgit2 cmake knobs (kill tests/bench; pick crypto; ssh; https)
+    set(BUILD_CLAR OFF CACHE BOOL "" FORCE)
+    set(USE_HTTPS ON CACHE BOOL "" FORCE)
+    set(USE_SSH   ON CACHE BOOL "" FORCE)
+    set(USE_OPENSSL ON CACHE BOOL "" FORCE)   # or flip to MBEDTLS if you hate openssl
+    set(USE_MBEDTLS OFF CACHE BOOL "" FORCE)
+
+    if(LIBGIT2_USE_STATIC_LIBS)
+        set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
+    else()
+        set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
+    endif()
+
+    FetchContent_MakeAvailable(libgit2_src)   # defines target "git2"
+
+    # unify on a single name your code can link to
+    if (TARGET libgit2::libgit2)
+      # installed package that exports an imported, namespaced target
+        add_library(git2::git2 ALIAS libgit2::libgit2)
+
+    elseif (TARGET git2)
+      # fetched from source: upstream builds a target named "git2"
+        add_library(git2::git2 ALIAS git2)
+
+    elseif (TARGET libgit2) # rare: some packagers rename the target to 'libgit2'
+        add_library(git2::git2 ALIAS libgit2)
+
+    else()
+        message(FATAL_ERROR "no libgit2 cmake target found (expected libgit2::libgit2 or git2).")
     endif()
 endif()
 
