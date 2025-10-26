@@ -54,15 +54,15 @@ namespace mcsm {
 
         mcsm::VoidResult reset();
 
-        mcsm::BoolResult exists();
+        mcsm::BoolResult exists() const;
 
-        mcsm::StringResult getJvmPath();
+        mcsm::StringResult getJvmPath() const;
         mcsm::VoidResult setJvmPath(const std::string& jvmPath);
 
-        tl::expected<std::vector<std::string>, mcsm::Error> getJvmArguments();
+        tl::expected<std::vector<std::string>, mcsm::Error> getJvmArguments() const;
         mcsm::VoidResult setJvmArguments(const std::vector<std::string>& jvmArgs);
 
-        tl::expected<std::vector<std::string>, mcsm::Error> getServerArguments();
+        tl::expected<std::vector<std::string>, mcsm::Error> getServerArguments() const;
         mcsm::VoidResult setServerArguments(const std::vector<std::string>& serverArgs);
 
         std::string getProfileName() const;

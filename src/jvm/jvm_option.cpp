@@ -164,7 +164,7 @@ mcsm::VoidResult mcsm::JvmOption::reset(){
     return this->option->reset();
 }
 
-mcsm::BoolResult mcsm::JvmOption::exists(){
+mcsm::BoolResult mcsm::JvmOption::exists() const {
     if(!this->initialized) {
         auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
         customTemp.message = "JvmOption function called without load.";
@@ -175,7 +175,7 @@ mcsm::BoolResult mcsm::JvmOption::exists(){
     return this->option->exists();
 }
 
-tl::expected<std::vector<std::string>, mcsm::Error> mcsm::JvmOption::getJvmArguments(){
+tl::expected<std::vector<std::string>, mcsm::Error> mcsm::JvmOption::getJvmArguments() const {
     if(!this->initialized) {
         auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
         customTemp.message = "JvmOption function called without load.";
@@ -232,7 +232,7 @@ mcsm::VoidResult mcsm::JvmOption::setJvmArguments(const std::vector<std::string>
     return opt2->save();
 }
 
-mcsm::StringResult mcsm::JvmOption::getJvmPath(){
+mcsm::StringResult mcsm::JvmOption::getJvmPath() const {
     if(!this->initialized) {
         auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
         customTemp.message = "JvmOption function called without load.";
@@ -282,7 +282,7 @@ mcsm::VoidResult mcsm::JvmOption::setJvmPath(const std::string& jvmPath){
     return opt2->save();
 }
 
-tl::expected<std::vector<std::string>, mcsm::Error> mcsm::JvmOption::getServerArguments(){
+tl::expected<std::vector<std::string>, mcsm::Error> mcsm::JvmOption::getServerArguments() const {
     if(!this->initialized) {
         auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
         customTemp.message = "JvmOption function called without load.";
