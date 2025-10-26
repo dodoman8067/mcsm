@@ -1,13 +1,15 @@
 cmake_minimum_required(VERSION 3.24)
 project(mcsm)
+include(FetchContent)
 
 # Detect OS
-if(NOT LINUX AND NOT WIN32)
+if(NOT LINUX AND NOT WIN32 AND NOT APPLE)
     message(FATAL_ERROR "This platform is not supported")
 endif()
 
 # Add options
 option(BUILD_STATIC_EXE "Build static executable" OFF)
+option(USE_SYSTEM_DEPS "Prefer system-installed libraries. Only affects nlohmann/json and tl::expected." ON)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
@@ -21,10 +23,75 @@ endif()
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
 
 # Find dependencies 
+# --- libcurl ---
 find_package(CURL REQUIRED)
-find_package(nlohmann_json REQUIRED)
-find_package(tl-expected REQUIRED)
+if(NOT CURL_FOUND)
+    message(STATUS "libcurl not found system-wide; trying pkg-config")
+    find_package(PkgConfig QUIET)
+    if(PkgConfig_FOUND)
+        pkg_check_modules(CURL_PKG libcurl QUIET)
+        if(CURL_PKG_FOUND)
+            add_library(CURL::libcurl INTERFACE IMPORTED)
+            set_target_properties(CURL::libcurl PROPERTIES
+                INTERFACE_INCLUDE_DIRECTORIES "${CURL_PKG_INCLUDE_DIRS}"
+                INTERFACE_LINK_LIBRARIES "${CURL_PKG_LIBRARIES}")
+        endif()
+    endif()
+endif()
+if(NOT TARGET CURL::libcurl)
+    message(FATAL_ERROR "libcurl not found. install libcurl-dev or use a toolchain (vcpkg/conan).")
+endif()
+
+# --- libgit2 ---
 include(Findlibgit2)
+if(LIBGIT2_FOUND)
+    add_library(git2 INTERFACE IMPORTED)
+    set_target_properties(git2 PROPERTIES
+        INTERFACE_INCLUDE_DIRECTORIES "${LIBGIT2_INCLUDE_DIRS}"
+        INTERFACE_LINK_LIBRARIES "${LIBGIT2_LIBRARIES}")
+else()
+    find_package(LibGit2 QUIET) # some distros ship a CMake config
+    if (TARGET libgit2package OR TARGET git2)
+    # ok
+    elseif (LibGit2_FOUND AND TARGET LibGit2::LibGit2)
+        add_library(git2 ALIAS LibGit2::LibGit2)
+    else()
+        message(FATAL_ERROR "libgit2 not found. install libgit2-dev or use a package manager.")
+    endif()
+endif()
+
+# --- nlohmann_json (header-only) ---
+# prefer system if available, otherwise fetch pinned tag
+if (USE_SYSTEM_DEPS)
+    find_package(nlohmann_json REQUIRED) # provides nlohmann_json::nlohmann_json
+endif()
+if (NOT nlohmann_json_FOUND)
+    FetchContent_Declare(nlohmann_json
+        GIT_REPOSITORY https://github.com/nlohmann/json.git
+        GIT_TAG v3.12.0
+    )
+    FetchContent_MakeAvailable(nlohmann_json)
+endif()
+
+# --- tl::expected (header-only) ---
+if (USE_SYSTEM_DEPS)
+    find_package(tl-expected REQUIRED)
+endif()
+if(NOT tl-expected_FOUND)
+    FetchContent_Declare(tl_expected
+        GIT_REPOSITORY https://github.com/TartanLlama/expected.git
+        GIT_TAG v1.3.1
+    )
+    FetchContent_GetProperties(tl_expected)
+    if(NOT tl_expected_POPULATED)
+        FetchContent_Populate(tl_expected)
+        add_library(tl_expected INTERFACE)
+        target_include_directories(tl_expected INTERFACE ${tl_expected_SOURCE_DIR}/include)
+        add_library(tl::expected ALIAS tl_expected)
+    endif()
+    message("-- [mcsm] Fetched tl::expected to " ${tl_expected_SOURCE_DIR} ".")
+endif()
+
 if(LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
     find_package(Backward REQUIRED)
 endif()
@@ -44,7 +111,6 @@ endif()
 if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
-
 
 # Set compiler options
 if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
@@ -94,9 +160,12 @@ if(CMAKE_BUILD_TYPE MATCHES Release)
 endif()
 
 # Link dependencies
-target_link_libraries(mcsm PRIVATE CURL::libcurl)
-target_link_libraries(mcsm PRIVATE nlohmann_json::nlohmann_json)
-target_link_libraries(mcsm PRIVATE tl::expected)
+target_link_libraries(mcsm
+  PRIVATE
+    CURL::libcurl
+    nlohmann_json::nlohmann_json
+    tl::expected
+)
 
 # Some dependencies for libgit2 in Windows
 if(WIN32)
@@ -104,7 +173,7 @@ if(WIN32)
     target_link_libraries(mcsm PRIVATE Rpcrt4)
 endif()
 
-target_link_libraries(mcsm PRIVATE ${LIBGIT2_LIBRARIES})
+target_link_libraries(mcsm PRIVATE git2)
 
 if(LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
     target_link_libraries(mcsm PRIVATE Backward::Backward)
