@@ -64,7 +64,9 @@ if(USE_SYSTEM_LIBGIT2)
         endif()
     endif()
 else()
-    find_package(OpenSSL REQUIRED)   # OpenSSL::SSL, OpenSSL::Crypto
+    if(LINUX)
+        find_package(OpenSSL REQUIRED)   # OpenSSL::SSL, OpenSSL::Crypto
+    endif()
     find_package(ZLIB REQUIRED)      # ZLIB::ZLIB
     find_package(Threads REQUIRED)   # Threads::Threads
     # respect no-internet builds (rpm/deb builders): allow overriding source dir
