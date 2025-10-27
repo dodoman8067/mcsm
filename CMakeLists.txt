@@ -78,6 +78,8 @@ else()
         set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
     endif()
 
+    set(USE_HTTPS OpenSSL CACHE STRING "" FORCE)
+
     FetchContent_MakeAvailable(libgit2_src)   # defines target "git2"
 
     # unify on a single name your code can link to
