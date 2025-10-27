@@ -66,9 +66,9 @@ if(USE_SYSTEM_LIBGIT2)
 else()
     if(LINUX)
         find_package(OpenSSL REQUIRED)   # OpenSSL::SSL, OpenSSL::Crypto
+        find_package(ZLIB REQUIRED)      # ZLIB::ZLIB
+        find_package(Threads REQUIRED)   # Threads::Threads
     endif()
-    find_package(ZLIB REQUIRED)      # ZLIB::ZLIB
-    find_package(Threads REQUIRED)   # Threads::Threads
     # respect no-internet builds (rpm/deb builders): allow overriding source dir
     set(FETCHCONTENT_FULLY_DISCONNECTED OFF CACHE BOOL "no network in build" FORCE)
 
