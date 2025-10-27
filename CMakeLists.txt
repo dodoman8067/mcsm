@@ -64,6 +64,9 @@ if(USE_SYSTEM_LIBGIT2)
         endif()
     endif()
 else()
+    find_package(OpenSSL REQUIRED)   # OpenSSL::SSL, OpenSSL::Crypto
+    find_package(ZLIB REQUIRED)      # ZLIB::ZLIB
+    find_package(Threads REQUIRED)   # Threads::Threads
     # respect no-internet builds (rpm/deb builders): allow overriding source dir
     set(FETCHCONTENT_FULLY_DISCONNECTED OFF CACHE BOOL "no network in build" FORCE)
 
@@ -216,6 +219,16 @@ target_link_libraries(mcsm
     tl::expected
     git2::git2
 )
+
+if(NOT USE_SYSTEM_LIBGIT2)
+target_link_libraries(mcsm
+  PRIVATE
+    OpenSSL::SSL
+    OpenSSL::Crypto
+    ZLIB::ZLIB
+    Threads::Threads
+)
+endif()
 
 if(LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
     target_link_libraries(mcsm PRIVATE Backward::Backward)
