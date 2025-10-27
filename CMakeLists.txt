@@ -79,6 +79,10 @@ else()
     endif()
 
     set(USE_HTTPS OpenSSL CACHE STRING "" FORCE)
+    set(BUILD_TESTS    OFF CACHE BOOL "" FORCE)
+    set(BUILD_CLI    OFF CACHE BOOL "" FORCE)
+    set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
+    set(BUILD_FUZZERS  OFF CACHE BOOL "" FORCE)
 
     FetchContent_MakeAvailable(libgit2_src)   # defines target "git2"
 
