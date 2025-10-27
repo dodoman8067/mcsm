@@ -52,6 +52,7 @@ if(USE_SYSTEM_LIBGIT2)
         set_target_properties(git2 PROPERTIES
             INTERFACE_INCLUDE_DIRECTORIES "${LIBGIT2_INCLUDE_DIRS}"
             INTERFACE_LINK_LIBRARIES "${LIBGIT2_LIBRARIES}")
+        add_library(git2::git2 ALIAS git2)
     else()
         find_package(LibGit2 QUIET) # some distros ship a CMake config
         if (TARGET libgit2package OR TARGET git2)
@@ -70,13 +71,6 @@ else()
         GIT_REPOSITORY https://github.com/libgit2/libgit2.git
         GIT_TAG        v1.9.1
     )
-
-    # libgit2 cmake knobs (kill tests/bench; pick crypto; ssh; https)
-    set(BUILD_CLAR OFF CACHE BOOL "" FORCE)
-    set(USE_HTTPS ON CACHE BOOL "" FORCE)
-    set(USE_SSH   ON CACHE BOOL "" FORCE)
-    set(USE_OPENSSL ON CACHE BOOL "" FORCE)   # or flip to MBEDTLS if you hate openssl
-    set(USE_MBEDTLS OFF CACHE BOOL "" FORCE)
 
     if(LIBGIT2_USE_STATIC_LIBS)
         set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
@@ -202,21 +196,20 @@ if(CMAKE_BUILD_TYPE MATCHES Release)
     endif()
 endif()
 
-# Link dependencies
-target_link_libraries(mcsm
-  PRIVATE
-    CURL::libcurl
-    nlohmann_json::nlohmann_json
-    tl::expected
-)
-
 # Some dependencies for libgit2 in Windows
 if(WIN32)
     target_link_libraries(mcsm PRIVATE Winhttp)
     target_link_libraries(mcsm PRIVATE Rpcrt4)
 endif()
 
-target_link_libraries(mcsm PRIVATE git2)
+# Link dependencies
+target_link_libraries(mcsm
+  PRIVATE
+    CURL::libcurl
+    nlohmann_json::nlohmann_json
+    tl::expected
+    git2::git2
+)
 
 if(LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
     target_link_libraries(mcsm PRIVATE Backward::Backward)
