@@ -81,7 +81,12 @@ else()
         set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
     endif()
 
-    set(USE_HTTPS OpenSSL CACHE STRING "" FORCE)
+    if(APPLE)
+        set(USE_HTTPS SecureTransport CACHE STRING "" FORCE)
+    else()
+        set(USE_HTTPS OpenSSL CACHE STRING "" FORCE)
+    endif()
+
     set(BUILD_TESTS    OFF CACHE BOOL "" FORCE)
     set(BUILD_CLI    OFF CACHE BOOL "" FORCE)
     set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
@@ -220,14 +225,14 @@ target_link_libraries(mcsm
     git2::git2
 )
 
-if(NOT USE_SYSTEM_LIBGIT2)
-target_link_libraries(mcsm
-  PRIVATE
-    OpenSSL::SSL
-    OpenSSL::Crypto
-    ZLIB::ZLIB
-    Threads::Threads
-)
+if(NOT USE_SYSTEM_LIBGIT2 AND LINUX)
+    target_link_libraries(mcsm
+        PRIVATE
+            OpenSSL::SSL
+            OpenSSL::Crypto
+            ZLIB::ZLIB
+            Threads::Threads
+    )
 endif()
 
 if(LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
