@@ -103,6 +103,12 @@ namespace mcsm {
                 }
                 return xdg;
             }
+            case mcsm::OS::MAC_OS: {
+                std::string val;
+                const std::string home = getEnvStr("HOME");
+                val = home.empty() ? std::string(".") : joinPath(home, "Library/Application Support");
+                return val;
+            }
         }
         return ".";
     }
@@ -125,6 +131,12 @@ namespace mcsm {
                     xdg = home.empty() ? std::string(".") : joinPath(home, ".config");
                 }
                 return xdg;
+            }
+            case mcsm::OS::MAC_OS: {
+                std::string val;
+                const std::string home = getEnvStr("HOME");
+                val = home.empty() ? std::string(".") : joinPath(home, "Library/Application Support");
+                return val;
             }
         }
         return ".";

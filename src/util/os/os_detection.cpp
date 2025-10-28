@@ -27,8 +27,10 @@ SOFTWARE.
 mcsm::OS mcsm::getCurrentOS() {
 #ifdef _WIN32
     return mcsm::OS::WINDOWS;
-#elif __linux__
+#elif defined(__linux__)
     return mcsm::OS::LINUX;
+#elif defined(__APPLE__)
+    return mcsm::OS::MAC_OS;
 #else
     return nullptr;
 #endif

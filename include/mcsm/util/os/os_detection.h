@@ -34,6 +34,11 @@ namespace mcsm {
         WINDOWS,
 
         /**
+         * Represents macOS Big Sur and newer.
+         */
+        MAC_OS,
+
+        /**
          * Represents Linux kernel based operating systems.
         */
         LINUX
