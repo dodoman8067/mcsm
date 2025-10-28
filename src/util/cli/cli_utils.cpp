@@ -98,7 +98,8 @@ std::string mcsm::asGlobalConfigPath(const std::string& value){
 
 mcsm::BoolResult mcsm::ensureDataDir() {
     const auto dir = mcsm::getDataPathPerOS();
-    if (mcsm::mkdir(dir) && dir != ".") return true;
+    mcsm::info(dir);
+    if (dir != ".") return true;
     auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
     customTemp.message = "Invalid data path set: " + dir + " \n Please make sure proper environment variables are set and directories are present.\nWindows: LOCALAPPDATA or fallback: USERPROFILE, Linux: XDG_DATA_HOME or fallback: HOME";
     return tl::unexpected(mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {}));
@@ -106,7 +107,7 @@ mcsm::BoolResult mcsm::ensureDataDir() {
 
 mcsm::BoolResult mcsm::ensureConfigDir() {
     const auto dir = mcsm::getConfigPathPerOS();
-    if (mcsm::mkdir(dir) && dir != ".") return true;
+    if (dir != ".") return true;
     auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
     customTemp.message = "Invalid config path set: " + dir + " \n Please make sure proper environment variables are set and directories are present.\nWindows: APPDATA or fallback: USERPROFILE, Linux: XDG_CONFIG_HOME or fallback: HOME";
     return tl::unexpected(mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {}));
