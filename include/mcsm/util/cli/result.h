@@ -391,26 +391,20 @@ namespace mcsm::errors {
         "Please remove them and try again."
     };
 
-    inline const ErrorTemplate GIT_CLONE_FAILED = {
-        502,
-        "Failed to clone a git repository %s with the following reason: %s",
-        ""
-    };
-
     inline const ErrorTemplate CURRENT_PATH_UNCATCHABLE = {
-        503,
+        502,
         "Getting current path operation failed with the following reason: %s",
         ""
     };
 
     inline const ErrorTemplate INTERNAL_FUNC_EXECUTION_FAILED = {
-        504,
+        503,
         "Executing function %s failed with the following reason: %s",
         ""
     };
 
     inline const ErrorTemplate ILLEGAL_PARAMETER = {
-        505,
+        504,
         "An illegal parameter value has been passed (likely nullptr). This message will likely be replaced by a more detailed description depending on the cause.",
         "Please report this to GitHub. (https://github.com/dodoman8067/mcsm)"
     };
