@@ -40,7 +40,4 @@ void mcsm::VersionCommand::execute(const std::vector<std::string>& /* args */){
     #ifdef MCSM_NLOHMANN_VER
         std::cout << "nlohmann::json version : " << MCSM_NLOHMANN_VER << "\n";
     #endif
-    #ifdef LIBGIT2_VERSION
-        std::cout << "libgit2 version : " << LIBGIT2_VERSION << "\n";
-    #endif
 }
