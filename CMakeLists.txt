@@ -10,7 +10,6 @@ endif()
 # Add options
 option(BUILD_STATIC_EXE "Build static executable" OFF)
 option(USE_SYSTEM_DEPS "Prefer system-installed libraries. Only affects nlohmann/json and tl::expected." ON)
-option(USE_SYSTEM_LIBGIT2 "prefer system-provided libgit2 if available" ON)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
@@ -41,76 +40,6 @@ if(NOT CURL_FOUND)
 endif()
 if(NOT TARGET CURL::libcurl)
     message(FATAL_ERROR "libcurl not found. install libcurl-dev or use a toolchain (vcpkg/conan).")
-endif()
-
-# --- libgit2 ---
-if(USE_SYSTEM_LIBGIT2)
-    include(Findlibgit2)
-    message("Note for Fedora: As of Fedora 42 libgit2-devel package will fail to compile due to corrupted header files. Use manually installed libgit2 or run with -DUSE_SYSTEM_LIBGIT2=OFF.")
-    if(LIBGIT2_FOUND)
-        add_library(git2 INTERFACE IMPORTED)
-        set_target_properties(git2 PROPERTIES
-            INTERFACE_INCLUDE_DIRECTORIES "${LIBGIT2_INCLUDE_DIRS}"
-            INTERFACE_LINK_LIBRARIES "${LIBGIT2_LIBRARIES}")
-        add_library(git2::git2 ALIAS git2)
-    else()
-        find_package(LibGit2 QUIET) # some distros ship a CMake config
-        if (TARGET libgit2package OR TARGET git2)
-        # ok
-        elseif (LibGit2_FOUND AND TARGET LibGit2::LibGit2)
-            add_library(git2 ALIAS LibGit2::LibGit2)
-        else()
-            message(FATAL_ERROR "libgit2 not found. install libgit2-dev or use a package manager.")
-        endif()
-    endif()
-else()
-    if(LINUX)
-        find_package(OpenSSL REQUIRED)   # OpenSSL::SSL, OpenSSL::Crypto
-        find_package(ZLIB REQUIRED)      # ZLIB::ZLIB
-        find_package(Threads REQUIRED)   # Threads::Threads
-    endif()
-    # respect no-internet builds (rpm/deb builders): allow overriding source dir
-    set(FETCHCONTENT_FULLY_DISCONNECTED OFF CACHE BOOL "no network in build" FORCE)
-
-    FetchContent_Declare(libgit2_src
-        GIT_REPOSITORY https://github.com/libgit2/libgit2.git
-        GIT_TAG        v1.9.1
-    )
-
-    if(LIBGIT2_USE_STATIC_LIBS)
-        set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
-    else()
-        set(BUILD_SHARED_LIBS ON CACHE BOOL "" FORCE)
-    endif()
-
-    if(APPLE)
-        set(USE_HTTPS SecureTransport CACHE STRING "" FORCE)
-    else()
-        set(USE_HTTPS OpenSSL CACHE STRING "" FORCE)
-    endif()
-
-    set(BUILD_TESTS    OFF CACHE BOOL "" FORCE)
-    set(BUILD_CLI    OFF CACHE BOOL "" FORCE)
-    set(BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
-    set(BUILD_FUZZERS  OFF CACHE BOOL "" FORCE)
-
-    FetchContent_MakeAvailable(libgit2_src)   # defines target "git2"
-
-    # unify on a single name your code can link to
-    if (TARGET libgit2::libgit2)
-      # installed package that exports an imported, namespaced target
-        add_library(git2::git2 ALIAS libgit2::libgit2)
-
-    elseif (TARGET git2)
-      # fetched from source: upstream builds a target named "git2"
-        add_library(git2::git2 ALIAS git2)
-
-    elseif (TARGET libgit2) # rare: some packagers rename the target to 'libgit2'
-        add_library(git2::git2 ALIAS libgit2)
-
-    else()
-        message(FATAL_ERROR "no libgit2 cmake target found (expected libgit2::libgit2 or git2).")
-    endif()
 endif()
 
 # --- nlohmann_json (header-only) ---
@@ -212,30 +141,13 @@ if(CMAKE_BUILD_TYPE MATCHES Release)
     endif()
 endif()
 
-# Some dependencies for libgit2 in Windows
-if(WIN32)
-    target_link_libraries(mcsm PRIVATE Winhttp)
-    target_link_libraries(mcsm PRIVATE Rpcrt4)
-endif()
-
 # Link dependencies
 target_link_libraries(mcsm
   PRIVATE
     CURL::libcurl
     nlohmann_json::nlohmann_json
     tl::expected
-    git2::git2
 )
-
-if(NOT USE_SYSTEM_LIBGIT2 AND LINUX)
-    target_link_libraries(mcsm
-        PRIVATE
-            OpenSSL::SSL
-            OpenSSL::Crypto
-            ZLIB::ZLIB
-            Threads::Threads
-    )
-endif()
 
 if(LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
     target_link_libraries(mcsm PRIVATE Backward::Backward)

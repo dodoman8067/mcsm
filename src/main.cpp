@@ -26,7 +26,6 @@ SOFTWARE.
 #include <mcsm/util/cli/signal_handler.h>
 #include <new>
 #include <thread>
-#include <mcsm/util/git/clone_utils.h>
 
 const std::string version = "0.5.1";
 
