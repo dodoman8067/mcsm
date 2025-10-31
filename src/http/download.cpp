@@ -30,12 +30,6 @@ static size_t writeFunction(char* ptr, size_t size, size_t nmemb, void* userdata
     return std::fwrite(ptr, size, nmemb, stream);
 }
 
-static size_t header_log(char* buf, size_t sz, size_t nm, void* /*ud*/) {
-    std::string_view h(buf, sz*nm);
-    std::cerr << "[H] " << h;   // or buffer & parse
-    return sz*nm;
-}
-
 static int progressCallback(void * /* clientp */, curl_off_t dltotal, curl_off_t dlnow, curl_off_t /* ultotal */, curl_off_t /* ulnow */) {
     const int barWidth = 20;
 
