@@ -39,6 +39,19 @@ mcsm::IntResult mcsm::runCommandQuietly(const std::string& command){
         #else
             return 1;
         #endif
+    }else if(mcsm::getCurrentOS() == mcsm::OS::MAC_OS){
+        std::string cmd = command + " > /dev/null 2>&1";
+        #ifdef __APPLE__
+            int code = std::system(cmd.c_str());
+            if(WIFEXITED(code)){
+                int finalCode = WEXITSTATUS(code);
+                return finalCode;
+            }else{
+                return 1;
+            }
+        #else
+            return 1;
+        #endif
     }else{
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSUPPORTED_OS, {});
         return tl::unexpected(err);
@@ -50,6 +63,18 @@ mcsm::IntResult mcsm::runCommand(const std::string& command){
         return std::system(command.c_str());
     }else if(mcsm::getCurrentOS() == mcsm::OS::LINUX){
         #ifdef __linux__
+            int code = std::system(command.c_str());
+            if(WIFEXITED(code)){
+                int finalCode = WEXITSTATUS(code);
+                return finalCode;
+            }else{
+                return 1;
+            }
+        #else
+            return 1;
+        #endif
+    }else if(mcsm::getCurrentOS() == mcsm::OS::MAC_OS){
+        #ifdef __APPLE__
             int code = std::system(command.c_str());
             if(WIFEXITED(code)){
                 int finalCode = WEXITSTATUS(code);

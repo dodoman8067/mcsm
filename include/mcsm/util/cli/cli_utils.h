@@ -37,6 +37,9 @@ SOFTWARE.
     #include <sys/wait.h>
     #include <errno.h>
 #endif
+#ifdef __APPLE__
+    #include <mach-o/dyld.h>
+#endif
 
 namespace mcsm {
     /**

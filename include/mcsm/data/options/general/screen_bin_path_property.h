@@ -13,6 +13,8 @@ namespace mcsm {
         inline nlohmann::json getDefaultValue() const override {
         #ifdef __linux__
             return "/usr/bin/screen";
+        #elif defined(__APPLE__)
+            return "/usr/bin/screen";
         #else
             return "";
         #endif
