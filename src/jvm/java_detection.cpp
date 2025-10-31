@@ -129,13 +129,14 @@ mcsm::StringResult mcsm::detectJava(){
             return tl::unexpected(err);
         }
         mcsm::info("Detected java from JAVA_HOME : " + mcsm::normalizePath(str));
+        str = mcsm::normalizePath(str);
         if(!mcsm::startsWith(str, "\"")){
             str = "\"" + str;
         }
         if(!mcsm::endsWith(str, "\"")){
             str = str + "\"";
         }
-        return mcsm::normalizePath(str);
+        return str;
     }
     mcsm::info("Failed to detect java from JAVA_HOME; Looking from PATH.");
     auto pSRes = getJavaFromPath();
@@ -151,7 +152,8 @@ mcsm::StringResult mcsm::detectJava(){
             mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::WARNING, customTemp, {});
             return tl::unexpected(err);
         }
-        mcsm::info("Detected java from PATH : " + pathStr + ".");
+        mcsm::info("Detected java from PATH : " + mcsm::normalizePath(pathStr) + ".");
+        pathStr = mcsm::normalizePath(pathStr);
         if(!mcsm::startsWith(pathStr, "\"")){
             pathStr = "\"" + pathStr;
         }
