@@ -242,6 +242,34 @@ mcsm::StringResult mcsm::getExecutablePath(){
     }
 
     return "\"" + std::string(buf) + "\"";
+#elif defined(__APPLE__)
+    uint32_t size = PATH_MAX;
+    std::vector<char> buf(size);
+
+    // First attempt with PATH_MAX; if too small, Apple tells us required size.
+    int rc = _NSGetExecutablePath(buf.data(), &size);
+    if(rc == -1){
+        buf.resize(size);
+        rc = _NSGetExecutablePath(buf.data(), &size);
+    }
+
+    if(rc != 0){
+        mcsm::Error err = mcsm::makeError(
+            mcsm::ErrorStatus::ERROR,
+            mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED,
+            {"_NSGetExecutablePath", "unknown"}
+        );
+        return tl::unexpected(err);
+    }
+
+    // Resolve potential symlinks and relative elements.
+    char resolved[PATH_MAX];
+    if(realpath(buf.data(), resolved) == nullptr){
+        // If realpath fails, fall back to the _NSGetExecutablePath result.
+        return "\"" + std::string(buf.data()) + "\"";
+    }
+
+    return "\"" + std::string(resolved) + "\"";
 #else
     mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSUPPORTED_OS, {});
     return tl::unexpected(err);

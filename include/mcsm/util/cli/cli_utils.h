@@ -38,6 +38,7 @@ SOFTWARE.
     #include <errno.h>
 #endif
 #ifdef __APPLE__
+    #include <sys/wait.h>
     #include <mach-o/dyld.h>
 #endif
 
