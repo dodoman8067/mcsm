@@ -1,12 +1,12 @@
 #include <mcsm/command/server/jvm/subcommands/import.h>
 #include <mcsm/data/options/general_option.h>
 
-void mcsm::JvmImportSubCommand::copyToRepo(const mcsm::JvmOption& opt, const mcsm::SearchTarget& target){
+void mcsm::JvmImportSubCommand::copyToRepo(const mcsm::JvmOption& opt, const mcsm::SearchTarget& target, const std::string& name){
     std::string path = mcsm::unwrapOrExit(opt.getProfilePath());
     mcsm::Option a(path, opt.getProfileName());
 
     if(!mcsm::unwrapOrExit(a.exists())){
-        mcsm::warning("Cannot import JVM profile " + path + "/" + opt.getProfileName() + " that does not exist.");
+        mcsm::warning("Cannot import JVM profile " + path + "/" + opt.getProfileName() + ".json" + " that does not exist.");
         std::exit(1);
     }
     mcsm::unwrapOrExit(a.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled()));
@@ -19,7 +19,7 @@ void mcsm::JvmImportSubCommand::copyToRepo(const mcsm::JvmOption& opt, const mcs
         bPath = mcsm::asGlobalDataPath("/jvm/profiles");
     }
 
-    mcsm::Option b(bPath, opt.getProfileName());
+    mcsm::Option b(bPath, name);
     if(mcsm::unwrapOrExit(b.exists())){
         mcsm::warning("Cannot copy JVM profile to the following location \"" + bPath + "\" that already contains the file.");
         std::exit(1);
@@ -27,7 +27,7 @@ void mcsm::JvmImportSubCommand::copyToRepo(const mcsm::JvmOption& opt, const mcs
 
     mcsm::unwrapOrExit(b.load());
 
-    mcsm::info("Copying the following datas in " + mcsm::joinPath(path, opt.getProfileName()) + " to " + mcsm::joinPath(bPath, opt.getProfileName()));
+    mcsm::info("Copying the following datas in " + mcsm::joinPath(path, opt.getProfileName() + ".json") + " to " + mcsm::joinPath(bPath, name + ".json"));
 
     auto jArgs = mcsm::unwrapOrExit(opt.getJvmArguments());
 
@@ -51,7 +51,6 @@ void mcsm::JvmImportSubCommand::copyToRepo(const mcsm::JvmOption& opt, const mcs
         }
         std::cout << "\n";
     }
-    std::cout << a.getData() << "\n";
     mcsm::unwrapOrExit(b.save(a.getData()));
     mcsm::success("Copy successful.");
 }
@@ -97,13 +96,21 @@ mcsm::SearchTarget mcsm::JvmImportSubCommand::getSaveTarget(const mcsm::Argument
 void mcsm::JvmImportSubCommand::execute(const std::vector<std::string>& args){
     const std::vector<std::pair<std::string, std::vector<std::string>>> availableOptions = {
         {"path", {"p"}},
-        {"global", {"g"}}
+        {"global", {"g"}},
+        {"name", {"n"}}
     };
     mcsm::ArgumentParser parser(availableOptions, mcsm::vecToString(args));
     mcsm::SearchTarget target = getSaveTarget(parser);
     
     auto jvmOption = getJvmOption(parser);
-    copyToRepo(*jvmOption.get(), target);
+
+    std::string copyAsName;
+    if(parser.flagExists("name")){
+        copyAsName = parser.getValue("name");
+    }else{
+        copyAsName = jvmOption->getProfileName();
+    }
+    copyToRepo(*jvmOption, target, copyAsName);
 
     std::exit(0);
 }

@@ -11,7 +11,7 @@ namespace mcsm {
         
         std::unique_ptr<mcsm::JvmOption> getJvmOption(const mcsm::ArgumentParser& parser);
 
-        void copyToRepo(const mcsm::JvmOption& opt, const mcsm::SearchTarget& target);
+        void copyToRepo(const mcsm::JvmOption& opt, const mcsm::SearchTarget& target, const std::string& name);
     public:
         JvmImportSubCommand() = default;
         ~JvmImportSubCommand() = default;
