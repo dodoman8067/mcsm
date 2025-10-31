@@ -89,6 +89,29 @@ mcsm::StringResult mcsm::getJavaFromPath(){
                 found = pathStr.find_first_of(':');
             }
         }
+        if(mcsm::getCurrentOS() == mcsm::OS::MAC_OS){
+            std::string pathStr(path);
+
+            size_t found = pathStr.find_first_of(':');
+            while(found != std::string::npos){
+                std::string directory = pathStr.substr(0, found);
+                std::filesystem::path javaPath = std::filesystem::path(directory) / javaExecutable;
+
+                std::error_code ec;
+                bool exists = std::filesystem::exists(javaPath, ec);
+                if(ec){
+                    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::FILE_EXIST_CHECK_FAILED, {javaPath.string(), ec.message()});
+                    return tl::unexpected(err);
+                }
+
+                if(exists){
+                    return javaPath.string();
+                }
+
+                pathStr = pathStr.substr(found + 1);
+                found = pathStr.find_first_of(':');
+            }
+        }
     }
     return "";
 }
@@ -105,14 +128,14 @@ mcsm::StringResult mcsm::detectJava(){
             mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::WARNING, customTemp, {});
             return tl::unexpected(err);
         }
-        mcsm::info("Detected java from JAVA_HOME : " + str);
+        mcsm::info("Detected java from JAVA_HOME : " + mcsm::normalizePath(str));
         if(!mcsm::startsWith(str, "\"")){
             str = "\"" + str;
         }
         if(!mcsm::endsWith(str, "\"")){
             str = str + "\"";
         }
-        return str;
+        return mcsm::normalizePath(str);
     }
     mcsm::info("Failed to detect java from JAVA_HOME; Looking from PATH.");
     auto pSRes = getJavaFromPath();
@@ -155,7 +178,7 @@ mcsm::BoolResult mcsm::isValidJava(const std::string& path){
     }
     if(mcsm::getCurrentOS() == mcsm::OS::WINDOWS){
         command = "\""+ path + "\"" + " -version > NUL 2>&1";
-    }else if(mcsm::getCurrentOS() == mcsm::OS::LINUX){
+    }else if(mcsm::getCurrentOS() == mcsm::OS::LINUX || mcsm::getCurrentOS() == mcsm::OS::MAC_OS){
         command = path + " -version > /dev/null 2>&1";
     }
     
