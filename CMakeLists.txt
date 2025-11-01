@@ -3,7 +3,7 @@ project(mcsm)
 include(FetchContent)
 
 # Detect OS
-if(NOT LINUX AND NOT WIN32 AND NOT APPLE)
+if(NOT LINUX AND NOT WIN32 AND NOT APPLE AND NOT ANDROID)
     message(FATAL_ERROR "This platform is not supported")
 endif()
 
@@ -75,7 +75,17 @@ if(NOT tl-expected_FOUND)
 endif()
 
 if(LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
-    find_package(Backward REQUIRED)
+    if(USE_SYSTEM_DEPS)
+        find_package(Backward REQUIRED)
+    else()
+        # Also requires one of: libbfd (gnu binutils), libdwarf, libdw (elfutils)
+        FetchContent_Declare(backward
+            GIT_REPOSITORY https://github.com/bombela/backward-cpp
+            GIT_TAG master  # or a version tag, such as v1.6
+            SYSTEM          # optional, the Backward include directory will be treated as system directory
+        )
+        FetchContent_MakeAvailable(backward)
+    endif()
 endif()
 
 # Set include directory
