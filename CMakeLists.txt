@@ -74,7 +74,7 @@ if(NOT tl-expected_FOUND)
     message("-- [mcsm] Fetched tl::expected to " ${tl_expected_SOURCE_DIR} ".")
 endif()
 
-if(LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
+if(LINUX AND NOT ANDROID AND CMAKE_BUILD_TYPE MATCHES Debug)
     if(USE_SYSTEM_DEPS)
         find_package(Backward REQUIRED)
     else()
@@ -136,7 +136,7 @@ if(CMAKE_BUILD_TYPE MATCHES Release)
 endif()
 
 # Add executable
-if(LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
+if(LINUX AND NOT ANDROID AND CMAKE_BUILD_TYPE MATCHES Debug)
     add_executable(mcsm ${SRC_FILES} ${RESOURCE_FILE} backward/backward.cpp)
 else()
     add_executable(mcsm ${SRC_FILES} ${RESOURCE_FILE})
@@ -167,6 +167,6 @@ target_link_libraries(mcsm
     tl::expected
 )
 
-if(LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
+if(LINUX AND NOT ANDROID AND CMAKE_BUILD_TYPE MATCHES Debug)
     target_link_libraries(mcsm PRIVATE Backward::Backward)
 endif()
