@@ -46,6 +46,7 @@ endif()
 # prefer system if available, otherwise fetch pinned tag
 if (USE_SYSTEM_DEPS)
     find_package(nlohmann_json REQUIRED) # provides nlohmann_json::nlohmann_json
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMCSM_NLOHMANN_VER=\\\"${nlohmann_json_VERSION}\\\"")
 endif()
 if (NOT nlohmann_json_FOUND)
     FetchContent_Declare(nlohmann_json
@@ -53,6 +54,7 @@ if (NOT nlohmann_json_FOUND)
         GIT_TAG v3.12.0
     )
     FetchContent_MakeAvailable(nlohmann_json)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMCSM_NLOHMANN_VER=\\\"3.12.0\\\"")
 endif()
 
 # --- tl::expected (header-only) ---
@@ -105,8 +107,8 @@ if(NOT CMAKE_BUILD_TYPE)
 endif()
 
 # Set compiler options
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -DMCSM_NLOHMANN_VER=\\\"${nlohmann_json_VERSION}\\\"")
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "AppleClang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
         set(CMAKE_CXX_FLAGS_DEBUG "-g -DMCSM_DEBUG -fsanitize=address,undefined -fno-omit-frame-pointer -fsanitize-address-use-after-scope")
     elseif(APPLE AND CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
