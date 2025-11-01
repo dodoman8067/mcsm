@@ -5,7 +5,7 @@
 #include <mcsm/http/holder.h>
 #include <mcsm/command/command_manager.h>
 #include <csignal>
-#ifdef __linux__
+#if defined(__linux__) && !defined(__ANDROID__)
     #include <execinfo.h>
 #endif
 

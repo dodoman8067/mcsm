@@ -36,9 +36,9 @@ void mcsm::signal_handler::handle(int signal){
     std::cerr << "[mcsm/FATAL] Please report this to my Github (https://github.com/dodoman8067/mcsm) and explain how you encountered this error.\n";
     mcsm::resetcol();
 
-    #ifdef __linux__
+    #if defined(__linux__) && !defined(__ANDROID__)
         mcsm::setcol(mcsm::NamedColor::DARK_RED);
-        std::cerr << "[mcsm/FATAL] POSIX detected. Will try to print stacktrace.\n";
+        std::cerr << "[mcsm/FATAL] General Linux distribution detected. Will try to print stacktrace.\n";
         mcsm::resetcol();
 
         std::vector<void*> array(50);
