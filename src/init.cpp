@@ -78,21 +78,6 @@ void mcsm::init::initCommands(const std::string& version){
     generateServerCommand->addAlias("initserver");
     mcsm::CommandManager::addCommand(std::move(generateServerCommand));
 
-    std::unique_ptr<mcsm::JvmOptionGeneratorCommand> jvmOptionGeneratorCommand = std::make_unique<mcsm::JvmOptionGeneratorCommand>("genJvmProfile", "Generates a Java Virtual Machine launch profile.");
-    jvmOptionGeneratorCommand->addAlias("generatejvmprofile");
-    jvmOptionGeneratorCommand->addAlias("genjvmprofile");
-    mcsm::CommandManager::addCommand(std::move(jvmOptionGeneratorCommand));
-
-    std::unique_ptr<mcsm::JvmOptionSearchCommand> jvmProfileSearchCommand = std::make_unique<mcsm::JvmOptionSearchCommand>("searchJvmProfile", "Looks up Java Virtual Machine profiles.");
-    jvmProfileSearchCommand->addAlias("searchprofile");
-    jvmProfileSearchCommand->addAlias("searchjvmprofile");
-    mcsm::CommandManager::addCommand(std::move(jvmProfileSearchCommand));
-
-    std::unique_ptr<mcsm::JvmOptionEditCommand> jvmOptionEditCommand = std::make_unique<mcsm::JvmOptionEditCommand>("editJvmProfile", "Edits the specified Java Virtual Machine launch profile.");
-    jvmOptionEditCommand->addAlias("editjvmprofile");
-    jvmOptionEditCommand->addAlias("editprofile");
-    mcsm::CommandManager::addCommand(std::move(jvmOptionEditCommand));
-
     std::unique_ptr<mcsm::StartServerCommand> startServerCommand = std::make_unique<mcsm::StartServerCommand>("start", "Starts the configured server.");
     startServerCommand->addAlias("startserver");
     mcsm::CommandManager::addCommand(std::move(startServerCommand));

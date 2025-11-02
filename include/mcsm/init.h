@@ -7,10 +7,7 @@
 #include <mcsm/command/util/help_command.h>
 #include <mcsm/command/server/generate_server_command.h>
 #include <mcsm/command/server/start_server_command.h>
-#include <mcsm/command/server/jvm/jvm_option_generator_command.h>
-#include <mcsm/command/server/jvm/jvm_option_search_command.h>
 #include <mcsm/command/server/jvm/jvm_test_command.h>
-#include <mcsm/command/server/jvm/jvm_option_edit_command.h>
 #include <mcsm/command/server/view_server_command.h>
 #include <mcsm/command/server/view_server_type_command.h>
 #include <mcsm/command/server/clear_server_command.h>
