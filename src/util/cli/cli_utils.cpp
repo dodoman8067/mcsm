@@ -22,6 +22,8 @@ SOFTWARE.
 
 #include <mcsm/util/cli/cli_utils.h>
 
+extern char **environ;
+
 mcsm::IntResult mcsm::runCommandQuietly(const std::string& command){
     if(mcsm::getCurrentOS() == mcsm::OS::WINDOWS){
         std::string cmd = command + " > NUL 2>&1";
@@ -31,7 +33,17 @@ mcsm::IntResult mcsm::runCommandQuietly(const std::string& command){
         #ifdef __linux__
             std::string shellPath;
             shellPath = mcsm::getEnvStr("SHELL");
-            if(mcsm::isWhitespaceOrEmpty(shellPath)) shellPath = "sh";
+            if(mcsm::isWhitespaceOrEmpty(shellPath)){ 
+                shellPath = "/bin/sh";
+            }else{
+                bool looks_posix =
+                    mcsm::endsWith(shellPath, "sh")   ||
+                    mcsm::endsWith(shellPath, "bash") ||
+                    mcsm::endsWith(shellPath, "zsh")  ||
+                    mcsm::endsWith(shellPath, "ksh")  ||
+                    mcsm::endsWith(shellPath, "dash");
+                if (!looks_posix) shellPath = "/bin/sh";
+            }
             const char* argv[] = { shellPath.c_str(), "-c", cmd.c_str(), nullptr };
 
             pid_t pid;
@@ -54,7 +66,17 @@ mcsm::IntResult mcsm::runCommandQuietly(const std::string& command){
         #ifdef __APPLE__
             std::string shellPath;
             shellPath = mcsm::getEnvStr("SHELL");
-            if(mcsm::isWhitespaceOrEmpty(shellPath)) shellPath = "sh";
+            if(mcsm::isWhitespaceOrEmpty(shellPath)){ 
+                shellPath = "/bin/sh";
+            }else{
+                bool looks_posix =
+                    mcsm::endsWith(shellPath, "sh")   ||
+                    mcsm::endsWith(shellPath, "bash") ||
+                    mcsm::endsWith(shellPath, "zsh")  ||
+                    mcsm::endsWith(shellPath, "ksh")  ||
+                    mcsm::endsWith(shellPath, "dash");
+                if (!looks_posix) shellPath = "/bin/sh";
+            }
             const char* argv[] = { shellPath.c_str(), "-c", cmd.c_str(), nullptr };
 
             pid_t pid;
@@ -85,7 +107,17 @@ mcsm::IntResult mcsm::runCommand(const std::string& command){
         #ifdef __linux__
             std::string shellPath;
             shellPath = mcsm::getEnvStr("SHELL");
-            if(mcsm::isWhitespaceOrEmpty(shellPath)) shellPath = "sh";
+            if(mcsm::isWhitespaceOrEmpty(shellPath)){ 
+                shellPath = "/bin/sh";
+            }else{
+                bool looks_posix =
+                    mcsm::endsWith(shellPath, "sh")   ||
+                    mcsm::endsWith(shellPath, "bash") ||
+                    mcsm::endsWith(shellPath, "zsh")  ||
+                    mcsm::endsWith(shellPath, "ksh")  ||
+                    mcsm::endsWith(shellPath, "dash");
+                if (!looks_posix) shellPath = "/bin/sh";
+            }
             const char* argv[] = { shellPath.c_str(), "-c", command.c_str(), nullptr };
 
             pid_t pid;
@@ -107,7 +139,17 @@ mcsm::IntResult mcsm::runCommand(const std::string& command){
         #ifdef __APPLE__
             std::string shellPath;
             shellPath = mcsm::getEnvStr("SHELL");
-            if(mcsm::isWhitespaceOrEmpty(shellPath)) shellPath = "sh";
+            if(mcsm::isWhitespaceOrEmpty(shellPath)){ 
+                shellPath = "/bin/sh";
+            }else{
+                bool looks_posix =
+                    mcsm::endsWith(shellPath, "sh")   ||
+                    mcsm::endsWith(shellPath, "bash") ||
+                    mcsm::endsWith(shellPath, "zsh")  ||
+                    mcsm::endsWith(shellPath, "ksh")  ||
+                    mcsm::endsWith(shellPath, "dash");
+                if (!looks_posix) shellPath = "/bin/sh";
+            }
             const char* argv[] = { shellPath.c_str(), "-c", command.c_str(), nullptr };
 
             pid_t pid;
