@@ -35,10 +35,12 @@ SOFTWARE.
 #include <climits>
 #ifdef __linux__
     #include <unistd.h>
+    #include <spawn.h>
     #include <sys/wait.h>
     #include <errno.h>
 #endif
 #ifdef __APPLE__
+    #include <spawn.h>
     #include <sys/wait.h>
     #include <mach-o/dyld.h>
 #endif

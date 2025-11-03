@@ -29,11 +29,21 @@ mcsm::IntResult mcsm::runCommandQuietly(const std::string& command){
     }else if(mcsm::getCurrentOS() == mcsm::OS::LINUX){
         std::string cmd = command + " > /dev/null 2>&1";
         #ifdef __linux__
-            int code = std::system(cmd.c_str());
-            if(WIFEXITED(code)){
-                int finalCode = WEXITSTATUS(code);
-                return finalCode;
+            std::string shellPath;
+            shellPath = mcsm::getEnvStr("SHELL");
+            if(mcsm::isWhitespaceOrEmpty(shellPath)) shellPath = "sh";
+            const char* argv[] = { shellPath.c_str(), "-c", cmd.c_str(), nullptr };
+
+            pid_t pid;
+            int rc = posix_spawn(&pid, shellPath.c_str(), nullptr, nullptr, const_cast<char* const*>(argv), environ);
+            if(rc != 0) return rc;
+
+            int st = 0;
+            if(waitpid(pid, &st, 0) == -1) return 1;
+            if(WIFEXITED(st)){ 
+                return WEXITSTATUS(st);
             }else{
+                mcsm::warning("Abnormal WIFEXITED detected; shell command: " + cmd);
                 return 1;
             }
         #else
@@ -42,11 +52,21 @@ mcsm::IntResult mcsm::runCommandQuietly(const std::string& command){
     }else if(mcsm::getCurrentOS() == mcsm::OS::MAC_OS){
         std::string cmd = command + " > /dev/null 2>&1";
         #ifdef __APPLE__
-            int code = std::system(cmd.c_str());
-            if(WIFEXITED(code)){
-                int finalCode = WEXITSTATUS(code);
-                return finalCode;
+            std::string shellPath;
+            shellPath = mcsm::getEnvStr("SHELL");
+            if(mcsm::isWhitespaceOrEmpty(shellPath)) shellPath = "sh";
+            const char* argv[] = { shellPath.c_str(), "-c", cmd.c_str(), nullptr };
+
+            pid_t pid;
+            int rc = posix_spawn(&pid, shellPath.c_str(), nullptr, nullptr, const_cast<char* const*>(argv), environ);
+            if(rc != 0) return rc;
+
+            int st = 0;
+            if(waitpid(pid, &st, 0) == -1) return 1;
+            if(WIFEXITED(st)){ 
+                return WEXITSTATUS(st);
             }else{
+                mcsm::warning("Abnormal WIFEXITED detected; shell command: " + cmd);
                 return 1;
             }
         #else
@@ -63,11 +83,21 @@ mcsm::IntResult mcsm::runCommand(const std::string& command){
         return std::system(command.c_str());
     }else if(mcsm::getCurrentOS() == mcsm::OS::LINUX){
         #ifdef __linux__
-            int code = std::system(command.c_str());
-            if(WIFEXITED(code)){
-                int finalCode = WEXITSTATUS(code);
-                return finalCode;
+            std::string shellPath;
+            shellPath = mcsm::getEnvStr("SHELL");
+            if(mcsm::isWhitespaceOrEmpty(shellPath)) shellPath = "sh";
+            const char* argv[] = { shellPath.c_str(), "-c", command.c_str(), nullptr };
+
+            pid_t pid;
+            int rc = posix_spawn(&pid, shellPath.c_str(), nullptr, nullptr, const_cast<char* const*>(argv), environ);
+            if(rc != 0) return rc;
+
+            int st = 0;
+            if(waitpid(pid, &st, 0) == -1) return 1;
+            if(WIFEXITED(st)){ 
+                return WEXITSTATUS(st);
             }else{
+                mcsm::warning("Abnormal WIFEXITED detected; shell command: " + command);
                 return 1;
             }
         #else
@@ -75,11 +105,21 @@ mcsm::IntResult mcsm::runCommand(const std::string& command){
         #endif
     }else if(mcsm::getCurrentOS() == mcsm::OS::MAC_OS){
         #ifdef __APPLE__
-            int code = std::system(command.c_str());
-            if(WIFEXITED(code)){
-                int finalCode = WEXITSTATUS(code);
-                return finalCode;
+            std::string shellPath;
+            shellPath = mcsm::getEnvStr("SHELL");
+            if(mcsm::isWhitespaceOrEmpty(shellPath)) shellPath = "sh";
+            const char* argv[] = { shellPath.c_str(), "-c", command.c_str(), nullptr };
+
+            pid_t pid;
+            int rc = posix_spawn(&pid, shellPath.c_str(), nullptr, nullptr, const_cast<char* const*>(argv), environ);
+            if(rc != 0) return rc;
+
+            int st = 0;
+            if(waitpid(pid, &st, 0) == -1) return 1;
+            if(WIFEXITED(st)){ 
+                return WEXITSTATUS(st);
             }else{
+                mcsm::warning("Abnormal WIFEXITED detected; shell command: " + command);
                 return 1;
             }
         #else
