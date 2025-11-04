@@ -31,27 +31,26 @@ std::set<std::string> addJavasFromEnv(){
     }
 
     #ifdef _WIN32
-        auto env = mcsm::getEnvStr("PATH");
-        std::set<std::string> entries;
+        auto env1 = mcsm::getEnvStr("PATH");
 
-        std::string mcsmPathStr(env);
-        mcsm::replaceAll(mcsmPathStr, "\\", "/");
+        std::string mcsmPathStr1(env1);
+        mcsm::replaceAll(mcsmPathStr1, "\\", "/");
 
-        size_t found = mcsmPathStr.find_first_of(';');
-        while(found != std::string::npos){
-            std::string directory = mcsmPathStr.substr(0, found);
-            std::filesystem::path javaPath = std::filesystem::path(directory) / javaExecutable;
+        size_t found1 = mcsmPathStr1.find_first_of(';');
+        while(found1 != std::string::npos){
+            std::string directory1 = mcsmPathStr1.substr(0, found1);
+            std::filesystem::path javaPath1 = std::filesystem::path(directory1) / javaExecutable;
 
             std::error_code ec;
-            bool exists = std::filesystem::exists(javaPath, ec);
+            bool exists = std::filesystem::exists(javaPath1, ec);
             if(ec){
                 continue;
             }
             if(exists){
-                entries.insert({javaPath.string()});
+                entries.insert({javaPath1.string()});
             }
-            mcsmPathStr = mcsmPathStr.substr(found + 1);
-            found = mcsmPathStr.find_first_of(';');
+            mcsmPathStr1 = mcsmPathStr1.substr(found1 + 1);
+            found1 = mcsmPathStr1.find_first_of(';');
         }
     #endif
     return entries;
