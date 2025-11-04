@@ -7,7 +7,7 @@ mcsm::VoidResult mcsm::ServerGroupGenerator::generate(const std::string& mode){
 
 mcsm::VoidResult mcsm::ServerGroupGenerator::generate(const std::string& mode, const std::vector<const mcsm::ServerConfigLoader*> servers){
     if(mode != "screen" && mode != "default"){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_GROUP_MODE_INVALID, {mode});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_GROUP_MODE_INVALID, {mode});
         return tl::unexpected(err);
     }
 
@@ -18,7 +18,7 @@ mcsm::VoidResult mcsm::ServerGroupGenerator::generate(const std::string& mode, c
     if(exists.value()){
         auto customTemp = mcsm::errors::SERVER_ALREADY_CONFIGURED;
         customTemp.message = "Server group file already exists at: " + this->handle->getPath();
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {mode});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {mode});
         return tl::unexpected(err);
     }
 
@@ -28,7 +28,7 @@ mcsm::VoidResult mcsm::ServerGroupGenerator::generate(const std::string& mode, c
     if(singleConfigExists.value()){
         auto customTemp = mcsm::errors::SERVER_ALREADY_CONFIGURED;
         customTemp.message = "Cannot create server group config file where a single server is already configured: " + this->handle->getPath();
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {mode});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {mode});
         return tl::unexpected(err);
     }
 

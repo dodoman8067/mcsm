@@ -95,7 +95,7 @@ mcsm::IntResult mcsm::runCommandQuietly(const std::string& command){
             return 1;
         #endif
     }else{
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSUPPORTED_OS, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSUPPORTED_OS, {});
         return tl::unexpected(err);
     }
 }
@@ -168,7 +168,7 @@ mcsm::IntResult mcsm::runCommand(const std::string& command){
             return 1;
         #endif
     }else{
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSUPPORTED_OS, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSUPPORTED_OS, {});
         return tl::unexpected(err);
     }
 }
@@ -177,7 +177,7 @@ mcsm::StringResult mcsm::getCurrentPath(){
     std::error_code ec;
     std::string path = std::filesystem::current_path(ec).string();
     if(ec){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::CURRENT_PATH_UNCATCHABLE, {ec.message()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::CURRENT_PATH_UNCATCHABLE, {ec.message()});
         return tl::unexpected(err);
     }
     return path;
@@ -208,7 +208,7 @@ mcsm::BoolResult mcsm::ensureDataDir() {
     if (dir != "./mcsm") return true;
     auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
     customTemp.message = "Invalid data path set: " + dir + " \nPlease make sure proper environment variables are set and directories are present.\nWindows: LOCALAPPDATA or fallback: USERPROFILE, Linux: XDG_DATA_HOME or fallback: HOME";
-    return tl::unexpected(mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {}));
+    return tl::unexpected(mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {}));
 }
 
 mcsm::BoolResult mcsm::ensureConfigDir() {
@@ -216,14 +216,14 @@ mcsm::BoolResult mcsm::ensureConfigDir() {
     if (dir != "./mcsm") return true;
     auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
     customTemp.message = "Invalid config path set: " + dir + " \nPlease make sure proper environment variables are set and directories are present.\nWindows: APPDATA or fallback: USERPROFILE, Linux: XDG_CONFIG_HOME or fallback: HOME";
-    return tl::unexpected(mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {}));
+    return tl::unexpected(mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {}));
 }
 
 mcsm::BoolResult mcsm::fileExists(const std::string& path){
     std::error_code ec;
     bool exists = std::filesystem::exists(path, ec);
     if(ec){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::FILE_EXIST_CHECK_FAILED, {path, ec.message()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::FILE_EXIST_CHECK_FAILED, {path, ec.message()});
         return tl::unexpected(err);
     }
     return exists;
@@ -234,7 +234,7 @@ mcsm::BoolResult mcsm::removeFile(const std::string& path){
     const bool removed = std::filesystem::remove(path, ec);
     if(ec){
         return tl::unexpected(mcsm::makeError(
-            mcsm::ErrorStatus::ERROR,
+            mcsm::ErrorStatus::MCSM_FAIL,
             mcsm::errors::FILE_REMOVE_FAILED,
             {path, ec.message()}
         ));
@@ -308,7 +308,7 @@ mcsm::StringResult mcsm::getExecutablePath(){
     ssize_t len = readlink("/proc/self/exe", buf, sizeof(buf) - 1);
 
     if(len == -1){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED, {"readlink", std::string(strerror(errno))});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED, {"readlink", std::string(strerror(errno))});
         return tl::unexpected(err);
     }
 
@@ -319,7 +319,7 @@ mcsm::StringResult mcsm::getExecutablePath(){
     DWORD len = GetModuleFileNameA(NULL, buf, MAX_PATH);
 
     if(len == 0 || len == MAX_PATH){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED, {"GetModuleFileName", "unknown"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED, {"GetModuleFileName", "unknown"});
         return tl::unexpected(err);
     }
 
@@ -337,7 +337,7 @@ mcsm::StringResult mcsm::getExecutablePath(){
 
     if(rc != 0){
         mcsm::Error err = mcsm::makeError(
-            mcsm::ErrorStatus::ERROR,
+            mcsm::ErrorStatus::MCSM_FAIL,
             mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED,
             {"_NSGetExecutablePath", "unknown"}
         );
@@ -353,7 +353,7 @@ mcsm::StringResult mcsm::getExecutablePath(){
 
     return "\"" + std::string(resolved) + "\"";
 #else
-    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSUPPORTED_OS, {});
+    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSUPPORTED_OS, {});
     return tl::unexpected(err);
 #endif
 }

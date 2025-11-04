@@ -45,7 +45,7 @@ tl::expected<mcsm::GeneralProperty*, mcsm::Error> mcsm::ServerRegistry::getGener
     if(it != this->generalProperties.end()){
         return it->second.get();
     }
-    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, {700, "Not a registered property: " + name, ""});
+    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, {700, "Not a registered property: " + name, ""});
     return tl::unexpected(err);
 }
 
@@ -63,7 +63,7 @@ tl::expected<mcsm::Server*, mcsm::Error> mcsm::ServerRegistry::getServer(const s
     if(it != this->serverFactories.end()){
         return it->second.get();
     }
-    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, {700, "Server type not found: " + name, ""});
+    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, {700, "Server type not found: " + name, ""});
     return tl::unexpected(err);
 }
 
@@ -73,6 +73,6 @@ mcsm::StringResult mcsm::ServerRegistry::getServerTypeString(const mcsm::ServerT
             return id;
         }
     }
-    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, {700, "Server type not found(likely unregistered)", ""});
+    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, {700, "Server type not found(likely unregistered)", ""});
     return tl::unexpected(err);
 }

@@ -28,14 +28,14 @@ mcsm::PurpurServer::~PurpurServer() {}
 
 mcsm::IntResult mcsm::PurpurServer::getVersion(const std::string& ver) const {
     if(!mcsm::isSafeString(ver)){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {ver});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {ver});
         return tl::unexpected(err);
     }
     auto res = mcsm::get("https://api.purpurmc.org/v2/purpur/" + ver);
     if(!res) return tl::unexpected(res.error());
     nlohmann::json json = nlohmann::json::parse(res.value(), nullptr, false);
     if(json.is_discarded()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://api.purpurmc.org/v2/purpur/" + ver, "Invalid API json responce"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::GET_REQUEST_FAILED, {"https://api.purpurmc.org/v2/purpur/" + ver, "Invalid API json responce"});
         return tl::unexpected(err);
     }
     if(json["builds"] != nullptr){
@@ -49,18 +49,18 @@ mcsm::IntResult mcsm::PurpurServer::getVersion(const std::string& ver) const {
 
 mcsm::IntResult mcsm::PurpurServer::getVersion(const std::string& ver, const std::string& build) const {
     if(!mcsm::isSafeString(build)){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {build});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {build});
         return tl::unexpected(err);
     }
     if(!mcsm::isSafeString(ver)){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {ver});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {ver});
         return tl::unexpected(err);
     }
     auto res = mcsm::get("https://api.purpurmc.org/v2/purpur/" + ver + "/" +  build);
     if(!res) return tl::unexpected(res.error());
     nlohmann::json json = nlohmann::json::parse(res.value(), nullptr, false);
     if(json.is_discarded()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://api.purpurmc.org/v2/purpur/" + ver + "/" + build, "Invalid API json responce"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::GET_REQUEST_FAILED, {"https://api.purpurmc.org/v2/purpur/" + ver + "/" + build, "Invalid API json responce"});
         return tl::unexpected(err);
     }
 
@@ -127,7 +127,7 @@ mcsm::VoidResult mcsm::PurpurServer::download(const std::string& version, const 
     auto optExists = opt.exists();
     if(!optExists) return tl::unexpected(optExists.error());
     if(!optExists.value()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_NOT_CONFIGURED, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_NOT_CONFIGURED, {});
         return tl::unexpected(err);
     }
 
@@ -144,15 +144,15 @@ mcsm::VoidResult mcsm::PurpurServer::download(const std::string& version, const 
 
     nlohmann::json typeValue = tVRes.value();
     if(typeValue == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"type\"", opt.getName(), "change it into \"type\": \"[yourtype]\""});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"type\"", opt.getName(), "change it into \"type\": \"[yourtype]\""});
         return tl::unexpected(err);
     }
     if(!typeValue.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"type\"", opt.getName(), "string", "change it into \"type\": \"[yourtype]\""});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"type\"", opt.getName(), "string", "change it into \"type\": \"[yourtype]\""});
         return tl::unexpected(err);
     }
     if(typeValue != "purpur"){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_WRONG_INSTANCE_GENERATED, {"Purpur"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_WRONG_INSTANCE_GENERATED, {"Purpur"});
         return tl::unexpected(err);
     }
 
@@ -162,11 +162,11 @@ mcsm::VoidResult mcsm::PurpurServer::download(const std::string& version, const 
     nlohmann::json serverBuildValue = sBVRes.value();
 
     if(serverBuildValue == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"server_build\"", opt.getName(), "add \"server_build\": \"latest\" to server.json for automatic download"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"server_build\"", opt.getName(), "add \"server_build\": \"latest\" to server.json for automatic download"});
         return tl::unexpected(err);
     }
     if(!serverBuildValue.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"server_build\"", opt.getName(), "string", "change it into \"server_build\": \"latest\""});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"server_build\"", opt.getName(), "string", "change it into \"server_build\": \"latest\""});
         return tl::unexpected(err);
     }
     if(serverBuildValue != "latest"){
@@ -175,7 +175,7 @@ mcsm::VoidResult mcsm::PurpurServer::download(const std::string& version, const 
         if(!ver) return tl::unexpected(ver.error());
 
         if(ver.value() == -1){
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {build});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {build});
             return tl::unexpected(err);
         }
         std::string strVer = std::to_string(ver.value());
@@ -189,7 +189,7 @@ mcsm::VoidResult mcsm::PurpurServer::download(const std::string& version, const 
         if(!ver) return tl::unexpected(ver.error());
 
         if(ver.value() == -1){
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {});
             return tl::unexpected(err);
         }
         std::string strVer = std::to_string(ver.value());
@@ -285,7 +285,7 @@ mcsm::VoidResult mcsm::PurpurServer::update(const std::string& path, const std::
     if(!verRes) return tl::unexpected(verRes.error());
     int ver = verRes.value();
     if(ver == -1){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {});
         return tl::unexpected(err);
     }
 
@@ -318,13 +318,13 @@ mcsm::VoidResult mcsm::PurpurServer::generate(const std::string& name, mcsm::Jvm
     mcsm::GeneralProperty* property = mcsm::GeneralOption::getGeneralOption().getProperty("skip_version_check_while_configuring");
 
     if(property == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"skip_version_check_while_configuring", "general option", "\"skip_version_check_while_configuring\": false"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"skip_version_check_while_configuring", "general option", "\"skip_version_check_while_configuring\": false"});
         return tl::unexpected(err);
     }
 
     const nlohmann::json& propertyValue = property->getCurrentValue();
     if(!propertyValue.is_boolean()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"skip_version_check_while_configuring", "general option", "boolean", "false or true"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"skip_version_check_while_configuring", "general option", "boolean", "false or true"});
         return tl::unexpected(err);
     }
 
@@ -334,7 +334,7 @@ mcsm::VoidResult mcsm::PurpurServer::generate(const std::string& name, mcsm::Jvm
         auto vExists = this->hasVersion(version);
         if(!vExists) return tl::unexpected(vExists.error());
         if(!vExists.value()){
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {});
             return tl::unexpected(err);
         }
     }

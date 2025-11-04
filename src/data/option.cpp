@@ -46,7 +46,7 @@ mcsm::BoolResult mcsm::Option::createDirectories(const std::string &dirName, std
             err.clear();
             return true;
         }else {
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::FILE_CREATE_FAILED, {"directory " + dirName});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::FILE_CREATE_FAILED, {"directory " + dirName});
             return tl::unexpected(err);
         }
         return false;
@@ -62,7 +62,7 @@ mcsm::VoidResult mcsm::Option::create(){
         if(!cdRes) return tl::unexpected(cdRes.error());
         std::ofstream ofs(fullPath);
         if(!ofs.is_open()){
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::FILE_CREATE_FAILED, {fullPath});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::FILE_CREATE_FAILED, {fullPath});
             return tl::unexpected(err);
         }
         
@@ -70,7 +70,7 @@ mcsm::VoidResult mcsm::Option::create(){
         ofs.close();
         return {};
     }
-    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::FILE_CREATE_FAILED, {fullPath});
+    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::FILE_CREATE_FAILED, {fullPath});
     return tl::unexpected(err);
 }
 
@@ -91,7 +91,7 @@ mcsm::VoidResult mcsm::Option::load(const bool& advancedParse){
 
     std::ifstream fileStream(fullPath);
     if(!fileStream.is_open()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::FILE_OPEN_FAILED, {fullPath});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::FILE_OPEN_FAILED, {fullPath});
         return tl::unexpected(err);
     }
 
@@ -104,13 +104,13 @@ mcsm::VoidResult mcsm::Option::load(const bool& advancedParse){
         try {
             finalValue = nlohmann::json::parse(content);
         }catch (const nlohmann::json::parse_error& e){
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, {203, "Json parsed failed in " + fullPath + " with reason: " + std::string(e.what()) + "\nByte position of error: " + std::to_string(e.byte), ""}, {});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, {203, "Json parsed failed in " + fullPath + " with reason: " + std::string(e.what()) + "\nByte position of error: " + std::to_string(e.byte), ""}, {});
             return tl::unexpected(err);
         }
     }else{
         finalValue = nlohmann::json::parse(content, nullptr, false);
         if(finalValue.is_discarded()) {
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_PARSE_FAILED, {fullPath});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_PARSE_FAILED, {fullPath});
             return tl::unexpected(err);
         }
     }
@@ -121,7 +121,7 @@ mcsm::VoidResult mcsm::Option::load(const bool& advancedParse){
 
 tl::expected<nlohmann::json, mcsm::Error> mcsm::Option::getValue(const std::string& key) const {
     if(this->data == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, {700, "Option's get/set function called without being loaded.", ""}, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, {700, "Option's get/set function called without being loaded.", ""}, {});
         return tl::unexpected(err);
     }
     const nlohmann::json& jsonData = this->data;
@@ -135,7 +135,7 @@ tl::expected<nlohmann::json, mcsm::Error> mcsm::Option::getValue(const std::stri
 
 mcsm::BoolResult mcsm::Option::hasValue(const std::string& key) const {
     if(this->data == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, {700, "Option's get/set function called without being loaded.", ""}, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, {700, "Option's get/set function called without being loaded.", ""}, {});
         return tl::unexpected(err);
     }
     return this->data.find(key) != this->data.end();
@@ -152,7 +152,7 @@ bool mcsm::Option::isGlobal() const {
 
 mcsm::VoidResult mcsm::Option::setValue(const std::string& key, const nlohmann::json& value){
     if(this->data == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, {700, "Option's get/set function called without being loaded.", ""}, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, {700, "Option's get/set function called without being loaded.", ""}, {});
         return tl::unexpected(err);
     }
     const std::string& fullPath = this->path + "/" + this->name;
@@ -169,7 +169,7 @@ mcsm::VoidResult mcsm::Option::save(){
         outFile << this->data.dump(2); 
         outFile.close();
     }else{
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::FILE_SAVE_FAILED, {fullPath});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::FILE_SAVE_FAILED, {fullPath});
         return tl::unexpected(err);
     }
     return {};
@@ -183,7 +183,7 @@ mcsm::VoidResult mcsm::Option::save(const nlohmann::json& json){
         outFile << this->data.dump(2); 
         outFile.close();
     }else{
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::FILE_SAVE_FAILED, {fullPath});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::FILE_SAVE_FAILED, {fullPath});
         return tl::unexpected(err);
     }
     return {};
@@ -196,7 +196,7 @@ mcsm::VoidResult mcsm::Option::reset(){
         outFile << "{}";
         outFile.close();
     }else{
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::FILE_SAVE_FAILED, {fullPath});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::FILE_SAVE_FAILED, {fullPath});
         return tl::unexpected(err);
     }
     return {};

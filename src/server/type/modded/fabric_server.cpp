@@ -32,14 +32,14 @@ mcsm::FabricServer::~FabricServer() {}
  */
 mcsm::StringResult mcsm::FabricServer::getVersion(const std::string& ver) const {
     if(!mcsm::isSafeString(ver)){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {ver});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {ver});
         return tl::unexpected(err);
     }
     auto res = mcsm::get("https://meta.fabricmc.net/v2/versions/loader/" + ver);
     if(!res) return res;
     nlohmann::json json = nlohmann::json::parse(res.value(), nullptr, false);
     if(json.is_discarded()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://meta.fabricmc.net/v2/versions/loader/" + ver, "Invalid API json responce"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::GET_REQUEST_FAILED, {"https://meta.fabricmc.net/v2/versions/loader/" + ver, "Invalid API json responce"});
         return tl::unexpected(err);
     }
     if(json.is_array() && !json.empty()){
@@ -60,7 +60,7 @@ mcsm::StringResult mcsm::FabricServer::getVersion() const {
     if(!res) return res;
     nlohmann::json json = nlohmann::json::parse(res.value(), nullptr, false);
     if(json.is_discarded()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {"https://meta.fabricmc.net/v2/versions/installer", "Invalid API json responce"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::GET_REQUEST_FAILED, {"https://meta.fabricmc.net/v2/versions/installer", "Invalid API json responce"});
         return tl::unexpected(err);
     }
     if(json.is_array() && !json.empty()){
@@ -126,7 +126,7 @@ mcsm::VoidResult mcsm::FabricServer::download(const std::string& version, const 
     auto optExists = opt.exists();
     if(!optExists) return tl::unexpected(optExists.error());
     if(!optExists.value()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_NOT_CONFIGURED, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_NOT_CONFIGURED, {});
         return tl::unexpected(err);
     }
 
@@ -139,15 +139,15 @@ mcsm::VoidResult mcsm::FabricServer::download(const std::string& version, const 
     if(!sTREs) return tl::unexpected(sTREs.error());
     nlohmann::json sType = sTREs.value();
     if(sType == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"type\"", opt.getName(), "add \"type\": \"[yourtype]\""});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"type\"", opt.getName(), "add \"type\": \"[yourtype]\""});
         return tl::unexpected(err);
     }
     if(!sType.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"type\"", opt.getName(), "string", "change it into \"type\": \"[yourtype]\""});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"type\"", opt.getName(), "string", "change it into \"type\": \"[yourtype]\""});
         return tl::unexpected(err);
     }
     if(sType != "fabric"){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_WRONG_INSTANCE_GENERATED, {"Fabric"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_WRONG_INSTANCE_GENERATED, {"Fabric"});
         return tl::unexpected(err);
     }
 
@@ -156,17 +156,17 @@ mcsm::VoidResult mcsm::FabricServer::download(const std::string& version, const 
     nlohmann::json sLoaderVer = sLGREs.value();
 
     if(sLoaderVer == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"loader_version\"", opt.getName(), "add \"loader_version\": \"latest\" to server.json for automatic download"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"loader_version\"", opt.getName(), "add \"loader_version\": \"latest\" to server.json for automatic download"});
         return tl::unexpected(err);
     }
     if(!sLoaderVer.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"loader_version\"", opt.getName(), "string", "add \"loader_version\": \"latest\" to server.json for automatic download."});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"loader_version\"", opt.getName(), "string", "add \"loader_version\": \"latest\" to server.json for automatic download."});
         return tl::unexpected(err);
     }
     if(sLoaderVer != "latest"){
         loaderVer = sLoaderVer.get<std::string>();
         if(mcsm::isWhitespaceOrEmpty(loaderVer)){
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"loader_version\"", opt.getName(), "add \"loader_version\": \"latest\" to server.json for automatic download"});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"loader_version\"", opt.getName(), "add \"loader_version\": \"latest\" to server.json for automatic download"});
             return tl::unexpected(err);
         }
     }else if(sLoaderVer == "latest"){
@@ -176,7 +176,7 @@ mcsm::VoidResult mcsm::FabricServer::download(const std::string& version, const 
         if(mcsm::isWhitespaceOrEmpty(loaderVer)){
             auto customTemp = mcsm::errors::SERVER_UNSUPPORTED_VERSION;
             customTemp.message = "Unsupported loader version.";
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
             return tl::unexpected(err);
         }
     }
@@ -186,17 +186,17 @@ mcsm::VoidResult mcsm::FabricServer::download(const std::string& version, const 
     nlohmann::json sInstallerVer = sILVGRes.value();
 
     if(sInstallerVer == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"installer_version\"", opt.getName(), "add \"installer_version\": \"latest\" to server.json for automatic download"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"installer_version\"", opt.getName(), "add \"installer_version\": \"latest\" to server.json for automatic download"});
         return tl::unexpected(err);
     }
     if(!sInstallerVer.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"installer_version\"", opt.getName(), "string", "add \"installer_version\": \"latest\" to server.json for automatic download."});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"installer_version\"", opt.getName(), "string", "add \"installer_version\": \"latest\" to server.json for automatic download."});
         return tl::unexpected(err);
     }
     if(sInstallerVer != "latest"){
         installerVer = sInstallerVer.get<std::string>();
         if(mcsm::isWhitespaceOrEmpty(installerVer)){
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"installer_version\"", opt.getName(), "add \"installer_version\": \"latest\" to server.json for automatic download"});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"installer_version\"", opt.getName(), "add \"installer_version\": \"latest\" to server.json for automatic download"});
             return tl::unexpected(err);
         }
     }else if(sInstallerVer == "latest"){
@@ -206,7 +206,7 @@ mcsm::VoidResult mcsm::FabricServer::download(const std::string& version, const 
         if(mcsm::isWhitespaceOrEmpty(installerVer)){
             auto customTemp = mcsm::errors::SERVER_UNSUPPORTED_VERSION;
             customTemp.message = "Unsupported installer version.";
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
             return tl::unexpected(err);
         }
     }
@@ -219,7 +219,7 @@ mcsm::VoidResult mcsm::FabricServer::download(const std::string& version, const 
     auto optExists = opt.exists();
     if(!optExists) return tl::unexpected(optExists.error());
     if(!optExists.value()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_NOT_CONFIGURED, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_NOT_CONFIGURED, {});
         return tl::unexpected(err);
     }
 
@@ -232,15 +232,15 @@ mcsm::VoidResult mcsm::FabricServer::download(const std::string& version, const 
     if(!sTREs) return tl::unexpected(sTREs.error());
     nlohmann::json sType = sTREs.value();
     if(sType == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"type\"", opt.getName(), "add \"type\": \"[yourtype]\""});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"type\"", opt.getName(), "add \"type\": \"[yourtype]\""});
         return tl::unexpected(err);
     }
     if(!sType.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"type\"", opt.getName(), "string", "change it into \"type\": \"[yourtype]\""});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"type\"", opt.getName(), "string", "change it into \"type\": \"[yourtype]\""});
         return tl::unexpected(err);
     }
     if(sType != "fabric"){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_WRONG_INSTANCE_GENERATED, {"Fabric"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_WRONG_INSTANCE_GENERATED, {"Fabric"});
         return tl::unexpected(err);
     }
 
@@ -249,17 +249,17 @@ mcsm::VoidResult mcsm::FabricServer::download(const std::string& version, const 
     nlohmann::json sLoaderVer = sLGREs.value();
 
     if(sLoaderVer == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"loader_version\"", opt.getName(), "add \"loader_version\": \"latest\" to server.json for automatic download"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"loader_version\"", opt.getName(), "add \"loader_version\": \"latest\" to server.json for automatic download"});
         return tl::unexpected(err);
     }
     if(!sLoaderVer.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"loader_version\"", opt.getName(), "string", "add \"loader_version\": \"latest\" to server.json for automatic download."});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"loader_version\"", opt.getName(), "string", "add \"loader_version\": \"latest\" to server.json for automatic download."});
         return tl::unexpected(err);
     }
     if(sLoaderVer != "latest"){
         loaderVer = sLoaderVer.get<std::string>();
         if(mcsm::isWhitespaceOrEmpty(loaderVer)){
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"loader_version\"", opt.getName(), "add \"loader_version\": \"latest\" to server.json for automatic download"});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"loader_version\"", opt.getName(), "add \"loader_version\": \"latest\" to server.json for automatic download"});
             return tl::unexpected(err);
         }
     }else if(sLoaderVer == "latest"){
@@ -269,7 +269,7 @@ mcsm::VoidResult mcsm::FabricServer::download(const std::string& version, const 
         if(mcsm::isWhitespaceOrEmpty(loaderVer)){
             auto customTemp = mcsm::errors::SERVER_UNSUPPORTED_VERSION;
             customTemp.message = "Unsupported loader version.";
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
             return tl::unexpected(err);
         }
     }
@@ -279,17 +279,17 @@ mcsm::VoidResult mcsm::FabricServer::download(const std::string& version, const 
     nlohmann::json sInstallerVer = sILVGRes.value();
 
     if(sInstallerVer == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"installer_version\"", opt.getName(), "add \"installer_version\": \"latest\" to server.json for automatic download"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"installer_version\"", opt.getName(), "add \"installer_version\": \"latest\" to server.json for automatic download"});
         return tl::unexpected(err);
     }
     if(!sInstallerVer.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"installer_version\"", opt.getName(), "string", "add \"installer_version\": \"latest\" to server.json for automatic download."});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"installer_version\"", opt.getName(), "string", "add \"installer_version\": \"latest\" to server.json for automatic download."});
         return tl::unexpected(err);
     }
     if(sInstallerVer != "latest"){
         installerVer = sInstallerVer.get<std::string>();
         if(mcsm::isWhitespaceOrEmpty(installerVer)){
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"installer_version\"", opt.getName(), "add \"installer_version\": \"latest\" to server.json for automatic download"});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"installer_version\"", opt.getName(), "add \"installer_version\": \"latest\" to server.json for automatic download"});
             return tl::unexpected(err);
         }
     }else if(sInstallerVer == "latest"){
@@ -299,7 +299,7 @@ mcsm::VoidResult mcsm::FabricServer::download(const std::string& version, const 
         if(mcsm::isWhitespaceOrEmpty(installerVer)){
             auto customTemp = mcsm::errors::SERVER_UNSUPPORTED_VERSION;
             customTemp.message = "Unsupported installer version.";
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
             return tl::unexpected(err);
         }
     }
@@ -320,7 +320,7 @@ mcsm::VoidResult mcsm::FabricServer::download(const std::string& version, const 
     auto optExists = opt.exists();
     if(!optExists) return tl::unexpected(optExists.error());
     if(!optExists.value()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_NOT_CONFIGURED, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_NOT_CONFIGURED, {});
         return tl::unexpected(err);
     }
 
@@ -331,15 +331,15 @@ mcsm::VoidResult mcsm::FabricServer::download(const std::string& version, const 
     if(!sTREs) return tl::unexpected(sTREs.error());
     nlohmann::json sType = sTREs.value();
     if(sType == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"type\"", opt.getName(), "add \"type\": \"[yourtype]\""});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"type\"", opt.getName(), "add \"type\": \"[yourtype]\""});
         return tl::unexpected(err);
     }
     if(!sType.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"type\"", opt.getName(), "string", "change it into \"type\": \"[yourtype]\""});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"type\"", opt.getName(), "string", "change it into \"type\": \"[yourtype]\""});
         return tl::unexpected(err);
     }
     if(sType != "fabric"){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_WRONG_INSTANCE_GENERATED, {"Fabric"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_WRONG_INSTANCE_GENERATED, {"Fabric"});
         return tl::unexpected(err);
     }
     mcsm::FabricServerDataOption sDataOpt(optionPath);
@@ -352,11 +352,11 @@ mcsm::VoidResult mcsm::FabricServer::download(const std::string& version, const 
     nlohmann::json sLoaderVer = sLGREs.value();
 
     if(sLoaderVer == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"loader_version\"", opt.getName(), "add \"loader_version\": \"latest\" to server.json for automatic download"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"loader_version\"", opt.getName(), "add \"loader_version\": \"latest\" to server.json for automatic download"});
         return tl::unexpected(err);
     }
     if(!sLoaderVer.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"loader_version\"", opt.getName(), "string", "add \"loader_version\": \"latest\" to server.json for automatic download."});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"loader_version\"", opt.getName(), "string", "add \"loader_version\": \"latest\" to server.json for automatic download."});
         return tl::unexpected(err);
     }
 
@@ -390,11 +390,11 @@ mcsm::VoidResult mcsm::FabricServer::download(const std::string& version, const 
     nlohmann::json sInstallerVer = sILVGRes.value();
 
     if(sInstallerVer == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"installer_version\"", opt.getName(), "add \"installer_version\": \"latest\" to server.json for automatic download"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"installer_version\"", opt.getName(), "add \"installer_version\": \"latest\" to server.json for automatic download"});
         return tl::unexpected(err);
     }
     if(!sInstallerVer.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"installer_version\"", opt.getName(), "string", "add \"installer_version\": \"latest\" to server.json for automatic download."});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"installer_version\"", opt.getName(), "string", "add \"installer_version\": \"latest\" to server.json for automatic download."});
         return tl::unexpected(err);
     }
 
@@ -437,17 +437,17 @@ mcsm::VoidResult mcsm::FabricServer::download(const std::string& version, const 
         if(result == "Unable to find valid version for loader_version" || result == "Fabric loader 0.12 or higher is required for unattended server installs. Please use a newer fabric loader version, or the full installer."){
             auto customTemp = mcsm::errors::SERVER_UNSUPPORTED_VERSION;
             customTemp.message = "Unsupported loader version : " + loaderVersion;
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
             return tl::unexpected(err);
         }else if(result == "Unable to find valid version for installer_version" || result == "Fabric loader 0.12 or higher is required for unattended server installs. Please use a newer fabric loader version, or the full installer."){
             auto customTemp = mcsm::errors::SERVER_UNSUPPORTED_VERSION;
             customTemp.message = "Unsupported installer version : " + installerVersion;
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
             return tl::unexpected(err);
         }else{
             auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
             customTemp.message = "mcsm::FabricServer::download() failed: Cannot download the file due to the following reason : " + result;
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
             return tl::unexpected(err);
         }
     }
@@ -569,7 +569,7 @@ mcsm::VoidResult mcsm::FabricServer::update(const std::string& path, const std::
         if(mcsm::isWhitespaceOrEmpty(loaderVer)){
             auto customTemp = mcsm::errors::SERVER_UNSUPPORTED_VERSION;
             customTemp.message = "Unsupported loader version. (Can't find a loader version for Minecraft " + sVer.value() + ")";
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
             return tl::unexpected(err);
         }
         if(tempLoaderVer.value() != loaderVer){
@@ -583,7 +583,7 @@ mcsm::VoidResult mcsm::FabricServer::update(const std::string& path, const std::
         if(mcsm::isWhitespaceOrEmpty(installerVer)){
             auto customTemp = mcsm::errors::SERVER_UNSUPPORTED_VERSION;
             customTemp.message = "Unsupported installer version.";
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
             return tl::unexpected(err);
         }
         if(tempInstallerVer.value() != installerVer){
@@ -614,13 +614,13 @@ mcsm::VoidResult mcsm::FabricServer::generate(const std::string& name, mcsm::Jvm
     mcsm::GeneralProperty* property = mcsm::GeneralOption::getGeneralOption().getProperty("skip_version_check_while_configuring");
 
     if(property == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"skip_version_check_while_configuring", "general option", "\"skip_version_check_while_configuring\": false"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"skip_version_check_while_configuring", "general option", "\"skip_version_check_while_configuring\": false"});
         return tl::unexpected(err);
     }
 
     const nlohmann::json& propertyValue = property->getCurrentValue();
     if(!propertyValue.is_boolean()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"skip_version_check_while_configuring", "general option", "boolean", "false or true"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"skip_version_check_while_configuring", "general option", "boolean", "false or true"});
         return tl::unexpected(err);
     }
 
@@ -632,7 +632,7 @@ mcsm::VoidResult mcsm::FabricServer::generate(const std::string& name, mcsm::Jvm
             return tl::unexpected(vExists.error());
         }
         if(!vExists.value()){
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {version});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {version});
             return tl::unexpected(err);
         }
     }

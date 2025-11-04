@@ -39,11 +39,11 @@ mcsm::JvmOption::JvmOption(std::unique_ptr<mcsm::Option> option){
 
 mcsm::VoidResult mcsm::JvmOption::init(){
     if(this->initialized) {
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED, {"mcsm::JvmOption::init()", "Called more than once"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED, {"mcsm::JvmOption::init()", "Called more than once"});
         return tl::unexpected(err);
     }
     if(!mcsm::isSafeString(this->name)){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {name});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {name});
         return tl::unexpected(err);
     }
     auto exists = this->option->exists();
@@ -64,7 +64,7 @@ mcsm::VoidResult mcsm::JvmOption::create(){
     if(!this->initialized) {
         auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
         customTemp.message = "JvmOption function called without load.";
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
     }
     auto jvm = mcsm::detectJava();
@@ -79,7 +79,7 @@ mcsm::VoidResult mcsm::JvmOption::create(){
         "nogui"
     };
     if(mcsm::isWhitespaceOrEmpty(jvm.value())){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JVM_DETECTION_FAILED, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JVM_DETECTION_FAILED, {});
         return tl::unexpected(err);
     }
     return create(jvm.value(), jvmArgs, serverArgs);
@@ -92,7 +92,7 @@ mcsm::VoidResult mcsm::JvmOption::create(const std::string& jvmPath){
     if(!this->initialized) {
         auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
         customTemp.message = "JvmOption function called without load.";
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
     }
     std::vector<std::string> jvmArgs = {
@@ -110,7 +110,7 @@ mcsm::VoidResult mcsm::JvmOption::create(const std::string& jvmPath, const std::
     if(!this->initialized) {
         auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
         customTemp.message = "JvmOption function called without load.";
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
     }
     std::vector<std::string> serverArgs = {
@@ -123,7 +123,7 @@ mcsm::VoidResult mcsm::JvmOption::create(const std::string& jvmPath, const std::
     if(!this->initialized) {
         auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
         customTemp.message = "JvmOption function called without load.";
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
     }
     std::string filePath;
@@ -132,7 +132,7 @@ mcsm::VoidResult mcsm::JvmOption::create(const std::string& jvmPath, const std::
     auto fileExists = this->option->exists();
     if(!fileExists) return tl::unexpected(fileExists.error());
     if(fileExists.value()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JVM_PROFILE_ALREADY_CONFIGURED, {this->name, this->option->getPath()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JVM_PROFILE_ALREADY_CONFIGURED, {this->name, this->option->getPath()});
         return tl::unexpected(err);
     }
     mcsm::Option* opt = this->option.get();
@@ -158,7 +158,7 @@ mcsm::VoidResult mcsm::JvmOption::reset(){
     if(!this->initialized) {
         auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
         customTemp.message = "JvmOption function called without load.";
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
     }
     return this->option->reset();
@@ -168,7 +168,7 @@ mcsm::BoolResult mcsm::JvmOption::exists() const {
     if(!this->initialized) {
         auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
         customTemp.message = "JvmOption function called without load.";
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
     }
     if(this->option.get() == nullptr) return false;
@@ -179,13 +179,13 @@ tl::expected<std::vector<std::string>, mcsm::Error> mcsm::JvmOption::getJvmArgum
     if(!this->initialized) {
         auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
         customTemp.message = "JvmOption function called without load.";
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
     }
     auto profileExists = this->exists();
     if(!profileExists) return tl::unexpected(profileExists.error());
     if(!profileExists.value()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JVM_PROFILE_NOT_FOUND, {this->option->getName(), this->option->getPath()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JVM_PROFILE_NOT_FOUND, {this->option->getName(), this->option->getPath()});
         return tl::unexpected(err);
     }
 
@@ -195,16 +195,16 @@ tl::expected<std::vector<std::string>, mcsm::Error> mcsm::JvmOption::getJvmArgum
     const nlohmann::json& value = valueRes.value();
     
     if(value == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"\"args\"", opt2->getName()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"args\"", opt2->getName()});
         return tl::unexpected(err);
     }
     if(!value.is_array()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"args\"", "array of string"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"args\"", "array of string"});
         return tl::unexpected(err);
     }
     for(auto& v : value){
         if(!v.is_string()){
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"args\"", "array of string"});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"args\"", "array of string"});
             return tl::unexpected(err);
         }
     }
@@ -216,13 +216,13 @@ mcsm::VoidResult mcsm::JvmOption::setJvmArguments(const std::vector<std::string>
     if(!this->initialized) {
         auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
         customTemp.message = "JvmOption function called without load.";
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
     }
     auto profileExists = this->exists();
     if(!profileExists) return tl::unexpected(profileExists.error());
     if(!profileExists.value()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JVM_PROFILE_NOT_FOUND, {this->option->getName(), this->option->getPath()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JVM_PROFILE_NOT_FOUND, {this->option->getName(), this->option->getPath()});
         return tl::unexpected(err);
     }
 
@@ -236,13 +236,13 @@ mcsm::StringResult mcsm::JvmOption::getJvmPath() const {
     if(!this->initialized) {
         auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
         customTemp.message = "JvmOption function called without load.";
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
     }
     auto profileExists = this->exists();
     if(!profileExists) return tl::unexpected(profileExists.error());
     if(!profileExists.value()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JVM_PROFILE_NOT_FOUND, {this->option->getName(), this->option->getPath()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JVM_PROFILE_NOT_FOUND, {this->option->getName(), this->option->getPath()});
         return tl::unexpected(err);
     }
     mcsm::Option* opt2 = this->option.get();
@@ -252,11 +252,11 @@ mcsm::StringResult mcsm::JvmOption::getJvmPath() const {
     const nlohmann::json& value = valueRes.value();
     
     if(value == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"\"path\"", opt2->getName()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"path\"", opt2->getName()});
         return tl::unexpected(err);
     }
     if(!value.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"path\"", "string"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"path\"", "string"});
         return tl::unexpected(err);
     }
     const std::string& path = value;
@@ -267,13 +267,13 @@ mcsm::VoidResult mcsm::JvmOption::setJvmPath(const std::string& jvmPath){
     if(!this->initialized) {
         auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
         customTemp.message = "JvmOption function called without load.";
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
     }
     auto profileExists = this->exists();
     if(!profileExists) return tl::unexpected(profileExists.error());
     if(!profileExists.value()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JVM_PROFILE_NOT_FOUND, {this->option->getName(), this->option->getPath()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JVM_PROFILE_NOT_FOUND, {this->option->getName(), this->option->getPath()});
         return tl::unexpected(err);
     }
     mcsm::Option* opt2 = this->option.get();
@@ -286,13 +286,13 @@ tl::expected<std::vector<std::string>, mcsm::Error> mcsm::JvmOption::getServerAr
     if(!this->initialized) {
         auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
         customTemp.message = "JvmOption function called without load.";
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
     }
     auto profileExists = this->exists();
     if(!profileExists) return tl::unexpected(profileExists.error());
     if(!profileExists.value()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JVM_PROFILE_NOT_FOUND, {this->option->getName(), this->option->getPath()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JVM_PROFILE_NOT_FOUND, {this->option->getName(), this->option->getPath()});
         return tl::unexpected(err);
     }
     mcsm::Option* opt2 = this->option.get();
@@ -302,16 +302,16 @@ tl::expected<std::vector<std::string>, mcsm::Error> mcsm::JvmOption::getServerAr
     const nlohmann::json& value = valueRes.value();
 
     if(value == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"\"server_args\"", opt2->getName()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"server_args\"", opt2->getName()});
         return tl::unexpected(err);
     }
     if(!value.is_array()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"server_args\"", "array of string"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"server_args\"", "array of string"});
         return tl::unexpected(err);
     }
     for(auto& v : value){
         if(!v.is_string()){
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"server_args\"", "array of string"});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"server_args\"", "array of string"});
             return tl::unexpected(err);
         }
     }
@@ -323,13 +323,13 @@ mcsm::VoidResult mcsm::JvmOption::setServerArguments(const std::vector<std::stri
     if(!this->initialized) {
         auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
         customTemp.message = "JvmOption function called without load.";
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
     }
     auto profileExists = this->exists();
     if(!profileExists) return tl::unexpected(profileExists.error());
     if(!profileExists.value()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JVM_PROFILE_NOT_FOUND, {this->option->getName(), this->option->getPath()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JVM_PROFILE_NOT_FOUND, {this->option->getName(), this->option->getPath()});
         return tl::unexpected(err);
     }
     mcsm::Option* opt2 = this->option.get();
@@ -346,7 +346,7 @@ mcsm::StringResult mcsm::JvmOption::getProfilePath() const {
     if(!this->initialized) {
         auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
         customTemp.message = "JvmOption function called without load.";
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
     }
     mcsm::Option* opt2 = this->option.get();

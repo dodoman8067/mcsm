@@ -23,16 +23,16 @@ mcsm::VoidResult mcsm::ServerGroupLoader::removeDuplicateServers(mcsm::Option* h
     const nlohmann::json& existingServers = existSRes.value();
 
     if(existingServers == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"\"servers\"", this->handle->getName()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"servers\"", this->handle->getName()});
         return tl::unexpected(err);
     }
     if(!existingServers.is_array()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"servers\"", "array of string"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"servers\"", "array of string"});
         return tl::unexpected(err);
     }
     for(auto& j : existingServers){
         if(!j.is_string()){
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"servers\"", "array of string"});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"servers\"", "array of string"});
             return tl::unexpected(err);
         }
     }
@@ -57,7 +57,7 @@ mcsm::VoidResult mcsm::ServerGroupLoader::load() {
     if(!optExists) return tl::unexpected(optExists.error());
 
     if(!optExists.value()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_NOT_CONFIGURED, {this->path});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_NOT_CONFIGURED, {this->path});
         return tl::unexpected(err);
     }
 
@@ -95,7 +95,7 @@ mcsm::VoidResult mcsm::ServerGroupLoader::save(){
         if(v == nullptr){
             auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
             customTemp.message = "Null server loader instance detected on server group loader instance.";
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
             return tl::unexpected(err);
         }
         strVec.push_back(v->getHandle()->getPath());
@@ -119,7 +119,7 @@ mcsm::StringResult mcsm::ServerGroupLoader::getName() const {
     if(!this->loaded){
         auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
         customTemp.message = "ServerGroupLoader function called without load.";
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
     }
 
@@ -128,16 +128,16 @@ mcsm::StringResult mcsm::ServerGroupLoader::getName() const {
 
     nlohmann::json value = valueRes.value();
     if(value == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"\"name\"", this->handle->getName()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"name\"", this->handle->getName()});
         return tl::unexpected(err);
     }
     if(!value.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"name\"", "string"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"name\"", "string"});
         return tl::unexpected(err);
     }
 
     if(!mcsm::isSafeString(value)){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {value});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {value});
         return tl::unexpected(err);
     }
     return value.get<std::string>();
@@ -147,11 +147,11 @@ mcsm::VoidResult mcsm::ServerGroupLoader::setName(const std::string& name){
     if(!this->loaded){
         auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
         customTemp.message = "ServerGroupLoader function called without load.";
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
     }
     if(!mcsm::isSafeString(name)){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {name});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {name});
         return tl::unexpected(err);
     }
     mcsm::VoidResult setRes = this->handle->setValue("name", name);
@@ -164,7 +164,7 @@ mcsm::StringResult mcsm::ServerGroupLoader::getMode() const {
     if(!this->loaded){
         auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
         customTemp.message = "ServerGroupLoader function called without load.";
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
     }
 
@@ -174,20 +174,20 @@ mcsm::StringResult mcsm::ServerGroupLoader::getMode() const {
     nlohmann::json value = valueRes.value();
 
     if(value == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"\"mode\"", this->handle->getName()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"mode\"", this->handle->getName()});
         return tl::unexpected(err);
     }
     if(!value.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"mode\"", "string"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"mode\"", "string"});
         return tl::unexpected(err);
     }
     if(value != "screen" && value != "default"){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_GROUP_MODE_INVALID, {std::string(value)});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_GROUP_MODE_INVALID, {std::string(value)});
         return tl::unexpected(err);
     }
 
     if(!mcsm::isSafeString(value)){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {value});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {value});
         return tl::unexpected(err);
     }
     return value;
@@ -197,11 +197,11 @@ mcsm::VoidResult mcsm::ServerGroupLoader::setMode(const std::string& mode){
     if(!this->loaded){
         auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
         customTemp.message = "ServerGroupLoader function called without load.";
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
     }
     if(!mcsm::isSafeString(mode)){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {mode});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {mode});
         return tl::unexpected(err);
     }
     mcsm::VoidResult setRes = this->handle->setValue("mode", mode);
@@ -222,11 +222,11 @@ mcsm::VoidResult mcsm::ServerGroupLoader::setServers(const std::vector<mcsm::Ser
     if(!this->loaded){
         auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
         customTemp.message = "ServerGroupLoader function called without load.";
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
     }
     if(!mcsm::isSafeString(mode)){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {mode});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {mode});
         return tl::unexpected(err);
     }
     this->loaders.clear();
@@ -235,7 +235,7 @@ mcsm::VoidResult mcsm::ServerGroupLoader::setServers(const std::vector<mcsm::Ser
         if(loader == nullptr){
             auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
             customTemp.message = "ServerGroupLoader#setServers failed: Null server config loader instance in input vector.";
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
             return tl::unexpected(err);
         }
         this->loaders.push_back(std::make_unique<mcsm::ServerConfigLoader>(*loader));
@@ -255,7 +255,7 @@ mcsm::VoidResult mcsm::ServerGroupLoader::addServer(const std::string& path){
             auto customTemp = mcsm::errors::SERVER_ALREADY_CONFIGURED;
             customTemp.message = "Server " + nPath + " already exists in the configuration.";
             customTemp.solution = "";
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
             return tl::unexpected(err);
         }
     }
@@ -267,13 +267,13 @@ mcsm::VoidResult mcsm::ServerGroupLoader::addServer(mcsm::ServerConfigLoader* se
     if(server == nullptr){
         auto customTemp = mcsm::errors::ILLEGAL_PARAMETER;
         customTemp.message = "Null serverconfigloader instance detected on servergrouploader.";
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
     }
     if(!server->isFullyLoaded()){
         auto customTemp = mcsm::errors::ILLEGAL_PARAMETER;
         customTemp.message = "ServerConfigLoader instance passed without being fully loaded on ServerGroupLoader.";
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
     }
 
@@ -283,7 +283,7 @@ mcsm::VoidResult mcsm::ServerGroupLoader::addServer(mcsm::ServerConfigLoader* se
             auto customTemp = mcsm::errors::SERVER_ALREADY_CONFIGURED;
             customTemp.message = "Server " + nPath + " already exists in the configuration.";
             customTemp.solution = "";
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
             return tl::unexpected(err);
         }
     }
@@ -295,13 +295,13 @@ mcsm::VoidResult mcsm::ServerGroupLoader::addServer(std::unique_ptr<mcsm::Server
     if(server == nullptr){
         auto customTemp = mcsm::errors::ILLEGAL_PARAMETER;
         customTemp.message = "Null serverconfigloader instance detected on servergrouploader.";
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
     }
     if(!server->isFullyLoaded()){
         auto customTemp = mcsm::errors::ILLEGAL_PARAMETER;
         customTemp.message = "ServerConfigLoader instance passed without being fully loaded on ServerGroupLoader.";
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
     }
 
@@ -311,7 +311,7 @@ mcsm::VoidResult mcsm::ServerGroupLoader::addServer(std::unique_ptr<mcsm::Server
             auto customTemp = mcsm::errors::SERVER_ALREADY_CONFIGURED;
             customTemp.message = "Server " + nPath + " already exists in the configuration.";
             customTemp.solution = "";
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
             return tl::unexpected(err);
         }
     }
@@ -324,13 +324,13 @@ mcsm::VoidResult mcsm::ServerGroupLoader::addServer(const std::vector<std::uniqu
         if(serv == nullptr){
             auto customTemp = mcsm::errors::ILLEGAL_PARAMETER;
             customTemp.message = "Null serverconfigloader instance detected on servergrouploader.";
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
             return tl::unexpected(err);
         }
         if(!serv->isFullyLoaded()){
             auto customTemp = mcsm::errors::ILLEGAL_PARAMETER;
             customTemp.message = "ServerConfigLoader instance passed without being fully loaded on ServerGroupLoader.";
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
             return tl::unexpected(err);
         }
         std::string nPath = mcsm::normalizePath(serv->getHandle()->getPath());
@@ -339,7 +339,7 @@ mcsm::VoidResult mcsm::ServerGroupLoader::addServer(const std::vector<std::uniqu
                 auto customTemp = mcsm::errors::SERVER_ALREADY_CONFIGURED;
                 customTemp.message = "Server " + nPath + " already exists in the configuration.";
                 customTemp.solution = "";
-                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
                 return tl::unexpected(err);
             }
         }
@@ -358,7 +358,7 @@ mcsm::VoidResult mcsm::ServerGroupLoader::removeServer(const std::string& path){
 
     auto customTemp = mcsm::errors::ILLEGAL_PARAMETER;
     customTemp.message = "Cannot remove an element that doesn't exist.";
-    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
     return tl::unexpected(err);
 }
 
@@ -371,7 +371,7 @@ mcsm::VoidResult mcsm::ServerGroupLoader::removeServer(mcsm::ServerConfigLoader*
     }
     auto customTemp = mcsm::errors::ILLEGAL_PARAMETER;
     customTemp.message = "Cannot remove an element that doesn't exist.";
-    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
     return tl::unexpected(err);
 }
 
@@ -396,6 +396,6 @@ mcsm::VoidResult mcsm::ServerGroupLoader::removeServer(const std::vector<mcsm::S
 
     auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
     customTemp.message = "None of the specified servers could be removed.";
-    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
     return tl::unexpected(err);
 }

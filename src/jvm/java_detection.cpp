@@ -54,7 +54,7 @@ mcsm::StringResult mcsm::getJavaFromPath(){
                 std::error_code ec;
                 bool exists = std::filesystem::exists(javaPath, ec);
                 if(ec){
-                    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::FILE_EXIST_CHECK_FAILED, {javaPath.string(), ec.message()});
+                    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::FILE_EXIST_CHECK_FAILED, {javaPath.string(), ec.message()});
                     return tl::unexpected(err);
                 }
 
@@ -77,7 +77,7 @@ mcsm::StringResult mcsm::getJavaFromPath(){
                 std::error_code ec;
                 bool exists = std::filesystem::exists(javaPath, ec);
                 if(ec){
-                    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::FILE_EXIST_CHECK_FAILED, {javaPath.string(), ec.message()});
+                    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::FILE_EXIST_CHECK_FAILED, {javaPath.string(), ec.message()});
                     return tl::unexpected(err);
                 }
 
@@ -100,7 +100,7 @@ mcsm::StringResult mcsm::getJavaFromPath(){
                 std::error_code ec;
                 bool exists = std::filesystem::exists(javaPath, ec);
                 if(ec){
-                    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::FILE_EXIST_CHECK_FAILED, {javaPath.string(), ec.message()});
+                    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::FILE_EXIST_CHECK_FAILED, {javaPath.string(), ec.message()});
                     return tl::unexpected(err);
                 }
 
@@ -125,7 +125,7 @@ mcsm::StringResult mcsm::detectJava(){
             auto customTemp = mcsm::errors::JVM_DETECTION_FAILED;
             customTemp.message = "Detected java was not a valid java.";
             customTemp.solution = "";
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::WARNING, customTemp, {});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_WARNING, customTemp, {});
             return tl::unexpected(err);
         }
         mcsm::info("Detected java from JAVA_HOME : " + mcsm::normalizePath(str));
@@ -149,7 +149,7 @@ mcsm::StringResult mcsm::detectJava(){
             auto customTemp = mcsm::errors::JVM_DETECTION_FAILED;
             customTemp.message = "Detected java was not a valid java.";
             customTemp.solution = "";
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::WARNING, customTemp, {});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_WARNING, customTemp, {});
             return tl::unexpected(err);
         }
         mcsm::info("Detected java from PATH : " + mcsm::normalizePath(pathStr) + ".");
@@ -166,7 +166,7 @@ mcsm::StringResult mcsm::detectJava(){
     auto customTemp = mcsm::errors::JVM_DETECTION_FAILED;
     customTemp.message = "Failed to detect java from PATH. But you may specify the jvm path manually.";
     customTemp.solution = "";
-    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::WARNING, customTemp, {});
+    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_WARNING, customTemp, {});
     return tl::unexpected(err);
 }
 

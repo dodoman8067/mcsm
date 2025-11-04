@@ -18,7 +18,7 @@ mcsm::VoidResult mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const
     if(!fileExists) return tl::unexpected(fileExists.error());
 
     if(!fileExists.value()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_NOT_CONFIGURED, {optionPath});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_NOT_CONFIGURED, {optionPath});
         return tl::unexpected(err);
     }
 
@@ -66,6 +66,6 @@ mcsm::VoidResult mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const
         // remove server session file
     }
 
-    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, {700, "Failed to validate server group " + groupOptionPath, ""}, {});
+    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, {700, "Failed to validate server group " + groupOptionPath, ""}, {});
     return tl::unexpected(err);
 }

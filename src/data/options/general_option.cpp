@@ -37,13 +37,13 @@ mcsm::VoidResult mcsm::GeneralOption::load(){
 
     auto* property = getProperty("advanced_json_parse_fail_errors");
     if(property == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"advanced_json_parse_fail_errors", "general option", "Value example: \"advanced_json_parse_fail_errors\": false"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"advanced_json_parse_fail_errors", "general option", "Value example: \"advanced_json_parse_fail_errors\": false"});
         return tl::unexpected(err);
     }
 
     const nlohmann::json& propertyValue = property->getCurrentValue();
     if(!propertyValue.is_boolean()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"advanced_json_parse_fail_errors", "general option", "boolean", "Value example: \"advanced_json_parse_fail_errors\": false"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"advanced_json_parse_fail_errors", "general option", "boolean", "Value example: \"advanced_json_parse_fail_errors\": false"});
         return tl::unexpected(err);
     }
 
@@ -51,13 +51,13 @@ mcsm::VoidResult mcsm::GeneralOption::load(){
 
     auto* property1 = getProperty("screen_binary_path");
     if(property1 == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"screen_binary_path", "general option", "Value example: \"/usr/bin/screen\""});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"screen_binary_path", "general option", "Value example: \"/usr/bin/screen\""});
         return tl::unexpected(err);
     }
 
     const nlohmann::json& propertyValue1 = property1->getCurrentValue();
     if(!propertyValue1.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"screen_binary_path", "general option", "string", "Value example: \"/usr/bin/screen\""});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"screen_binary_path", "general option", "string", "Value example: \"/usr/bin/screen\""});
         return tl::unexpected(err);
     }
 
@@ -65,13 +65,13 @@ mcsm::VoidResult mcsm::GeneralOption::load(){
 
     auto* property2 = getProperty("color_download_progress_bar");
     if(property2 == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"color_download_progress_bar", "general option", "Value example: true"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"color_download_progress_bar", "general option", "Value example: true"});
         return tl::unexpected(err);
     }
 
     const nlohmann::json& propertyValue2 = property2->getCurrentValue();
     if(!propertyValue2.is_boolean()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"color_download_progress_bar", "general option", "boolean", "Value example: true"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"color_download_progress_bar", "general option", "boolean", "Value example: true"});
         return tl::unexpected(err);
     }
 
@@ -95,7 +95,7 @@ mcsm::VoidResult mcsm::GeneralOption::save(){
 
 mcsm::VoidResult mcsm::GeneralOption::initialize(){
     if(init){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED, {"GeneralOption::initialize()", "Called more than once"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED, {"GeneralOption::initialize()", "Called more than once"});
         return tl::unexpected(err);
     }
     init = true;

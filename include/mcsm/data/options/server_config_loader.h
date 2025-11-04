@@ -19,7 +19,7 @@ namespace mcsm {
         template <typename T>
         inline tl::expected<T, mcsm::Error> get(const std::string& key) const{
             if(!this->isLoaded){
-                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
+                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
                 return tl::unexpected(err);
             }
 
@@ -28,7 +28,7 @@ namespace mcsm {
             auto value = valueRes.value();
 
             if(value == nullptr){
-                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"\"" + key + "\"", this->optionHandle->getName()});
+                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"" + key + "\"", this->optionHandle->getName()});
                 return tl::unexpected(err);
             }
 
@@ -37,16 +37,16 @@ namespace mcsm {
                         std::is_same<T, std::vector<bool>>::value ||
                         std::is_same<T, std::vector<std::string>>::value){
                 if(value.type() != nlohmann::json::value_t::array){
-                    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"" + key + "\"", "array"});
+                    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"" + key + "\"", "array"});
                     return tl::unexpected(err);
                 }
             }else if (value.type() != getJsonType<T>()){
-                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"" + key + "\"", value.type_name()});
+                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"" + key + "\"", value.type_name()});
                 return tl::unexpected(err);
             }
             if constexpr (std::is_same<T, std::string>::value){
                 if(!mcsm::isSafeString(value)){
-                    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {value});
+                    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {value});
                     return tl::unexpected(err);
                 }
             }

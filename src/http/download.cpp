@@ -91,7 +91,7 @@ mcsm::VoidResult mcsm::download(const std::string& name, const std::string& url,
     file = std::fopen(filename.c_str(), "wb");
     if(file == nullptr){
         auto reason = std::string(std::strerror(errno));
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::FILE_CREATE_FAILED, {filename, reason});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::FILE_CREATE_FAILED, {filename, reason});
         return tl::unexpected(err);
     }
 
@@ -117,7 +117,7 @@ mcsm::VoidResult mcsm::download(const std::string& name, const std::string& url,
     if(percentages) std::cout << "\n";
 
     if(res != CURLE_OK){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::DOWNLOAD_REQUEST_FAILED, {url, curl_easy_strerror(res)});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::DOWNLOAD_REQUEST_FAILED, {url, curl_easy_strerror(res)});
         std::fclose(file);
         curl_easy_reset(curl);
         return tl::unexpected(err);
@@ -144,7 +144,7 @@ mcsm::BoolResult mcsm::isText(const std::string& url){
     res = curl_easy_perform(curl);
 
     if(res != CURLE_OK){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {url, curl_easy_strerror(res)});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::GET_REQUEST_FAILED, {url, curl_easy_strerror(res)});
         curl_easy_reset(curl);
         return tl::unexpected(err);
     }
@@ -154,7 +154,7 @@ mcsm::BoolResult mcsm::isText(const std::string& url){
         const std::string& contentTypeStr = contentType;
         isText = contentTypeStr.find("text") == 0 || contentTypeStr.find("json") != std::string::npos;
     }else{
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::GET_REQUEST_FAILED, {url, curl_easy_strerror(res)});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::GET_REQUEST_FAILED, {url, curl_easy_strerror(res)});
         curl_easy_reset(curl);
         return tl::unexpected(err);
     }

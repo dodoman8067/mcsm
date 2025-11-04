@@ -48,7 +48,7 @@ mcsm::StringResult mcsm::CustomServer::getFileLocation(const std::string& option
     auto exists = option.exists();
     if(!exists) return tl::unexpected(exists.error());
     if(!exists.value()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_NOT_CONFIGURED, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_NOT_CONFIGURED, {});
         return tl::unexpected(err);
     }
 
@@ -61,11 +61,11 @@ mcsm::StringResult mcsm::CustomServer::getFileLocation(const std::string& option
     nlohmann::json jarLoc = jarLocVal.value();
 
     if(jarLoc == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"\"jarfile_source_location\"", "server.json"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"jarfile_source_location\"", "server.json"});
         return tl::unexpected(err);
     }
     if(!jarLoc.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"jarfile_source_location\"", "string"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"jarfile_source_location\"", "string"});
         return tl::unexpected(err);
     }
     if(jarLoc != nullptr && (mcsm::startsWith(jarLoc.get<std::string>(), "current") && mcsm::endsWith(jarLoc.get<std::string>(), "current"))){
@@ -85,7 +85,7 @@ mcsm::StringResult mcsm::CustomServer::getCustomStartCommand(const std::string& 
     auto exists = option.exists();
     if(!exists) return tl::unexpected(exists.error());
     if(!exists.value()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_NOT_CONFIGURED, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_NOT_CONFIGURED, {});
         return tl::unexpected(err);
     }
 
@@ -98,11 +98,11 @@ mcsm::StringResult mcsm::CustomServer::getCustomStartCommand(const std::string& 
     nlohmann::json crcVal = crcRes.value();
 
     if(crcVal == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"\"custom_run_command\"", "server.json"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"custom_run_command\"", "server.json"});
         return tl::unexpected(err);
     }
     if(!crcVal.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"custom_run_command\"", "string"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"custom_run_command\"", "string"});
         return tl::unexpected(err);
     }
     std::string value = crcVal;
@@ -136,20 +136,20 @@ mcsm::VoidResult mcsm::CustomServer::setupServerJarFile(const std::string& jarNa
             if(!fileExists) return tl::unexpected(fileExists.error());
 
             if(!fileExists.value()){
-                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, {700, "Cannot copy a file that doesn't exist.", ""}, {});
+                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, {700, "Cannot copy a file that doesn't exist.", ""}, {});
                 return tl::unexpected(err);
             }
 
             std::error_code copyEC;
             std::filesystem::copy_file(location, mcsm::joinPath(path, jarName), copyEC);
             if(copyEC){
-                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, {700, "Copying jarfile from " + location + " to " + path + "/" + jarName + " failed for reason: " + copyEC.message(), ""}, {});
+                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, {700, "Copying jarfile from " + location + " to " + path + "/" + jarName + " failed for reason: " + copyEC.message(), ""}, {});
                 return tl::unexpected(err);
             }
             return {};
         }
     }
-    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, {700, "The following server jarfile wasn't in a vaild location : " + location, ""}, {});
+    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, {700, "The following server jarfile wasn't in a vaild location : " + location, ""}, {});
     return tl::unexpected(err);
 }
 
@@ -243,7 +243,7 @@ mcsm::BoolResult mcsm::CustomServer::isFile(const std::string& location) const {
     std::error_code ec;
     bool isRegularFile = std::filesystem::is_regular_file(location, ec);
     if(ec){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::FILE_EXIST_CHECK_FAILED, {location + " is a file", ec.message()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::FILE_EXIST_CHECK_FAILED, {location + " is a file", ec.message()});
         return tl::unexpected(err);
     }
     return isRegularFile;

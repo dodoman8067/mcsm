@@ -58,7 +58,7 @@ mcsm::StringResult mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::J
     std::error_code ec;
     std::filesystem::current_path(optionPath, ec);
     if(ec){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, {700, "Server starting failed : %s", ""}, {ec.message()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, {700, "Server starting failed : %s", ""}, {ec.message()});
         return tl::unexpected(err);
     }
 
@@ -124,12 +124,12 @@ mcsm::StringResult mcsm::Server::getJarFile(const std::string& checkDir) const {
         if(!value) return value;
 
         if(value.value() == nullptr){
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_NOT_FOUND, {"\"server_jar\"", opt.getName()});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"server_jar\"", opt.getName()});
             return tl::unexpected(err);
         }
 
         if(!value.value().is_string()){
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JSON_WRONG_TYPE, {"\"server_jar\"", "string"});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"server_jar\"", "string"});
             return tl::unexpected(err);
         }
         return value.value().get<std::string>();

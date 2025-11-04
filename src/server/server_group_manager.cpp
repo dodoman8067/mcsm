@@ -33,7 +33,7 @@ mcsm::VoidResult mcsm::ServerGroupManager::start(){
             if(server == nullptr){
                 auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
                 customTemp.message = "Null server config loader found in ServerGroupLoader's servers.";
-                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
                 return tl::unexpected(err);
             }
 
@@ -46,7 +46,7 @@ mcsm::VoidResult mcsm::ServerGroupManager::start(){
             std::filesystem::current_path(server->getHandle()->getPath(), ec);
             if(mcsm::isDebug()) mcsm::info("Work path changed to: " + server->getHandle()->getPath());
             if(ec){
-                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_GROUP_CANNOT_START_SERVER, {ec.message()});
+                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_GROUP_CANNOT_START_SERVER, {ec.message()});
                 return tl::unexpected(err);
             }
 
@@ -81,7 +81,7 @@ mcsm::VoidResult mcsm::ServerGroupManager::start(const std::string& serverPath){
             if(server == nullptr){
                 auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
                 customTemp.message = "Null server config loader found in ServerGroupLoader's servers.";
-                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
                 return tl::unexpected(err);
             }
 
@@ -94,14 +94,14 @@ mcsm::VoidResult mcsm::ServerGroupManager::start(const std::string& serverPath){
                 std::filesystem::current_path(server->getHandle()->getPath(), ec);
                 if(mcsm::isDebug()) mcsm::info("[DEBUG] Work path changed to: " + server->getHandle()->getPath());
                 if(ec){
-                    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_GROUP_CANNOT_START_SERVER, {ec.message()});
+                    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_GROUP_CANNOT_START_SERVER, {ec.message()});
                     return tl::unexpected(err);
                 }
 
                 mcsm::ScreenSession session(groupName.value() + "." + modified, exePath.value() + " start -__mcsm__Internal_Group_Start \"" + groupPath + "\"");
                 mcsm::info("[DEBUG] Checking if session is running for: " + serverPath + " with session name: " + session.getFullSessionName());
                 if(session.isRunning()){
-                    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_GROUP_CANNOT_START_SERVER, {"Server \"" + serverPath + "\" is already running."});
+                    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_GROUP_CANNOT_START_SERVER, {"Server \"" + serverPath + "\" is already running."});
                     return tl::unexpected(err);
                 }
                 // StartServerCommand will handle the rest
@@ -110,7 +110,7 @@ mcsm::VoidResult mcsm::ServerGroupManager::start(const std::string& serverPath){
             }
         }
 
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_NOT_LISTED_ON_CURRENT_GROUP, {serverPath});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_NOT_LISTED_ON_CURRENT_GROUP, {serverPath});
         return tl::unexpected(err);
     }else{
         // TODO
@@ -132,7 +132,7 @@ mcsm::VoidResult mcsm::ServerGroupManager::stop(){
             if(server == nullptr){
                 auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
                 customTemp.message = "Null server config loader found in ServerGroupLoader's servers.";
-                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
                 return tl::unexpected(err);
             }
 
@@ -141,7 +141,7 @@ mcsm::VoidResult mcsm::ServerGroupManager::stop(){
 
             mcsm::ScreenSession session(groupName.value() + "." + modified);
             if(!session.isRunning()){ // replace with runningsessionsoption#isrunning
-                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_GROUP_CANNOT_STOP_SERVER, {"Cannot stop a session not running. ID: " + session.getFullSessionName()});
+                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_GROUP_CANNOT_STOP_SERVER, {"Cannot stop a session not running. ID: " + session.getFullSessionName()});
                 return tl::unexpected(err);
             }
             return session.sendCommand("stop\n");
@@ -168,7 +168,7 @@ mcsm::VoidResult mcsm::ServerGroupManager::stop(const std::string& serverPath){
             if(server == nullptr){
                 auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
                 customTemp.message = "Null server config loader found in ServerGroupLoader's servers.";
-                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
                 return tl::unexpected(err);
             }
 
@@ -178,13 +178,13 @@ mcsm::VoidResult mcsm::ServerGroupManager::stop(const std::string& serverPath){
             if(serverPath == groupServerPath){
                 mcsm::ScreenSession session(groupName.value() + "." + modified);
                 if(!session.isRunning()){ // todo: replace with runningsessionsoption#isrunning
-                    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_GROUP_CANNOT_STOP_SERVER, {"Cannot stop a session not running. ID: " + session.getFullSessionName()});
+                    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_GROUP_CANNOT_STOP_SERVER, {"Cannot stop a session not running. ID: " + session.getFullSessionName()});
                     return tl::unexpected(err);
                 }
                 return session.sendCommand("stop\n");
             }
         }
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_NOT_LISTED_ON_CURRENT_GROUP, {serverPath});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_NOT_LISTED_ON_CURRENT_GROUP, {serverPath});
         return tl::unexpected(err);
     }else{
         // TODO
@@ -209,7 +209,7 @@ mcsm::IntResult mcsm::ServerGroupManager::getRunningSessions() const {
             if(server == nullptr){
                 auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
                 customTemp.message = "Null server config loader found in ServerGroupLoader's servers.";
-                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
                 return tl::unexpected(err);
             }
 
@@ -248,7 +248,7 @@ tl::expected<std::vector<const mcsm::ServerConfigLoader*>, mcsm::Error> mcsm::Se
             if(server == nullptr){
                 auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
                 customTemp.message = "Null server config loader found in ServerGroupLoader's servers.";
-                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, customTemp, {});
+                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
                 return tl::unexpected(err);
             }
 

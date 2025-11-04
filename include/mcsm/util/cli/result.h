@@ -44,10 +44,10 @@ namespace mcsm {
     };
 
     enum class ErrorStatus {
-        OK,
-        WARNING,
-        WARNING_NOEXIT,
-        ERROR
+        MCSM_OK,
+        MCSM_WARNING,
+        MCSM_WARNING_NOEXIT,
+        MCSM_FAIL
     };
 
     struct ErrorTemplate {
@@ -97,24 +97,24 @@ namespace mcsm {
     }
 
     inline void printError(const mcsm::Error& err) {
-        if(err.status == mcsm::ErrorStatus::ERROR){
+        if(err.status == mcsm::ErrorStatus::MCSM_FAIL){
             mcsm::error(formatError(err));
         }
-        if(err.status == mcsm::ErrorStatus::WARNING || err.status == mcsm::ErrorStatus::WARNING_NOEXIT){
+        if(err.status == mcsm::ErrorStatus::MCSM_WARNING || err.status == mcsm::ErrorStatus::MCSM_WARNING_NOEXIT){
             mcsm::warning(formatError(err));
         }
-        if(err.status == mcsm::ErrorStatus::OK){
+        if(err.status == mcsm::ErrorStatus::MCSM_OK){
             mcsm::info(formatError(err));
         }
 
         if(!err.solution.empty()){
-            if(err.status == mcsm::ErrorStatus::ERROR){
+            if(err.status == mcsm::ErrorStatus::MCSM_FAIL){
                 mcsm::error(err.solution);
             }
-            if(err.status == mcsm::ErrorStatus::WARNING || err.status == mcsm::ErrorStatus::WARNING_NOEXIT){
+            if(err.status == mcsm::ErrorStatus::MCSM_WARNING || err.status == mcsm::ErrorStatus::MCSM_WARNING_NOEXIT){
                 mcsm::warning(err.solution);
             }
-            if(err.status == mcsm::ErrorStatus::OK){
+            if(err.status == mcsm::ErrorStatus::MCSM_OK){
                 mcsm::info(err.solution);
             }
         }
@@ -127,7 +127,7 @@ namespace mcsm {
 
 
     inline void exitIfFail(const mcsm::Error& err) {
-        if(err.status != mcsm::ErrorStatus::OK && err.status != mcsm::ErrorStatus::WARNING_NOEXIT){
+        if(err.status != mcsm::ErrorStatus::MCSM_OK && err.status != mcsm::ErrorStatus::MCSM_WARNING_NOEXIT){
             std::exit(1);
         }
     }

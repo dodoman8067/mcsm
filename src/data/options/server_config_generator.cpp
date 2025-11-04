@@ -27,7 +27,7 @@ mcsm::VoidResult mcsm::ServerConfigGenerator::generate(const std::string& versio
     if(!jvmOptionExists) return tl::unexpected(jvmOptionExists.error());
 
     if(!jvmOptionExists.value()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::JVM_PROFILE_NOT_FOUND, {defaultOption.getProfileName()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JVM_PROFILE_NOT_FOUND, {defaultOption.getProfileName()});
         return tl::unexpected(err);
     }
     
@@ -35,7 +35,7 @@ mcsm::VoidResult mcsm::ServerConfigGenerator::generate(const std::string& versio
     if(!canGenerate) return tl::unexpected(canGenerate.error());
 
     if(canGenerate.value()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::SERVER_ALREADY_CONFIGURED, {this->configPath});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_ALREADY_CONFIGURED, {this->configPath});
         return tl::unexpected(err);
     }
 
@@ -56,7 +56,7 @@ mcsm::VoidResult mcsm::ServerConfigGenerator::generate(const std::string& versio
     if(!res2) return res2;
     
     if(!mcsm::isSafeString(version)){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::ERROR, mcsm::errors::UNSAFE_STRING, {version});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {version});
         return tl::unexpected(err);
     }
     mcsm::VoidResult res3 = this->optionHandle->setValue("version", version);
