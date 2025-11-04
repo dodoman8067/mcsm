@@ -129,7 +129,7 @@ endif()
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -DMCSM_DEBUG")
-    if(LINUX)
+    if(LINUX OR APPLE)
         set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -DMCSM_DEBUG -fsanitize=address,undefined -D_GLIBCXX_ASSERTIONS")
     endif()
 endif()
