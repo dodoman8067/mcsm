@@ -73,10 +73,10 @@ std::unique_ptr<mcsm::JvmOption> mcsm::JvmImportSubCommand::getJvmOption(const m
         mcsm::warning("No parent path detected in the given --path value; defualting to current directory.");
         parentPath = mcsm::unwrapOrExit(mcsm::getCurrentPath());
     }else{
-        parentPath = path.parent_path();
+        parentPath = path.parent_path().string();
     }
 
-    auto optP = std::make_unique<mcsm::Option>(parentPath, path.filename());
+    auto optP = std::make_unique<mcsm::Option>(parentPath, path.filename().string());
     std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(std::move(optP));
     
     mcsm::VoidResult res = opt->init();
