@@ -34,15 +34,6 @@ namespace mcsm {
     void warning(const std::string &message);
     void error(const std::string &message); 
 
-    enum class ResultType{
-        MCSM_SUCCESS,
-        MCSM_OK,
-        MCSM_WARN,
-        MCSM_WARN_NOEXIT,
-        MCSM_FAIL,
-        MCSM_UNKNOWN
-    };
-
     enum class ErrorStatus {
         MCSM_OK,
         MCSM_WARNING,
