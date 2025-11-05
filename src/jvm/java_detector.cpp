@@ -40,7 +40,6 @@ std::set<std::string> addJavasFromEnv(){
         auto env1 = mcsm::getEnvStr("PATH");
 
         std::string mcsmPathStr1(env1);
-        mcsm::replaceAll(mcsmPathStr1, "\\", "/");
 
         size_t found1 = mcsmPathStr1.find_first_of(';');
         while(found1 != std::string::npos){
@@ -53,7 +52,9 @@ std::set<std::string> addJavasFromEnv(){
                 continue;
             }
             if(exists){
-                entries.insert({javaPath1.string()});
+                std::string toAdd = javaPath1.string();
+                mcsm::replaceAll(toAdd, "\\", "/");
+                entries.insert({toAdd});
             }
             mcsmPathStr1 = mcsmPathStr1.substr(found1 + 1);
             found1 = mcsmPathStr1.find_first_of(';');
