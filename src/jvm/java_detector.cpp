@@ -221,6 +221,7 @@ std::set<std::string> mcsm::findJavaPaths(){
 }
 #else
 std::set<std::string> mcsm::findJavaPaths(){
+    #error test
     std::set<std::string> javas;
     for(auto& s : addJavasFromEnv()){
         std::cout << s;
