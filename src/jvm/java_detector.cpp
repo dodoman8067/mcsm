@@ -75,8 +75,10 @@ std::set<std::string> mcsm::findJavaPaths(){
                 continue;
 
             std::filesystem::path prefix = std::filesystem::canonical(entry.path());
+            javas.insert((prefix / "java").string());
             javas.insert((prefix / "jre" / "bin" / "java").string());
             javas.insert((prefix / "bin" / "java").string());
+            std::cout << prefix << " (DEBUG)\n";
         }
     };
 
