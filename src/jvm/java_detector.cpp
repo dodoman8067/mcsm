@@ -8,7 +8,6 @@
 
 std::set<std::string> addJavasFromEnv(){
     auto env = mcsm::getEnvStr("MCSM_JAVA_PATHS");
-    std::cout << env << "\n";
     std::set<std::string> entries;
     
     std::string mcsmPathStr(env);
@@ -17,7 +16,6 @@ std::set<std::string> addJavasFromEnv(){
     size_t found = mcsmPathStr.find_first_of(';');
     if(found == std::string::npos){
         std::filesystem::path a(mcsmPathStr);
-        mcsm::warning((a / "java").string());
         entries.insert((a / "java").string());
     }else{
         while(found != std::string::npos){
@@ -230,7 +228,6 @@ std::set<std::string> mcsm::findJavaPaths(){
 std::set<std::string> mcsm::findJavaPaths(){
     std::set<std::string> javas;
     for(auto& s : addJavasFromEnv()){
-        std::cout << s;
         javas.insert(s);
     }
     return javas;
