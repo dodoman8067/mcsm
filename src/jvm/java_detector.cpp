@@ -17,9 +17,8 @@ std::set<std::string> addJavasFromEnv(){
     size_t found = mcsmPathStr.find_first_of(';');
     if(found == std::string::npos){
         std::filesystem::path a(mcsmPathStr);
-        entries.insert((a / "bin" / "java"));
-        entries.insert((a / "jre" / "bin" / "java"));
-        entries.insert((a / "bin" / "java"));
+        mcsm::warning((a / "java").string());
+        entries.insert((a / "java").string());
     }else{
         while(found != std::string::npos){
             std::string directory = mcsmPathStr.substr(0, found);
