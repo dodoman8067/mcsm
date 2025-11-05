@@ -91,6 +91,7 @@ std::set<std::string> mcsm::findJavaPaths(){
         }
     };
 #ifdef __linux__
+    mcsm::info("yo its linux");
     scanJavaDirs("/usr/java");
     // general locations used by distro packaging
     scanJavaDirs("/usr/lib/jvm");
@@ -138,6 +139,7 @@ std::set<std::string> mcsm::findJavaPaths(){
     scanJavaDirs(mcsm::joinPath(home, ".gradle/jdks"));
     //javas.insert(getMinnecraftJava());
     for(auto& s : addJavasFromEnv()){
+        std::cout << s;
         javas.insert(s);
     }
     return javas;
@@ -221,7 +223,6 @@ std::set<std::string> mcsm::findJavaPaths(){
 }
 #else
 std::set<std::string> mcsm::findJavaPaths(){
-    #error test
     std::set<std::string> javas;
     for(auto& s : addJavasFromEnv()){
         std::cout << s;
