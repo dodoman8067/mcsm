@@ -164,7 +164,7 @@ std::set<std::string> mcsm::findJavaPaths(){
             std::filesystem::path prefix = std::filesystem::canonical(entry.path());
             auto finalPath = prefix / "Contents" / "Home" / "bin" / "java";
             javas.insert(mcsm::normalizePath(finalPath.string()));
-            auto finalPath1 = prefix / "Contents" / "Home" / "jre" / "bin" / "java";
+            auto finalPath1 = prefix / "Contents" / "Commands" / "java";
             javas.insert(mcsm::normalizePath(finalPath1.string()));
         }
     }
@@ -173,13 +173,13 @@ std::set<std::string> mcsm::findJavaPaths(){
 
     std::string sdkManDir = mcsm::getEnvStr("SDKMAN_DIR");
     if(mcsm::isWhitespaceOrEmpty(sdkManDir)) sdkManDir = mcsm::joinPath(home, ".sdkman");
-    if(std::filesystem::exists(sdkManDir) && std::filesystem::is_directory(sdkManDir)){
-        for(const auto& entry : std::filesystem::directory_iterator(sdkManDir)){
+    std::string sdkManJavaDir = mcsm::joinPath(sdkManDir, "candidates/java");
+    if(std::filesystem::exists(sdkManJavaDir) && std::filesystem::is_directory(sdkManJavaDir)){
+        for(const auto& entry : std::filesystem::directory_iterator(sdkManJavaDir)){
             if(!entry.is_directory())
                 continue;
-            std::filesystem::path prefix = std::filesystem::canonical(entry.path());
-            auto finalPath = prefix / "Contents" / "Home" / "bin" / "java";
-            javas.insert(mcsm::normalizePath(finalPath.string()));
+            std::string toAdd = mcsm::normalizePath(entry.path().string() + "/bin/java");
+            javas.insert({toAdd});
         }
     }
 
@@ -190,9 +190,8 @@ std::set<std::string> mcsm::findJavaPaths(){
         for(const auto& entry : std::filesystem::directory_iterator(asdfJavaDir)){
             if(!entry.is_directory())
                 continue;
-            std::filesystem::path prefix = std::filesystem::canonical(entry.path());
-            auto finalPath = prefix / "bin" / "java";
-            javas.insert(mcsm::normalizePath(finalPath.string()));
+            std::string toAdd = mcsm::normalizePath(entry.path().string() + "/bin/java");
+            javas.insert({toAdd});
         }
     }
 
