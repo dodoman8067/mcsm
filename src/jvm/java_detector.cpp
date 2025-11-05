@@ -15,21 +15,28 @@ std::set<std::string> addJavasFromEnv(){
     mcsm::replaceAll(mcsmPathStr, "\\", "/");
 
     size_t found = mcsmPathStr.find_first_of(';');
-    while(found != std::string::npos){
-        std::string directory = mcsmPathStr.substr(0, found);
-        std::filesystem::path javaPath = std::filesystem::path(directory) / javaExecutable;
-        mcsm::info(javaPath.string());
-            
-        std::error_code ec;
-        bool exists = std::filesystem::exists(javaPath, ec);
-        if(ec){
-            continue;
+    if(found == std::string::npos){
+        std::filesystem::path a(mcsmPathStr);
+        entries.insert((a / "bin" / "java"));
+        entries.insert((a / "jre" / "bin" / "java"));
+        entries.insert((a / "bin" / "java"));
+    }else{
+        while(found != std::string::npos){
+            std::string directory = mcsmPathStr.substr(0, found);
+            std::filesystem::path javaPath = std::filesystem::path(directory) / javaExecutable;
+            mcsm::info(javaPath.string());
+
+            std::error_code ec;
+            bool exists = std::filesystem::exists(javaPath, ec);
+            if(ec){
+                continue;
+            }
+            if(exists){
+                entries.insert({javaPath.string()});
+            }
+            mcsmPathStr = mcsmPathStr.substr(found + 1);
+            found = mcsmPathStr.find_first_of(';');
         }
-        if(exists){
-            entries.insert({javaPath.string()});
-        }
-        mcsmPathStr = mcsmPathStr.substr(found + 1);
-        found = mcsmPathStr.find_first_of(';');
     }
 
     #ifdef _WIN32
@@ -77,7 +84,6 @@ std::set<std::string> mcsm::findJavaPaths(){
                 continue;
 
             std::filesystem::path prefix = std::filesystem::canonical(entry.path());
-            javas.insert((prefix / "java").string());
             javas.insert((prefix / "jre" / "bin" / "java").string());
             javas.insert((prefix / "bin" / "java").string());
             std::cout << prefix << " (DEBUG)\n";
