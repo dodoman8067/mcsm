@@ -8,6 +8,7 @@
 
 std::set<std::string> addJavasFromEnv(){
     auto env = mcsm::getEnvStr("MCSM_JAVA_PATHS");
+    std::cout << env << "\n";
     std::set<std::string> entries;
     
     std::string mcsmPathStr(env);
@@ -17,6 +18,7 @@ std::set<std::string> addJavasFromEnv(){
     while(found != std::string::npos){
         std::string directory = mcsmPathStr.substr(0, found);
         std::filesystem::path javaPath = std::filesystem::path(directory) / javaExecutable;
+        mcsm::info(javaPath.string());
             
         std::error_code ec;
         bool exists = std::filesystem::exists(javaPath, ec);
@@ -91,7 +93,6 @@ std::set<std::string> mcsm::findJavaPaths(){
         }
     };
 #ifdef __linux__
-    mcsm::info("yo its linux");
     scanJavaDirs("/usr/java");
     // general locations used by distro packaging
     scanJavaDirs("/usr/lib/jvm");
@@ -139,7 +140,6 @@ std::set<std::string> mcsm::findJavaPaths(){
     scanJavaDirs(mcsm::joinPath(home, ".gradle/jdks"));
     //javas.insert(getMinnecraftJava());
     for(auto& s : addJavasFromEnv()){
-        std::cout << s;
         javas.insert(s);
     }
     return javas;
