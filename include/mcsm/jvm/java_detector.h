@@ -13,7 +13,7 @@ namespace mcsm {
         return std::make_shared<mcsm::JavaInstall>(path);
     }
 
-    std::set<std::string> findJavaPaths(); 
+    std::set<std::string> findJavaPaths();
 }
 
 #endif // __MCSM_JAVA_DETECTOR_H__

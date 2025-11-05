@@ -136,4 +136,82 @@ std::set<std::string> mcsm::findJavaPaths(){
     }
     return javas;
 }
+#elif defined(__APPLE__)
+std::set<std::string> mcsm::findJavaPaths(){
+    std::set<std::string> javas;
+    javas.insert({"java"});
+    javas.insert({"/Applications/Xcode.app/Contents/Applications/Application Loader.app/Contents/MacOS/itms/java/bin/java"});
+    javas.insert({"/Library/Internet Plug-Ins/JavaAppletPlugin.plugin/Contents/Home/bin/java"});
+    javas.insert({"/System/Library/Frameworks/JavaVM.framework/Versions/Current/Commands/java"});
+    std::filesystem::path libJvmDir("/Library/Java/JavaVirtualMachines/");
+    if(std::filesystem::exists(libJvmDir) && std::filesystem::is_directory(libJvmDir)){
+        for(const auto& entry : std::filesystem::directory_iterator(libJvmDir)){
+            if(!entry.is_directory())
+                continue;
+            std::filesystem::path prefix = std::filesystem::canonical(entry.path());
+            auto finalPath = prefix / "Contents" / "Home" / "bin" / "java";
+            auto finalPath1 = prefix / "Contents" / "Home" / "jre" / "bin" / "java";
+            javas.insert(mcsm::normalizePath(finalPath.string()));
+            javas.insert(mcsm::normalizePath(finalPath1.string()));
+        }
+    }
+
+    std::filesystem::path sysLibJvmDir("/System/Library/Java/JavaVirtualMachines/");
+    if(std::filesystem::exists(sysLibJvmDir) && std::filesystem::is_directory(sysLibJvmDir)){
+        for(const auto& entry : std::filesystem::directory_iterator(sysLibJvmDir)){
+            if(!entry.is_directory())
+                continue;
+            std::filesystem::path prefix = std::filesystem::canonical(entry.path());
+            auto finalPath = prefix / "Contents" / "Home" / "bin" / "java";
+            javas.insert(mcsm::normalizePath(finalPath.string()));
+            auto finalPath1 = prefix / "Contents" / "Home" / "jre" / "bin" / "java";
+            javas.insert(mcsm::normalizePath(finalPath1.string()));
+        }
+    }
+
+    std::string home = mcsm::getEnvStr("HOME");
+
+    std::string sdkManDir = mcsm::getEnvStr("SDKMAN_DIR");
+    if(mcsm::isWhitespaceOrEmpty(sdkManDir)) sdkManDir = mcsm::joinPath(home, ".sdkman");
+    if(std::filesystem::exists(sdkManDir) && std::filesystem::is_directory(sdkManDir)){
+        for(const auto& entry : std::filesystem::directory_iterator(sdkManDir)){
+            if(!entry.is_directory())
+                continue;
+            std::filesystem::path prefix = std::filesystem::canonical(entry.path());
+            auto finalPath = prefix / "Contents" / "Home" / "bin" / "java";
+            javas.insert(mcsm::normalizePath(finalPath.string()));
+        }
+    }
+
+    std::string asdfDir = mcsm::getEnvStr("ASDF_DATA_DIR");
+    if(mcsm::isWhitespaceOrEmpty(asdfDir)) asdfDir = mcsm::joinPath(home, ".asdf");
+    std::string asdfJavaDir = mcsm::joinPath(asdfDir, "installs/java");
+    if(std::filesystem::exists(asdfJavaDir) && std::filesystem::is_directory(asdfJavaDir)){
+        for(const auto& entry : std::filesystem::directory_iterator(asdfJavaDir)){
+            if(!entry.is_directory())
+                continue;
+            std::filesystem::path prefix = std::filesystem::canonical(entry.path());
+            auto finalPath = prefix / "bin" / "java";
+            javas.insert(mcsm::normalizePath(finalPath.string()));
+        }
+    }
+
+    std::filesystem::path homeLibJvmDir(mcsm::joinPath(home, "/Library/Java/JavaVirtualMachines/"));
+    if(std::filesystem::exists(homeLibJvmDir) && std::filesystem::is_directory(homeLibJvmDir)){
+        for(const auto& entry : std::filesystem::directory_iterator(homeLibJvmDir)){
+            if(!entry.is_directory())
+                continue;
+            std::filesystem::path prefix = std::filesystem::canonical(entry.path());
+            auto finalPath  = prefix / "Contents" / "Home" / "bin" / "java";
+            javas.insert(mcsm::normalizePath(finalPath.string()));
+            auto finalPath1 = prefix / "Contents" / "Commands" / "java";
+            javas.insert(mcsm::normalizePath(finalPath1.string()));
+        }
+    }
+
+    for(auto& s : addJavasFromEnv()){
+        javas.insert(s);
+    }
+    return javas;
+}
 #endif
