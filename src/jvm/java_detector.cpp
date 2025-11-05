@@ -126,8 +126,12 @@ std::set<std::string> mcsm::findJavaPaths(){
     auto sdkmanDir = mcsm::getEnvStr("SDKMAN_DIR");
     if(mcsm::isWhitespaceOrEmpty(sdkmanDir)) sdkmanDir = mcsm::joinPath(home, ".sdkman");
 
+    scanJavaDirs(mcsm::joinPath(sdkmanDir, "candidates/java"));
+
     auto asdfDataDir = mcsm::getEnvStr("ASDF_DATA_DIR");
     if(mcsm::isWhitespaceOrEmpty(asdfDataDir)) asdfDataDir = mcsm::joinPath(home, ".asdf");
+    
+    scanJavaDirs(mcsm::joinPath(asdfDataDir, "installs/java"))
 
     scanJavaDirs(mcsm::joinPath(home, ".gradle/jdks"));
     //javas.insert(getMinnecraftJava());
