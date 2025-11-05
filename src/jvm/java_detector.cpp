@@ -138,7 +138,6 @@ std::set<std::string> mcsm::findJavaPaths(){
     scanJavaDirs(mcsm::joinPath(home, ".gradle/jdks"));
     //javas.insert(getMinnecraftJava());
     for(auto& s : addJavasFromEnv()){
-        std::cout << s;
         javas.insert(s);
     }
     return javas;
@@ -216,6 +215,15 @@ std::set<std::string> mcsm::findJavaPaths(){
     }
 
     for(auto& s : addJavasFromEnv()){
+        javas.insert(s);
+    }
+    return javas;
+}
+#else
+std::set<std::string> mcsm::findJavaPaths(){
+    std::set<std::string> javas;
+    for(auto& s : addJavasFromEnv()){
+        std::cout << s;
         javas.insert(s);
     }
     return javas;
