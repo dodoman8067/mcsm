@@ -32,6 +32,8 @@ namespace mcsm {
      * @param url link to perform GET request
     */
     const mcsm::StringResult get(const std::string& url);
+
+    const mcsm::StringResult get(const std::string& url, const std::string& userAgent);
 }
 
 
