@@ -30,11 +30,23 @@ SOFTWARE.
 #include <mcsm/util/mc/mc_utils.h>
 
 namespace mcsm {
+    struct PaperMetadata {
+        std::vector<std::string> recommendedJavaFlags;
+        std::string minJava;
+        std::string channel; // alpha, stable etc..
+        std::string supportStatus;
+        std::string downloadUrl;
+        std::string build;
+    };
+
     class PaperServer : public mcsm::BukkitServer, public mcsm::Downloadable, public std::enable_shared_from_this<PaperServer> {
     private:
     public:
         PaperServer();
         ~PaperServer();
+
+        mcsm::Result<mcsm::PaperMetadata> getVersionData(const std::string& ver);
+        mcsm::Result<mcsm::PaperMetadata> getVersionData(const std::string& ver, const std::string& build);
 
         mcsm::IntResult getVersion(const std::string& ver) const;
         mcsm::IntResult getVersion(const std::string& ver, const std::string& build) const;
