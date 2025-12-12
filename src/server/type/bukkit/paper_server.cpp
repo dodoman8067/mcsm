@@ -40,8 +40,7 @@ mcsm::Result<mcsm::PaperMetadata> mcsm::PaperServer::getVersionData(const std::s
     }
     nlohmann::json jvonVersion = json1["version"];
     if(jvonVersion == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"version\"", "https://fill.papermc.io/v3/projects/paper/versions/" + ver});
-        err.solution = "This is likely caused by PaperMC API breakage.";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_UNSUPPORTED_VERSION_CUSTOM, {ver});
         return tl::unexpected(err);
     }
     if(!jvonVersion.is_object()){
@@ -115,6 +114,7 @@ mcsm::Result<mcsm::PaperMetadata> mcsm::PaperServer::getVersionData(const std::s
             metaJVMFlags.push_back(s.get<std::string>());
         }
     }
+    metaJVMFlags.push_back("-jar");
     
     if(javaVersion == nullptr){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"version\" in \"java\"", "https://fill.papermc.io/v3/projects/paper/versions/" + ver});
@@ -146,8 +146,7 @@ mcsm::Result<mcsm::PaperMetadata> mcsm::PaperServer::getVersionData(const std::s
         return tl::unexpected(err);
     }
     if(json["id"] == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"id\"", "https://fill.papermc.io/v3/projects/paper/versions/" + ver + "/builds/latest"});
-        err.solution = "This is likely caused by PaperMC API breakage.";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_UNSUPPORTED_VERSION_CUSTOM, {ver + " with build latest"});
         return tl::unexpected(err);
     }
     if(!json["id"].is_number_integer()){
@@ -233,8 +232,7 @@ mcsm::Result<mcsm::PaperMetadata> mcsm::PaperServer::getVersionData(const std::s
     }
     nlohmann::json jvonVersion = json1["version"];
     if(jvonVersion == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"version\"", "https://fill.papermc.io/v3/projects/paper/versions/" + ver});
-        err.solution = "This is likely caused by PaperMC API breakage.";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_UNSUPPORTED_VERSION_CUSTOM, {ver});
         return tl::unexpected(err);
     }
     if(!jvonVersion.is_object()){
@@ -308,6 +306,7 @@ mcsm::Result<mcsm::PaperMetadata> mcsm::PaperServer::getVersionData(const std::s
             metaJVMFlags.push_back(s.get<std::string>());
         }
     }
+    metaJVMFlags.push_back("-jar");
     
     if(javaVersion == nullptr){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"version\" in \"java\"", "https://fill.papermc.io/v3/projects/paper/versions/" + ver});
@@ -336,6 +335,10 @@ mcsm::Result<mcsm::PaperMetadata> mcsm::PaperServer::getVersionData(const std::s
     nlohmann::json json = nlohmann::json::parse(res.value(), nullptr, false);
     if(json.is_discarded()){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::GET_REQUEST_FAILED, {"https://fill.papermc.io/v3/projects/paper/versions/" + ver + "/builds/" + build, "Invalid API json responce"});
+        return tl::unexpected(err);
+    }
+    if(json["id"] == nullptr){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_UNSUPPORTED_VERSION_CUSTOM, {ver + " with build " + build});
         return tl::unexpected(err);
     }
 
@@ -473,6 +476,21 @@ std::string mcsm::PaperServer::getGitHub() const {
     return "https://github.com/PaperMC/Paper";
 }
 
+const tl::expected<std::map<std::string, std::string>, mcsm::Error> mcsm::PaperServer::getRequiredValues() const {
+    return tl::expected<std::map<std::string, std::string>, mcsm::Error>{
+        std::map<std::string, std::string>{
+                {"name", "" },
+                {"minecraft_version", ""},
+                {"if_paper_should_generate_recommended_profile", "false"},
+                {"default_jvm_launch_profile_search_path", "current"},
+                {"default_jvm_launch_profile_name", ""},
+                {"server_jarfile", getTypeAsString() + ".jar"},
+                {"server_build_version", "latest"},
+                {"auto_server_jar_update", "true"}
+        }
+    };
+}
+
 mcsm::VoidResult mcsm::PaperServer::download(const std::string& version){
     auto path1 = mcsm::getCurrentPath();
     if(!path1) return tl::unexpected(path1.error());
@@ -550,31 +568,21 @@ mcsm::VoidResult mcsm::PaperServer::download(const std::string& version, const s
     }
     if(serverBuildValue != "latest"){
         std::string build = serverBuildValue.get<std::string>();
-        auto ver = getVersion(version, build);
+        auto ver = getVersionData(version, build);
         if(!ver) return tl::unexpected(ver.error());
 
-        if(ver.value() == -1){
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {build});
-            return tl::unexpected(err);
-        }
-        std::string strVer = std::to_string(ver.value());
-        std::string url = "https://api.papermc.io/v2/projects/paper/versions/" + version + "/builds/" + strVer + "/downloads/paper-" + version + "-" + strVer + ".jar";
-        mcsm::info("URL : " + url);
-        auto res = mcsm::download(name, url, path, true);
+        std::string strVer = ver.value().build;
+        mcsm::info("URL : " + ver.value().downloadUrl);
+        auto res = mcsm::download(name, ver.value().downloadUrl, path, true);
         if(!res) return res;
         return sDataOpt.updateLastDownloadedBuild(strVer);
     }else{
-        auto ver = getVersion(version);
+        auto ver = getVersionData(version);
         if(!ver) return tl::unexpected(ver.error());
 
-        if(ver.value() == -1){
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {});
-            return tl::unexpected(err);
-        }
-        std::string strVer = std::to_string(ver.value());
-        std::string url = "https://api.papermc.io/v2/projects/paper/versions/" + version + "/builds/" + strVer + "/downloads/paper-" + version + "-" + strVer + ".jar";
-        mcsm::info("URL : " + url);
-        auto res = mcsm::download(name, url, path, true);
+        std::string strVer = ver.value().build;
+        mcsm::info("URL : " + ver.value().downloadUrl);
+        auto res = mcsm::download(name, ver.value().downloadUrl, path, true);
         if(!res) return res;
         return sDataOpt.updateLastDownloadedBuild(strVer);
     }
@@ -703,13 +711,53 @@ mcsm::VoidResult mcsm::PaperServer::generate(const std::string& name, mcsm::JvmO
     bool skipCheck = propertyValue;
 
     if(!skipCheck){
-        auto vExists = this->hasVersion(version);
-        if(!vExists) return tl::unexpected(vExists.error());
-        if(!vExists.value()){
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {});
-            return tl::unexpected(err);
+        auto vExists = this->getVersionData(version);
+        if(!vExists){
+            if(vExists.error().code != mcsm::errors::SERVER_UNSUPPORTED_VERSION_CUSTOM.code){
+                return tl::unexpected(vExists.error());
+            }
         }
     }
+    if(extraValues.find("if_paper_should_generate_recommended_profile")->second == "true"){
+        auto vData = this->getVersionData(version);
+        if(!vData){
+            if(vData.error().code != mcsm::errors::SERVER_UNSUPPORTED_VERSION_CUSTOM.code){
+                return tl::unexpected(vData.error());
+            }
+        }
+        mcsm::JvmOption option(mcsm::unwrapOrExit(mcsm::jvmProfileFromSearchTarget("_paper_autogenerated", mcsm::SearchTarget::CURRENT, path)));
+        auto initRes = option.init();
+        if(!initRes){
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_WARNING_NOEXIT, mcsm::errors::FILE_CREATE_FAILED, {"for internal reason: " + initRes.error().message});
+            return tl::unexpected(err);
+        }
+
+        auto jvm = mcsm::detectJava();
+        if(!jvm){
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_WARNING_NOEXIT, mcsm::errors::FILE_CREATE_FAILED, {"for internal reason: " + jvm.error().message});
+            return tl::unexpected(err);
+        }
+
+        auto createRes = option.create(jvm.value(), vData.value().recommendedJavaFlags);
+        if(!createRes){
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_WARNING_NOEXIT, mcsm::errors::FILE_CREATE_FAILED, {"for internal reason: " + createRes.error().message});
+            return tl::unexpected(err);
+        }
+        mcsm::info("Java Virtual Machine launch profile generated : ");
+        mcsm::info("Profile name : _paper_autogenerated");
+        mcsm::info("Profile location : " + path);
+        mcsm::info("JVM path : " + jvm.value());
+
+        if(!vData.value().recommendedJavaFlags.empty()) {
+            std::cout << "[mcsm/INFO] JVM arguments : ";
+            for(std::string_view args : vData.value().recommendedJavaFlags) {
+                std::cout << args << " ";
+            }
+            std::cout << "\n";
+        }
+        mcsm::info("Server arguments : nogui");
+    }
+
     mcsm::ServerDataOption opt(path);
 
     // No need to call opt.load() here. create() in ServerDataOption will call it eventually

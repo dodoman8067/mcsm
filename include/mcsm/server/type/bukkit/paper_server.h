@@ -75,6 +75,8 @@ namespace mcsm {
 
         std::string getTypeAsString() const override;
 
+        const tl::expected<std::map<std::string, std::string>, mcsm::Error> getRequiredValues() const override;
+
         mcsm::VoidResult update();
         mcsm::VoidResult update(const std::string& optionPath);
         mcsm::VoidResult update(const std::string& path, const std::string& optionPath);

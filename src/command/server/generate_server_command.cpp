@@ -94,6 +94,14 @@ bool mcsm::GenerateServerCommand::checkValid(const std::string& key, std::string
         }
         return !(value != "true" && value != "false");
     }
+    if(key == "if_paper_should_generate_recommended_profile"){
+        if(mcsm::isWhitespaceOrEmpty(value)){
+            value = defaultValue;
+            return true;
+        }
+        return !(value != "true" && value != "false");
+    }
+
     return !mcsm::isWhitespaceOrEmpty(value);
 }
 
