@@ -22,11 +22,8 @@ namespace mcsm {
         FoliaServer();
         ~FoliaServer();
 
-        mcsm::Result<mcsm::FoliaMetaData> getVersionData(const std::string& ver);
-        mcsm::Result<mcsm::FoliaMetaData> getVersionData(const std::string& ver, const std::string& build);
-
-        mcsm::IntResult getVersion(const std::string& ver) const;
-        mcsm::IntResult getVersion(const std::string& ver, const std::string& build) const;
+        mcsm::Result<mcsm::FoliaMetaData> getVersionData(const std::string& ver) const;
+        mcsm::Result<mcsm::FoliaMetaData> getVersionData(const std::string& ver, const std::string& build) const;
 
         std::vector<std::string> getAvailableVersions() override;
 
@@ -55,6 +52,8 @@ namespace mcsm {
         mcsm::VoidResult update();
         mcsm::VoidResult update(const std::string& optionPath);
         mcsm::VoidResult update(const std::string& path, const std::string& optionPath);
+        
+        const tl::expected<std::map<std::string, std::string>, mcsm::Error> getRequiredValues() const override;
 
         mcsm::VoidResult generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues) override;
     };

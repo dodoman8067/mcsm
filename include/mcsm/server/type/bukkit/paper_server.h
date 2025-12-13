@@ -45,11 +45,8 @@ namespace mcsm {
         PaperServer();
         ~PaperServer();
 
-        mcsm::Result<mcsm::PaperMetadata> getVersionData(const std::string& ver);
-        mcsm::Result<mcsm::PaperMetadata> getVersionData(const std::string& ver, const std::string& build);
-
-        mcsm::IntResult getVersion(const std::string& ver) const;
-        mcsm::IntResult getVersion(const std::string& ver, const std::string& build) const;
+        mcsm::Result<mcsm::PaperMetadata> getVersionData(const std::string& ver) const;
+        mcsm::Result<mcsm::PaperMetadata> getVersionData(const std::string& ver, const std::string& build) const;
 
         std::vector<std::string> getAvailableVersions() override;
 

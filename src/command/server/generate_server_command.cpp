@@ -56,6 +56,16 @@ bool mcsm::GenerateServerCommand::checkValid(const std::string& key, std::string
         }
         return !(value != "true" && value != "false");
     }
+    if(key == "minecraft_version"){
+        if(mcsm::isWhitespaceOrEmpty(value) && !mcsm::isWhitespaceOrEmpty(defaultValue)){
+            value = defaultValue;
+            return true;
+        }
+        if(mcsm::isWhitespaceOrEmpty(value) && mcsm::isWhitespaceOrEmpty(defaultValue)){
+            return false;
+        }
+        return true;
+    }
     if(key == "server_jarfile"){
         if(mcsm::isWhitespaceOrEmpty(value)){
             value = defaultValue;
@@ -101,7 +111,20 @@ bool mcsm::GenerateServerCommand::checkValid(const std::string& key, std::string
         }
         return !(value != "true" && value != "false");
     }
-
+    if(key == "if_folia_should_generate_recommended_profile"){
+        if(mcsm::isWhitespaceOrEmpty(value)){
+            value = defaultValue;
+            return true;
+        }
+        return !(value != "true" && value != "false");
+    }
+    if(key == "if_velocity_should_generate_recommended_profile"){
+        if(mcsm::isWhitespaceOrEmpty(value)){
+            value = defaultValue;
+            return true;
+        }
+        return !(value != "true" && value != "false");
+    }
     return !mcsm::isWhitespaceOrEmpty(value);
 }
 

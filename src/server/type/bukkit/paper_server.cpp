@@ -26,7 +26,7 @@ mcsm::PaperServer::PaperServer() {}
 
 mcsm::PaperServer::~PaperServer() {}
 
-mcsm::Result<mcsm::PaperMetadata> mcsm::PaperServer::getVersionData(const std::string& ver){
+mcsm::Result<mcsm::PaperMetadata> mcsm::PaperServer::getVersionData(const std::string& ver) const {
     if(!mcsm::isSafeString(ver)){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {ver});
         return tl::unexpected(err);
@@ -214,7 +214,7 @@ mcsm::Result<mcsm::PaperMetadata> mcsm::PaperServer::getVersionData(const std::s
     return meta;
 }
 
-mcsm::Result<mcsm::PaperMetadata> mcsm::PaperServer::getVersionData(const std::string& ver, const std::string& build){
+mcsm::Result<mcsm::PaperMetadata> mcsm::PaperServer::getVersionData(const std::string& ver, const std::string& build) const {
     if(!mcsm::isSafeString(ver)){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {ver});
         return tl::unexpected(err);
@@ -398,58 +398,6 @@ mcsm::Result<mcsm::PaperMetadata> mcsm::PaperServer::getVersionData(const std::s
     meta.supportStatus = metaSupportStatus;
     meta.minJava = metaMinJava;
     return meta;
-}
-
-mcsm::IntResult mcsm::PaperServer::getVersion(const std::string& ver) const {
-    if(!mcsm::isSafeString(ver)){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {ver});
-        return tl::unexpected(err);
-    }
-    auto res = mcsm::get("https://api.papermc.io/v2/projects/paper/versions/" + ver, "mcsm/0.6 (https://github.com/dodoman8067/mcsm)");
-    if(!res) return tl::unexpected(res.error());
-    nlohmann::json json = nlohmann::json::parse(res.value(), nullptr, false);
-    if(json.is_discarded()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::GET_REQUEST_FAILED, {"https://api.papermc.io/v2/projects/paper/versions/" + ver, "Invalid API json responce"});
-        return tl::unexpected(err);
-    }
-    if(json["builds"] == nullptr){
-        return -1; // keep it this way; otherwise it returns invalid get error instead of unsupported version error
-    }
-    if(json["builds"].is_array()){
-        nlohmann::json builds = json["builds"];
-        if(builds[json["builds"].size() - 1] == nullptr || !builds[json["builds"].size() - 1].is_number_integer()) return -1;
-        return builds[json["builds"].size() - 1];
-    }else{
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::GET_REQUEST_FAILED, {"https://api.papermc.io/v2/projects/paper/versions/" + ver, "Invalid API json responce on property \"builds\""});
-        return tl::unexpected(err);
-    }
-}
-
-// used for checking if versions with specific build exists
-mcsm::IntResult mcsm::PaperServer::getVersion(const std::string& ver, const std::string& build) const {
-    if(!mcsm::isSafeString(build)){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {build});
-        return tl::unexpected(err);
-    }
-    if(!mcsm::isSafeString(ver)){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {ver});
-        return tl::unexpected(err);
-    }
-    auto res = mcsm::get("https://api.papermc.io/v2/projects/paper/versions/" + ver + "/builds/" + build);
-    if(!res) return tl::unexpected(res.error());
-    nlohmann::json json = nlohmann::json::parse(res.value(), nullptr, false);
-    if(json.is_discarded()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::GET_REQUEST_FAILED, {"https://api.papermc.io/v2/projects/paper/versions/" + ver + "/builds/" + build, "Invalid API json responce"});
-        return tl::unexpected(err);
-    }
-
-    if(json["build"] == nullptr) return -1;  // keep it this way; otherwise it returns invalid get error instead of unsupported version error
-    if(!json["build"].is_number_integer()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::GET_REQUEST_FAILED, {"https://api.papermc.io/v2/projects/paper/versions/" + ver + "/builds/" + build, "Invalid API json responce on property \"build\""});
-        return tl::unexpected(err);
-    }else{
-        return json["build"];
-    }
 }
 
 std::vector<std::string> mcsm::PaperServer::getAvailableVersions(){
@@ -665,21 +613,19 @@ mcsm::VoidResult mcsm::PaperServer::update(const std::string& path, const std::s
     auto version = loader.getServerVersion();
     if(!version) return tl::unexpected(version.error());
     
-    auto ver = getVersion(version.value());
-    if(!ver) return tl::unexpected(ver.error());
-
-    if(ver.value() == -1){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_UNSUPPORTED_VERSION, {});
-        return tl::unexpected(err);
+    auto vData = this->getVersionData(version.value());
+    if(!vData){
+        return tl::unexpected(vData.error());
     }
+
     auto lastBuild = sDataOpt.getLastDownloadedBuild();
     if(!lastBuild) return tl::unexpected(lastBuild.error());
 
-    if(lastBuild.value() == std::to_string(ver.value())){
+    if(lastBuild.value() == vData.value().build){
         mcsm::success("Server is up to date.");
         return {};
     }
-    mcsm::success("Update found : "  + std::to_string(ver.value()) + ". Current build : " + lastBuild.value());
+    mcsm::success("Update found : "  + vData.value().build + ". Current build : " + lastBuild.value());
 
     auto jar = loader.getServerJarFile();
     if(!jar) return tl::unexpected(jar.error());
@@ -713,17 +659,13 @@ mcsm::VoidResult mcsm::PaperServer::generate(const std::string& name, mcsm::JvmO
     if(!skipCheck){
         auto vExists = this->getVersionData(version);
         if(!vExists){
-            if(vExists.error().code != mcsm::errors::SERVER_UNSUPPORTED_VERSION_CUSTOM.code){
-                return tl::unexpected(vExists.error());
-            }
+            return tl::unexpected(vExists.error());
         }
     }
     if(extraValues.find("if_paper_should_generate_recommended_profile")->second == "true"){
         auto vData = this->getVersionData(version);
         if(!vData){
-            if(vData.error().code != mcsm::errors::SERVER_UNSUPPORTED_VERSION_CUSTOM.code){
-                return tl::unexpected(vData.error());
-            }
+            return tl::unexpected(vData.error());
         }
         mcsm::JvmOption option(mcsm::unwrapOrExit(mcsm::jvmProfileFromSearchTarget("_paper_autogenerated", mcsm::SearchTarget::CURRENT, path)));
         auto initRes = option.init();
@@ -765,7 +707,9 @@ mcsm::VoidResult mcsm::PaperServer::generate(const std::string& name, mcsm::JvmO
 }
 
 mcsm::BoolResult mcsm::PaperServer::hasVersion(const std::string& version) const {
-    return getVersion(version) != -1;
+    auto res = getVersionData(version);
+    if(!res) return tl::unexpected(res.error());
+    return !mcsm::isWhitespaceOrEmpty(res.value().build);
 }
 
 std::string mcsm::PaperServer::getTypeAsString() const {
