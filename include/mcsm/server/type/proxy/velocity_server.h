@@ -32,11 +32,23 @@ SOFTWARE.
 #include <mcsm/util/mc/mc_utils.h>
 
 namespace mcsm {
+    struct VelocityMetaData {
+        std::vector<std::string> recommendedJavaFlags;
+        std::string minJava;
+        std::string channel; // alpha, stable etc..
+        std::string supportStatus;
+        std::string downloadUrl;
+        std::string build;
+    };
     class VelocityServer : public mcsm::Server, public mcsm::Downloadable, public std::enable_shared_from_this<VelocityServer> {
     private:
     public:
         VelocityServer();
         ~VelocityServer();
+
+        mcsm::Result<mcsm::VelocityMetaData> getVersionData();
+        mcsm::Result<mcsm::VelocityMetaData> getVersionData(const std::string& ver);
+        mcsm::Result<mcsm::VelocityMetaData> getVersionData(const std::string& ver, const std::string& build);
 
         mcsm::IntResult getVersion(const std::string& ver) const;
         mcsm::IntResult getVersion(const std::string& ver, const std::string& build) const;

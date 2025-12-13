@@ -8,11 +8,22 @@
 #include <mcsm/util/mc/mc_utils.h>
 
 namespace mcsm {
+    struct FoliaMetaData {
+        std::vector<std::string> recommendedJavaFlags;
+        std::string minJava;
+        std::string channel; // alpha, stable etc..
+        std::string supportStatus;
+        std::string downloadUrl;
+        std::string build;
+    };
     class FoliaServer : public mcsm::BukkitServer, public mcsm::Downloadable, public std::enable_shared_from_this<FoliaServer> {
     private:
     public:
         FoliaServer();
         ~FoliaServer();
+
+        mcsm::Result<mcsm::FoliaMetaData> getVersionData(const std::string& ver);
+        mcsm::Result<mcsm::FoliaMetaData> getVersionData(const std::string& ver, const std::string& build);
 
         mcsm::IntResult getVersion(const std::string& ver) const;
         mcsm::IntResult getVersion(const std::string& ver, const std::string& build) const;
