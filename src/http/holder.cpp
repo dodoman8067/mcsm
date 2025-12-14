@@ -3,15 +3,16 @@
 CURL* mcsm::curl_holder::curl = nullptr;
 std::mutex mcsm::curl_holder::curl_mutex;
 
-mcsm::Result mcsm::curl_holder::init(){
+mcsm::VoidResult mcsm::curl_holder::init(){
     std::lock_guard<std::mutex> lock(curl_mutex);
     if(!curl){
         curl = curl_easy_init();
         if(!curl){
-            return {mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::curlInitFailed()};
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::CURL_INIT_FAILED, {});
+            return tl::unexpected(err);
         }
     }
-    return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
+    return {};
 }
 
 void mcsm::curl_holder::cleanup(){

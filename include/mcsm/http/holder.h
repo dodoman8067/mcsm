@@ -15,7 +15,7 @@ namespace mcsm {
         static CURL* curl;
         static std::mutex curl_mutex;
         
-        static mcsm::Result init();
+        static mcsm::VoidResult init();
         static void cleanup();
     };
 }

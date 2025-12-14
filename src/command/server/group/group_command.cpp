@@ -28,34 +28,23 @@ void mcsm::GroupCommand::execute(const std::vector<std::string>& args){
     // will handle string valid checks on command classes.
     // only handle them here if you must
     if(subc == "add"){
-        mcsm::ServerGroupLoader gl(mcsm::getCurrentPath());
-        mcsm::Result loadRes = gl.load();
-        if(!loadRes.isSuccess()){
-            loadRes.printMessage();
-            if(loadRes.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
+        mcsm::ServerGroupLoader gl(mcsm::unwrapOrExit(mcsm::getCurrentPath()));
+        mcsm::unwrapOrExit(gl.load());
         
         mcsm::GroupAddSubCommand cmd(&gl);
         cmd.execute(subArgs);
     }
     if(subc == "remove"){
-        mcsm::ServerGroupLoader gl(mcsm::getCurrentPath());
-        mcsm::Result loadRes = gl.load();
-        if(!loadRes.isSuccess()){
-            loadRes.printMessage();
-            if(loadRes.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
+        mcsm::ServerGroupLoader gl(mcsm::unwrapOrExit(mcsm::getCurrentPath()));
+        mcsm::unwrapOrExit(gl.load());
+
         
         mcsm::GroupRemoveSubCommand cmd(&gl);
         cmd.execute(subArgs); 
     }
     if(subc == "attach"){
-        std::unique_ptr<mcsm::ServerGroupLoader> gl = std::make_unique<mcsm::ServerGroupLoader>(mcsm::getCurrentPath());
-        mcsm::Result loadRes = gl->load();
-        if(!loadRes.isSuccess()){
-            loadRes.printMessage();
-            if(loadRes.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
+        std::unique_ptr<mcsm::ServerGroupLoader> gl = std::make_unique<mcsm::ServerGroupLoader>(mcsm::unwrapOrExit(mcsm::getCurrentPath()));
+        mcsm::unwrapOrExit(gl->load());
 
         mcsm::ServerGroupManager sm(std::move(gl));
         
@@ -70,19 +59,15 @@ void mcsm::GroupCommand::execute(const std::vector<std::string>& args){
         }
         std::string name = subArgs[0];
         std::string mode = subArgs[1];
-        std::string path = mcsm::getCurrentPath(); // going to make my program able to specify where to configure the file. use subArgs[2] if implemented
+        std::string path = mcsm::unwrapOrExit(mcsm::getCurrentPath()); // going to make my program able to specify where to configure the file. use subArgs[2] if implemented
 
         mcsm::ServerGroupGenerator gen(name, path);
         mcsm::GroupInitSubCommand cmd(&gen);
         cmd.execute(subArgs);
     }
     if(subc == "list"){
-        std::unique_ptr<mcsm::ServerGroupLoader> gl = std::make_unique<mcsm::ServerGroupLoader>(mcsm::getCurrentPath());
-        mcsm::Result loadRes = gl->load();
-        if(!loadRes.isSuccess()){
-            loadRes.printMessage();
-            if(loadRes.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
+        std::unique_ptr<mcsm::ServerGroupLoader> gl = std::make_unique<mcsm::ServerGroupLoader>(mcsm::unwrapOrExit(mcsm::getCurrentPath()));
+        mcsm::unwrapOrExit(gl->load());
 
         mcsm::ServerGroupManager sm(std::move(gl));
         
@@ -90,12 +75,8 @@ void mcsm::GroupCommand::execute(const std::vector<std::string>& args){
         cmd.execute(subArgs);
     }
     if(subc == "start"){
-        std::unique_ptr<mcsm::ServerGroupLoader> gl = std::make_unique<mcsm::ServerGroupLoader>(mcsm::getCurrentPath());
-        mcsm::Result loadRes = gl->load();
-        if(!loadRes.isSuccess()){
-            loadRes.printMessage();
-            if(loadRes.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
+        std::unique_ptr<mcsm::ServerGroupLoader> gl = std::make_unique<mcsm::ServerGroupLoader>(mcsm::unwrapOrExit(mcsm::getCurrentPath()));
+        mcsm::unwrapOrExit(gl->load());
 
         mcsm::ServerGroupManager sm(std::move(gl));
         
@@ -103,12 +84,8 @@ void mcsm::GroupCommand::execute(const std::vector<std::string>& args){
         cmd.execute(subArgs);
     }
     if(subc == "stop"){
-        std::unique_ptr<mcsm::ServerGroupLoader> gl = std::make_unique<mcsm::ServerGroupLoader>(mcsm::getCurrentPath());
-        mcsm::Result loadRes = gl->load();
-        if(!loadRes.isSuccess()){
-            loadRes.printMessage();
-            if(loadRes.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
+        std::unique_ptr<mcsm::ServerGroupLoader> gl = std::make_unique<mcsm::ServerGroupLoader>(mcsm::unwrapOrExit(mcsm::getCurrentPath()));
+        mcsm::unwrapOrExit(gl->load());
 
         mcsm::ServerGroupManager sm(std::move(gl));
         

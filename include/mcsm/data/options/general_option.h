@@ -15,13 +15,14 @@ namespace mcsm {
     private:
         GeneralOption() = default;
 
-        std::unique_ptr<mcsm::GlobalOption> optionHandle;
+        std::unique_ptr<mcsm::Option> optionHandle;
         std::vector<mcsm::GeneralProperty*> properties;
 
-        mcsm::Result save();
-        mcsm::Result load();
+        mcsm::VoidResult save();
+        mcsm::VoidResult load();
 
         bool advp;
+        bool advpb;
         std::string sbp;
     public:
         GeneralOption(const mcsm::GeneralOption&) = delete;
@@ -29,18 +30,19 @@ namespace mcsm {
         ~GeneralOption() = default;
 
         // initializes optionHandle
-        static mcsm::Result initialize();
+        static mcsm::VoidResult initialize();
         // returns instance of GeneralOption
         static mcsm::GeneralOption& getGeneralOption();
 
         std::vector<mcsm::GeneralProperty*>& getProperties() const;
 
         mcsm::GeneralProperty* getProperty(const std::string& propertyName) const;
-        mcsm::Result setProperty(const std::string& propertyName, nlohmann::json newValue);
+        mcsm::VoidResult setProperty(const std::string& propertyName, nlohmann::json newValue);
 
-        mcsm::GlobalOption* getOption();
+        mcsm::Option* getOption();
 
         bool advancedParseEnabled() const;
+        bool colorDownloadProgressBar() const;
         std::string screenBinPathProperty() const;
     };
 }

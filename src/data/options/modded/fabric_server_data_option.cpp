@@ -6,68 +6,80 @@ mcsm::FabricServerDataOption::FabricServerDataOption(const std::string& path) : 
 
 mcsm::FabricServerDataOption::~FabricServerDataOption(){}
 
-std::string mcsm::FabricServerDataOption::getLoaderVersion() const {
-    bool optExists = this->option->exists();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-    if(!optExists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::fileNotFound(this->option->getName())});
-        return "";
+mcsm::StringResult mcsm::FabricServerDataOption::getLoaderVersion() const {
+    auto optExists = this->option->exists();
+    if(!optExists) return tl::unexpected(optExists.error());
+    if(!optExists.value()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_NOT_CONFIGURED, {this->option->getPath()});
+        return tl::unexpected(err);
     }
 
-    const nlohmann::json& value = this->option->getValue("last_downloaded_loader_version");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    auto valueRes = this->option->getValue("last_downloaded_loader_version");
+    if(!valueRes) return tl::unexpected(valueRes.error());
+    const nlohmann::json& value = valueRes.value();
 
     if(value == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"last_downloaded_loader_version\"", this->option->getName())});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"last_downloaded_loader_version\"", this->option->getName()});
+        return tl::unexpected(err);
     }
     if(!value.is_string()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"last_downloaded_loader_version\"", "string")});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"last_downloaded_loader_version\"", "string"});
+        return tl::unexpected(err);
+    }
+    if(!mcsm::isSafeString(value)){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {value});
+        return tl::unexpected(err);
     }
 
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return mcsm::safeString(value);
+    return value;
 }
 
-mcsm::Result mcsm::FabricServerDataOption::updateLoaderVersion(const std::string& version){
+mcsm::VoidResult mcsm::FabricServerDataOption::updateLoaderVersion(const std::string& version){
     if(!mcsm::isSafeString(version)){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(version)});
-        return res;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {version});
+        return tl::unexpected(err);
     }
-    mcsm::Result res1 = this->option->setValue("last_downloaded_loader_version", mcsm::safeString(version));
-    if(!res1.isSuccess()) return res1;
+    mcsm::VoidResult res1 = this->option->setValue("last_downloaded_loader_version", version);
+    if(!res1) return res1;
 
     return this->option->save();
 }
 
-std::string mcsm::FabricServerDataOption::getInstallerVersion() const {
-    bool optExists = this->option->exists();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-    if(!optExists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::fileNotFound(this->option->getName())});
-        return "";
+mcsm::StringResult mcsm::FabricServerDataOption::getInstallerVersion() const {
+    auto optExists = this->option->exists();
+    if(!optExists) return tl::unexpected(optExists.error());
+    if(!optExists.value()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_NOT_CONFIGURED, {this->option->getPath()});
+        return tl::unexpected(err);
     }
 
-    const nlohmann::json& value = this->option->getValue("last_downloaded_installer_version");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    auto valueRes = this->option->getValue("last_downloaded_installer_version");
+    if(!valueRes) return tl::unexpected(valueRes.error());
+    const nlohmann::json& value = valueRes.value();
 
     if(value == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"last_downloaded_installer_version\"", this->option->getName())});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"last_downloaded_installer_version\"", this->option->getName()});
+        return tl::unexpected(err);
     }
     if(!value.is_string()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"last_downloaded_installer_version\"", "string")});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"last_downloaded_installer_version\"", "string"});
+        return tl::unexpected(err);
+    }
+    if(!mcsm::isSafeString(value)){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {value});
+        return tl::unexpected(err);
     }
 
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return mcsm::safeString(value);
+    return value;
 }
 
-mcsm::Result mcsm::FabricServerDataOption::updateInstallerVersion(const std::string& version){
-    mcsm::Result res = this->option->setValue("last_downloaded_installer_version", mcsm::safeString(version));
-    if(!res.isSuccess()) return res;
+mcsm::VoidResult mcsm::FabricServerDataOption::updateInstallerVersion(const std::string& version){
+    if(!mcsm::isSafeString(version)){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {version});
+        return tl::unexpected(err);
+    }
+    mcsm::VoidResult res = this->option->setValue("last_downloaded_installer_version", version);
+    if(!res) return res;
 
     return this->option->save();
 }

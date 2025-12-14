@@ -12,32 +12,23 @@ mcsm::ServerConfigLoader::~ServerConfigLoader(){
     this->isLoaded = false;
 }
 
-mcsm::Result mcsm::ServerConfigLoader::loadConfig(){
+mcsm::VoidResult mcsm::ServerConfigLoader::loadConfig(){
     this->optionHandle = std::make_unique<mcsm::Option>(this->configPath, "server");
-    const bool& optExists = this->optionHandle->exists();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto optExists = this->optionHandle->exists();
+    if(!optExists) return tl::unexpected(optExists.error());
 
-    if(!optExists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured(this->configPath)});
-        return res;
+    if(!optExists.value()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_NOT_CONFIGURED, {this->configPath});
+        return tl::unexpected(err);
     }
 
     bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
 
-    mcsm::Result lRes = this->optionHandle->load(advp);
-    if(!lRes.isSuccess()) return lRes;
+    auto lRes = this->optionHandle->load(advp);
+    if(!lRes) return lRes;
 
     this->isLoaded = true;
-    return mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    return {};
 }
 
 template <>
@@ -79,370 +70,336 @@ nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<nlohmann::json>() 
 
 template <>
 nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<std::vector<nlohmann::json>>() const {
-    return nlohmann::json::value_t::object;
+    return nlohmann::json::value_t::array;
+}
+
+static std::filesystem::path resolveAgainstConfig(const std::string& raw, const std::string& configDir){
+    std::filesystem::path p(raw);
+    if(p.is_absolute()){
+        return p.lexically_normal();
+    }
+    return (std::filesystem::path(configDir) / p).lexically_normal();
 }
 
 // isLoaded won't be "true" if the option does not exist which is why I don't check the existence of the option file.
 
-std::string mcsm::ServerConfigLoader::getServerName() const {
+mcsm::StringResult mcsm::ServerConfigLoader::getServerName() const {
     if(!this->isLoaded){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "ServerConfigLoader function called without loadConfig.",
-            "High chance to be an internal issue. Please open an issue in Github."
-        }});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
+        return tl::unexpected(err);
     }
 
-    nlohmann::json value = this->optionHandle->getValue("name");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    auto valueRes = this->optionHandle->getValue("name");
+    if(!valueRes) return tl::unexpected(valueRes.error());
+
+    nlohmann::json value = valueRes.value();
 
     if(value == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"name\"", this->optionHandle->getName())});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"name\"", this->optionHandle->getName()});
+        return tl::unexpected(err);
     }
     if(!value.is_string()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"name\"", "string")});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"name\"", "string"});
+        return tl::unexpected(err);
     }
 
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     if(!mcsm::isSafeString(value)){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {value});
+        return tl::unexpected(err);
     }
     return value;
 }
 
-mcsm::Result mcsm::ServerConfigLoader::setServerName(const std::string& name){
+mcsm::VoidResult mcsm::ServerConfigLoader::setServerName(const std::string& name){
     if(!this->isLoaded){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "ServerConfigLoader function called without loadConfig.",
-            "High chance to be an internal issue. Please open an issue in Github."
-        }});
-        return res;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
+        return tl::unexpected(err);
     }
     if(!mcsm::isSafeString(name)){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(name)});
-        return res;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {name});
+        return tl::unexpected(err);
     }
-    mcsm::Result setRes = this->optionHandle->setValue("name", name);
+    auto setRes = this->optionHandle->setValue("name", name);
 
-    if(!setRes.isSuccess()) return setRes;
+    if(!setRes) return setRes;
     return this->optionHandle->save();
 }
 
-std::string mcsm::ServerConfigLoader::getServerVersion() const {
+mcsm::StringResult mcsm::ServerConfigLoader::getServerVersion() const {
     if(!this->isLoaded){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "ServerConfigLoader function called without loadConfig.",
-            "High chance to be an internal issue. Please open an issue in Github."
-        }});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
+        return tl::unexpected(err);
     }
 
-    const nlohmann::json& value = this->optionHandle->getValue("version");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    auto valueRes = this->optionHandle->getValue("version");
+    if(!valueRes) return tl::unexpected(valueRes.error());
+
+    const nlohmann::json& value = valueRes.value();
 
     if(value == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"version\"", this->optionHandle->getName())});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"version\"", this->optionHandle->getName()});
+        return tl::unexpected(err);
     }
     if(!value.is_string()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"version\"", "string")});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"version\"", "string"});
+        return tl::unexpected(err);
     }
 
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     if(!mcsm::isSafeString(value)){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {value});
+        return tl::unexpected(err);
     }
     return value;
 }
 
-mcsm::Result mcsm::ServerConfigLoader::setServerVersion(const std::string& version){
+mcsm::VoidResult mcsm::ServerConfigLoader::setServerVersion(const std::string& version){
     if(!this->isLoaded){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "ServerConfigLoader function called without loadConfig.",
-            "High chance to be an internal issue. Please open an issue in Github."
-        }});
-        return res;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
+        return tl::unexpected(err);
     }
     if(!mcsm::isSafeString(version)){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(version)});
-        return res;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {version});
+        return tl::unexpected(err);
     }
-    mcsm::Result setRes = this->optionHandle->setValue("version", version);
+    auto setRes = this->optionHandle->setValue("version", version);
 
-    if(!setRes.isSuccess()) return setRes;
+    if(!setRes) return setRes;
     return this->optionHandle->save();
 }
 
-std::unique_ptr<mcsm::JvmOption> mcsm::ServerConfigLoader::getDefaultOption() const {
+tl::expected<std::unique_ptr<mcsm::JvmOption>, mcsm::Error> mcsm::ServerConfigLoader::getDefaultOption() const {
     if(!this->isLoaded){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "ServerConfigLoader function called without loadConfig.",
-            "High chance to be an internal issue. Please open an issue in Github."
-        }});
-        return nullptr;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
+        return tl::unexpected(err);
     }
 
-    const nlohmann::json& profileObj = this->optionHandle->getValue("default_launch_profile");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return nullptr;
+    auto pORes = this->optionHandle->getValue("default_launch_profile");
+    const nlohmann::json& profileObj = pORes.value();
 
     if(profileObj == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverDefaultProfileNotFound(this->optionHandle->getName())});
-        return nullptr;
+        auto customTemp = mcsm::errors::JSON_NOT_FOUND;
+        customTemp.message = "No default launch profile name specified in file " + this->optionHandle->getName();
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
+        return tl::unexpected(err);
     }
-    if(profileObj["name"] == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "No default launch profile name specified in file " + this->optionHandle->getName(),
-            "Manually editing the launch profile might have caused this issue.",
-            "If you know what you're doing, I believe you that you know how to handle this issue.",
-            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
-        }});
-        return nullptr;      
-    }
-    if(!profileObj["name"].is_string()){
+    if(!profileObj.is_string()){
         // Don't use jsonWrongType
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Value \"name\" in \"default_launch_profile\" has to be a string, but it's not.",
-            "Manually editing the launch profile might have caused this issue.",
-            "If you know what you're doing, I believe you that you know how to handle this issue.",
-            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
-        }});
-        return nullptr;
-    }
-    if(profileObj["location"] == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "No default launch profile location specified in file " + this->optionHandle->getName(),
-            "Manually editing the launch profile might have caused this issue.",
-            "If you know what you're doing, I believe you that you know how to handle this issue.",
-            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
-        }});
-        return nullptr;    
-    }
-    if(!profileObj["location"].is_string()){
-        // Don't use jsonWrongType
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Value \"location\" in \"default_launch_profile\" has to be a string, but it's not.",
-            "Manually editing the launch profile might have caused this issue.",
-            "If you know what you're doing, I believe you that you know how to handle this issue.",
-            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
-        }});
-        return nullptr;
-    }
-    mcsm::SearchTarget target;
-    if(profileObj["location"] == "global"){
-        target = mcsm::SearchTarget::GLOBAL;
-    }else if(profileObj["location"] == "current"){
-        target = mcsm::SearchTarget::CURRENT;
-    }else{
-        // Don't use jsonWrongType
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Value \"location\" in \"default_launch_profile\" has to be \"global\" or \"current\", but it's not.",
-            "Manually editing the launch profile might have caused this issue.",
-            "If you know what you're doing, I believe you that you know how to handle this issue.",
-            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
-        }});
-        return nullptr;
-    }
-    std::unique_ptr<mcsm::JvmOption> jvmOption = std::make_unique<mcsm::JvmOption>(profileObj["name"], target, this->configPath);
-    if(!jvmOption->exists() || jvmOption == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Invalid default launch profile.",
-            "File server.json might be corrupted or the profile is removed.",
-            "Please change the profile or create a new server.json file."
-        }});
-        return nullptr;
+        auto customTemp = mcsm::errors::JSON_WRONG_TYPE;
+        customTemp.message = "Value \"default_launch_profile\" has to be a string, but it's not.\nManually editing the launch profile might have caused this issue.";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
+        return tl::unexpected(err);
     }
 
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+    std::filesystem::path path(profileObj.get<std::string>());
+    auto abs = resolveAgainstConfig(profileObj.get<std::string>(), this->configPath);
+    if(!abs.has_filename()){
+        auto customTemp = mcsm::errors::JSON_WRONG_TYPE;
+        customTemp.message = "Value \"default_launch_profile\" in " + this->optionHandle->getName() + " does not contain valid file path: " + profileObj.get<std::string>();
+        customTemp.solution = "Make sure proper value is given and the file is present.";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
+        return tl::unexpected(err);
+    }
+
+    std::unique_ptr<mcsm::Option> jsonOption = std::make_unique<mcsm::Option>(abs.parent_path().string(), abs.filename().string());
+    std::unique_ptr<mcsm::JvmOption> jvmOption = std::make_unique<mcsm::JvmOption>(std::move(jsonOption));
+    auto jvmInit = jvmOption->init();
+    if(!jvmInit) return tl::unexpected(jvmInit.error());
+
+    auto jvmExts = jvmOption->exists();
+    if(!jvmExts) return tl::unexpected(jvmExts.error());
+
+    if(!jvmExts.value() || jvmOption == nullptr){
+        auto customTemp = mcsm::errors::SERVER_DEFAULT_PROFILE_NOT_FOUND;
+        customTemp.message = "Invalid default launch profile.\nFile server.json may be corrupted or the profile is removed.";
+        customTemp.solution = "Please change the profile or create a new server.json file.";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
+        return tl::unexpected(err);
+    }
+
     return jvmOption;
 }
 
-mcsm::Result mcsm::ServerConfigLoader::setDefaultOption(mcsm::JvmOption& jvmOption){
+mcsm::VoidResult mcsm::ServerConfigLoader::setDefaultOption(mcsm::JvmOption& jvmOption){
     if(!this->isLoaded){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "ServerConfigLoader function called without loadConfig.",
-            "High chance to be an internal issue. Please open an issue in Github."
-        }});
-        return res;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
+        return tl::unexpected(err);
     }
-    nlohmann::json profileObj;
-    profileObj["name"] = jvmOption.getProfileName();
-    if(jvmOption.getSearchTarget() == mcsm::SearchTarget::GLOBAL){
-        profileObj["location"] = "global";
-    }else{
-        profileObj["location"] = "current";
-    }
-    mcsm::Result setRes = this->optionHandle->setValue("default_launch_profile", profileObj);
+    auto jvmpPath = jvmOption.getProfilePath();
+    if(!jvmpPath) return tl::unexpected(jvmpPath.error());
 
-    if(!setRes.isSuccess()) return setRes;
+    std::string jvmpLocation = mcsm::joinPath(jvmpPath.value(), jvmOption.getProfileName() + ".json");
+    std::filesystem::path p(jvmpLocation);
+    std::string toStore = p.lexically_normal().generic_string();
+    auto setRes = this->optionHandle->setValue("default_launch_profile", toStore);
+
+    if(!setRes) return setRes;
     return this->optionHandle->save();
 }
 
-std::string mcsm::ServerConfigLoader::getServerType() const {
+mcsm::StringResult mcsm::ServerConfigLoader::getServerType() const {
     if(!this->isLoaded){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "ServerConfigLoader function called without loadConfig.",
-            "High chance to be an internal issue. Please open an issue in Github."
-        }});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
+        return tl::unexpected(err);
     }
 
-    const nlohmann::json& value = this->optionHandle->getValue("type");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    auto valueRes = this->optionHandle->getValue("type");
+    if(!valueRes) return tl::unexpected(valueRes.error());
+    const nlohmann::json& value = valueRes.value();
 
     if(value == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"type\"", this->optionHandle->getName())});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"type\"", this->optionHandle->getName()});
+        return tl::unexpected(err);
     }
     if(!value.is_string()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"type\"", "string")});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"type\"", "string"});
+        return tl::unexpected(err);
     }
 
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    if(!mcsm::isSafeString(value)){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
-        return "";
+    if(!mcsm::isSafeString(value.get<std::string>())){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {value.get<std::string>()});
+        return tl::unexpected(err);
     }
-    return value;
+    return value.get<std::string>();
 }
 
-std::string mcsm::ServerConfigLoader::getServerJarFile() const {
+mcsm::StringResult mcsm::ServerConfigLoader::getServerJar() const {
     if(!this->isLoaded){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "ServerConfigLoader function called without loadConfig.",
-            "High chance to be an internal issue. Please open an issue in Github."
-        }});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
+        return tl::unexpected(err);
     }
 
-    const nlohmann::json& value = this->optionHandle->getValue("server_jar_name");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    auto valueRes = this->optionHandle->getValue("server_jar");
+    if(!valueRes) return tl::unexpected(valueRes.error());
+    const nlohmann::json& value = valueRes.value();
 
     if(value == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"server_jar_name\"", this->optionHandle->getName())});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"server_jar\"", this->optionHandle->getName()});
+        return tl::unexpected(err);
     }
     if(!value.is_string()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"server_jar_name\"", "string")});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"server_jar\"", "string"});
+        return tl::unexpected(err);
     }
 
-    if(!mcsm::isSafeString(value)){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
-        return "";
+    auto abs = resolveAgainstConfig(value.get<std::string>(), this->configPath);
+    if(!abs.has_filename()){
+        auto customTemp = mcsm::errors::JSON_WRONG_TYPE;
+        customTemp.message = "Value \"server_jar\" in " + this->optionHandle->getName() + " does not contain valid file path: " + abs.string();
+        customTemp.solution = "Make sure proper value is given and the file is present.";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
+        return tl::unexpected(err);
     }
-
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return value;
+    return abs.string();
 }
 
-mcsm::Result mcsm::ServerConfigLoader::setServerJarFile(const std::string& name){
+mcsm::VoidResult mcsm::ServerConfigLoader::setServerJar(const std::string& filePath) {
     if(!this->isLoaded){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "ServerConfigLoader function called without loadConfig.",
-            "High chance to be an internal issue. Please open an issue in Github."
-        }});
-        return res;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
+        return tl::unexpected(err);
     }
-    if(!mcsm::isSafeString(name)){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(name)});
-        return res;
-    }
-    mcsm::Result setRes = this->optionHandle->setValue("server_jar_name", name);
+    std::filesystem::path p(filePath);
+    std::string toStore = p.lexically_normal().generic_string(); // keep forward slashes in JSON
 
-    if(!setRes.isSuccess()) return setRes;
+    auto setRes = this->optionHandle->setValue("server_jar", toStore);
+    if(!setRes) return setRes;
     return this->optionHandle->save();
 }
 
-std::string mcsm::ServerConfigLoader::getServerJarBuild() const {
+mcsm::StringResult mcsm::ServerConfigLoader::getServerJarFile() const {
+    auto fileRes = this->getServerJar();
+    if(!fileRes) return fileRes;
+    std::string file = fileRes.value();
+
+    std::filesystem::path path(file);
+    if(!path.has_filename()){
+        auto customTemp = mcsm::errors::JSON_WRONG_TYPE;
+        customTemp.message = "Value \"server_jar\" in " + this->optionHandle->getName() + " does not contain valid file path: " + file;
+        customTemp.solution = "Make sure proper value is given and the file is present.";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
+        return tl::unexpected(err);
+    }
+    return path.filename().string();
+}
+
+mcsm::StringResult mcsm::ServerConfigLoader::getServerJarPath() const {
+    auto absRes = this->getServerJar();
+    if(!absRes) return absRes;
+    std::filesystem::path abs(absRes.value());
+    return abs.parent_path().string();
+}
+
+mcsm::StringResult mcsm::ServerConfigLoader::getServerJarBuild() const {
     if(!this->isLoaded){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "ServerConfigLoader function called without loadConfig.",
-            "High chance to be an internal issue. Please open an issue in Github."
-        }});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
+        return tl::unexpected(err);
     }
 
-    const nlohmann::json& value = this->optionHandle->getValue("server_build");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    auto valueRes = this->optionHandle->getValue("server_build");
+    if(!valueRes) return tl::unexpected(valueRes.error());
+    const nlohmann::json& value = valueRes.value();
 
     if(value == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"server_build\"", this->optionHandle->getName())});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"server_build\"", this->optionHandle->getName()});
+        return tl::unexpected(err);
     }
     if(!value.is_string()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"server_build\"", "string")});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"server_build\"", "string"});
+        return tl::unexpected(err);
     }
 
     if(!mcsm::isSafeString(value)){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {value});
+        return tl::unexpected(err);
     }
 
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return value;
 }
 
-mcsm::Result mcsm::ServerConfigLoader::setServerJarBuild(const std::string& build){
+mcsm::VoidResult mcsm::ServerConfigLoader::setServerJarBuild(const std::string& build){
     if(!this->isLoaded){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "ServerConfigLoader function called without loadConfig.",
-            "High chance to be an internal issue. Please open an issue in Github."
-        }});
-        return res;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
+        return tl::unexpected(err);
     }
     if(!mcsm::isSafeString(build)){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(build)});
-        return res;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {build});
+        return tl::unexpected(err);
     }
-    mcsm::Result setRes =  this->optionHandle->setValue("server_build", build);
+    auto setRes =  this->optionHandle->setValue("server_build", build);
 
-    if(!setRes.isSuccess()) return setRes;
+    if(!setRes) return setRes;
     return this->optionHandle->save();
 }
 
-bool mcsm::ServerConfigLoader::doesAutoUpdate() const {
+mcsm::BoolResult mcsm::ServerConfigLoader::doesAutoUpdate() const {
     if(!this->isLoaded){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "ServerConfigLoader function called without loadConfig.",
-            "High chance to be an internal issue. Please open an issue in Github."
-        }});
-        return false;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
+        return tl::unexpected(err);
     }
 
-    const nlohmann::json& value = this->optionHandle->getValue("auto_update");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    auto valueRes = this->optionHandle->getValue("auto_update");
+    if(!valueRes) return tl::unexpected(valueRes.error());
+    const nlohmann::json& value = valueRes.value();
 
     if(value == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"auto_update\"", this->optionHandle->getName())});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"auto_update\"", this->optionHandle->getName()});
+        return tl::unexpected(err);
     }
     if(!value.is_boolean()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"auto_update\"", "boolean")});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"auto_update\"", "boolean"});
+        return tl::unexpected(err);
     }
 
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return value;
 }
 
-mcsm::Result mcsm::ServerConfigLoader::setAutoUpdate(const bool& update){
+mcsm::VoidResult mcsm::ServerConfigLoader::setAutoUpdate(const bool& update){
     if(!this->isLoaded){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "ServerConfigLoader function called without loadConfig.",
-            "High chance to be an internal issue. Please open an issue in Github."
-        }});
-        return res;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
+        return tl::unexpected(err);
     }
     
-    mcsm::Result setRes = this->optionHandle->setValue("auto_update", update);
-    if(!setRes.isSuccess()) return setRes;
+    auto setRes = this->optionHandle->setValue("auto_update", update);
+    if(!setRes) return setRes;
     return this->optionHandle->save();
 }
 
@@ -454,16 +411,13 @@ bool mcsm::ServerConfigLoader::isFullyLoaded() const {
     return this->isLoaded;
 }
 
-mcsm::Server* mcsm::ServerConfigLoader::getServerInstance(){
+tl::expected<mcsm::Server*, mcsm::Error> mcsm::ServerConfigLoader::getServerInstance(){
     if(!this->isLoaded){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "ServerConfigLoader function called without loadConfig.",
-            "High chance to be an internal issue. Please open an issue in Github."
-        }});
-        return nullptr;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
+        return tl::unexpected(err);
     }
-    std::string sType = getServerType();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return nullptr;
+    auto sType = getServerType();
+    if(!sType) return tl::unexpected(sType.error());
 
-    return mcsm::ServerRegistry::getServerRegistry().getServer(sType);
+    return mcsm::ServerRegistry::getServerRegistry().getServer(sType.value());
 }

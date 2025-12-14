@@ -24,6 +24,8 @@ SOFTWARE.
 #define __MCSM_STRING_UTILS_H__
 
 #include <string>
+#include <vector>
+#include <sstream>
 
 namespace mcsm {
     /**
@@ -67,6 +69,8 @@ namespace mcsm {
 
     // used on formatting "jvm_version" to "Jvm version"
     std::string formatPrompt(const std::string& key);
+
+    std::string vecToString(const std::vector<std::string>& vec);
 }
 
 #endif

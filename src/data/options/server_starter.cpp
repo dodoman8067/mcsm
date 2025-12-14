@@ -8,88 +8,64 @@ mcsm::ServerStarter::~ServerStarter(){
 
 }
 
-mcsm::Result mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
+mcsm::VoidResult mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
     mcsm::ServerDataOption serverDataOpt(optionPath);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
+
+    auto sLoadRes = serverDataOpt.load();
+    if(!sLoadRes) return sLoadRes;
+
+    auto fileExists = mcsm::fileExists(optionPath + "/server.json");
+    if(!fileExists) return tl::unexpected(fileExists.error());
+
+    if(!fileExists.value()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_NOT_CONFIGURED, {optionPath});
+        return tl::unexpected(err);
     }
 
-    mcsm::Result sLoadRes = serverDataOpt.load();
-    if(!sLoadRes.isSuccess()) return sLoadRes;
+    auto server = this->loader->getServerInstance();
+    if(!server) return tl::unexpected(server.error());
 
-    bool fileExists = mcsm::fileExists(optionPath + "/server.json");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    mcsm::Server* sp = server.value();
 
-    if(!fileExists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured(optionPath)});
-        return res;
-    }
+    auto name = this->loader->getServerName();
+    if(!name) return tl::unexpected(name.error());
 
-    mcsm::Server* server = this->loader->getServerInstance();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
-
-    const std::string& name = this->loader->getServerName();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
-
-    const std::string& version = this->loader->getServerVersion();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    auto version = this->loader->getServerVersion();
+    if(!version) return tl::unexpected(version.error());
 
     const std::string& profileName = option.getProfileName();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
 
     mcsm::success("Starting server..");
-    mcsm::info("Server name : " + name);
-    mcsm::info("Server MC version : " + version);
+    mcsm::info("Server name : " + name.value());
+    mcsm::info("Server MC version : " + version.value());
     mcsm::info("Server JVM launch profile : " + profileName);
-    mcsm::Result res = serverDataOpt.updateLastTimeLaunched();
-    if(!res.isSuccess()) return res;
-    mcsm::Result res2 = server->start(this->loader, option, path, optionPath);
-    return res2;
+    mcsm::VoidResult res = serverDataOpt.updateLastTimeLaunched();
+    if(!res) return res;
+    mcsm::StringResult res2 = sp->start(this->loader, option, mcsm::normalizePath(path), mcsm::normalizePath(optionPath));
+    if(!res2) return tl::unexpected(res2.error());
+    return {};
 }
 
-mcsm::Result mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::string& groupOptionPath){
+mcsm::VoidResult mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::string& groupOptionPath) {
     mcsm::ServerGroupLoader gLoader(groupOptionPath);
-    mcsm::Result gLoadRes = gLoader.load();
-    if(gLoadRes.getResult() != mcsm::ResultType::MCSM_OK && gLoadRes.getResult() != mcsm::ResultType::MCSM_SUCCESS){
-        gLoadRes.printMessage();
-        if(gLoadRes.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    auto gLoadRes = gLoader.load();
+    if(!gLoadRes){
+        mcsm::printError(gLoadRes.error());
+        mcsm::exitIfFail(gLoadRes.error());
     }
 
     std::vector<const mcsm::ServerConfigLoader*> gServers = gLoader.getServers();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        mcsm::printResultMessage();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-    }
+    auto cPath = mcsm::getCurrentPath();
+    if(!cPath) return tl::unexpected(cPath.error());
 
     for(const mcsm::ServerConfigLoader* gServer : gServers){
         if(gServer == nullptr) continue;
-        if(gServer->getHandle()->getPath() != mcsm::getCurrentPath()) continue;
+        if(gServer->getHandle()->getPath() != cPath.value()) continue;
         // add server session file
         return startServer(option, path, optionPath);
         // remove server session file
     }
 
-    return {mcsm::ResultType::MCSM_FAIL, {"Failed to validate server group " + groupOptionPath}};
+    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, {700, "Failed to validate server group " + groupOptionPath, ""}, {});
+    return tl::unexpected(err);
 }

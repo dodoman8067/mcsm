@@ -30,14 +30,23 @@ SOFTWARE.
 #include <mcsm/util/mc/mc_utils.h>
 
 namespace mcsm {
+    struct PaperMetadata {
+        std::vector<std::string> recommendedJavaFlags;
+        std::string minJava;
+        std::string channel; // alpha, stable etc..
+        std::string supportStatus;
+        std::string downloadUrl;
+        std::string build;
+    };
+
     class PaperServer : public mcsm::BukkitServer, public mcsm::Downloadable, public std::enable_shared_from_this<PaperServer> {
     private:
     public:
         PaperServer();
         ~PaperServer();
 
-        int getVersion(const std::string& ver) const;
-        int getVersion(const std::string& ver, const std::string& build) const;
+        mcsm::Result<mcsm::PaperMetadata> getVersionData(const std::string& ver) const;
+        mcsm::Result<mcsm::PaperMetadata> getVersionData(const std::string& ver, const std::string& build) const;
 
         std::vector<std::string> getAvailableVersions() override;
 
@@ -49,25 +58,27 @@ namespace mcsm {
         
         std::string getGitHub() const override;
 
-        mcsm::Result start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option) override;
-        mcsm::Result start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
+        mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option) override;
+        mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
 
-        mcsm::Result download(const std::string& version) override;
-        mcsm::Result download(const std::string& version, const std::string& path) override;
-        mcsm::Result download(const std::string& version, const std::string& path, const std::string& name) override;
-        mcsm::Result download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
+        mcsm::VoidResult download(const std::string& version) override;
+        mcsm::VoidResult download(const std::string& version, const std::string& path) override;
+        mcsm::VoidResult download(const std::string& version, const std::string& path, const std::string& name) override;
+        mcsm::VoidResult download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
 
-        mcsm::Result obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
+        mcsm::VoidResult obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
 
-        bool hasVersion(const std::string& version) const override;
+        mcsm::BoolResult hasVersion(const std::string& version) const override;
 
         std::string getTypeAsString() const override;
 
-        mcsm::Result update();
-        mcsm::Result update(const std::string& optionPath);
-        mcsm::Result update(const std::string& path, const std::string& optionPath);
+        const tl::expected<std::map<std::string, std::string>, mcsm::Error> getRequiredValues() const override;
 
-        mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues) override;
+        mcsm::VoidResult update();
+        mcsm::VoidResult update(const std::string& optionPath);
+        mcsm::VoidResult update(const std::string& path, const std::string& optionPath);
+
+        mcsm::VoidResult generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues) override;
     };
 }
 

@@ -40,13 +40,13 @@ namespace mcsm {
         static mcsm::ServerRegistry& getServerRegistry();
         void registerServer(const std::string& name, std::unique_ptr<mcsm::Server> server);
 
-        mcsm::Server* getServer(const std::string& name) const;
+        tl::expected<mcsm::Server*, mcsm::Error> getServer(const std::string& name) const;
 
-        std::string getServerTypeString(const mcsm::ServerType& type) const;
+        mcsm::StringResult getServerTypeString(const mcsm::ServerType& type) const;
 
         void registerGeneralProperty(const std::string& name, std::unique_ptr<mcsm::GeneralProperty> property);
 
-        mcsm::GeneralProperty* getGeneralProperty(const std::string& name);
+        tl::expected<mcsm::GeneralProperty*, mcsm::Error> getGeneralProperty(const std::string& name);
 
         std::vector<mcsm::GeneralProperty*> getRegisteredProperties();
     private:

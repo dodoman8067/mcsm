@@ -27,7 +27,7 @@ SOFTWARE.
 #include <new>
 #include <thread>
 
-const std::string version = "0.5.1";
+const std::string version = "0.6";
 
 int main(int argc, char *argv[]){
     std::set_new_handler(mcsm::signal_handler::new_handle);
@@ -52,7 +52,7 @@ int main(int argc, char *argv[]){
     mcsm::set_log_enabled(true);
 
     mcsm::init init;
-    init.initMCSM(version);
+    mcsm::unwrapOrExit(init.initMCSM(version));
 
     if(!init.isInitialized()){
         std::cerr << "Program initialization failed.\n";

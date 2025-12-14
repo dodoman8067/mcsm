@@ -15,10 +15,10 @@ namespace mcsm {
         ScreenSession(const std::string& name, const std::string& command);
         ~ScreenSession() = default;
 
-        mcsm::Result start();
-        mcsm::Result stop();
-        mcsm::Result attach();
-        mcsm::Result sendCommand(const std::string& str);
+        mcsm::VoidResult start();
+        mcsm::VoidResult stop();
+        mcsm::VoidResult attach();
+        mcsm::VoidResult sendCommand(const std::string& str);
 
         bool isRunning() const; // only one screen session that ends with current name.mcsm can exist
         bool validateScreen() const;

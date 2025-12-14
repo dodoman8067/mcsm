@@ -1,13 +1,15 @@
 cmake_minimum_required(VERSION 3.24)
 project(mcsm)
+include(FetchContent)
 
 # Detect OS
-if(NOT LINUX AND NOT WIN32)
+if(NOT LINUX AND NOT WIN32 AND NOT APPLE AND NOT ANDROID)
     message(FATAL_ERROR "This platform is not supported")
 endif()
 
 # Add options
 option(BUILD_STATIC_EXE "Build static executable" OFF)
+option(USE_SYSTEM_DEPS "Prefer system-installed libraries. Only affects nlohmann/json and tl::expected." ON)
 
 # Set C++ standard
 set(CMAKE_CXX_STANDARD 17)
@@ -21,11 +23,71 @@ endif()
 SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/Modules/")
 
 # Find dependencies 
-find_package(CURL REQUIRED CONFIG)
-find_package(nlohmann_json REQUIRED)
-include(Findlibgit2)
-if(LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
-    find_package(Backward REQUIRED)
+# --- libcurl ---
+find_package(CURL REQUIRED)
+if(NOT CURL_FOUND)
+    message(STATUS "libcurl not found system-wide; trying pkg-config")
+    find_package(PkgConfig QUIET)
+    if(PkgConfig_FOUND)
+        pkg_check_modules(CURL_PKG libcurl QUIET)
+        if(CURL_PKG_FOUND)
+            add_library(CURL::libcurl INTERFACE IMPORTED)
+            set_target_properties(CURL::libcurl PROPERTIES
+                INTERFACE_INCLUDE_DIRECTORIES "${CURL_PKG_INCLUDE_DIRS}"
+                INTERFACE_LINK_LIBRARIES "${CURL_PKG_LIBRARIES}")
+        endif()
+    endif()
+endif()
+if(NOT TARGET CURL::libcurl)
+    message(FATAL_ERROR "libcurl not found. install libcurl-dev or use a toolchain (vcpkg/conan).")
+endif()
+
+# --- nlohmann_json (header-only) ---
+# prefer system if available, otherwise fetch pinned tag
+if (USE_SYSTEM_DEPS)
+    find_package(nlohmann_json REQUIRED) # provides nlohmann_json::nlohmann_json
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMCSM_NLOHMANN_VER=\\\"${nlohmann_json_VERSION}\\\"")
+endif()
+if (NOT nlohmann_json_FOUND)
+    FetchContent_Declare(nlohmann_json
+        GIT_REPOSITORY https://github.com/nlohmann/json.git
+        GIT_TAG v3.12.0
+    )
+    FetchContent_MakeAvailable(nlohmann_json)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMCSM_NLOHMANN_VER=\\\"3.12.0\\\"")
+endif()
+
+# --- tl::expected (header-only) ---
+if (USE_SYSTEM_DEPS)
+    find_package(tl-expected REQUIRED)
+endif()
+if(NOT tl-expected_FOUND)
+    FetchContent_Declare(tl_expected
+        GIT_REPOSITORY https://github.com/TartanLlama/expected.git
+        GIT_TAG v1.3.1
+    )
+    FetchContent_GetProperties(tl_expected)
+    if(NOT tl_expected_POPULATED)
+        FetchContent_Populate(tl_expected)
+        add_library(tl_expected INTERFACE)
+        target_include_directories(tl_expected INTERFACE ${tl_expected_SOURCE_DIR}/include)
+        add_library(tl::expected ALIAS tl_expected)
+    endif()
+    message("-- [mcsm] Fetched tl::expected to " ${tl_expected_SOURCE_DIR} ".")
+endif()
+
+if(LINUX AND NOT ANDROID AND CMAKE_BUILD_TYPE MATCHES Debug)
+    if(USE_SYSTEM_DEPS)
+        find_package(Backward REQUIRED)
+    else()
+        # Also requires one of: libbfd (gnu binutils), libdwarf, libdw (elfutils)
+        FetchContent_Declare(backward
+            GIT_REPOSITORY https://github.com/bombela/backward-cpp
+            GIT_TAG master  # or a version tag, such as v1.6
+            SYSTEM          # optional, the Backward include directory will be treated as system directory
+        )
+        FetchContent_MakeAvailable(backward)
+    endif()
 endif()
 
 # Set include directory
@@ -44,11 +106,17 @@ if(NOT CMAKE_BUILD_TYPE)
   set(CMAKE_BUILD_TYPE Release)
 endif()
 
-
 # Set compiler options
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -DMCSM_NLOHMANN_VER=\\\"${nlohmann_json_VERSION}\\\"")
-    set(CMAKE_CXX_FLAGS_DEBUG "-g -DMCSM_DEBUG")
+if(CMAKE_CXX_COMPILER_ID MATCHES "GNU" OR CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "AppleClang")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        set(CMAKE_CXX_FLAGS_DEBUG "-g -DMCSM_DEBUG")
+        if(LINUX)
+            set(CMAKE_CXX_FLAGS_DEBUG "-g -DMCSM_DEBUG -fsanitize=address,undefined -fno-omit-frame-pointer -fsanitize-address-use-after-scope")
+        endif()
+    elseif(APPLE AND CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+        set(CMAKE_CXX_FLAGS_DEBUG "-g -DMCSM_DEBUG -fsanitize=address,undefined -fno-omit-frame-pointer")
+    endif()
     set(CMAKE_CXX_FLAGS_RELEASE "-O3 -ffunction-sections -fdata-sections")
 endif()
 
@@ -60,16 +128,29 @@ if(BUILD_STATIC_EXE)
 endif()
 
 if(CMAKE_BUILD_TYPE MATCHES Debug)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -DMCSM_DEBUG")
+    execute_process(
+        COMMAND git rev-parse HEAD
+        OUTPUT_VARIABLE MCSM_GIT_HASH
+        OUTPUT_STRIP_TRAILING_WHITESPACE
+    )
+    set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -DMCSM_GIT_HASH=\\\"${MCSM_GIT_HASH}\\\"")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -DMCSM_DEBUG -DMCSM_GIT_HASH=\\\"${MCSM_GIT_HASH}\\\"")
+    if(LINUX OR APPLE)
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -DMCSM_DEBUG -fsanitize=address,undefined -D_GLIBCXX_ASSERTIONS")
+    endif()
 endif()
 
 if(CMAKE_BUILD_TYPE MATCHES Release)
     set(CMAKE_INTERPROCEDURAL_OPTIMIZATION_RELEASE ON)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--gc-sections")
+    if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,--gc-sections")
+    elseif(APPLE AND CMAKE_CXX_COMPILER_ID STREQUAL "AppleClang")
+        set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -Wl,-dead_strip")
+    endif()
 endif()
 
 # Add executable
-if(LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
+if(LINUX AND NOT ANDROID AND CMAKE_BUILD_TYPE MATCHES Debug)
     add_executable(mcsm ${SRC_FILES} ${RESOURCE_FILE} backward/backward.cpp)
 else()
     add_executable(mcsm ${SRC_FILES} ${RESOURCE_FILE})
@@ -93,17 +174,13 @@ if(CMAKE_BUILD_TYPE MATCHES Release)
 endif()
 
 # Link dependencies
-target_link_libraries(mcsm PRIVATE CURL::libcurl)
-target_link_libraries(mcsm PRIVATE nlohmann_json::nlohmann_json)
+target_link_libraries(mcsm
+  PRIVATE
+    CURL::libcurl
+    nlohmann_json::nlohmann_json
+    tl::expected
+)
 
-# Some dependencies for libgit2 in Windows
-if(WIN32)
-    target_link_libraries(mcsm PRIVATE Winhttp)
-    target_link_libraries(mcsm PRIVATE Rpcrt4)
-endif()
-
-target_link_libraries(mcsm PRIVATE ${LIBGIT2_LIBRARIES})
-
-if(LINUX AND CMAKE_BUILD_TYPE MATCHES Debug)
+if(LINUX AND NOT ANDROID AND CMAKE_BUILD_TYPE MATCHES Debug)
     target_link_libraries(mcsm PRIVATE Backward::Backward)
 endif()

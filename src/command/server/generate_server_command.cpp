@@ -56,7 +56,17 @@ bool mcsm::GenerateServerCommand::checkValid(const std::string& key, std::string
         }
         return !(value != "true" && value != "false");
     }
-    if(key == "server_jarfile_name"){
+    if(key == "minecraft_version"){
+        if(mcsm::isWhitespaceOrEmpty(value) && !mcsm::isWhitespaceOrEmpty(defaultValue)){
+            value = defaultValue;
+            return true;
+        }
+        if(mcsm::isWhitespaceOrEmpty(value) && mcsm::isWhitespaceOrEmpty(defaultValue)){
+            return false;
+        }
+        return true;
+    }
+    if(key == "server_jarfile"){
         if(mcsm::isWhitespaceOrEmpty(value)){
             value = defaultValue;
             return true;
@@ -94,6 +104,27 @@ bool mcsm::GenerateServerCommand::checkValid(const std::string& key, std::string
         }
         return !(value != "true" && value != "false");
     }
+    if(key == "if_paper_should_generate_recommended_profile"){
+        if(mcsm::isWhitespaceOrEmpty(value)){
+            value = defaultValue;
+            return true;
+        }
+        return !(value != "true" && value != "false");
+    }
+    if(key == "if_folia_should_generate_recommended_profile"){
+        if(mcsm::isWhitespaceOrEmpty(value)){
+            value = defaultValue;
+            return true;
+        }
+        return !(value != "true" && value != "false");
+    }
+    if(key == "if_velocity_should_generate_recommended_profile"){
+        if(mcsm::isWhitespaceOrEmpty(value)){
+            value = defaultValue;
+            return true;
+        }
+        return !(value != "true" && value != "false");
+    }
     return !mcsm::isWhitespaceOrEmpty(value);
 }
 
@@ -123,24 +154,25 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& /
         std::cout << "Enter server type : ";
         
         std::getline(std::cin, type);
-            
-        if(mcsm::ServerRegistry::getServerRegistry().getServer(type) != nullptr){
+
+        auto serv = mcsm::ServerRegistry::getServerRegistry().getServer(type);
+        if(serv){
             break;
         }else{
-            mcsm::Result({mcsm::ResultType::MCSM_SUCCESS, {"Success"}}); // clear the result
             std::cout << "Server type \"" << type << "\" does not exist. Please try again.\n";
         }
     }
 
     std::map<std::string, std::string> extras;
 
-    auto sPtr = mcsm::ServerRegistry::getServerRegistry().getServer(type);
-    if((mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) || sPtr == nullptr){
-        mcsm::printResultMessage();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+    auto sPtr = mcsm::unwrapOrExit(mcsm::ServerRegistry::getServerRegistry().getServer(type));
+    auto sv = sPtr->getRequiredValues();
+    if(!sv) {
+        mcsm::printError(sv);
+        mcsm::exitIfFail(sv);
     }
 
-    for(auto&[name, defaultValue] : sPtr->getRequiredValues()){
+    for(auto&[name, defaultValue] : sv.value()){
         handle(name, extras, defaultValue);
     }
 
@@ -157,20 +189,10 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& /
         mcsm::error("default JVM launch profile search path (current/global) invalid value detected");
         std::exit(1);
     }
- 
-    mcsm::JvmOption defaultProfile(extras["default_jvm_launch_profile_name"], t);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        mcsm::printResultMessage();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-    }
+    mcsm::JvmOption defaultProfile(mcsm::unwrapOrExit(mcsm::jvmProfileFromSearchTarget(extras["default_jvm_launch_profile_name"], t, mcsm::unwrapOrExit(mcsm::getCurrentPath()))));
+    mcsm::unwrapOrExit(defaultProfile.init());
 
-
-    mcsm::Result genRes = sPtr->generate(name, defaultProfile, mcsm::getCurrentPath(), version, bUpdate, extras);
-
-    if(!genRes.isSuccess()){
-        genRes.printMessage();
-        if(genRes.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-    }
+    mcsm::unwrapOrExit(sPtr->generate(name, defaultProfile, mcsm::unwrapOrExit(mcsm::getCurrentPath()), version, bUpdate, extras));
     return;
     
     mcsm::error("Server type not supported : " + type);
@@ -178,15 +200,7 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& /
 }
 
 inline bool mcsm::GenerateServerCommand::isConfigured(){
-    std::string path = mcsm::getCurrentPath();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        mcsm::printResultMessage();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-    }
-    bool fileExists = mcsm::fileExists(path + "/server.json");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        mcsm::printResultMessage();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-    }
+    std::string path = mcsm::unwrapOrExit(mcsm::getCurrentPath());
+    bool fileExists = mcsm::unwrapOrExit(mcsm::fileExists(path + "/server.json"));
     return fileExists;
 }

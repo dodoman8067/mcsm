@@ -32,14 +32,14 @@ SOFTWARE.
 
 namespace mcsm {
     /**
-     * @brief No mcsm::Result needed
+     * @brief No mcsm::StringResult needed
      */
     std::string getJavaFromHome();
-    std::string getJavaFromPath();
+    mcsm::StringResult getJavaFromPath();
 
-    std::string detectJava();
+    mcsm::StringResult detectJava();
 
-    bool isValidJava(const std::string& path);
+    mcsm::BoolResult isValidJava(const std::string& path);
 }
 
 #endif

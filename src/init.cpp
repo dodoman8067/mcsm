@@ -27,32 +27,38 @@ SOFTWARE.
 #include <mcsm/data/options/general/advanced_json_errors_property.h>
 #include <mcsm/data/options/general/sponge_api_search_recommended_versions_property.h>
 #include <mcsm/data/options/general/screen_bin_path_property.h>
+#include <mcsm/data/options/general/color_download_progress_bar_property.h>
 
 mcsm::init::init(){
-    this->initialized = new bool(false);
+    this->initialized = false;
 }
 
 mcsm::init::~init(){
     mcsm::CommandManager::cleanup();
     mcsm::curl_holder::cleanup();
     curl_global_cleanup();
-    delete this->initialized;
-    this->initialized = nullptr;
 }
 
-void mcsm::init::initMCSM(const std::string& version){
+mcsm::VoidResult mcsm::init::initMCSM(const std::string& version){
     curl_global_init(CURL_GLOBAL_DEFAULT);
-    if(!mcsm::curl_holder::init().isSuccess()) return;
+    auto curlInitRes = mcsm::curl_holder::init();
+    if(!curlInitRes) return curlInitRes;
+
+    auto env1 = mcsm::ensureDataDir();
+    if(!env1) return tl::unexpected(env1.error());
+    auto env2 = mcsm::ensureConfigDir();
+    if(!env2) return tl::unexpected(env2.error());
+
     initCommands(version);
     initServers(); // hanles server registry for singleton server instances
 
-    mcsm::Result res = mcsm::GeneralOption::getGeneralOption().initialize(); // initializes global configurations
-    if(!res.isSuccess()){
-        res.printMessage();
-        return;
+    mcsm::VoidResult res = mcsm::GeneralOption::getGeneralOption().initialize(); // initializes global configurations
+    if(!res){
+        return res;
     }
 
-    *this->initialized = true;
+    this->initialized = true;
+    return {};
 }
 
 void mcsm::init::initCommands(const std::string& version){
@@ -72,21 +78,6 @@ void mcsm::init::initCommands(const std::string& version){
     generateServerCommand->addAlias("initserver");
     mcsm::CommandManager::addCommand(std::move(generateServerCommand));
 
-    std::unique_ptr<mcsm::JvmOptionGeneratorCommand> jvmOptionGeneratorCommand = std::make_unique<mcsm::JvmOptionGeneratorCommand>("genJvmProfile", "Generates a Java Virtual Machine launch profile.");
-    jvmOptionGeneratorCommand->addAlias("generatejvmprofile");
-    jvmOptionGeneratorCommand->addAlias("genjvmprofile");
-    mcsm::CommandManager::addCommand(std::move(jvmOptionGeneratorCommand));
-
-    std::unique_ptr<mcsm::JvmOptionSearchCommand> jvmProfileSearchCommand = std::make_unique<mcsm::JvmOptionSearchCommand>("searchJvmProfile", "Looks up Java Virtual Machine profiles.");
-    jvmProfileSearchCommand->addAlias("searchprofile");
-    jvmProfileSearchCommand->addAlias("searchjvmprofile");
-    mcsm::CommandManager::addCommand(std::move(jvmProfileSearchCommand));
-
-    std::unique_ptr<mcsm::JvmOptionEditCommand> jvmOptionEditCommand = std::make_unique<mcsm::JvmOptionEditCommand>("editJvmProfile", "Edits the specified Java Virtual Machine launch profile.");
-    jvmOptionEditCommand->addAlias("editjvmprofile");
-    jvmOptionEditCommand->addAlias("editprofile");
-    mcsm::CommandManager::addCommand(std::move(jvmOptionEditCommand));
-
     std::unique_ptr<mcsm::StartServerCommand> startServerCommand = std::make_unique<mcsm::StartServerCommand>("start", "Starts the configured server.");
     startServerCommand->addAlias("startserver");
     mcsm::CommandManager::addCommand(std::move(startServerCommand));
@@ -105,6 +96,10 @@ void mcsm::init::initCommands(const std::string& version){
 
     std::unique_ptr<mcsm::GroupCommand> groupCommand = std::make_unique<mcsm::GroupCommand>("group", "Group command");
     mcsm::CommandManager::addCommand(std::move(groupCommand));
+
+    std::unique_ptr<mcsm::JvmCommand> jvmCommand =
+        std::make_unique<mcsm::JvmCommand>("jvm", "JVM related command");
+    mcsm::CommandManager::addCommand(std::move(jvmCommand));
 }
 
 void mcsm::init::initServers(){
@@ -131,6 +126,9 @@ void mcsm::init::initServers(){
     auto custom = std::make_unique<mcsm::CustomServer>();
     sr.registerServer("custom", std::move(custom));
 
+    auto folia = std::make_unique<mcsm::FoliaServer>();
+    sr.registerServer("folia", std::move(folia));
+
     std::unique_ptr<mcsm::SkipVersionCheckProperty> p1 = std::make_unique<mcsm::SkipVersionCheckProperty>("skip_version_check_while_configuring");
     sr.registerGeneralProperty("skip_version_check_while_configuring", std::move(p1));
 
@@ -142,8 +140,11 @@ void mcsm::init::initServers(){
 
     std::unique_ptr<mcsm::ScreenBinPathProperty> p4 = std::make_unique<mcsm::ScreenBinPathProperty>("screen_binary_path");
     sr.registerGeneralProperty("screen_binary_path", std::move(p4));
+
+    std::unique_ptr<mcsm::ColorDownloadProgressBarProperty> p5 = std::make_unique<mcsm::ColorDownloadProgressBarProperty>("color_download_progress_bar");
+    sr.registerGeneralProperty("color_download_progress_bar", std::move(p5));
 }
 
 bool mcsm::init::isInitialized() const {
-    return *this->initialized;
+    return this->initialized;
 }

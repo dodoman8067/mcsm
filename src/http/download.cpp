@@ -22,11 +22,12 @@ SOFTWARE.
 
 
 #include <mcsm/http/download.h>
+#include <mcsm/data/options/general_option.h>
+#include <cerrno>
 
-static size_t writeFunction(mcsm::Result *ptr, size_t size, size_t nmemb, FILE *stream) {
-    size_t written;
-    written = fwrite(ptr, size, nmemb, stream);
-    return written;
+static size_t writeFunction(char* ptr, size_t size, size_t nmemb, void* userdata) {
+    std::FILE* stream = static_cast<std::FILE*>(userdata);
+    return std::fwrite(ptr, size, nmemb, stream);
 }
 
 static int progressCallback(void * /* clientp */, curl_off_t dltotal, curl_off_t dlnow, curl_off_t /* ultotal */, curl_off_t /* ulnow */) {
@@ -36,16 +37,18 @@ static int progressCallback(void * /* clientp */, curl_off_t dltotal, curl_off_t
         double percentage = static_cast<double>(dlnow) / static_cast<double>(dltotal) * 100.0;
         int progress = static_cast<int>(barWidth * percentage / 100.0);
 
-        if(progress < 4)
-            mcsm::setcol(mcsm::TextColor::DARK_RED);
-        else if(progress < 10)
-            mcsm::setcol(mcsm::TextColor::RED);
-        else if(progress < 16)
-            mcsm::setcol(mcsm::TextColor::YELLOW);
-        else if(progress < 20)
-            mcsm::setcol(mcsm::TextColor::GREEN);
-        else
-            mcsm::setcol(mcsm::TextColor::BLUE);
+        if(mcsm::GeneralOption::getGeneralOption().colorDownloadProgressBar()){
+            if(progress < 4)
+                mcsm::setcol(mcsm::NamedColor::DARK_RED);
+            else if(progress < 10)
+                mcsm::setcol(mcsm::NamedColor::RED);
+            else if(progress < 16)
+                mcsm::setcol(mcsm::NamedColor::YELLOW);
+            else if(progress < 20)
+                mcsm::setcol(mcsm::NamedColor::GREEN);
+            else
+                mcsm::setcol(mcsm::NamedColor::BLUE);
+        }
 
         std::cout << "\r[";
         for(int i = 0; i < barWidth; i++){
@@ -57,7 +60,10 @@ static int progressCallback(void * /* clientp */, curl_off_t dltotal, curl_off_t
         std::cout << std::fixed << std::setprecision(1) << percentage << "%";
         std::cout.flush();
 
-        mcsm::setcol(mcsm::TextColor::RESET);
+        mcsm::resetcol();
+    }else{
+        std::cout << "\r" << (dlnow / 1024) << " KiB downloaded...";
+        std::cout.flush();
     }
     return 0;
 }
@@ -66,37 +72,40 @@ static int xferinfoCallback(void *clientp, curl_off_t dltotal, curl_off_t dlnow,
     return progressCallback(clientp, dltotal, dlnow, ultotal, ulnow);
 }
 
-mcsm::Result mcsm::download(const std::string& name, const std::string& url){
-    const std::string& path = mcsm::getCurrentPath();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+mcsm::VoidResult mcsm::download(const std::string& name, const std::string& url){
+    auto path = mcsm::getCurrentPath();
+    if(!path) return tl::unexpected(path.error());
 
-    return download(name, url, path);
+    return download(name, url, path.value());
 }
 
-mcsm::Result mcsm::download(const std::string& name, const std::string& url, const std::string& path){
+mcsm::VoidResult mcsm::download(const std::string& name, const std::string& url, const std::string& path){
     return download(name, url, path, false);
 }
 
-mcsm::Result mcsm::download(const std::string& name, const std::string& url, const std::string& path, const bool& percentages){
+mcsm::VoidResult mcsm::download(const std::string& name, const std::string& url, const std::string& path, const bool& percentages){
     CURL* curl = mcsm::curl_holder::curl;
     CURLcode res;
     std::FILE* file;
     const std::string& filename = path + "/" + name;
     file = std::fopen(filename.c_str(), "wb");
+    if(file == nullptr){
+        auto reason = std::string(std::strerror(errno));
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::FILE_CREATE_FAILED, {filename, reason});
+        return tl::unexpected(err);
+    }
 
     curl_easy_setopt(curl, CURLOPT_URL, url.c_str());
     curl_easy_setopt(curl, CURLOPT_FOLLOWLOCATION, 1L);
     curl_easy_setopt(curl, CURLOPT_WRITEFUNCTION, writeFunction);
     curl_easy_setopt(curl, CURLOPT_WRITEDATA, file);
-    curl_easy_setopt(curl, CURLOPT_USERAGENT, "libcurl/8.10.0");
-    curl_easy_setopt(curl, CURLOPT_VERBOSE, 0L);
+    curl_easy_setopt(curl, CURLOPT_USERAGENT, curl_version());
     curl_easy_setopt(curl, CURLOPT_TCP_KEEPALIVE, 1L);
-    curl_easy_setopt(curl, CURLOPT_HTTP_VERSION, CURL_HTTP_VERSION_2TLS);
     curl_easy_setopt(curl, CURLOPT_DNS_CACHE_TIMEOUT, 60L);
+    /*
+    curl_easy_setopt(curl, CURLOPT_HEADERFUNCTION, header_log);
+    curl_easy_setopt(curl, CURLOPT_VERBOSE, 1L); // optional for redirects/effective URL
+    */
     
     if(percentages){
         curl_easy_setopt(curl, CURLOPT_NOPROGRESS, 0L);
@@ -108,19 +117,18 @@ mcsm::Result mcsm::download(const std::string& name, const std::string& url, con
     if(percentages) std::cout << "\n";
 
     if(res != CURLE_OK){
-        mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::downloadRequestFailed(url, curl_easy_strerror(res))});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::DOWNLOAD_REQUEST_FAILED, {url, curl_easy_strerror(res)});
         std::fclose(file);
         curl_easy_reset(curl);
-        return result;
+        return tl::unexpected(err);
     }
 
     std::fclose(file);
     curl_easy_reset(curl);
-    mcsm::Result result({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return result;
+    return {};
 }
 
-bool mcsm::isText(const std::string& url){
+mcsm::BoolResult mcsm::isText(const std::string& url){
     CURL* curl = mcsm::curl_holder::curl;
     char *contentType = nullptr;
     bool isText = false;
@@ -136,9 +144,9 @@ bool mcsm::isText(const std::string& url){
     res = curl_easy_perform(curl);
 
     if(res != CURLE_OK){
-        mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::getRequestFailed(url, curl_easy_strerror(res))});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::GET_REQUEST_FAILED, {url, curl_easy_strerror(res)});
         curl_easy_reset(curl);
-        return false;
+        return tl::unexpected(err);
     }
 
     res = curl_easy_getinfo(curl, CURLINFO_CONTENT_TYPE, &contentType);
@@ -146,12 +154,11 @@ bool mcsm::isText(const std::string& url){
         const std::string& contentTypeStr = contentType;
         isText = contentTypeStr.find("text") == 0 || contentTypeStr.find("json") != std::string::npos;
     }else{
-        mcsm::Result result({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::getRequestFailed(url, curl_easy_strerror(res))});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::GET_REQUEST_FAILED, {url, curl_easy_strerror(res)});
         curl_easy_reset(curl);
-        return false;
+        return tl::unexpected(err);
     }
 
     curl_easy_reset(curl);
-    mcsm::Result result({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return isText;
 }

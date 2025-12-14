@@ -82,7 +82,7 @@ std::string mcsm::normalizePath(const std::string& p){
     if(p.empty()) return p; // Handle empty input
 
     // Use std::filesystem for better handling of ".." and "."
-    std::filesystem::path pathObj(p);
+    std::filesystem::path pathObj = std::filesystem::absolute(p);
     std::string result = pathObj.lexically_normal().string();
 
     // Ensure it does not end with a trailing slash unless it's root "/"
@@ -115,5 +115,16 @@ std::string mcsm::formatPrompt(const std::string &key){
     if(key == "sponge_api_search_recommended_versions"){
         formatted = "if the server search on recommended versions api";
     }
+    if(key == "server_jarfile") {
+        formatted = "server jarfile path. Must include filename at the end not including \"/\".";
+    }
     return formatted;
+}
+
+std::string mcsm::vecToString(const std::vector<std::string>& vec) {
+    std::string s;
+    for(const auto& v : vec){
+        s += v + " ";
+    }
+    return s;
 }

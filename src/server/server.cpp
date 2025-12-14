@@ -23,89 +23,71 @@ SOFTWARE.
 #include <mcsm/server/server.h>
 #include <mcsm/data/options/general_option.h>
 
-mcsm::Result mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
-    return start(loader, option, mcsm::getCurrentPath(), mcsm::getCurrentPath());
+mcsm::StringResult mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
+    auto cPath = mcsm::getCurrentPath();
+    if(!cPath) return cPath;
+    return start(loader, option, cPath.value(), cPath.value());
 }
 
-mcsm::Result mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
+mcsm::StringResult mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
     std::string jvmOpt = " ";
     auto jArgs = option.getJvmArguments();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    if(!jArgs) return tl::unexpected(jArgs.error());
 
-    for(auto& s : jArgs){
+    for(auto& s : jArgs.value()){
         jvmOpt = jvmOpt + s + " ";
     }
 
     std::string svrOpt = " ";
     auto sArgs = option.getServerArguments();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    if(!sArgs) return tl::unexpected(sArgs.error());
 
-    for(auto& s : sArgs){
+    for(auto& s : sArgs.value()){
         svrOpt = svrOpt + s + " ";
     }
 
-    std::string jPath = option.getJvmPath();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    mcsm::StringResult jPath = option.getJvmPath();
+    if(!jPath) return jPath;
 
-    std::string jar = loader->getServerJarFile();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    mcsm::StringResult jar = loader->getServerJarFile();
+    if(!jar) return jar;
 
-    std::string command = jPath + jvmOpt + path + "/" + jar + svrOpt;
+    std::string command = jPath.value() + jvmOpt + mcsm::normalizePath(path) + "/" + jar.value() + svrOpt;
     mcsm::info("Running command : " + command);
     
     std::error_code ec;
     std::filesystem::current_path(optionPath, ec);
     if(ec){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Server starting failed : " + ec.message(),
-            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you believe that this is a software issue."
-        }});
-        return res;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, {700, "Server starting failed : %s", ""}, {ec.message()});
+        return tl::unexpected(err);
     }
 
-    int result = mcsm::runCommand(command);
-    if(result != 0){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Server exited with error code : " + std::to_string(result)
-        }});
-        return res;
+    auto result = mcsm::runCommand(command);
+    if(!result) return tl::unexpected(result.error());
+    if(result.value() != 0){
+        return "\033[38;2;255;0;0mServer exited with error code : " + std::to_string(result.value());
     }
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {
-        "Server exited with error code : 0"
-    }});
-    return res;
+    return "\033[38;2;0;255;0mServer exited with error code : 0";
 }
 
-mcsm::Result mcsm::Server::configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate){
-    return configure(version, server, sDataOpt, path, name, option, autoUpdate, "latest");
+mcsm::VoidResult mcsm::Server::configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate){
+    return configure(version, server, sDataOpt, path, name, option, autoUpdate, "latest", path);
 }
 
-mcsm::Result mcsm::Server::configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate, const std::string& build){
+mcsm::VoidResult mcsm::Server::configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate, const std::string& build){
+    return configure(version, server, sDataOpt, path, name, option, autoUpdate, build, path);
+}
+
+mcsm::VoidResult mcsm::Server::configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate, const std::string& build, const std::string& jarPath){
     mcsm::ServerConfigGenerator serverOption(path);
-    
-    mcsm::Result sRes = serverOption.generate(version, server, sDataOpt, name, option, autoUpdate, build);
-    if(!sRes.isSuccess()) return sRes;
+
+    mcsm::VoidResult sRes = serverOption.generate(version, server, sDataOpt, name, option, autoUpdate, build, jarPath);
+    if(!sRes) return sRes;
 
     mcsm::ServerConfigLoader loader(path);
-    
-    mcsm::Result loadRes = loader.loadConfig();
-    if(!loadRes.isSuccess()) return loadRes;
+
+    mcsm::VoidResult loadRes = loader.loadConfig();
+    if(!loadRes) return loadRes;
 
     mcsm::success("Configured server's information : ");
     mcsm::info("Server name : " + mcsm::safeString(name));
@@ -115,42 +97,43 @@ mcsm::Result mcsm::Server::configure(const std::string &version, mcsm::Server* s
     mcsm::info("Server JVM launch profile : " + option.getProfileName());
     if(!autoUpdate) mcsm::info("Automatic updates : disabled");
 
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return res;
+    return {};
 }
 
-std::string mcsm::Server::getJarFile() const {
-    std::string path = mcsm::getCurrentPath();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-    return getJarFile(path);
+mcsm::StringResult mcsm::Server::getJarFile() const {
+    auto path = mcsm::getCurrentPath();
+    if(!path) return path;
+    return getJarFile(path.value());
 }
 
-std::string mcsm::Server::getJarFile(const std::string& checkDir) const {
+mcsm::StringResult mcsm::Server::getJarFile(const std::string& checkDir) const {
     //this method is usually for getting the configured server's jarfile.
     mcsm::Option opt(checkDir, "server");
-    bool exists = opt.exists();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-
-    opt.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-
-    if(exists){
-        nlohmann::json value = opt.getValue("server_jar_name");
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-
-        if(value == nullptr){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"server_jar_name\"", opt.getName())});
-            return "";
-        }
-
-        if(!value.is_string()){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"server_jar_name\"", "string")});
-            return "";
-        }
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-        return value;
+    mcsm::BoolResult exists = opt.exists();
+    if(!exists){
+        return tl::unexpected(exists.error());
     }
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
+
+    mcsm::VoidResult optLoadRes = opt.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
+    if(!optLoadRes){
+        return tl::unexpected(optLoadRes.error());
+    }
+
+    if(exists.value()){
+        auto value = opt.getValue("server_jar");
+        if(!value) return value;
+
+        if(value.value() == nullptr){
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"server_jar\"", opt.getName()});
+            return tl::unexpected(err);
+        }
+
+        if(!value.value().is_string()){
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"server_jar\"", "string"});
+            return tl::unexpected(err);
+        }
+        return value.value().get<std::string>();
+    }
     return getTypeAsString() + ".jar";
 }
 
@@ -159,14 +142,16 @@ bool mcsm::Server::isBasedAs(const std::string& input) const {
     return getBasedServer() == input;
 }
 
-const std::map<std::string, std::string> mcsm::Server::getRequiredValues() const {
-    return {
-        {"name", "" },
-        {"minecraft_version", ""},
-        {"default_jvm_launch_profile_search_path", "current"},
-        {"default_jvm_launch_profile_name", ""},
-        {"server_jarfile_name", getTypeAsString() + ".jar"},
-        {"server_build_version", "latest"},
-        {"auto_server_jar_update", "true"}
+const tl::expected<std::map<std::string, std::string>, mcsm::Error> mcsm::Server::getRequiredValues() const {
+    return tl::expected<std::map<std::string, std::string>, mcsm::Error>{
+        std::map<std::string, std::string>{
+                {"name", "" },
+                {"minecraft_version", ""},
+                {"default_jvm_launch_profile_search_path", "current"},
+                {"default_jvm_launch_profile_name", ""},
+                {"server_jarfile", getTypeAsString() + ".jar"},
+                {"server_build_version", "latest"},
+                {"auto_server_jar_update", "true"}
+        }
     };
 }

@@ -43,80 +43,82 @@ std::string mcsm::CustomServer::getSupportedVersions() const {
     return "unknown";
 }
 
-std::string mcsm::CustomServer::getFileLocation(const std::string& optionPath) const {
+mcsm::StringResult mcsm::CustomServer::getFileLocation(const std::string& optionPath) const {
     mcsm::Option option(optionPath, "server");
-    bool exists = option.exists();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-    if(!exists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
-        return "";
+    auto exists = option.exists();
+    if(!exists) return tl::unexpected(exists.error());
+    if(!exists.value()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_NOT_CONFIGURED, {});
+        return tl::unexpected(err);
     }
 
-    option.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    auto optLoadRes = option.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
+    if(!optLoadRes) return tl::unexpected(optLoadRes.error());
 
-    if(option.getValue("jar_location") == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"jar_location\"", "server.json")});
-        return "";
+    auto jarLocVal = option.getValue("jarfile_source_location");
+    if(!jarLocVal) return tl::unexpected(jarLocVal.error());
+
+    nlohmann::json jarLoc = jarLocVal.value();
+
+    if(jarLoc == nullptr){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"jarfile_source_location\"", "server.json"});
+        return tl::unexpected(err);
     }
-    if(!option.getValue("jar_location").is_string()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"jar_location\"", "string")});
-        return "";
+    if(!jarLoc.is_string()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"jarfile_source_location\"", "string"});
+        return tl::unexpected(err);
     }
-    std::string value = option.getValue("jar_location");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-    if(mcsm::startsWith(value, "current") && mcsm::endsWith(value, "current")){
+    if(jarLoc != nullptr && (mcsm::startsWith(jarLoc.get<std::string>(), "current") && mcsm::endsWith(jarLoc.get<std::string>(), "current"))){
         return mcsm::getCurrentPath();
     }
-    return value;
+    return jarLoc.get<std::string>();
 }
 
-mcsm::Result mcsm::CustomServer::setFileLocation(mcsm::Option* option, const std::string& location) {
-    mcsm::Result setRes = option->setValue("jar_location", location);
-    if(!setRes.isSuccess()) return setRes;
+mcsm::VoidResult mcsm::CustomServer::setFileLocation(mcsm::Option* option, const std::string& location) {
+    mcsm::VoidResult setRes = option->setValue("jarfile_source_location", location);
+    if(!setRes) return setRes;
     return option->save();
 }
 
-std::string mcsm::CustomServer::getCustomStartCommand(const std::string& optionPath) const {
+mcsm::StringResult mcsm::CustomServer::getCustomStartCommand(const std::string& optionPath) const {
     mcsm::Option option(optionPath, "server");
-    bool exists = option.exists();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
-    if(!exists){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::serverNotConfigured()});
-        return "";
+    auto exists = option.exists();
+    if(!exists) return tl::unexpected(exists.error());
+    if(!exists.value()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_NOT_CONFIGURED, {});
+        return tl::unexpected(err);
     }
 
-    option.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    auto optLRes = option.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
+    if(!optLRes) return tl::unexpected(optLRes.error());
 
-    if(option.getValue("custom_run_command") == nullptr){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"custom_run_command\"", "server.json")});
-        return "";
-    }
-    if(!option.getValue("custom_run_command").is_string()){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"custom_run_command\"", "string")});
-        return "";
-    }
-    std::string value = option.getValue("custom_run_command");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) return "";
+    auto crcRes = option.getValue("custom_run_command");
+    if(!crcRes) return tl::unexpected(crcRes.error());
 
+    nlohmann::json crcVal = crcRes.value();
+
+    if(crcVal == nullptr){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"custom_run_command\"", "server.json"});
+        return tl::unexpected(err);
+    }
+    if(!crcVal.is_string()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"custom_run_command\"", "string"});
+        return tl::unexpected(err);
+    }
+    std::string value = crcVal;
     return value;
 }
 
-mcsm::Result mcsm::CustomServer::setCustomStartCommand(mcsm::Option* option, const std::string& command){
-    mcsm::Result setRes = option->setValue("custom_run_command", command);
-    if(!setRes.isSuccess()) return setRes;
+mcsm::VoidResult mcsm::CustomServer::setCustomStartCommand(mcsm::Option* option, const std::string& command){
+    mcsm::VoidResult setRes = option->setValue("custom_run_command", command);
+    if(!setRes) return setRes;
     return option->save();
 }
 
-mcsm::Result mcsm::CustomServer::setupServerJarFile(const std::string& path, const std::string& optionPath){
-    std::string location = getFileLocation(optionPath);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
-    std::string jar = getJarFile(optionPath);
+mcsm::VoidResult mcsm::CustomServer::setupServerJarFile(const std::string& jarName, const std::string& path, const std::string& optionPath){
+    auto locRes = getFileLocation(optionPath);
+    if(!locRes) return tl::unexpected(locRes.error());
+    std::string location = locRes.value();
 
     // how it works:
     // 1. check if the location is url, will try to download if it is
@@ -125,84 +127,61 @@ mcsm::Result mcsm::CustomServer::setupServerJarFile(const std::string& path, con
     bool url = isURL(location);
     
     if(url){
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-            mcsm::Result res(resp.first, resp.second);
-            return res;
-        }
-        return mcsm::download(jar, location, path, true);
+        return mcsm::download(jarName, location, path, true);
     }else{
-        bool file = isFile(location);
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-            mcsm::Result res(resp.first, resp.second);
-            return res;
-        }
-        if(file){
-            bool fileExists = mcsm::fileExists(location);
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-                std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-                mcsm::Result res(resp.first, resp.second);
-                return res;
-            }
+        auto file = isFile(location);
+        if(!file) return tl::unexpected(file.error());
+        if(file.value()){
+            auto fileExists = mcsm::fileExists(location);
+            if(!fileExists) return tl::unexpected(fileExists.error());
 
-            if(!fileExists){
-                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-                    "Cannot copy a file that doesn't exist.",
-                    "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
-                }});
-                return res;
+            if(!fileExists.value()){
+                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, {700, "Cannot copy a file that doesn't exist.", ""}, {});
+                return tl::unexpected(err);
             }
 
             std::error_code copyEC;
-            std::filesystem::copy_file(location, path + "/" + jar, copyEC);
+            std::filesystem::copy_file(location, mcsm::joinPath(path, jarName), copyEC);
             if(copyEC){
-                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-                    "Copying jarfile from " + location + " to " + path + "/" + jar + " failed for reason: " + copyEC.message(),
-                    "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
-                }});
-                return res;
+                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, {700, "Copying jarfile from " + location + " to " + path + "/" + jarName + " failed for reason: " + copyEC.message(), ""}, {});
+                return tl::unexpected(err);
             }
-
-            return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
+            return {};
         }
     }
-    mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-        "The following server jarfile wasn't in a vaild location : " + location,
-        "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
-    }});
-    return res;
+    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, {700, "The following server jarfile wasn't in a vaild location : " + location, ""}, {});
+    return tl::unexpected(err);
 }
 
-mcsm::Result mcsm::CustomServer::obtainJarFile(const std::string& /* version */, const std::string& path, const std::string& /* name */, const std::string& optionPath){
-    return setupServerJarFile(path, optionPath);
+mcsm::VoidResult mcsm::CustomServer::obtainJarFile(const std::string& /* version */, const std::string& path, const std::string& name, const std::string& optionPath){
+    return setupServerJarFile(name, path, optionPath);
 }
 
-mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues){
+mcsm::VoidResult mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues){
     return generate(name, option, path, version, autoUpdate, extraValues.find("server_file_location")->second, extraValues);
 }
 
-mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& /* version */, const bool& /* autoUpdate */, const std::string& fileLocation, const std::map<std::string, std::string>& extraValues){
+mcsm::VoidResult mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& /* version */, const bool& /* autoUpdate */, const std::string& fileLocation, const std::map<std::string, std::string>& extraValues){
     mcsm::ServerConfigGenerator serverOption(path);
     mcsm::ServerDataOption sDOpt(path);
 
     // No need to call opt.load() here. create() in ServerDataOption will call it eventually
     
-    mcsm::Result sRes = serverOption.generate("ignored", this, &sDOpt, name, option, false);
-    if(!sRes.isSuccess()) return sRes;
+    mcsm::VoidResult sRes = serverOption.generate("ignored", this, &sDOpt, name, option, false);
+    if(!sRes) return sRes;
 
-    mcsm::Result fileRes = setFileLocation(serverOption.getHandle().get(), fileLocation);
-    if(!fileRes.isSuccess()) return fileRes;
+    mcsm::VoidResult fileRes = setFileLocation(serverOption.getHandle(), fileLocation);
+    if(!fileRes) return fileRes;
 
     std::string customCommand = extraValues.find("custom_run_command")->second;
 
-    mcsm::Result cRCRes = setCustomStartCommand(serverOption.getHandle().get(), customCommand);
-    if(!cRCRes.isSuccess()) return cRCRes;
+    mcsm::VoidResult cRCRes = setCustomStartCommand(serverOption.getHandle(), customCommand);
+    if(!cRCRes) return cRCRes;
 
     mcsm::ServerConfigLoader loader(path);
     
-    mcsm::Result loadRes = loader.loadConfig();
-    if(!loadRes.isSuccess()) return loadRes;
+    mcsm::VoidResult loadRes = loader.loadConfig();
+    if(!loadRes) return loadRes;
 
     mcsm::success("Custom configured server's information : ");
     mcsm::info("Server name : " + mcsm::safeString(name));
@@ -217,76 +196,55 @@ mcsm::Result mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOpti
     mcsm::warning("NOTE: Custom servers are currently in beta state.");
     mcsm::warning("We are not responsible for the consequences of using beta features.");
 
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return res;
+    return {};
 }
 
-mcsm::Result mcsm::CustomServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
+mcsm::StringResult mcsm::CustomServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
     // ServerOption class handles the data file stuff
 
-    std::string customCommand = getCustomStartCommand(loader->getHandle()->getPath());
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    mcsm::StringResult customCommand = getCustomStartCommand(loader->getHandle()->getPath());
+    if(!customCommand) return customCommand;
 
-    if(!mcsm::isWhitespaceOrEmpty(customCommand)){
+    if(!mcsm::isWhitespaceOrEmpty(customCommand.value())){
         mcsm::info("NOTE: JVM profile based launch system is currently overrided by \"custom_run_command\" value inside server.json.");
         mcsm::info("Leave it empty to use default launch system.");
-        mcsm::info("Running command : " + customCommand);
-        int result = mcsm::runCommand(customCommand);
-        if(result != 0){
-            mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-                "Server exited with error code : " + std::to_string(result)
-            }});
-            return res;
+        mcsm::info("Running command : " + customCommand.value());
+        mcsm::IntResult result = mcsm::runCommand(customCommand.value());
+        if(!result) return tl::unexpected(result.error());
+        if(result.value() != 0){
+            return "\033[38;2;255;0;0mServer exited with error code : " + std::to_string(result.value());
         }
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {
-            "Server exited with error code : 0"
-        }});
-        return res;
+        return "\033[38;2;0;255;0mServer exited with error code : 0";
     }
     
-    std::string jar = loader->getServerJarFile();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    mcsm::StringResult jar = loader->getServerJarFile();
+    if(!jar) return jar;
 
-    bool fileExists = mcsm::fileExists(path + "/" + jar);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-        mcsm::Result res(resp.first, resp.second);
-        return res;
-    }
+    mcsm::BoolResult fileExists = mcsm::fileExists(path + "/" + jar.value());
+    if(!fileExists) return tl::unexpected(fileExists.error());
 
-    if(!fileExists){
-        mcsm::info("Setting up " + jar + "...");
-        mcsm::info("\"server_jar_name\" will be used as the copied/downloaded file name. Make sure you don't have characters like \"/\".");
-        std::string sVer = loader->getServerVersion();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
-            mcsm::Result res(resp.first, resp.second);
-            return res;
-        }
+    auto locRes = getFileLocation(optionPath);
+    if(!locRes) return tl::unexpected(locRes.error());
+    std::string location = locRes.value();
 
-        mcsm::Result res = setupServerJarFile(path, optionPath);
-        if(!res.isSuccess()) return res;
+    if(!fileExists.value()){
+        mcsm::info("Setting up jarfile in " + path + "/" + jar.value() + " from " + location + "...");
+        mcsm::info("\"server_jar\" will be used as the copied/downloaded file path. File's name must be included at the end in order to store the file at specified path.");
+        mcsm::StringResult sVer = loader->getServerVersion();
+        if(!sVer) return sVer;
+
+        mcsm::VoidResult res = setupServerJarFile(jar.value(), path, optionPath);
+        if(!res) return tl::unexpected(res.error());
     }
     return Server::start(loader, option, path, optionPath);
 }
 
-bool mcsm::CustomServer::isFile(const std::string& location) const {
+mcsm::BoolResult mcsm::CustomServer::isFile(const std::string& location) const {
     std::error_code ec;
     bool isRegularFile = std::filesystem::is_regular_file(location, ec);
     if(ec){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Checking if " + location + " is a file operation failed : " + ec.message(), 
-            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
-            }});
-        return false;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::FILE_EXIST_CHECK_FAILED, {location + " is a file", ec.message()});
+        return tl::unexpected(err);
     }
     return isRegularFile;
 }
@@ -298,14 +256,16 @@ bool mcsm::CustomServer::isURL(const std::string& location) const {
     return std::regex_match(location, urlPattern);
 }
 
-const std::map<std::string, std::string> mcsm::CustomServer::getRequiredValues() const {
-    return {
-        {"name", "" },
-        {"default_jvm_launch_profile_search_path", "current"}, // (current/global)
-        {"default_jvm_launch_profile_name", ""},
-        {"server_jarfile_name", "custom.jar"},
-        {"server_file_location", ""}, // (url/filepath)
-        {"custom_run_command", ""} // Overrides server JVM profile based start system.
+const tl::expected<std::map<std::string, std::string>, mcsm::Error> mcsm::CustomServer::getRequiredValues() const {
+    return tl::expected<std::map<std::string, std::string>, mcsm::Error>{
+        std::map<std::string, std::string>{
+                {"name", "" },
+                {"default_jvm_launch_profile_search_path", "current"}, // (current/global)
+                {"default_jvm_launch_profile_name", ""},
+                {"server_jarfile", "custom.jar"},
+                {"server_file_location", ""}, // (url/filepath)
+                {"custom_run_command", ""} // Overrides server JVM profile based start system.
+        }
     };
 }
 

@@ -32,15 +32,20 @@ mcsm::VersionCommand::~VersionCommand(){
 
 void mcsm::VersionCommand::execute(const std::vector<std::string>& /* args */){
     #ifdef MCSM_DEBUG
-        std::cout << "MCSM version : " << version << " (DEBUG)\n";
+        #ifdef MCSM_GIT_HASH
+            std::cout << "MCSM version : " << version << " (DEBUG-git-commit-" << MCSM_GIT_HASH << ")\n";
+        #else
+            std::cout << "MCSM version : " << version << " (DEBUG)\n";
+        #endif
     #else
-        std::cout << "MCSM version : " << version << "\n";
+        #ifdef MCSM_GIT_HASH
+            std::cout << "MCSM version : " << version << ", commit " << MCSM_GIT_HASH << "\n";
+        #else
+            std::cout << "MCSM version : " << version << "\n";
+        #endif
     #endif
     std::cout << "cURL version : " << curl_version() << "\n";
     #ifdef MCSM_NLOHMANN_VER
         std::cout << "nlohmann::json version : " << MCSM_NLOHMANN_VER << "\n";
-    #endif
-    #ifdef LIBGIT2_VERSION
-        std::cout << "libgit2 version : " << LIBGIT2_VERSION << "\n";
     #endif
 }

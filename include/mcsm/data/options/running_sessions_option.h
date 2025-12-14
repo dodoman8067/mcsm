@@ -1,6 +1,8 @@
 #ifndef __MCSM_RUNNING_SESSIONS_OPTION_H__
 #define __MCSM_RUNNING_SESSIONS_OPTION_H__
 
+/*
+
 #include <mcsm/data/options/server_group_loader.h>
 
 namespace mcsm {
@@ -27,18 +29,19 @@ namespace mcsm {
         RunningSessionsOption();
         ~RunningSessionsOption();
 
-        mcsm::Result load();
-        mcsm::Result save();
+        mcsm::VoidResult load();
+        mcsm::VoidResult save();
 
         std::vector<const mcsm::RunningGroup*> getRunningGroups() const;
-        std::vector<const mcsm::ServerConfigLoader*> getRunningServersOfGroup(const std::string& groupName) const;
+        tl::expected<std::vector<const mcsm::ServerConfigLoader*>, mcsm::Error> getRunningServersOfGroup(const std::string& groupName) const;
 
-        mcsm::Result addRunningGroup(std::unique_ptr<mcsm::RunningGroup> group);
-        mcsm::Result addRunningServer(const std::string& groupName, const mcsm::ServerConfigLoader* server);
+        mcsm::VoidResult addRunningGroup(std::unique_ptr<mcsm::RunningGroup> group);
+        mcsm::VoidResult addRunningServer(const std::string& groupName, const mcsm::ServerConfigLoader* server);
 
-        mcsm::Result removeRunningGroup(std::unique_ptr<mcsm::RunningGroup> group);
-        mcsm::Result removeRunningServer(const std::string& groupName, const mcsm::ServerConfigLoader* server);
+        mcsm::VoidResult removeRunningGroup(std::unique_ptr<mcsm::RunningGroup> group);
+        mcsm::VoidResult removeRunningServer(const std::string& groupName, const mcsm::ServerConfigLoader* server);
     };
 }
+*/
 
 #endif // __MCSM_RUNNING_SESSIONS_OPTION_H__

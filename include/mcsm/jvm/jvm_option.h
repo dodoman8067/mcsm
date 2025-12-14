@@ -23,7 +23,6 @@ SOFTWARE.
 #ifndef __MCSM_JVM_OPTION_H__
 #define __MCSM_JVM_OPTION_H__
 
-#include <mcsm/data/global_option.h>
 #include <mcsm/data/option.h>
 #include <mcsm/jvm/java_detection.h>
 #include <mcsm/util/string_utils.h>
@@ -38,39 +37,41 @@ namespace mcsm {
 
     class JvmOption {
     private:
-        std::unique_ptr<mcsm::Configurable> option;
+        std::unique_ptr<mcsm::Option> option;
         std::string name;
-        std::string workingDir;
+        bool initialized = false;
     public:
-        JvmOption(const std::string& name);
-        JvmOption(const std::string& name, const SearchTarget& target);
-        JvmOption(const std::string& name, const SearchTarget& target, const std::string& workingPath);
+        JvmOption(const std::string& path, const std::string& name);
+        JvmOption(std::unique_ptr<mcsm::Option> option); 
         ~JvmOption();
 
-        mcsm::Result create();
-        mcsm::Result create(const std::string& jvmPath, const SearchTarget& target);
-        mcsm::Result create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions, const SearchTarget& target);
-        mcsm::Result create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions, const std::vector<std::string>& serverOptions, const SearchTarget& target);
+        mcsm::VoidResult init();
 
-        mcsm::Result reset();
+        mcsm::VoidResult create();
+        mcsm::VoidResult create(const std::string& jvmPath);
+        mcsm::VoidResult create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions);
+        mcsm::VoidResult create(const std::string& jvmPath, const std::vector<std::string>& jvmOptions, const std::vector<std::string>& serverOptions);
 
-        bool exists();
+        mcsm::VoidResult reset();
 
-        std::string getJvmPath();
-        mcsm::Result setJvmPath(const std::string& jvmPath);
+        mcsm::BoolResult exists() const;
 
-        std::vector<std::string> getJvmArguments();
-        mcsm::Result setJvmArguments(const std::vector<std::string>& jvmArgs);
+        mcsm::StringResult getJvmPath() const;
+        mcsm::VoidResult setJvmPath(const std::string& jvmPath);
 
-        std::vector<std::string> getServerArguments();
-        mcsm::Result setServerArguments(const std::vector<std::string>& serverArgs);
+        tl::expected<std::vector<std::string>, mcsm::Error> getJvmArguments() const;
+        mcsm::VoidResult setJvmArguments(const std::vector<std::string>& jvmArgs);
+
+        tl::expected<std::vector<std::string>, mcsm::Error> getServerArguments() const;
+        mcsm::VoidResult setServerArguments(const std::vector<std::string>& serverArgs);
 
         std::string getProfileName() const;
 
-        std::string getProfilePath() const;
-        
-        mcsm::SearchTarget getSearchTarget() const;
+        mcsm::StringResult getProfilePath() const;
     };
+
+    mcsm::Result<std::unique_ptr<mcsm::Option>> jvmProfileFromSearchTarget(const std::string& name, const mcsm::SearchTarget& target, const std::string& workingPath);
+    
 }
 
 #endif

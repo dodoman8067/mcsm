@@ -42,14 +42,14 @@ void mcsm::GroupAddSubCommand::execute(const std::vector<std::string>& args){
             continue;
         }
         std::unique_ptr<mcsm::ServerConfigLoader> sl = std::make_unique<mcsm::ServerConfigLoader>(arg);
-        mcsm::Result loadRes = sl->loadConfig();
+        mcsm::VoidResult loadRes = sl->loadConfig();
 
-        if(!loadRes.isSuccess()){
+        if(!loadRes){
             if(strict){
                 mcsm::error("Failed to load server on \"" + arg + "\".");
                 mcsm::error("Below lines are the output from the interal system.");
                 mcsm::error("");
-                loadRes.printMessage();
+                mcsm::printError(loadRes);
                 mcsm::warning("NOTE: Strict mode is currently enabled.");
                 std::exit(1);
             }
@@ -57,14 +57,13 @@ void mcsm::GroupAddSubCommand::execute(const std::vector<std::string>& args){
             continue;
         }
 
-        std::string serverName = sl->getServerName();
-        mcsm::Result sNGRes({mcsm::getLastResult().first, mcsm::getLastResult().second});
-        if(!sNGRes.isSuccess()){
+        auto serverName = sl->getServerName();
+        if(!serverName){
             if(strict){
                 mcsm::error("Failed to load server's name on \"" + arg + "\".");
                 mcsm::error("Below lines are the output from the interal system.");
                 mcsm::error("");
-                sNGRes.printMessage();
+                mcsm::printError(serverName);
                 mcsm::warning("NOTE: Strict mode is currently enabled.");
                 std::exit(1);
             }
@@ -72,15 +71,13 @@ void mcsm::GroupAddSubCommand::execute(const std::vector<std::string>& args){
             continue;
         }
 
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}}); // clear result
-
-        mcsm::Result addRes = this->loader->addServer(std::move(sl));
-        if(!addRes.isSuccess()){
+        mcsm::VoidResult addRes = this->loader->addServer(std::move(sl));
+        if(!addRes){
             if(strict){
                 mcsm::error("Failed to add server \"" + arg + "\".");
                 mcsm::error("Below lines are the output from the interal system.");
                 mcsm::error("");
-                addRes.printMessage();
+                mcsm::printError(addRes);
                 mcsm::warning("NOTE: Strict mode is currently enabled.");
                 std::exit(1);
             }
@@ -88,7 +85,7 @@ void mcsm::GroupAddSubCommand::execute(const std::vector<std::string>& args){
             continue;
         }
         if(requestedServers < 15){
-            mcsm::info("Server " + serverName + " on \"" + arg + "\" added.");
+            mcsm::info("Server " + serverName.value() + " on \"" + arg + "\" added.");
         }
         addedServers++;
     }

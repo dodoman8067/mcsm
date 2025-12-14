@@ -40,7 +40,7 @@ namespace mcsm {
          */
         mcsm::ServerType getType() const override;
 
-        mcsm::Result obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override = 0;
+        mcsm::VoidResult obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override = 0;
     };
 }
 

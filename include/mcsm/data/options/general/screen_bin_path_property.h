@@ -10,8 +10,10 @@ namespace mcsm {
         ~ScreenBinPathProperty() = default;
         
         // virtual function; means constexpr is impossible
-        inline nlohmann::json getDefaultValue() override {
+        inline nlohmann::json getDefaultValue() const override {
         #ifdef __linux__
+            return "/usr/bin/screen";
+        #elif defined(__APPLE__)
             return "/usr/bin/screen";
         #else
             return "";

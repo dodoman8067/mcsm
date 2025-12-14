@@ -36,7 +36,7 @@ namespace mcsm {
      * @param name file's name
      * @param url link to perform GET request
     */
-    mcsm::Result download(const std::string& name, const std::string& url);
+    mcsm::VoidResult download(const std::string& name, const std::string& url);
 
     /**
      * Downloads a file in `url` named as `name`.
@@ -44,7 +44,7 @@ namespace mcsm {
      * @param url link to perform GET request
      * @param path file's stored location
     */
-    mcsm::Result download(const std::string& name, const std::string& url, const std::string& path);
+    mcsm::VoidResult download(const std::string& name, const std::string& url, const std::string& path);
 
     /**
      * Downloads a file in `url` named as `name` while printing percentages.
@@ -53,14 +53,14 @@ namespace mcsm {
      * @param path file's stored location
      * @param percentages progress of downloading the file
     */
-    mcsm::Result download(const std::string& name, const std::string& url, const std::string& path, const bool& percentages);
+    mcsm::VoidResult download(const std::string& name, const std::string& url, const std::string& path, const bool& percentages);
 
     /**
      * Checks if the following `url` returns a text.
      * @param url link to check with
      * @return true if the following `url` returns a text, otherwise false
      */
-    bool isText(const std::string& url);
+    mcsm::BoolResult isText(const std::string& url);
 }
 
 #endif // __MCSM_DOWNLOAD_H__

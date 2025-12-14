@@ -2,7 +2,7 @@
 #include <mcsm/command/command_manager.h>
 
 void mcsm::signal_handler::handle(int signal){
-    mcsm::setcol(mcsm::TextColor::DARK_RED);
+    mcsm::setcol(mcsm::NamedColor::DARK_RED);
     switch (signal){
         case SIGSEGV:
             std::cerr << "[mcsm/FATAL] Segmentation fault (SIGSEGV) encountered." << "\n";
@@ -34,13 +34,13 @@ void mcsm::signal_handler::handle(int signal){
     }
     std::cerr << "[mcsm/FATAL] Signal: " << signal << "\n";
     std::cerr << "[mcsm/FATAL] Please report this to my Github (https://github.com/dodoman8067/mcsm) and explain how you encountered this error.\n";
-    mcsm::setcol(mcsm::TextColor::RESET);
+    mcsm::resetcol();
 
-    #ifdef __linux__
-        mcsm::setcol(mcsm::TextColor::DARK_RED);
-        std::cerr << "[mcsm/FATAL] POSIX detected. Will try to print stacktrace.\n";
-        mcsm::setcol(mcsm::TextColor::RESET);
-        
+    #if defined(__linux__) && !defined(__ANDROID__)
+        mcsm::setcol(mcsm::NamedColor::DARK_RED);
+        std::cerr << "[mcsm/FATAL] General Linux distribution detected. Will try to print stacktrace.\n";
+        mcsm::resetcol();
+
         std::vector<void*> array(50);
         size_t size = backtrace(array.data(), array.size());
 
@@ -56,10 +56,10 @@ void mcsm::signal_handler::handle(int signal){
 }
 
 void mcsm::signal_handler::new_handle(){
-    mcsm::setcol(mcsm::TextColor::DARK_RED);
+    mcsm::setcol(mcsm::NamedColor::DARK_RED);
     std::cerr << "[mcsm/FATAL] Memory allocation failed.\n";
     std::cerr << "[mcsm/FATAL] Make sure you have enough memory to have this program running.\n";
     std::cerr << "[mcsm/FATAL] Please report this to my Github (https://github.com/dodoman8067/mcsm) if you believe this is an error.\n";
-    mcsm::setcol(mcsm::TextColor::RESET);
+    mcsm::resetcol();
     std::abort();
 }

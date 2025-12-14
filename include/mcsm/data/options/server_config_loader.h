@@ -14,26 +14,22 @@ namespace mcsm {
               isLoaded(other.isLoaded){}
         ~ServerConfigLoader();
 
-        mcsm::Result loadConfig();
+        mcsm::VoidResult loadConfig();
 
         template <typename T>
-        inline T get(const std::string& key) const{
+        inline tl::expected<T, mcsm::Error> get(const std::string& key) const{
             if(!this->isLoaded){
-                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-                    "ServerConfigLoader function called without loadConfig.",
-                    "High chance to be an internal issue. Please open an issue in Github."
-                }});
-                return T();
+                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
+                return tl::unexpected(err);
             }
 
-            nlohmann::json value = this->optionHandle->getValue(key);
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS) {
-                return T();
-            }
+            auto valueRes = this->optionHandle->getValue(key);
+            if(!valueRes) return tl::unexpected(valueRes.error());
+            auto value = valueRes.value();
 
             if(value == nullptr){
-                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonNotFound("\"" + key + "\"", this->optionHandle->getName())});
-                return T();
+                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"" + key + "\"", this->optionHandle->getName()});
+                return tl::unexpected(err);
             }
 
             if constexpr(std::is_same<T, std::vector<int>>::value ||
@@ -41,49 +37,53 @@ namespace mcsm {
                         std::is_same<T, std::vector<bool>>::value ||
                         std::is_same<T, std::vector<std::string>>::value){
                 if(value.type() != nlohmann::json::value_t::array){
-                    mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"" + key + "\"", "array")});
-                    return T();
+                    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"" + key + "\"", "array"});
+                    return tl::unexpected(err);
                 }
             }else if (value.type() != getJsonType<T>()){
-                mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::jsonWrongType("\"" + key + "\"", value.type_name())});
-                return T();
+                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"" + key + "\"", value.type_name()});
+                return tl::unexpected(err);
             }
             if constexpr (std::is_same<T, std::string>::value){
                 if(!mcsm::isSafeString(value)){
-                    mcsm::Result res({mcsm::ResultType::MCSM_FAIL, mcsm::message_utils::unsafeString(value)});
-                    return T();
+                    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {value});
+                    return tl::unexpected(err);
                 }
             }
 
-            mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
             return value.get<T>();
         }
 
-        std::string getServerName() const;
-        mcsm::Result setServerName(const std::string& name);
+        mcsm::StringResult getServerName() const;
+        mcsm::VoidResult setServerName(const std::string& name);
 
-        std::string getServerVersion() const;
-        mcsm::Result setServerVersion(const std::string& version);
+        mcsm::StringResult getServerVersion() const;
+        mcsm::VoidResult setServerVersion(const std::string& version);
 
-        std::unique_ptr<mcsm::JvmOption> getDefaultOption() const;
-        mcsm::Result setDefaultOption(mcsm::JvmOption& jvmOption);
+        tl::expected<std::unique_ptr<mcsm::JvmOption>, mcsm::Error> getDefaultOption() const;
+        mcsm::VoidResult setDefaultOption(mcsm::JvmOption& jvmOption);
 
-        std::string getServerType() const;
+        mcsm::StringResult getServerType() const;
 
-        std::string getServerJarFile() const;
-        mcsm::Result setServerJarFile(const std::string& name);
+        mcsm::StringResult getServerJar() const;
+        mcsm::VoidResult setServerJar(const std::string& filePath);
 
-        std::string getServerJarBuild() const;
-        mcsm::Result setServerJarBuild(const std::string& build);
+        mcsm::StringResult getServerJarFile() const;
+        //mcsm::VoidResult setServerJarFile(const std::string& name);
 
-        bool doesAutoUpdate() const;
-        mcsm::Result setAutoUpdate(const bool& update);
+        mcsm::StringResult getServerJarPath() const;
+
+        mcsm::StringResult getServerJarBuild() const;
+        mcsm::VoidResult setServerJarBuild(const std::string& build);
+
+        mcsm::BoolResult doesAutoUpdate() const;
+        mcsm::VoidResult setAutoUpdate(const bool& update);
 
         mcsm::Option* getHandle() const;
 
         bool isFullyLoaded() const;
 
-        mcsm::Server* getServerInstance();
+        tl::expected<mcsm::Server*, mcsm::Error> getServerInstance();
         
     private:
         std::string configPath;

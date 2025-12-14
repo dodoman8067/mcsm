@@ -42,12 +42,16 @@ void mcsm::JvmTestCommand::execute(const std::vector<std::string>& args){
 
 std::unique_ptr<mcsm::JvmOption> mcsm::JvmTestCommand::searchOption(const mcsm::SearchTarget& target, const std::string& name){
     if(target == mcsm::SearchTarget::GLOBAL || target == mcsm::SearchTarget::ALL){
-        std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(name, mcsm::SearchTarget::GLOBAL);
-        if(opt->exists()) return opt;
+        std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(mcsm::unwrapOrExit(mcsm::jvmProfileFromSearchTarget(name, mcsm::SearchTarget::GLOBAL, mcsm::unwrapOrExit(mcsm::getCurrentPath()))));
+        mcsm::unwrapOrExit(opt->init());
+        bool profileExists = mcsm::unwrapOrExit(opt->exists());
+        if(profileExists) return opt;
     }
     if(target == mcsm::SearchTarget::CURRENT || target == mcsm::SearchTarget::ALL){
-        std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(name, mcsm::SearchTarget::CURRENT);
-        if(opt->exists()) return opt;
+        std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(mcsm::unwrapOrExit(mcsm::jvmProfileFromSearchTarget(name, mcsm::SearchTarget::CURRENT, mcsm::unwrapOrExit(mcsm::getCurrentPath()))));
+        mcsm::unwrapOrExit(opt->init());
+        bool profileExists = mcsm::unwrapOrExit(opt->exists());
+        if(profileExists) return opt;
     }
     return nullptr;
 }
@@ -83,9 +87,9 @@ std::string mcsm::JvmTestCommand::getProfileName(const std::vector<std::string>&
 }
 
 inline void mcsm::JvmTestCommand::performTest(std::unique_ptr<mcsm::JvmOption> option){
-    std::string jvm = option->getJvmPath();
+    std::string jvm = mcsm::unwrapOrExit(option->getJvmPath());
     mcsm::info("Profile name : " + option->getProfileName());
-    mcsm::info("Profile path : " + option->getProfilePath());
+    mcsm::info("Profile path : " + mcsm::unwrapOrExit(option->getProfilePath()));
     mcsm::info("Performing test with the following command : " + jvm + " -version");
     if(mcsm::runCommandQuietly(jvm + " --version") != 0){
         mcsm::warning("Test failed : " + jvm);

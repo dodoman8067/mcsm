@@ -27,18 +27,17 @@ SOFTWARE.
 #include <filesystem>
 #include <fstream>
 #include <mcsm/util/cli/logging.h>
-#include <mcsm/data/configurable.h>
 #include <mcsm/util/string_utils.h>
 #include <mcsm/util/cli/cli_utils.h>
 
 namespace mcsm {
-    class Option : public mcsm::Configurable {
+    class Option {
     private:
         std::string path;
         std::string name;
         mutable nlohmann::json data; 
 
-        bool createDirectories(std::string const &dirName, std::error_code &err) const;
+        mcsm::BoolResult createDirectories(std::string const &dirName, std::error_code &err) const;
     public:
         /**
          * @brief No mcsm::Result needed
@@ -49,11 +48,11 @@ namespace mcsm {
         */
         ~Option();
 
-        mcsm::Result create();
+        mcsm::VoidResult create();
 
-        mcsm::Result load();
+        mcsm::VoidResult load();
 
-        mcsm::Result load(const bool& advancedParse);
+        mcsm::VoidResult load(const bool& advancedParse);
 
         nlohmann::json& getData() const;
 
@@ -67,22 +66,22 @@ namespace mcsm {
         */
         std::string getName() const;
 
-        nlohmann::json getValue(const std::string& key) const;
-        mcsm::Result setValue(const std::string& key, const nlohmann::json& value);
-        bool hasValue(const std::string& key) const;
+        tl::expected<nlohmann::json, mcsm::Error> getValue(const std::string& key) const;
+        mcsm::VoidResult setValue(const std::string& key, const nlohmann::json& value);
+        mcsm::BoolResult hasValue(const std::string& key) const;
 
-        bool exists() const override;
+        mcsm::BoolResult exists() const; // todo edit configurable or remove it too
 
         /**
          * @brief No mcsm::Result needed
         */
-        bool isGlobal() const override;
+        bool isGlobal() const;
 
-        mcsm::Result save();
+        mcsm::VoidResult save();
 
-        mcsm::Result save(const nlohmann::json& json);
+        mcsm::VoidResult save(const nlohmann::json& json);
         
-        mcsm::Result reset();
+        mcsm::VoidResult reset();
     };
 }
 

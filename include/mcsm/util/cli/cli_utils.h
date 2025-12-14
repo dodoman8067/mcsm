@@ -34,7 +34,15 @@ SOFTWARE.
 #include <any>
 #include <climits>
 #ifdef __linux__
+    #include <unistd.h>
+    #include <spawn.h>
     #include <sys/wait.h>
+    #include <errno.h>
+#endif
+#ifdef __APPLE__
+    #include <spawn.h>
+    #include <sys/wait.h>
+    #include <mach-o/dyld.h>
 #endif
 
 namespace mcsm {
@@ -42,17 +50,17 @@ namespace mcsm {
      * Runs a console command without printing the output.
      * @param command string to run as a command
     */
-    int runCommandQuietly(const std::string& command);
+    mcsm::IntResult runCommandQuietly(const std::string& command);
 
     /**
      * Runs a console command.
      * @param command string to run as a command
     */
-    int runCommand(const std::string& command);
+    mcsm::IntResult runCommand(const std::string& command);
 
-    std::string getCurrentPath();
-    bool fileExists(const std::string& path);
-    bool removeFile(const std::string& path);
+    mcsm::StringResult getCurrentPath();
+    mcsm::BoolResult fileExists(const std::string& path);
+    mcsm::BoolResult removeFile(const std::string& path);
     bool mkdir(const std::string& dirName);
 
     /**
@@ -67,7 +75,91 @@ namespace mcsm {
 
     bool isDebug();
 
-    std::string getExecutablePath();
+    static inline std::string getEnvStr(const char* k){
+        if(!k) return {};
+        if(const char* v = std::getenv(k)) return std::string(v);
+        return {};
+    }
+
+    static inline std::string joinPath(const std::string& a, const std::string& b){
+        if(a.empty()) return b;
+        if(b.empty()) return a;
+        return (std::filesystem::path(a) / std::filesystem::path(b)).string();
+    }
+
+    static inline std::string appSubdir(const std::string& base){
+        return joinPath(base, "mcsm");
+    }
+
+    static inline std::string dataRoot(){
+        switch (mcsm::getCurrentOS()){
+            case mcsm::OS::WINDOWS: {
+                std::string base = getEnvStr("LOCALAPPDATA");
+                if(base.empty()){
+                    const std::string up = getEnvStr("USERPROFILE");
+                    if (!up.empty()) base = joinPath(up, "AppData/Local");
+                }
+                if(base.empty()) base = ".";
+                return base;
+            }
+            case mcsm::OS::LINUX: {
+                std::string xdg = getEnvStr("XDG_DATA_HOME");
+                if(xdg.empty()){
+                    const std::string home = getEnvStr("HOME");
+                    xdg = home.empty() ? std::string(".") : joinPath(home, ".local/share");
+                }
+                return xdg;
+            }
+            case mcsm::OS::MAC_OS: {
+                std::string val;
+                const std::string home = getEnvStr("HOME");
+                val = home.empty() ? std::string(".") : joinPath(home, "Library/Application Support");
+                return val;
+            }
+        }
+        return ".";
+    }
+
+    static inline std::string configRoot(){
+        switch (mcsm::getCurrentOS()){
+            case mcsm::OS::WINDOWS: {
+                std::string base = getEnvStr("APPDATA");
+                if(base.empty()){
+                    const std::string up = getEnvStr("USERPROFILE");
+                    if (!up.empty()) base = joinPath(up, "AppData/Roaming");
+                }
+                if(base.empty()) base = ".";
+                return base;
+            }
+            case mcsm::OS::LINUX: {
+                std::string xdg = getEnvStr("XDG_CONFIG_HOME");
+                if(xdg.empty()){
+                    const std::string home = getEnvStr("HOME");
+                    xdg = home.empty() ? std::string(".") : joinPath(home, ".config");
+                }
+                return xdg;
+            }
+            case mcsm::OS::MAC_OS: {
+                std::string val;
+                const std::string home = getEnvStr("HOME");
+                val = home.empty() ? std::string(".") : joinPath(home, "Library/Application Support");
+                return val;
+            }
+        }
+        return ".";
+    }
+
+
+    std::string getDataPathPerOS();
+    std::string getConfigPathPerOS();
+
+    std::string asGlobalDataPath(const std::string &value);
+    std::string asGlobalConfigPath(const std::string &value);
+
+    mcsm::BoolResult ensureDataDir();
+    mcsm::BoolResult ensureConfigDir();
+
+    mcsm::StringResult getExecutablePath();
 }
 
 #endif // __MCSM_CLI_UTILS_H__

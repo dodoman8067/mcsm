@@ -7,48 +7,56 @@ mcsm::ScreenSession::ScreenSession(const std::string& name, const std::string& c
     this->screenPath = mcsm::GeneralOption::getGeneralOption().screenBinPathProperty();
 }
 
-mcsm::Result mcsm::ScreenSession::start(){
+mcsm::VoidResult mcsm::ScreenSession::start(){
     if(isRunning()){
-        return {mcsm::ResultType::MCSM_FAIL, {"A screen session with the same name already exists."}};
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SCREEN_SESSION, {"A screen session with the same name already exists."});
+        return tl::unexpected(err);
     }
     std::string startCommand = this->screenPath + " -dmS " + getFullSessionName() + " sh -c '" + this->command + "'";
     if(mcsm::runCommandQuietly(startCommand) != 0){
-        return {mcsm::ResultType::MCSM_FAIL, {"Failed to start screen session " + getFullSessionName()}};
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SCREEN_SESSION, {"Failed to start screen session " + getFullSessionName()});
+        return tl::unexpected(err);
     }
-    return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
+    return {};
 }
 
-mcsm::Result mcsm::ScreenSession::stop(){
+mcsm::VoidResult mcsm::ScreenSession::stop(){
     if(!isRunning()){
-        return {mcsm::ResultType::MCSM_FAIL, {"No running session with name " + this->name + ".mcsm to stop."}};
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SCREEN_SESSION, {"No running session with name " + this->name + ".mcsm to stop."});
+        return tl::unexpected(err);
     }
     std::string stopCommand = this->screenPath + " -S " + getFullSessionName() + " -X quit";
     if(mcsm::runCommandQuietly(stopCommand) != 0){
-        return {mcsm::ResultType::MCSM_FAIL, {"Failed to stop screen session " + getFullSessionName()}};
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SCREEN_SESSION, {"Failed to stop screen session " + getFullSessionName()});
+        return tl::unexpected(err);
     }
-    return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
+    return {};
 }
 
-mcsm::Result mcsm::ScreenSession::attach(){
+mcsm::VoidResult mcsm::ScreenSession::attach(){
     if(!isRunning()){
-        return {mcsm::ResultType::MCSM_FAIL, {"Cannot send command to a session that is not running: " + this->name + ".mcsm"}};
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SCREEN_SESSION, {"Cannot send command to a session that is not running: " + this->name + ".mcsm"});
+        return tl::unexpected(err);
     }
     std::string attachCommand = this->screenPath + " -r " + getFullSessionName();
     if(mcsm::runCommandQuietly(attachCommand) != 0){
-        return {mcsm::ResultType::MCSM_FAIL, {"Failed to attach to session: " + getFullSessionName()}};
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SCREEN_SESSION, {"Failed to attach to session: " + getFullSessionName()});
+        return tl::unexpected(err);
     }
-    return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
+    return {};
 }
 
-mcsm::Result mcsm::ScreenSession::sendCommand(const std::string& str){
+mcsm::VoidResult mcsm::ScreenSession::sendCommand(const std::string& str){
     if(!isRunning()){
-        return {mcsm::ResultType::MCSM_FAIL, {"Cannot send command to a non-existent session: " + this->name + ".mcsm"}};
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SCREEN_SESSION, {"Cannot send command to a non-existent session: " + this->name + ".mcsm"});
+        return tl::unexpected(err);
     }
     std::string command = this->screenPath + " -S " + getFullSessionName() + " -p 0 -X stuff \"" + str + "\\n\"";
     if(mcsm::runCommandQuietly(command) != 0){
-        return {mcsm::ResultType::MCSM_FAIL, {"Failed to send command to session: " + getFullSessionName()}};
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SCREEN_SESSION, {"Failed to send command to session: " + getFullSessionName()});
+        return tl::unexpected(err);
     }
-    return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
+    return {};
 }
 
 bool mcsm::ScreenSession::validateScreen() const {
@@ -71,8 +79,9 @@ bool mcsm::ScreenSession::isRunning() const {
     std::string sessionName = getFullSessionName();
     std::string checkCommand = this->screenPath + " -ls | grep -w \"" + sessionName + "\"";
 
-    int exitCode = mcsm::runCommandQuietly(checkCommand.c_str());
-    return exitCode == 0;
+    auto exitCode = mcsm::runCommandQuietly(checkCommand.c_str());
+    if(!exitCode) return false;
+    return exitCode.value() == 0;
 }
 
 bool mcsm::ScreenSession::tryReconnect(){

@@ -1,3 +1,5 @@
+/*
+TODO: Reimplement based on sqlite3 later
 #include <mcsm/data/options/running_sessions_option.h>
 #include <mcsm/data/options/general_option.h>
 
@@ -25,8 +27,8 @@ mcsm::RunningSessionsOption::~RunningSessionsOption(){
  *     ]
  * }
  * 
-*/
-mcsm::Result mcsm::RunningSessionsOption::load(){
+
+mcsm::VoidResult mcsm::RunningSessionsOption::load(){
     this->handle = std::make_unique<mcsm::GlobalOption>("", "running_sessions_do_not_edit_this");
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -111,7 +113,7 @@ mcsm::Result mcsm::RunningSessionsOption::load(){
     return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}}; // temp
 }
 
-mcsm::Result mcsm::RunningSessionsOption::save(){
+mcsm::VoidResult mcsm::RunningSessionsOption::save(){
     return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
 }
 
@@ -125,7 +127,7 @@ std::vector<const mcsm::RunningGroup*> mcsm::RunningSessionsOption::getRunningGr
     return rtv;
 }
 
-std::vector<const mcsm::ServerConfigLoader*> mcsm::RunningSessionsOption::getRunningServersOfGroup(const std::string& groupName) const {
+tl::expected<std::vector<const mcsm::ServerConfigLoader*>, mcsm::Error> mcsm::RunningSessionsOption::getRunningServersOfGroup(const std::string& groupName) const {
     std::vector<const mcsm::ServerConfigLoader*> rtv;
     mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     bool success = false;
@@ -151,7 +153,7 @@ std::vector<const mcsm::ServerConfigLoader*> mcsm::RunningSessionsOption::getRun
     return rtv;
 }
 
-mcsm::Result mcsm::RunningSessionsOption::addRunningGroup(std::unique_ptr<mcsm::RunningGroup> group){
+mcsm::VoidResult mcsm::RunningSessionsOption::addRunningGroup(std::unique_ptr<mcsm::RunningGroup> group){
     for(auto& g : this->runningGroups){
         std::string rgn = g->group->getName();
         if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
@@ -173,7 +175,7 @@ mcsm::Result mcsm::RunningSessionsOption::addRunningGroup(std::unique_ptr<mcsm::
     return this->save();
 }
 
-mcsm::Result mcsm::RunningSessionsOption::addRunningServer(const std::string& groupName, const mcsm::ServerConfigLoader* server){
+mcsm::VoidResult mcsm::RunningSessionsOption::addRunningServer(const std::string& groupName, const mcsm::ServerConfigLoader* server){
     std::string serverName = server->getServerName();
     if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
         std::pair<mcsm::ResultType, std::vector<std::string>> resp = mcsm::getLastResult();
@@ -217,11 +219,13 @@ mcsm::Result mcsm::RunningSessionsOption::addRunningServer(const std::string& gr
 }
 
 // this doesn't actually stop the server, call ServerGroupManager#stop instead
-mcsm::Result mcsm::RunningSessionsOption::removeRunningGroup(std::unique_ptr<mcsm::RunningGroup> /* group */){
+mcsm::VoidResult mcsm::RunningSessionsOption::removeRunningGroup(std::unique_ptr<mcsm::RunningGroup> /* group ){
     return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
 }
 
 // this doesn't actually stop the server, call ServerGroupManager#stop instead
-mcsm::Result mcsm::RunningSessionsOption::removeRunningServer(const std::string& /* groupName */, const mcsm::ServerConfigLoader* /* server */){
+mcsm::VoidResult mcsm::RunningSessionsOption::removeRunningServer(const std::string& /* groupName , const mcsm::ServerConfigLoader* /* server ){
     return {mcsm::ResultType::MCSM_SUCCESS, {"Success"}};
 }
+
+*/

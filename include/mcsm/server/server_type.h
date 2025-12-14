@@ -24,6 +24,7 @@ SOFTWARE.
 #define __MCSM_SERVER_TYPE_H__
 
 #include <string>
+#include <mcsm/util/cli/result.h>
 
 namespace mcsm {
     // Represents an enum of Minecraft server type.
@@ -74,7 +75,7 @@ namespace mcsm {
      * @param type enum value to convert it to a string
      * @return string version of server type
     */
-    std::string getServerType(const mcsm::ServerType& type);
+    mcsm::StringResult getServerType(const mcsm::ServerType& type);
 }
 
 #endif

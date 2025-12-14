@@ -54,14 +54,12 @@ mcsm::StartServerCommand::~StartServerCommand() {}
 
 void mcsm::StartServerCommand::execute(const std::vector<std::string>& args){
     executionPath = getServerPath(args);
-    if(mcsm::isWhitespaceOrEmpty(executionPath)) executionPath = mcsm::getCurrentPath();
+    if(mcsm::isWhitespaceOrEmpty(executionPath)) executionPath = mcsm::unwrapOrExit(mcsm::getCurrentPath());
     if(!isConfigured()){
         mcsm::warning("Server not configured in " + executionPath);
         mcsm::warning("Task aborted.");
         std::exit(1);
     }
-
-    mcsm::info(executionPath);
 
     bool isGroup = false;
     std::string groupPath;
@@ -76,21 +74,12 @@ void mcsm::StartServerCommand::execute(const std::vector<std::string>& args){
                     std::exit(1);
                 }
                 mcsm::ServerGroupLoader gLoader(groupPath);
-                mcsm::Result gLoadRes = gLoader.load();
-                if(gLoadRes.getResult() != mcsm::ResultType::MCSM_OK && gLoadRes.getResult() != mcsm::ResultType::MCSM_SUCCESS){
-                    gLoadRes.printMessage();
-                    if(gLoadRes.getResult() != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-                }
-
+                mcsm::unwrapOrExit(gLoader.load());
                 std::vector<const mcsm::ServerConfigLoader*> gServers = gLoader.getServers();
-                if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-                    mcsm::printResultMessage();
-                    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-                }
 
                 for(const mcsm::ServerConfigLoader* gServer : gServers){
                     if(gServer == nullptr) continue;
-                    if(gServer->getHandle()->getPath() != mcsm::getCurrentPath()) continue;
+                    if(gServer->getHandle()->getPath() != mcsm::unwrapOrExit(mcsm::getCurrentPath())) continue;
                     isGroup = true;
                     break;
                 }
@@ -101,28 +90,18 @@ void mcsm::StartServerCommand::execute(const std::vector<std::string>& args){
     }
 
     mcsm::ServerConfigLoader loader(executionPath);
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        mcsm::printResultMessage();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-    }
 
-    loader.loadConfig();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        mcsm::printResultMessage();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-    }
+    mcsm::unwrapOrExit(loader.loadConfig());
+
+    auto jarPath = mcsm::unwrapOrExit(loader.getServerJarPath());
 
     std::unique_ptr<mcsm::JvmOption> jvmOpt = searchOption(args, &loader);
 
     mcsm::ServerStarter starter(&loader);
     if(isGroup){
-        starter.startServer(*jvmOpt, mcsm::getCurrentPath(), mcsm::getCurrentPath(), groupPath);
+        mcsm::unwrapOrExit(starter.startServer(*jvmOpt, jarPath, mcsm::unwrapOrExit(mcsm::getCurrentPath()), groupPath));
     }else{
-        starter.startServer(*jvmOpt, executionPath, executionPath);
-    }
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        mcsm::printResultMessage();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
+        mcsm::unwrapOrExit(starter.startServer(*jvmOpt, jarPath, executionPath));
     }
 }
 
@@ -146,18 +125,14 @@ std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const st
                     std::exit(1);
                 }
                 mcsm::info("Found JVM launch profile " + pName + ".");
-                mcsm::info("Location : " + profile->getProfilePath());
+                mcsm::info("Location : " + mcsm::unwrapOrExit(profile->getProfilePath()));
                 return profile;
             }
         }
     }
     mcsm::info("No specified JVM launch profile detected; using default JVM launch profile.");
     
-    std::unique_ptr<mcsm::JvmOption> jvmOpt = loader->getDefaultOption();
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        mcsm::printResultMessage();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-    }
+    std::unique_ptr<mcsm::JvmOption> jvmOpt = mcsm::unwrapOrExit(loader->getDefaultOption());
     return jvmOpt;
 }
 
@@ -168,12 +143,14 @@ std::unique_ptr<mcsm::JvmOption> mcsm::StartServerCommand::searchOption(const mc
         std::exit(1);
     }
     if(target == mcsm::SearchTarget::GLOBAL || target == mcsm::SearchTarget::ALL){
-        std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(name, mcsm::SearchTarget::GLOBAL);
-        if(opt->exists()) return opt;
+        std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(mcsm::unwrapOrExit(mcsm::jvmProfileFromSearchTarget(name, mcsm::SearchTarget::GLOBAL, mcsm::unwrapOrExit(mcsm::getCurrentPath()))));
+        mcsm::unwrapOrExit(opt->init());
+        if(mcsm::unwrapOrExit(opt->exists())) return opt;
     }
     if(target == mcsm::SearchTarget::CURRENT || target == mcsm::SearchTarget::ALL){
-        std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(name, mcsm::SearchTarget::CURRENT, executionPath);
-        if(opt->exists()) return opt;
+        std::unique_ptr<mcsm::JvmOption> opt = std::make_unique<mcsm::JvmOption>(mcsm::unwrapOrExit(mcsm::jvmProfileFromSearchTarget(name, mcsm::SearchTarget::CURRENT, executionPath)));
+        mcsm::unwrapOrExit(opt->init());
+        if(mcsm::unwrapOrExit(opt->exists())) return opt;
     }
     return nullptr;
 }
@@ -210,10 +187,6 @@ std::string mcsm::StartServerCommand::getServerPath(const std::vector<std::strin
 }
 
 inline bool mcsm::StartServerCommand::isConfigured(){
-    bool fileExists = mcsm::fileExists(executionPath + "/server.json");
-    if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-        mcsm::printResultMessage();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-    }
+    bool fileExists = mcsm::unwrapOrExit(mcsm::fileExists(executionPath + "/server.json"));
     return fileExists;
 }

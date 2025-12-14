@@ -18,18 +18,14 @@ void mcsm::GroupListSubCommand::execute(const std::vector<std::string>& args){
 
     std::map<std::string, bool> strmap; // server name(server path) and bool to check if it's running
     auto arr = manager->getGroupLoader()->getServers();
-    auto arr2 = manager->getRunningServers();
+    auto arr2 = mcsm::unwrapOrExit(manager->getRunningServers());
     for(const mcsm::ServerConfigLoader* loader : arr){
         if(loader == nullptr){
             if(mcsm::isDebug()) mcsm::warning("Null server config on manager->getGroupLoader()->getServers() detected.");
             continue;
         }
         bool running = false;
-        std::string name = loader->getServerName();
-        if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_OK && mcsm::getLastResult().first != mcsm::ResultType::MCSM_SUCCESS){
-            mcsm::printResultMessage();
-            if(mcsm::getLastResult().first != mcsm::ResultType::MCSM_WARN_NOEXIT) std::exit(1);
-        }
+        std::string name = mcsm::unwrapOrExit(loader->getServerName());
 
         std::string path = loader->getHandle()->getPath();
         for(const mcsm::ServerConfigLoader* runningLoader : arr2){
@@ -57,9 +53,9 @@ void mcsm::GroupListSubCommand::execute(const std::vector<std::string>& args){
     }else{
         for(auto& [serverstr, isRunning] : strmap){
             if(isRunning){
-                mcsm::setcol(mcsm::TextColor::GREEN);
+                mcsm::setcol(mcsm::NamedColor::GREEN);
                 std::cout << " * " + serverstr + " (running)\n";
-                mcsm::setcol(mcsm::TextColor::RESET);
+                mcsm::resetcol();
             }else{
                 std::cout << " * " + serverstr << "\n";
             }

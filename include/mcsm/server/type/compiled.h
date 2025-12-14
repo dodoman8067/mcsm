@@ -41,27 +41,27 @@ namespace mcsm {
          * Clones the source code of server for specified version.
          * @param version version of the server
          */
-        virtual mcsm::Result cloneSource(const std::string& version) = 0;
+        virtual mcsm::VoidResult cloneSource(const std::string& version) = 0;
 
         /**
          * Clones the source code of server for specified version in the specified directory.
          * @param version version of the server
          * @param path file's path
          */
-        virtual mcsm::Result cloneSource(const std::string& version, const std::string& path) = 0;
+        virtual mcsm::VoidResult cloneSource(const std::string& version, const std::string& path) = 0;
 
         /**
          * Compiles the source code of the server.
          * @param version version of the server
          */
-        virtual mcsm::Result compile(const std::string version);
+        virtual mcsm::VoidResult compile(const std::string version);
 
         /**
          * Compiles the source code of the server.
          * @param version version of the server
          * @param workingPath where to perform the compilation
          */
-        virtual mcsm::Result compile(const std::string version, const std::string workingPath);
+        virtual mcsm::VoidResult compile(const std::string version, const std::string workingPath);
 
         /**
          * Compiles the source code of the server.
@@ -69,7 +69,7 @@ namespace mcsm {
          * @param workingPath where to perform the compilation
          * @param outputPath where to copy the output jar
          */
-        virtual mcsm::Result compile(const std::string version, const std::string workingPath, const std::string outputPath);
+        virtual mcsm::VoidResult compile(const std::string version, const std::string workingPath, const std::string outputPath);
 
         /**
          * Returns if the following server has this version.

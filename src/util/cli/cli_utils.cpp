@@ -22,95 +22,226 @@ SOFTWARE.
 
 #include <mcsm/util/cli/cli_utils.h>
 
-int mcsm::runCommandQuietly(const std::string& command){
+extern char **environ;
+
+mcsm::IntResult mcsm::runCommandQuietly(const std::string& command){
     if(mcsm::getCurrentOS() == mcsm::OS::WINDOWS){
         std::string cmd = command + " > NUL 2>&1";
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return std::system(cmd.c_str());
     }else if(mcsm::getCurrentOS() == mcsm::OS::LINUX){
         std::string cmd = command + " > /dev/null 2>&1";
         #ifdef __linux__
-            int code = std::system(cmd.c_str());
-            if(WIFEXITED(code)){
-                int finalCode = WEXITSTATUS(code);
-                mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-                return finalCode;
+            std::string shellPath;
+            shellPath = mcsm::getEnvStr("SHELL");
+            if(mcsm::isWhitespaceOrEmpty(shellPath)){ 
+                shellPath = "/bin/sh";
             }else{
+                bool looks_posix =
+                    mcsm::endsWith(shellPath, "sh")   ||
+                    mcsm::endsWith(shellPath, "bash") ||
+                    mcsm::endsWith(shellPath, "zsh")  ||
+                    mcsm::endsWith(shellPath, "ksh")  ||
+                    mcsm::endsWith(shellPath, "dash");
+                if (!looks_posix) shellPath = "/bin/sh";
+            }
+            const char* argv[] = { shellPath.c_str(), "-c", cmd.c_str(), nullptr };
+
+            pid_t pid;
+            int rc = posix_spawn(&pid, shellPath.c_str(), nullptr, nullptr, const_cast<char* const*>(argv), environ);
+            if(rc != 0) return rc;
+
+            int st = 0;
+            if(waitpid(pid, &st, 0) == -1) return 1;
+            if(WIFEXITED(st)){ 
+                return WEXITSTATUS(st);
+            }else{
+                mcsm::warning("Abnormal WIFEXITED detected; shell command: " + cmd);
+                return 1;
+            }
+        #else
+            return 1;
+        #endif
+    }else if(mcsm::getCurrentOS() == mcsm::OS::MAC_OS){
+        std::string cmd = command + " > /dev/null 2>&1";
+        #ifdef __APPLE__
+            std::string shellPath;
+            shellPath = mcsm::getEnvStr("SHELL");
+            if(mcsm::isWhitespaceOrEmpty(shellPath)){ 
+                shellPath = "/bin/sh";
+            }else{
+                bool looks_posix =
+                    mcsm::endsWith(shellPath, "sh")   ||
+                    mcsm::endsWith(shellPath, "bash") ||
+                    mcsm::endsWith(shellPath, "zsh")  ||
+                    mcsm::endsWith(shellPath, "ksh")  ||
+                    mcsm::endsWith(shellPath, "dash");
+                if (!looks_posix) shellPath = "/bin/sh";
+            }
+            const char* argv[] = { shellPath.c_str(), "-c", cmd.c_str(), nullptr };
+
+            pid_t pid;
+            int rc = posix_spawn(&pid, shellPath.c_str(), nullptr, nullptr, const_cast<char* const*>(argv), environ);
+            if(rc != 0) return rc;
+
+            int st = 0;
+            if(waitpid(pid, &st, 0) == -1) return 1;
+            if(WIFEXITED(st)){ 
+                return WEXITSTATUS(st);
+            }else{
+                mcsm::warning("Abnormal WIFEXITED detected; shell command: " + cmd);
                 return 1;
             }
         #else
             return 1;
         #endif
     }else{
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"This platform is not supported. Please use Windows or Linux."}});
-        return 1;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSUPPORTED_OS, {});
+        return tl::unexpected(err);
     }
 }
 
-int mcsm::runCommand(const std::string& command){
+mcsm::IntResult mcsm::runCommand(const std::string& command){
     if(mcsm::getCurrentOS() == mcsm::OS::WINDOWS){
-        mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
         return std::system(command.c_str());
     }else if(mcsm::getCurrentOS() == mcsm::OS::LINUX){
         #ifdef __linux__
-            int code = std::system(command.c_str());
-            if(WIFEXITED(code)){
-                int finalCode = WEXITSTATUS(code);
-                mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-                return finalCode;
+            std::string shellPath;
+            shellPath = mcsm::getEnvStr("SHELL");
+            if(mcsm::isWhitespaceOrEmpty(shellPath)){ 
+                shellPath = "/bin/sh";
             }else{
+                bool looks_posix =
+                    mcsm::endsWith(shellPath, "sh")   ||
+                    mcsm::endsWith(shellPath, "bash") ||
+                    mcsm::endsWith(shellPath, "zsh")  ||
+                    mcsm::endsWith(shellPath, "ksh")  ||
+                    mcsm::endsWith(shellPath, "dash");
+                if (!looks_posix) shellPath = "/bin/sh";
+            }
+            const char* argv[] = { shellPath.c_str(), "-c", command.c_str(), nullptr };
+
+            pid_t pid;
+            int rc = posix_spawn(&pid, shellPath.c_str(), nullptr, nullptr, const_cast<char* const*>(argv), environ);
+            if(rc != 0) return rc;
+
+            int st = 0;
+            if(waitpid(pid, &st, 0) == -1) return 1;
+            if(WIFEXITED(st)){ 
+                return WEXITSTATUS(st);
+            }else{
+                mcsm::warning("Abnormal WIFEXITED detected; shell command: " + command);
+                return 1;
+            }
+        #else
+            return 1;
+        #endif
+    }else if(mcsm::getCurrentOS() == mcsm::OS::MAC_OS){
+        #ifdef __APPLE__
+            std::string shellPath;
+            shellPath = mcsm::getEnvStr("SHELL");
+            if(mcsm::isWhitespaceOrEmpty(shellPath)){ 
+                shellPath = "/bin/sh";
+            }else{
+                bool looks_posix =
+                    mcsm::endsWith(shellPath, "sh")   ||
+                    mcsm::endsWith(shellPath, "bash") ||
+                    mcsm::endsWith(shellPath, "zsh")  ||
+                    mcsm::endsWith(shellPath, "ksh")  ||
+                    mcsm::endsWith(shellPath, "dash");
+                if (!looks_posix) shellPath = "/bin/sh";
+            }
+            const char* argv[] = { shellPath.c_str(), "-c", command.c_str(), nullptr };
+
+            pid_t pid;
+            int rc = posix_spawn(&pid, shellPath.c_str(), nullptr, nullptr, const_cast<char* const*>(argv), environ);
+            if(rc != 0) return rc;
+
+            int st = 0;
+            if(waitpid(pid, &st, 0) == -1) return 1;
+            if(WIFEXITED(st)){ 
+                return WEXITSTATUS(st);
+            }else{
+                mcsm::warning("Abnormal WIFEXITED detected; shell command: " + command);
                 return 1;
             }
         #else
             return 1;
         #endif
     }else{
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"This platform is not supported. Please use Windows or Linux."}});
-        return 1;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSUPPORTED_OS, {});
+        return tl::unexpected(err);
     }
 }
 
-std::string mcsm::getCurrentPath(){
+mcsm::StringResult mcsm::getCurrentPath(){
     std::error_code ec;
     std::string path = std::filesystem::current_path(ec).string();
     if(ec){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Getting current path operation failed : " + ec.message(), 
-            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
-            }});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::CURRENT_PATH_UNCATCHABLE, {ec.message()});
+        return tl::unexpected(err);
     }
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return path;
 }
 
-bool mcsm::fileExists(const std::string& path){
+std::string mcsm::getDataPathPerOS(){
+    return mcsm::appSubdir(mcsm::dataRoot());
+}
+
+std::string mcsm::getConfigPathPerOS(){
+    return mcsm::appSubdir(mcsm::configRoot());
+}
+
+std::string mcsm::asGlobalDataPath(const std::string& value){
+    const auto base = mcsm::getDataPathPerOS();
+    const auto p = std::filesystem::path(base) / std::filesystem::path(value).relative_path();
+    return mcsm::normalizePath(p.string());
+}
+
+std::string mcsm::asGlobalConfigPath(const std::string& value){
+    const auto base = mcsm::getConfigPathPerOS();
+    const auto p = std::filesystem::path(base) / std::filesystem::path(value).relative_path();
+    return mcsm::normalizePath(p.string());
+}
+
+mcsm::BoolResult mcsm::ensureDataDir() {
+    const auto dir = mcsm::getDataPathPerOS();
+    if (dir != "./mcsm") return true;
+    auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
+    customTemp.message = "Invalid data path set: " + dir + " \nPlease make sure proper environment variables are set and directories are present.\nWindows: LOCALAPPDATA or fallback: USERPROFILE, Linux: XDG_DATA_HOME or fallback: HOME";
+    return tl::unexpected(mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {}));
+}
+
+mcsm::BoolResult mcsm::ensureConfigDir() {
+    const auto dir = mcsm::getConfigPathPerOS();
+    if (dir != "./mcsm") return true;
+    auto customTemp = mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED;
+    customTemp.message = "Invalid config path set: " + dir + " \nPlease make sure proper environment variables are set and directories are present.\nWindows: APPDATA or fallback: USERPROFILE, Linux: XDG_CONFIG_HOME or fallback: HOME";
+    return tl::unexpected(mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {}));
+}
+
+mcsm::BoolResult mcsm::fileExists(const std::string& path){
     std::error_code ec;
     bool exists = std::filesystem::exists(path, ec);
     if(ec){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Checking if file/directory " + path + "operation failed : " + ec.message(), 
-            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
-            }});
-        return false;
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::FILE_EXIST_CHECK_FAILED, {path, ec.message()});
+        return tl::unexpected(err);
     }
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return exists;
 }
 
-bool mcsm::removeFile(const std::string& path){
-    if(!fileExists(path)) return false;
+mcsm::BoolResult mcsm::removeFile(const std::string& path){
     std::error_code ec;
-    bool success = std::filesystem::remove(path, ec);
+    const bool removed = std::filesystem::remove(path, ec);
     if(ec){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {
-            "Removing file " + path + "operation failed : " + ec.message(), 
-            "Please report this to GitHub (https://github.com/dodoman8067/mcsm) if you think this is a software issue."
-            }});
-        return false;
+        return tl::unexpected(mcsm::makeError(
+            mcsm::ErrorStatus::MCSM_FAIL,
+            mcsm::errors::FILE_REMOVE_FAILED,
+            {path, ec.message()}
+        ));
     }
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
-    return success; 
+    // removed == true  -> deleted
+    // removed == false -> didn't exist
+    return removed;
 }
 
 bool mcsm::mkdir(const std::string& dirName){
@@ -119,12 +250,10 @@ bool mcsm::mkdir(const std::string& dirName){
     if(!std::filesystem::create_directories(dirName, ec)){
         if(std::filesystem::exists(dirName)){
             ec.clear();
-            mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
             return true;
         }
         return false;
     }
-    mcsm::Result res({mcsm::ResultType::MCSM_SUCCESS, {"Success"}});
     return true;
 }
 
@@ -173,14 +302,14 @@ bool mcsm::isDebug(){
     #endif
 }
 
-std::string mcsm::getExecutablePath(){
+mcsm::StringResult mcsm::getExecutablePath(){
 #ifdef __linux__
     char buf[PATH_MAX];
     ssize_t len = readlink("/proc/self/exe", buf, sizeof(buf) - 1);
 
-    if (len == -1) {
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"readlink failed."}});
-        return "";
+    if(len == -1){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED, {"readlink", std::string(strerror(errno))});
+        return tl::unexpected(err);
     }
 
     buf[len] = '\0';
@@ -190,13 +319,41 @@ std::string mcsm::getExecutablePath(){
     DWORD len = GetModuleFileNameA(NULL, buf, MAX_PATH);
 
     if(len == 0 || len == MAX_PATH){
-        mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"GetModuleFileName failed."}});
-        return "";
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED, {"GetModuleFileName", "unknown"});
+        return tl::unexpected(err);
     }
 
     return "\"" + std::string(buf) + "\"";
+#elif defined(__APPLE__)
+    uint32_t size = PATH_MAX;
+    std::vector<char> buf(size);
+
+    // First attempt with PATH_MAX; if too small, Apple tells us required size.
+    int rc = _NSGetExecutablePath(buf.data(), &size);
+    if(rc == -1){
+        buf.resize(size);
+        rc = _NSGetExecutablePath(buf.data(), &size);
+    }
+
+    if(rc != 0){
+        mcsm::Error err = mcsm::makeError(
+            mcsm::ErrorStatus::MCSM_FAIL,
+            mcsm::errors::INTERNAL_FUNC_EXECUTION_FAILED,
+            {"_NSGetExecutablePath", "unknown"}
+        );
+        return tl::unexpected(err);
+    }
+
+    // Resolve potential symlinks and relative elements.
+    char resolved[PATH_MAX];
+    if(realpath(buf.data(), resolved) == nullptr){
+        // If realpath fails, fall back to the _NSGetExecutablePath result.
+        return "\"" + std::string(buf.data()) + "\"";
+    }
+
+    return "\"" + std::string(resolved) + "\"";
 #else
-    mcsm::Result res({mcsm::ResultType::MCSM_FAIL, {"Unsupported platform for getExecutablePath."}});
-    return "";
+    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSUPPORTED_OS, {});
+    return tl::unexpected(err);
 #endif
 }

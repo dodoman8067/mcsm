@@ -1,0 +1,40 @@
+# base style
+BasedOnStyle: LLVM
+
+# indentation
+IndentWidth: 4
+TabWidth: 4
+UseTab: Never
+
+# control statements
+BreakBeforeBraces: Attach       # puts braces on same line like if(){}
+SpaceBeforeParens: Never        # no space: if(){}, not if () {}
+SpaceAfterCStyleCast: false     # don't add space after casts (int)x;
+AllowShortIfStatementsOnASingleLine: true
+AllowShortLoopsOnASingleLine: true
+AllowShortFunctionsOnASingleLine: Inline
+
+# spacing
+SpacesInParentheses: false
+SpacesInSquareBrackets: false
+SpaceBeforeAssignmentOperators: true
+SpaceBeforeRangeBasedForLoopColon: true
+
+# formatting rules
+AlignConsecutiveAssignments: true
+AlignOperands: false
+AlignTrailingComments: true
+AlwaysBreakAfterReturnType: None
+KeepEmptyLinesAtTheStartOfBlocks: false
+
+# namespace and includes
+NamespaceIndentation: All
+IncludeBlocks: Preserve
+
+# function and class definitions
+ConstructorInitializerAllOnOneLineOrOnePerLine: true
+BreakConstructorInitializersBeforeComma: false
+IndentCaseLabels: true
+
+# preprocessor
+IndentPPDirectives: AfterHash

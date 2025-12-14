@@ -31,30 +31,32 @@ namespace mcsm {
     class ServerDataOption {
     protected:
         std::string path;
+        bool loaded = false;
         std::unique_ptr<mcsm::Option> option;
+
     public:
         ServerDataOption();
         ServerDataOption(const std::string& path);
         ~ServerDataOption();
 
-        mcsm::Result load();
+        mcsm::VoidResult load();
 
-        mcsm::Result load(const bool& advp);
+        mcsm::VoidResult load(const bool& advp);
 
-        mcsm::Result create(const std::string& lastTimeLaunched);
+        mcsm::VoidResult create(const std::string& lastTimeLaunched);
 
-        mcsm::Result reset();
+        mcsm::VoidResult reset();
 
-        std::string getLastTimeLaunched() const;
-        mcsm::Result updateLastTimeLaunched();
+        mcsm::StringResult getLastTimeLaunched() const;
+        mcsm::VoidResult updateLastTimeLaunched();
 
-        std::string getServerTimeCreated() const;
-        mcsm::Result updateServerTimeCreated();
+        mcsm::StringResult getServerTimeCreated() const;
+        mcsm::VoidResult updateServerTimeCreated();
 
-        std::string getLastDownloadedBuild() const;
-        mcsm::Result updateLastDownloadedBuild(const std::string& build);
+        mcsm::StringResult getLastDownloadedBuild() const;
+        mcsm::VoidResult updateLastDownloadedBuild(const std::string& build);
         
-        bool exists() const;
+        mcsm::BoolResult exists() const;
     };
 }
 

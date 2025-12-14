@@ -39,9 +39,9 @@ namespace mcsm {
         SpongeServer();
         ~SpongeServer();
 
-        std::string getVersion(const std::string& ver) const;
-        std::string getVersion(const std::string& ver, const bool& apiSearchRecommended) const;
-        std::string getVersion(const std::string& ver, const std::string& build, const bool& apiSearchRecommended) const;
+        mcsm::StringResult getVersion(const std::string& ver) const;
+        mcsm::StringResult getVersion(const std::string& ver, const bool& apiSearchRecommended) const;
+        mcsm::StringResult getVersion(const std::string& ver, const std::string& build, const bool& apiSearchRecommended) const;
 
         std::vector<std::string> getAvailableVersions() override;
 
@@ -53,31 +53,31 @@ namespace mcsm {
         
         std::string getGitHub() const override;
 
-        mcsm::Result start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option) override;
-        mcsm::Result start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
+        mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option) override;
+        mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
 
-        mcsm::Result download(const std::string& version) override;
-        mcsm::Result download(const std::string& version, const std::string& path) override;
-        mcsm::Result download(const std::string& version, const std::string& path, const std::string& name) override;
-        mcsm::Result download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
+        mcsm::VoidResult download(const std::string& version) override;
+        mcsm::VoidResult download(const std::string& version, const std::string& path) override;
+        mcsm::VoidResult download(const std::string& version, const std::string& path, const std::string& name) override;
+        mcsm::VoidResult download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
 
-        mcsm::Result obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
+        mcsm::VoidResult obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
 
-        std::string getDownloadLink(const std::string& build) const;
+        mcsm::StringResult getDownloadLink(const std::string& build) const;
 
-        bool hasVersion(const std::string& version) const override;
+        mcsm::BoolResult hasVersion(const std::string &version) const override;
 
         mcsm::ServerType getType() const override;
         
         std::string getTypeAsString() const override;
 
-        const std::map<std::string, std::string> getRequiredValues() const override;
+        const tl::expected<std::map<std::string, std::string>, mcsm::Error> getRequiredValues() const override;
 
-        mcsm::Result update();
-        mcsm::Result update(const std::string& optionPath);
-        mcsm::Result update(const std::string& path, const std::string& optionPath);
+        mcsm::VoidResult update();
+        mcsm::VoidResult update(const std::string& optionPath);
+        mcsm::VoidResult update(const std::string& path, const std::string& optionPath);
 
-        mcsm::Result generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues) override;
+        mcsm::VoidResult generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues) override;
     };
 }
 
