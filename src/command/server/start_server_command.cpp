@@ -83,7 +83,7 @@ void mcsm::StartServerCommand::execute(const std::vector<std::string>& args){
                     isGroup = true;
                     break;
                 }
-                mcsm::warning("Group validation failed. If you're seeing this it's likely a bug. Report this at Github.");
+                mcsm::warning("Group validation failed. If you're seeing this it's likely a bug. Report this to my Github.");
                 break;
             }
         }
@@ -99,9 +99,9 @@ void mcsm::StartServerCommand::execute(const std::vector<std::string>& args){
 
     mcsm::ServerStarter starter(&loader);
     if(isGroup){
-        mcsm::unwrapOrExit(starter.startServer(*jvmOpt, jarPath, mcsm::unwrapOrExit(mcsm::getCurrentPath()), groupPath));
+        mcsm::unwrapOrExit(starter.startServer(*jvmOpt, jarPath, args, mcsm::unwrapOrExit(mcsm::getCurrentPath()), groupPath));
     }else{
-        mcsm::unwrapOrExit(starter.startServer(*jvmOpt, jarPath, executionPath));
+        mcsm::unwrapOrExit(starter.startServer(*jvmOpt, jarPath, args, executionPath));
     }
 }
 

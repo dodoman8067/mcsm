@@ -200,13 +200,24 @@ mcsm::VoidResult mcsm::CustomServer::generate(const std::string& name, mcsm::Jvm
 }
 
 mcsm::StringResult mcsm::CustomServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
+    return start(loader, option, path, optionPath, {});
+}
+
+mcsm::StringResult mcsm::CustomServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& cliArgs){
     // ServerOption class handles the data file stuff
 
     mcsm::StringResult customCommand = getCustomStartCommand(loader->getHandle()->getPath());
     if(!customCommand) return customCommand;
 
-    if(!mcsm::isWhitespaceOrEmpty(customCommand.value())){
-        mcsm::info("NOTE: JVM profile based launch system is currently overrided by \"custom_run_command\" value inside server.json.");
+    bool hasIgnoreFlag = false;
+    for(auto& str : cliArgs){
+        if(str == "--force-default-launch-command" || str == "-force-default-launch-command"){
+            hasIgnoreFlag = true;
+        }
+    }
+
+    if(!mcsm::isWhitespaceOrEmpty(customCommand.value()) && !hasIgnoreFlag){
+        mcsm::info("NOTE: JVM profile based launch system is currently overridden by \"custom_run_command\" value inside server.json.");
         mcsm::info("Leave it empty to use default launch system.");
         mcsm::info("Running command : " + customCommand.value());
         mcsm::IntResult result = mcsm::runCommand(customCommand.value());
@@ -215,6 +226,8 @@ mcsm::StringResult mcsm::CustomServer::start(mcsm::ServerConfigLoader* loader, m
             return "\033[38;2;255;0;0mServer exited with error code : " + std::to_string(result.value());
         }
         return "\033[38;2;0;255;0mServer exited with error code : 0";
+    }else if(hasIgnoreFlag){
+        mcsm::warning("\"custom_run_command\" value temporarily ignored by --force-default-launch-command flag.");
     }
     
     mcsm::StringResult jar = loader->getServerJarFile();
@@ -236,7 +249,7 @@ mcsm::StringResult mcsm::CustomServer::start(mcsm::ServerConfigLoader* loader, m
         mcsm::VoidResult res = setupServerJarFile(jar.value(), path, optionPath);
         if(!res) return tl::unexpected(res.error());
     }
-    return Server::start(loader, option, path, optionPath);
+    return Server::start(loader, option, path, optionPath, cliArgs);
 }
 
 mcsm::BoolResult mcsm::CustomServer::isFile(const std::string& location) const {

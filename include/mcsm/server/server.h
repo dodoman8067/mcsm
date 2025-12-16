@@ -112,6 +112,8 @@ namespace mcsm {
         */
         virtual mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath);
 
+        virtual mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& cliArgs);
+
         virtual const tl::expected<std::map<std::string, std::string>, mcsm::Error> getRequiredValues() const;
 
         /**

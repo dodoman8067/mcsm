@@ -26,10 +26,14 @@ SOFTWARE.
 mcsm::StringResult mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
     auto cPath = mcsm::getCurrentPath();
     if(!cPath) return cPath;
-    return start(loader, option, cPath.value(), cPath.value());
+    return start(loader, option, cPath.value(), cPath.value(), {});
 }
 
 mcsm::StringResult mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
+    return start(loader, option, path, optionPath, {});
+}
+
+mcsm::StringResult mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& /* cliArgs */){
     std::string jvmOpt = " ";
     auto jArgs = option.getJvmArguments();
     if(!jArgs) return tl::unexpected(jArgs.error());

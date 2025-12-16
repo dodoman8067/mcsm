@@ -8,7 +8,7 @@ mcsm::ServerStarter::~ServerStarter(){
 
 }
 
-mcsm::VoidResult mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
+mcsm::VoidResult mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const std::string& path, const std::vector<std::string>& cliArgs, const std::string& optionPath){
     mcsm::ServerDataOption serverDataOpt(optionPath);
 
     auto sLoadRes = serverDataOpt.load();
@@ -41,12 +41,12 @@ mcsm::VoidResult mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const
     mcsm::info("Server JVM launch profile : " + profileName);
     mcsm::VoidResult res = serverDataOpt.updateLastTimeLaunched();
     if(!res) return res;
-    mcsm::StringResult res2 = sp->start(this->loader, option, mcsm::normalizePath(path), mcsm::normalizePath(optionPath));
+    mcsm::StringResult res2 = sp->start(this->loader, option, mcsm::normalizePath(path), mcsm::normalizePath(optionPath), cliArgs);
     if(!res2) return tl::unexpected(res2.error());
     return {};
 }
 
-mcsm::VoidResult mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::string& groupOptionPath) {
+mcsm::VoidResult mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const std::string& path, const std::vector<std::string>& cliArgs, const std::string& optionPath, const std::string& groupOptionPath) {
     mcsm::ServerGroupLoader gLoader(groupOptionPath);
     auto gLoadRes = gLoader.load();
     if(!gLoadRes){
@@ -62,7 +62,7 @@ mcsm::VoidResult mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const
         if(gServer == nullptr) continue;
         if(gServer->getHandle()->getPath() != cPath.value()) continue;
         // add server session file
-        return startServer(option, path, optionPath);
+        return startServer(option, path, cliArgs, optionPath);
         // remove server session file
     }
 
