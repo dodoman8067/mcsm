@@ -146,6 +146,55 @@ bool mcsm::Server::isBasedAs(const std::string& input) const {
     return getBasedServer() == input;
 }
 
+const tl::expected<std::vector<mcsm::ServerOptionSpec>, mcsm::Error> mcsm::Server::getRequiredOptions() const {
+    std::vector<mcsm::ServerOptionSpec> spec = {
+        {
+            .key = "name",
+            .type = mcsm::OptionType::STRING,
+            .required = true,
+            .defaultValue = ""
+        },
+        {
+            .key = "minecraft_version",
+            .type = mcsm::OptionType::STRING,
+            .required = true,
+            .defaultValue = ""
+        },
+        {
+            .key = "default_jvm_launch_profile_search_path",
+            .type = mcsm::OptionType::ENUM,
+            .required = false,
+            .defaultValue = "current",
+            .enumValues = { "current", "global" }
+        },
+        {
+            .key = "default_jvm_launch_profile_name",
+            .type = mcsm::OptionType::STRING,
+            .required = true,
+            .defaultValue = ""
+        },
+        {
+            .key = "server_jarfile",
+            .type = mcsm::OptionType::STRING,
+            .required = false,
+            .defaultValue = getTypeAsString() + ".jar"
+        },
+        {
+            .key = "server_build_version",
+            .type = mcsm::OptionType::STRING,
+            .required = false,
+            .defaultValue = "latest"
+        },
+        {
+            .key = "auto_server_jar_update",
+            .type = mcsm::OptionType::BOOL,
+            .required = false,
+            .defaultValue = "true"
+        }
+    };
+    return spec;
+}
+
 const tl::expected<std::map<std::string, std::string>, mcsm::Error> mcsm::Server::getRequiredValues() const {
     return tl::expected<std::map<std::string, std::string>, mcsm::Error>{
         std::map<std::string, std::string>{

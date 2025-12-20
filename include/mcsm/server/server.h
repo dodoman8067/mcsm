@@ -31,6 +31,39 @@ SOFTWARE.
 namespace mcsm {
     class ServerConfigLoader;
 
+    enum class OptionType {
+        STRING,
+        BOOL,
+        ENUM
+    };
+
+    struct ServerOptionSpec {
+        std::string key;
+        mcsm::OptionType type;
+        bool required;
+        std::string defaultValue;
+
+        std::vector<std::string> enumValues;
+
+        std::function<bool(const std::map<std::string, std::string>&)> visibleIf;
+        std::function<bool(const std::map<std::string, std::string>&)> requiredIf;
+    };
+
+
+    struct ServerGenerationContext {
+        std::string name;
+        std::string minecraftVersion;
+        std::string buildVersion;
+        std::string jarPath;
+
+        bool autoUpdate;
+
+        mcsm::Server* server;
+        mcsm::ServerDataOption* serverData;
+        mcsm::JvmOption* defaultJvm;
+    };
+
+
     /**
      * Represents base of server.
      */
@@ -116,6 +149,7 @@ namespace mcsm {
 
         virtual const tl::expected<std::map<std::string, std::string>, mcsm::Error> getRequiredValues() const;
 
+        virtual const tl::expected<std::vector<mcsm::ServerOptionSpec>, mcsm::Error> getRequiredOptions() const;
         /**
          * Obtains jar file. (Will compile the server jarfile or download if downloadable server)
          * 
