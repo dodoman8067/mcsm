@@ -60,6 +60,7 @@ namespace mcsm {
         mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& cliArgs) override;
 
         const tl::expected<std::map<std::string, std::string>, mcsm::Error> getRequiredValues() const override;
+        const tl::expected<std::vector<mcsm::ServerOptionSpec>, mcsm::Error> getRequiredOptions() const override;
 
         mcsm::VoidResult generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::map<std::string, std::string>& extraValues) override;
         mcsm::VoidResult generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& version, const bool& autoUpdate, const std::string& fileLocation, const std::map<std::string, std::string>& extraValues);

@@ -62,6 +62,7 @@ namespace mcsm {
         mcsm::BoolResult hasVersion(const std::string& version) const override;
 
         const tl::expected<std::map<std::string, std::string>, mcsm::Error> getRequiredValues() const override;
+        const tl::expected<std::vector<mcsm::ServerOptionSpec>, mcsm::Error> getRequiredOptions() const override;
 
         mcsm::ServerType getType() const override;
         std::string getTypeAsString() const override;

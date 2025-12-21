@@ -69,6 +69,7 @@ namespace mcsm {
         mcsm::ServerType getType() const override;
 
         const tl::expected<std::map<std::string, std::string>, mcsm::Error> getRequiredValues() const override;
+        const tl::expected<std::vector<mcsm::ServerOptionSpec>, mcsm::Error> getRequiredOptions() const override;
         
         mcsm::VoidResult update();
         mcsm::VoidResult update(const std::string& optionPath);
