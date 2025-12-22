@@ -322,18 +322,6 @@ const tl::expected<std::vector<mcsm::ServerOptionSpec>, mcsm::Error> mcsm::Vanil
             .type = mcsm::OptionType::STRING,
             .required = false,
             .defaultValue = getTypeAsString() + ".jar"
-        },
-        {
-            .key = "server_build_version",
-            .type = mcsm::OptionType::STRING,
-            .required = false,
-            .defaultValue = "latest"
-        },
-        {
-            .key = "auto_server_jar_update",
-            .type = mcsm::OptionType::BOOL,
-            .required = false,
-            .defaultValue = "true"
         }
     };
     return spec;
