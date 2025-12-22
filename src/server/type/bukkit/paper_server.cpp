@@ -461,6 +461,12 @@ const tl::expected<std::vector<mcsm::ServerOptionSpec>, mcsm::Error> mcsm::Paper
             .enumValues = { "current", "global" }
         },
         {
+            .key = "if_paper_should_generate_recommended_profile",
+            .type = mcsm::OptionType::BOOL,
+            .required = false,
+            .defaultValue = "false"
+        },
+        {
             .key = "default_jvm_launch_profile_name",
             .type = OptionType::STRING,
             .required = true,
@@ -470,13 +476,6 @@ const tl::expected<std::vector<mcsm::ServerOptionSpec>, mcsm::Error> mcsm::Paper
                 return it == values.end() || it->second != "true";
             }
         },
-        {
-            .key = "default_jvm_launch_profile_name",
-            .type = mcsm::OptionType::STRING,
-            .required = true,
-            .defaultValue = ""
-        },
-
         {
             .key = "server_jarfile",
             .type = mcsm::OptionType::STRING,
