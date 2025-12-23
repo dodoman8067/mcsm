@@ -41,111 +41,38 @@ mcsm::SearchTarget mcsm::GenerateServerCommand::getSearchTarget(const std::strin
     return mcsm::SearchTarget::ALL;
 }
 
-bool mcsm::GenerateServerCommand::checkValid(const std::string& key, std::string& value, const std::string& defaultValue){
-    if(key == "default_jvm_launch_profile_search_path"){
-        if(mcsm::isWhitespaceOrEmpty(value)){
-            value = defaultValue;
-            return true;
-        }
-        return !(value != "global" && value != "current");
+std::string prompt(const mcsm::ServerOptionSpec& spec) {
+    if(!spec.defaultValue.empty()){
+        std::cout << "Enter "
+                  << mcsm::formatPrompt(spec.key)
+                  << " (default: " << spec.defaultValue << ") : ";
+    }else{
+        std::cout << "Enter "
+                  << mcsm::formatPrompt(spec.key)
+                  << " : ";
     }
-    if(key == "auto_server_jar_update"){
-        if(mcsm::isWhitespaceOrEmpty(value)){
-            value = defaultValue;
-            return true;
-        }
-        return !(value != "true" && value != "false");
-    }
-    if(key == "minecraft_version"){
-        if(mcsm::isWhitespaceOrEmpty(value) && !mcsm::isWhitespaceOrEmpty(defaultValue)){
-            value = defaultValue;
-            return true;
-        }
-        if(mcsm::isWhitespaceOrEmpty(value) && mcsm::isWhitespaceOrEmpty(defaultValue)){
-            return false;
-        }
-        return true;
-    }
-    if(key == "server_jarfile"){
-        if(mcsm::isWhitespaceOrEmpty(value)){
-            value = defaultValue;
-            return true;
-        }
-        return true;
-    }
-    if(key == "server_build_version"){
-        if(mcsm::isWhitespaceOrEmpty(value)){
-            value = defaultValue;
-        }
-        return true;
-    }
-    if(key == "server_installer_version"){
-        if(mcsm::isWhitespaceOrEmpty(value)){
-            value = defaultValue;
-        }
-        return true;
-    }
-    if(key == "server_loader_version"){
-        if(mcsm::isWhitespaceOrEmpty(value)){
-            value = defaultValue;
-        }
-        return true;
-    }
-    if(key == "custom_run_command"){
-        if(mcsm::isWhitespaceOrEmpty(value)){
-            value = defaultValue;
-        }
-        return true;
-    }
-    if(key == "sponge_api_search_recommended_versions"){
-        if(mcsm::isWhitespaceOrEmpty(value)){
-            value = defaultValue;
-            return true;
-        }
-        return !(value != "true" && value != "false");
-    }
-    if(key == "if_paper_should_generate_recommended_profile"){
-        if(mcsm::isWhitespaceOrEmpty(value)){
-            value = defaultValue;
-            return true;
-        }
-        return !(value != "true" && value != "false");
-    }
-    if(key == "if_folia_should_generate_recommended_profile"){
-        if(mcsm::isWhitespaceOrEmpty(value)){
-            value = defaultValue;
-            return true;
-        }
-        return !(value != "true" && value != "false");
-    }
-    if(key == "if_velocity_should_generate_recommended_profile"){
-        if(mcsm::isWhitespaceOrEmpty(value)){
-            value = defaultValue;
-            return true;
-        }
-        return !(value != "true" && value != "false");
-    }
-    return !mcsm::isWhitespaceOrEmpty(value);
+
+    std::string input;
+    std::getline(std::cin, input);
+    return input;
 }
 
-void mcsm::GenerateServerCommand::handle(const std::string& key, std::map<std::string, std::string>& extras, const std::string& defaultValue){
-    std::string typedInput;
-    while(true){
-        if(!mcsm::isWhitespaceOrEmpty(defaultValue)){
-            std::cout << "Enter " << mcsm::formatPrompt(key) << "(default : " << defaultValue << ") : ";
-        }else{
-            std::cout << "Enter " << mcsm::formatPrompt(key) << " : ";
-        }
-        
-        std::getline(std::cin, typedInput);
-            
-        if(checkValid(key, typedInput, defaultValue)){
-            extras[key] = typedInput;
-            break;
-        }else{
-            std::cout << "Invalid input \"" << typedInput << "\". Please try again.\n";
-        }
+
+bool validate(const mcsm::ServerOptionSpec& spec, const std::string& value) {
+    if(value.empty()) return !spec.required;
+
+    switch (spec.type){
+        case mcsm::OptionType::STRING:
+            return true;
+
+        case mcsm::OptionType::BOOL:
+            return value == "true" || value == "false";
+
+        case mcsm::OptionType::ENUM:
+            return std::find(spec.enumValues.begin(), spec.enumValues.end(), value) != spec.enumValues.end();
     }
+
+    return false;
 }
 
 void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& /* args */){
@@ -166,15 +93,51 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& /
     std::map<std::string, std::string> extras;
 
     auto sPtr = mcsm::unwrapOrExit(mcsm::ServerRegistry::getServerRegistry().getServer(type));
-    auto sv = sPtr->getRequiredValues();
-    if(!sv) {
-        mcsm::printError(sv);
-        mcsm::exitIfFail(sv);
+
+    auto vecRes = sPtr->getRequiredOptions();
+    if(!vecRes){
+        mcsm::printError(vecRes.error());
+        mcsm::exitIfFail(vecRes.error());
+    }
+    auto vec = vecRes.value();
+    for(const auto& spec : vec){
+        if(spec.resolveValue){
+            auto resolved = spec.resolveValue(extras);
+            if(resolved){
+                extras[spec.key] = *resolved;
+                continue;
+            }
+        }
+
+        if(spec.visibleIf && !spec.visibleIf(extras)){
+            extras[spec.key] = spec.defaultValue;
+            continue;
+        }
+
+        bool isRequired = spec.required;
+        if(spec.requiredIf){
+            isRequired = spec.requiredIf(extras);
+        }
+
+        std::string value;
+        while (true){
+            value = prompt(spec);
+
+            if(value.empty() && !isRequired){
+                value = spec.defaultValue;
+                break;
+            }
+
+            if(validate(spec, value)){
+                break;
+            }
+
+            std::cout << "Invalid input \"" << value << "\". Please try again.\n";
+        }
+
+        extras[spec.key] = value;
     }
 
-    for(auto&[name, defaultValue] : sv.value()){
-        handle(name, extras, defaultValue);
-    }
 
     std::string name = extras["name"];
     std::string version = extras["minecraft_version"];
@@ -189,9 +152,9 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& /
         mcsm::error("default JVM launch profile search path (current/global) invalid value detected");
         std::exit(1);
     }
+
     mcsm::JvmOption defaultProfile(mcsm::unwrapOrExit(mcsm::jvmProfileFromSearchTarget(extras["default_jvm_launch_profile_name"], t, mcsm::unwrapOrExit(mcsm::getCurrentPath()))));
     mcsm::unwrapOrExit(defaultProfile.init());
-
     mcsm::unwrapOrExit(sPtr->generate(name, defaultProfile, mcsm::unwrapOrExit(mcsm::getCurrentPath()), version, bUpdate, extras));
     return;
     

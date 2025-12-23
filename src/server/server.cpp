@@ -30,7 +30,7 @@ mcsm::StringResult mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::J
 }
 
 mcsm::StringResult mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
-    return start(loader, option, path, optionPath, {});
+    return Server::start(loader, option, path, optionPath, {});
 }
 
 mcsm::StringResult mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& /* cliArgs */){

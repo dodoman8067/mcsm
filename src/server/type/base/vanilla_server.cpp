@@ -220,10 +220,14 @@ mcsm::StringResult mcsm::VanillaServer::start(mcsm::ServerConfigLoader* loader, 
 
     mcsm::StringResult cJarPath = loader->getServerJarPath();
     if(!cJarPath) return cJarPath;
-    return start(loader, option, cJarPath.value(), loader->getHandle()->getPath());
+    return start(loader, option, cJarPath.value(), loader->getHandle()->getPath(), {});
 }
 
 mcsm::StringResult mcsm::VanillaServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
+    return start(loader, option, path, optionPath, {});
+}
+
+mcsm::StringResult mcsm::VanillaServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& /* cliArgs */){
     // ServerOption class handles the data file stuff
     
     mcsm::StringResult jar = loader->getServerJarFile();

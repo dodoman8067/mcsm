@@ -469,10 +469,14 @@ mcsm::StringResult mcsm::FabricServer::start(mcsm::ServerConfigLoader* loader, m
 
     mcsm::StringResult cJarPath = loader->getServerJarPath();
     if(!cJarPath) return cJarPath;
-    return start(loader, option, cJarPath.value(), loader->getHandle()->getPath());
+    return start(loader, option, cJarPath.value(), loader->getHandle()->getPath(), {});
 }
 
 mcsm::StringResult mcsm::FabricServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
+    return start(loader, option, path, optionPath, {});
+}
+
+mcsm::StringResult mcsm::FabricServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& /* cliArgs */){
     // ServerOption class handles the data file stuff
     
     mcsm::StringResult jar = loader->getServerJarFile();
@@ -732,7 +736,13 @@ const tl::expected<std::vector<mcsm::ServerOptionSpec>, mcsm::Error> mcsm::Fabri
             .defaultValue = getTypeAsString() + ".jar"
         },
         {
-            .key = "server_build_version",
+            .key = "server_loader_version",
+            .type = mcsm::OptionType::STRING,
+            .required = false,
+            .defaultValue = "latest"
+        },
+        {
+            .key = "server_installer_version",
             .type = mcsm::OptionType::STRING,
             .required = false,
             .defaultValue = "latest"

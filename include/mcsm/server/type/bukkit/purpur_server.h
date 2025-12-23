@@ -51,6 +51,7 @@ namespace mcsm {
 
         mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option) override;
         mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
+        mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& cliArgs) override;
 
         mcsm::VoidResult download(const std::string& version) override;
         mcsm::VoidResult download(const std::string& version, const std::string& path) override;

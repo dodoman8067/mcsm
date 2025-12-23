@@ -27,6 +27,7 @@ SOFTWARE.
 #include <mcsm/jvm/jvm_option.h>
 #include <mcsm/util/cli/cli_utils.h>
 #include <mcsm/data/options/server_data_option.h>
+#include <optional>
 
 namespace mcsm {
     class ServerConfigLoader;
@@ -38,31 +39,17 @@ namespace mcsm {
     };
 
     struct ServerOptionSpec {
-        std::string key;
-        mcsm::OptionType type;
-        bool required;
-        std::string defaultValue;
+        std::string key = "";
+        mcsm::OptionType type = mcsm::OptionType::STRING;
+        bool required = true;
+        std::string defaultValue = "";
 
-        std::vector<std::string> enumValues;
+        std::vector<std::string> enumValues = {};
 
-        std::function<bool(const std::map<std::string, std::string>&)> visibleIf;
-        std::function<bool(const std::map<std::string, std::string>&)> requiredIf;
+        std::function<bool(const std::map<std::string, std::string>&)> visibleIf = {};
+        std::function<bool(const std::map<std::string, std::string>&)> requiredIf = {};
+        std::function<std::optional<std::string>(const std::map<std::string, std::string>&)> resolveValue = {};
     };
-
-
-    struct ServerGenerationContext {
-        std::string name;
-        std::string minecraftVersion;
-        std::string buildVersion;
-        std::string jarPath;
-
-        bool autoUpdate;
-
-        mcsm::Server* server;
-        mcsm::ServerDataOption* serverData;
-        mcsm::JvmOption* defaultJvm;
-    };
-
 
     /**
      * Represents base of server.
@@ -169,6 +156,20 @@ namespace mcsm {
         mcsm::VoidResult configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate, const std::string& build);
 
         mcsm::VoidResult configure(const std::string &version, mcsm::Server* server, mcsm::ServerDataOption *sDataOpt, const std::string& path, const std::string& name, mcsm::JvmOption& option, const bool& autoUpdate, const std::string& build, const std::string& jarPath);
+    };
+
+
+    struct ServerGenerationContext {
+        std::string name;
+        std::string minecraftVersion;
+        std::string buildVersion;
+        std::string jarPath;
+
+        bool autoUpdate;
+
+        mcsm::Server* server;
+        mcsm::ServerDataOption* serverData;
+        mcsm::JvmOption* defaultJvm;
     };
 }
 

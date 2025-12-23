@@ -291,12 +291,6 @@ const tl::expected<std::vector<mcsm::ServerOptionSpec>, mcsm::Error> mcsm::Custo
             .defaultValue = ""
         },
         {
-            .key = "minecraft_version",
-            .type = mcsm::OptionType::STRING,
-            .required = true,
-            .defaultValue = ""
-        },
-        {
             .key = "default_jvm_launch_profile_search_path",
             .type = mcsm::OptionType::ENUM,
             .required = false,
@@ -316,16 +310,17 @@ const tl::expected<std::vector<mcsm::ServerOptionSpec>, mcsm::Error> mcsm::Custo
             .defaultValue = getTypeAsString() + ".jar"
         },
         {
-            .key = "server_build_version",
-            .type = mcsm::OptionType::STRING,
-            .required = false,
-            .defaultValue = "latest"
+            .key = "server_file_location",
+            .type = mcsm::OptionType::ENUM,
+            .required = true,
+            .defaultValue = "",
+            .enumValues = {"url", "filepath"}
         },
         {
-            .key = "auto_server_jar_update",
-            .type = mcsm::OptionType::BOOL,
+            .key = "custom_run_command",
+            .type = mcsm::OptionType::STRING,
             .required = false,
-            .defaultValue = "true"
+            .defaultValue = ""
         }
     };
     return spec;

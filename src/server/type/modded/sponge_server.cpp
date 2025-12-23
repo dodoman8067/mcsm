@@ -459,10 +459,14 @@ mcsm::StringResult mcsm::SpongeServer::start(mcsm::ServerConfigLoader* loader, m
 
     mcsm::StringResult cJarPath = loader->getServerJarPath();
     if(!cJarPath) return cJarPath;
-    return start(loader, option, cJarPath.value(), loader->getHandle()->getPath());
+    return start(loader, option, cJarPath.value(), loader->getHandle()->getPath(), {});
 }
 
 mcsm::StringResult mcsm::SpongeServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
+    return start(loader, option, path, optionPath, {});
+}
+
+mcsm::StringResult mcsm::SpongeServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& /* cliArgs */){
     // ServerOption class handles the data file stuff
     
     mcsm::StringResult jar = loader->getServerJarFile();
@@ -640,6 +644,19 @@ const tl::expected<std::map<std::string, std::string>, mcsm::Error> mcsm::Sponge
 }
 
 const tl::expected<std::vector<mcsm::ServerOptionSpec>, mcsm::Error> mcsm::SpongeServer::getRequiredOptions() const {
+    auto* property1 = mcsm::GeneralOption::getGeneralOption().getProperty("sponge_api_search_recommended_versions");
+    if(property1 == nullptr){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"sponge_api_search_recommended_versions\"", "general config"});
+        return tl::unexpected(err);
+    }
+
+    const nlohmann::json& v = property1->getCurrentValue();
+    if(!v.is_boolean()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"sponge_api_search_recommended_versions\"", "boolean"});
+        return tl::unexpected(err);
+    }
+    std::string strV = v.get<bool>() ? "true" : "false";
+
     std::vector<mcsm::ServerOptionSpec> spec = {
         {
             .key = "name",
@@ -683,6 +700,12 @@ const tl::expected<std::vector<mcsm::ServerOptionSpec>, mcsm::Error> mcsm::Spong
             .type = mcsm::OptionType::BOOL,
             .required = false,
             .defaultValue = "true"
+        },
+        {
+            .key = "sponge_api_search_recommended_versions",
+            .type = mcsm::OptionType::BOOL,
+            .required = false,
+            .defaultValue = strV
         }
     };
     return spec;
