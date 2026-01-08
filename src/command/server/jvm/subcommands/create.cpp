@@ -1,4 +1,5 @@
 #include <mcsm/command/server/jvm/subcommands/create.h>
+#include <mcsm/jvm/java_detector.h>
 
 void mcsm::JvmCreateSubCommand::execute(const std::vector<std::string>& args){
     const std::vector<std::pair<std::string, std::vector<std::string>>> availableOptions = {
@@ -6,7 +7,8 @@ void mcsm::JvmCreateSubCommand::execute(const std::vector<std::string>& args){
         {"global", {"g"}},
         {"serverarguments", {"serverargs", "sargs", "sa"}},
         {"name", {"n"}},
-        {"jvmarguments", {"jvmargs", "jargs", "ja"}}
+        {"jvmarguments", {"jvmargs", "jargs", "ja"}},
+        {"defaults", {"d", "use-defaults"}}
     };
     mcsm::ArgumentParser parser(availableOptions, mcsm::vecToString(args));
     mcsm::SearchTarget target = getSaveTarget(parser);
@@ -18,11 +20,7 @@ mcsm::SearchTarget mcsm::JvmCreateSubCommand::getSaveTarget(const mcsm::Argument
 }
 
 std::string mcsm::JvmCreateSubCommand::getJvmPath(const mcsm::ArgumentParser& args) const {
-    if(!args.flagExists("jvmpath")){
-        mcsm::info("Java detection from -jp command arguments failed; Automatically detecting java..");
-        std::string java = mcsm::unwrapOrExit(mcsm::detectJava());
-        return java;
-    }
+    if(!args.flagExists("jvmpath")) return "";
     std::string jvmPath = args.getValue("jvmpath");
     if(!mcsm::startsWith(jvmPath, "\"") && !mcsm::startsWith(jvmPath, "\'")){
         jvmPath = "\"" + jvmPath;
@@ -40,13 +38,6 @@ std::string mcsm::JvmCreateSubCommand::getJvmPath(const mcsm::ArgumentParser& ar
 
 std::vector<std::string> mcsm::JvmCreateSubCommand::getJvmArguments(const mcsm::ArgumentParser& args) const {
     std::vector<std::string> jvmArgs;
-    if(!args.flagExists("jvmarguments")){
-        jvmArgs.push_back("-Xms2G");
-        jvmArgs.push_back("-Xmx2G");
-        jvmArgs.push_back("-jar");
-        mcsm::info("No JVM arguments specified; Defaulting to -Xms2G, -Xmx2G and -jar.");
-        return jvmArgs;
-    }
     std::string jvmArgsRaw = args.getValue("jvmarguments");
     std::istringstream iss(jvmArgsRaw);
     std::string part;
@@ -60,11 +51,6 @@ std::vector<std::string> mcsm::JvmCreateSubCommand::getJvmArguments(const mcsm::
 
 std::vector<std::string> mcsm::JvmCreateSubCommand::getServerArguments(const mcsm::ArgumentParser& args) const {
     std::vector<std::string> serverArgs;
-    if(!args.flagExists("jvmarguments")) {
-        serverArgs.push_back("nogui");
-        mcsm::info("No server arguments specified; Defaulting to nogui.");
-        return serverArgs;
-    }
     std::string serverArgsRaw = args.getValue("serverarguments");
     std::istringstream iss(serverArgsRaw);
     std::string part;
@@ -101,13 +87,80 @@ std::string mcsm::JvmCreateSubCommand::getProfileName(const mcsm::ArgumentParser
     return name;
 }
 
+std::string mcsm::JvmCreateSubCommand::prompt(const std::string& key) const {
+    std::cout << "Enter "
+              << key
+              << " : ";
+
+    std::string input;
+    std::getline(std::cin, input);
+    return input;
+}
+
 void mcsm::JvmCreateSubCommand::createProfile(const mcsm::ArgumentParser& args, const mcsm::SearchTarget& target) {
     mcsm::JvmOption option(mcsm::unwrapOrExit(mcsm::jvmProfileFromSearchTarget(getProfileName(args, target), target, mcsm::unwrapOrExit(mcsm::getCurrentPath()))));
     mcsm::unwrapOrExit(option.init());
 
+    bool useDefaults = args.flagExists("defaults");
+
     std::vector<std::string> jvmArgs = getJvmArguments(args);
+    if(!args.flagExists("jvmarguments") && useDefaults){
+        jvmArgs.push_back("-Xms2G");
+        jvmArgs.push_back("-Xmx2G");
+        jvmArgs.push_back("-jar");
+        mcsm::info("No JVM arguments specified; Defaulting to -Xms2G, -Xmx2G and -jar.");
+    }else if(!args.flagExists("jvmarguments") && !useDefaults){
+        jvmArgs = mcsm::stringToVec(prompt("Java virtual machine flags to use"));
+    }
+    
     std::vector<std::string> sargs = getServerArguments(args);
+    if(!args.flagExists("serverarguments") && useDefaults) {
+        sargs.push_back("nogui");
+        mcsm::info("No server arguments specified; Defaulting to nogui.");
+    }else if(!args.flagExists("serverarguments") && !useDefaults){
+        sargs = mcsm::stringToVec(prompt("server flags to use"));
+    }
+
     std::string jvm = getJvmPath(args);
+    if(!args.flagExists("jvmpath")){
+        if(useDefaults){
+            //TODO: add "default_jvm_path" on general option
+            mcsm::warning("defaults on jvm path not implemented");
+        }
+        std::map<int, std::string> jvmMap;
+        int i = 1;
+        for(const std::string& java : mcsm::findJavaPaths()){
+            auto isValid = mcsm::unwrapOrExit(mcsm::isValidJava(java));
+            if(isValid){
+                jvmMap.insert({i, java});
+                std::cout << " * " << i << ". " << java << "\n";
+                i++;
+            }
+        }
+
+        std::cout << "\nEnter one of the given numbers, or a custom path for Java virtual machine binary that this profile will use.\n";
+        bool valid = false;
+        while (!valid){
+            std::string res = prompt("JVM path");
+            if(mcsm::is_number(res)){
+                int index = std::stoi(res);
+                if(index < 1 || index > i){
+                    std::cout << "Invalid input; please try again.\n";
+                    continue;
+                }else{
+                    jvm = jvmMap[index];
+                    std::cout << "Choosing " << jvm << "..\n";
+                    valid = true;
+                    break;
+                }
+            }else{
+                jvm = res;
+                std::cout << "Choosing " << jvm << "..\n";
+                valid = true;
+                break;
+            }
+        }
+    }
 
     mcsm::unwrapOrExit(option.create(jvm, jvmArgs, sargs));
 

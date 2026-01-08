@@ -15,6 +15,7 @@ namespace mcsm {
         std::string getOptionName(const mcsm::ArgumentParser& args) const;
         std::string getProfileName(const mcsm::ArgumentParser& args, const mcsm::SearchTarget& target) const;
         inline void createProfile(const mcsm::ArgumentParser& args, const mcsm::SearchTarget& target);
+        std::string prompt(const std::string& key) const;
     public:
         JvmCreateSubCommand() = default;
         ~JvmCreateSubCommand() = default;
