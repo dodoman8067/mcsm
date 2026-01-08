@@ -73,9 +73,20 @@ bool mcsm::isSafeString(const std::string& str){
 }
 
 bool mcsm::is_number(const std::string& s){
+    if(s.empty()) return false;
+
     std::string::const_iterator it = s.begin();
-    while (it != s.end() && std::isdigit(*it)) ++it;
-    return !s.empty() && it == s.end();
+
+    if(*it == '+' || *it == '-'){
+        ++it;
+        if (it == s.end()) return false;
+    }
+
+    while (it != s.end() && std::isdigit(static_cast<unsigned char>(*it))){
+        ++it;
+    }
+
+    return it == s.end();
 }
 
 std::string mcsm::normalizePath(const std::string& p){
