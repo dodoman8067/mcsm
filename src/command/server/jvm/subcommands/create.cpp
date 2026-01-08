@@ -128,13 +128,13 @@ void mcsm::JvmCreateSubCommand::createProfile(const mcsm::ArgumentParser& args, 
             mcsm::warning("defaults on jvm path not implemented");
         }
         std::map<int, std::string> jvmMap;
-        int i = 1;
+        int i = 0;
         for(const std::string& java : mcsm::findJavaPaths()){
             auto isValid = mcsm::unwrapOrExit(mcsm::isValidJava(java));
             if(isValid){
+                i++;
                 jvmMap.insert({i, java});
                 std::cout << " * " << i << ". " << java << "\n";
-                i++;
             }
         }
 
@@ -154,6 +154,10 @@ void mcsm::JvmCreateSubCommand::createProfile(const mcsm::ArgumentParser& args, 
                     break;
                 }
             }else{
+                if(mcsm::isWhitespaceOrEmpty(jvm)){
+                    std::cout << "Invalid input; please try again.\n";
+                    continue;
+                }
                 jvm = res;
                 std::cout << "Choosing " << jvm << "..\n";
                 valid = true;
