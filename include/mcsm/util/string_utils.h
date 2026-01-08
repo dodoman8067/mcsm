@@ -71,6 +71,8 @@ namespace mcsm {
     std::string formatPrompt(const std::string& key);
 
     std::string vecToString(const std::vector<std::string>& vec);
+
+    std::vector<std::string> stringToVec(const std::string& str);
 }
 
 #endif

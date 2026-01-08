@@ -128,3 +128,15 @@ std::string mcsm::vecToString(const std::vector<std::string>& vec) {
     }
     return s;
 }
+
+std::vector<std::string> mcsm::stringToVec(const std::string& str){
+    std::vector<std::string> vec;
+    std::istringstream iss(str);
+    std::string part;
+    while(std::getline(iss, part, ' ')){
+        if(!part.empty()){
+            vec.push_back(part);
+        }
+    }
+    return vec;
+}
