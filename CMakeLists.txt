@@ -57,6 +57,22 @@ if (NOT nlohmann_json_FOUND)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DMCSM_NLOHMANN_VER=\\\"3.12.0\\\"")
 endif()
 
+# --- tomlplusplus (header-only) ---
+# prefer system if available, otherwise fetch pinned tag
+if (USE_SYSTEM_DEPS)
+    find_package(tomlplusplus REQUIRED)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTOML_EXCEPTIONS=0 -DMCSM_TOMLPLUSPLUS_VER=\\\"${tomlplusplus_VERSION}\\\"")
+endif()
+if (NOT tomlplusplus_FOUND)
+    FetchContent_Declare(tomlplusplus
+        GIT_REPOSITORY https://github.com/marzer/tomlplusplus.git
+        GIT_TAG v3.4.0
+    )
+    FetchContent_MakeAvailable(tomlplusplus)
+    message("-- [mcsm] Fetched tomlplusplus to " ${tomlplusplus_SOURCE_DIR} ".")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DTOML_EXCEPTIONS=0 -DMCSM_TOMLPLUSPLUS_VER=\\\"3.4.0\\\"")
+endif()
+
 # --- tl::expected (header-only) ---
 if (USE_SYSTEM_DEPS)
     find_package(tl-expected REQUIRED)
@@ -179,6 +195,7 @@ target_link_libraries(mcsm
     CURL::libcurl
     nlohmann_json::nlohmann_json
     tl::expected
+    tomlplusplus::tomlplusplus
 )
 
 if(LINUX AND NOT ANDROID AND CMAKE_BUILD_TYPE MATCHES Debug)

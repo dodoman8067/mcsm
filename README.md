@@ -24,6 +24,7 @@ This project uses the following dependencies :
 
 * [cURL](https://github.com/curl/curl)
 * [nlohmann/json](https://github.com/nlohmann/json)
+* [toml++](https://github.com/marzer/tomlplusplus)
 * [tl/expected](https://github.com/TartanLlama/expected)
 * [backward-cpp](https://github.com/bombela/backward-cpp) (DEBUG)
 
@@ -39,5 +40,6 @@ This project is under [MIT](LICENSE) license.
 
 * [cURL](https://curl.se/docs/copyright.html)
 * [nlohmann/json](https://github.com/nlohmann/json/blob/develop/LICENSE.MIT)
+* [toml++](https://github.com/marzer/tomlplusplus/blob/master/LICENSE)
 * [tl/expected](https://github.com/TartanLlama/expected/blob/master/COPYING)
 * [backward-cpp](https://github.com/bombela/backward-cpp/blob/master/LICENSE.txt)
