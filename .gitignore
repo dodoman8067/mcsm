@@ -5,6 +5,9 @@
 *.app
 *.exe
 
+# clangd
+.cache/
+
 # Compiled source
 *.suo
 *.pdb
@@ -67,6 +70,7 @@ CMakeScripts/
 CMakeTmp/
 CTestTestfile.cmake
 Testing/
+compile_commands.json
 
 # Sublime Text files
 *.sublime-project
