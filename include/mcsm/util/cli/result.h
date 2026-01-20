@@ -197,7 +197,7 @@ namespace mcsm::errors {
     };
 
     // ================================
-    // 20X: JSON Errors
+    // 20X: JSON and TOML Errors
     // ================================
     inline const ErrorTemplate JSON_WRONG_TYPE = {
         200,
@@ -231,6 +231,42 @@ namespace mcsm::errors {
 
     inline const ErrorTemplate JSON_PARSE_FAILED_CANNOT_BE_MODIFIED = {
         205,
+        "Failed to parse json. Likely an invalid JSON responce was recieved from curl requests.",
+        "This error cannot be resolved by editing the file."
+    };
+
+    inline const ErrorTemplate TOML_WRONG_TYPE = {
+        206,
+        "Value %s has to be a(n) %s, but it's not.",
+        "Manually editing the file might have caused this issue."
+    };
+
+    inline const ErrorTemplate TOML_WRONG_TYPE_PLUS_FIX = {
+        207,
+        "Value %s option in %s must be a(n) %s.\n%s",
+        ""
+    };
+
+    inline const ErrorTemplate TOML_NOT_FOUND = {
+        208,
+        "No %s value found in %s.",
+        "Make sure the field is defined in the config file."
+    };
+
+    inline const ErrorTemplate TOML_NOT_FOUND_PLUS_FIX = {
+        209,
+        "No %s value found in %s.\n%s",
+        ""
+    };
+
+    inline const ErrorTemplate TOML_PARSE_FAILED = {
+        210,
+        "Failed to parse toml %s.",
+        "Check for comments, unclosed brackets, trailing commas, or incorrect escape sequences."
+    };
+
+    inline const ErrorTemplate TOML_PARSE_FAILED_CANNOT_BE_MODIFIED = {
+        211,
         "Failed to parse json. Likely an invalid JSON responce was recieved from curl requests.",
         "This error cannot be resolved by editing the file."
     };
