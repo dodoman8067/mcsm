@@ -74,8 +74,8 @@ mcsm::StringResult mcsm::CustomServer::getFileLocation(const std::string& option
     return jarLoc.get<std::string>();
 }
 
-mcsm::VoidResult mcsm::CustomServer::setFileLocation(mcsm::Option* option, const std::string& location) {
-    mcsm::VoidResult setRes = option->setValue("jarfile_source_location", location);
+mcsm::VoidResult mcsm::CustomServer::setFileLocation(mcsm::TomlOption* option, const std::string& location) {
+    mcsm::VoidResult setRes = option->setValue("jarfile_source_location", valstr(location));
     if(!setRes) return setRes;
     return option->save();
 }
@@ -109,8 +109,8 @@ mcsm::StringResult mcsm::CustomServer::getCustomStartCommand(const std::string& 
     return value;
 }
 
-mcsm::VoidResult mcsm::CustomServer::setCustomStartCommand(mcsm::Option* option, const std::string& command){
-    mcsm::VoidResult setRes = option->setValue("custom_run_command", command);
+mcsm::VoidResult mcsm::CustomServer::setCustomStartCommand(mcsm::TomlOption* option, const std::string& command){
+    mcsm::VoidResult setRes = option->setValue("custom_run_command", valstr(command));
     if(!setRes) return setRes;
     return option->save();
 }

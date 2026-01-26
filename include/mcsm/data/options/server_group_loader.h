@@ -7,11 +7,11 @@ namespace mcsm {
     class ServerGroupLoader {
     private:
         std::string path, mode;
-        std::unique_ptr<mcsm::Option> handle;
+        std::unique_ptr<mcsm::TomlOption> handle;
         std::vector<std::unique_ptr<mcsm::ServerConfigLoader>> loaders;
         bool loaded;
 
-        mcsm::VoidResult removeDuplicateServers(mcsm::Option* handle);
+        mcsm::VoidResult removeDuplicateServers(mcsm::TomlOption* handle);
     public: 
         ServerGroupLoader(const std::string& path);
         ~ServerGroupLoader();
@@ -19,7 +19,7 @@ namespace mcsm {
         mcsm::VoidResult load();
         mcsm::VoidResult save();
 
-        const mcsm::Option* getHandle() const;
+        const mcsm::TomlOption* getHandle() const;
 
         bool isLoaded() const; 
 

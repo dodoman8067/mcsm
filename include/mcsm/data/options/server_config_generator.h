@@ -2,7 +2,7 @@
 #define __MCSM_SERVER_CONFIG_GENERATOR_H__
 
 #include <mcsm/data/options/server_data_option.h>
-#include <mcsm/server/server.h>
+#include <mcsm/data/options/server_config_loader.h>
 
 namespace mcsm {
     class ServerConfigGenerator {
@@ -10,7 +10,7 @@ namespace mcsm {
         explicit ServerConfigGenerator(const std::string& path);
         ServerConfigGenerator(const mcsm::ServerConfigGenerator& other)
             : configPath(other.configPath),
-              optionHandle(other.optionHandle ? std::make_unique<mcsm::Option>(*other.optionHandle) : nullptr){}
+              optionHandle(other.optionHandle ? std::make_unique<mcsm::TomlOption>(*other.optionHandle) : nullptr){}
         ~ServerConfigGenerator();
 
         /**
@@ -30,14 +30,14 @@ namespace mcsm {
 
         mcsm::VoidResult generate(const std::string& version, mcsm::Server* server, mcsm::ServerDataOption* sDataOpt, const std::string& name, mcsm::JvmOption& defaultOption, const bool& update, const std::string& build, const std::string& jarPath);
 
-        mcsm::Option* getHandle();
+        mcsm::TomlOption* getHandle();
 
         std::string getPath() const;
 
         mcsm::BoolResult validatePath();
     private:
         std::string configPath;
-        std::unique_ptr<mcsm::Option> optionHandle;
+        std::unique_ptr<mcsm::TomlOption> optionHandle;
     };
 }
 

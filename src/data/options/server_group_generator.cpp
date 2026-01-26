@@ -11,7 +11,7 @@ mcsm::VoidResult mcsm::ServerGroupGenerator::generate(const std::string& mode, c
         return tl::unexpected(err);
     }
 
-    this->handle = std::make_unique<mcsm::Option>(this->path, "mcsm_server_group");
+    this->handle = std::make_unique<mcsm::TomlOption>(this->path, "mcsm_server_group");
 
     auto exists = this->handle->exists();
     if(!exists) return tl::unexpected(exists.error());
@@ -39,10 +39,10 @@ mcsm::VoidResult mcsm::ServerGroupGenerator::generate(const std::string& mode, c
     auto lRes = this->handle->load(advp);
     if(!lRes) return lRes;
 
-    auto nameSetRes = this->handle->setValue("name", this->name);
+    auto nameSetRes = this->handle->setValue("name", valstr(this->name));
     if(!nameSetRes) return nameSetRes;
 
-    auto modeSetRes = this->handle->setValue("mode", mode);
+    auto modeSetRes = this->handle->setValue("mode", valstr(mode));
     if(!modeSetRes) return modeSetRes;
 
     std::vector<std::string> serversStrVec;
@@ -63,13 +63,13 @@ mcsm::VoidResult mcsm::ServerGroupGenerator::generate(const std::string& mode, c
         }
     }
 
-    auto serversSetRes = this->handle->setValue("servers", serversStrVec);
+    auto serversSetRes = this->handle->setValue("servers", vectoarr(serversStrVec));
     if(!serversSetRes) return serversSetRes;
 
     return this->handle->save();
 }
 
-const mcsm::Option* mcsm::ServerGroupGenerator::getHandle() const {
+const mcsm::TomlOption* mcsm::ServerGroupGenerator::getHandle() const {
     if(this->handle) return this->handle.get();
     return nullptr;
 }

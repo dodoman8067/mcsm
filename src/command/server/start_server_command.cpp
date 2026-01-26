@@ -20,6 +20,7 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include <mcsm/jvm/jvm_option.h>
 #include <mcsm/command/server/start_server_command.h>
 #include <mcsm/data/options/server_group_loader.h>
 

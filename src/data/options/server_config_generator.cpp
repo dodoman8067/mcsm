@@ -39,7 +39,7 @@ mcsm::VoidResult mcsm::ServerConfigGenerator::generate(const std::string& versio
         return tl::unexpected(err);
     }
 
-    this->optionHandle = std::make_unique<mcsm::Option>(this->configPath, "server");
+    this->optionHandle = std::make_unique<mcsm::TomlOption>(this->configPath, "server");
     bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
         
     mcsm::VoidResult jLoadRes = this->optionHandle->load(advp);
@@ -52,29 +52,30 @@ mcsm::VoidResult mcsm::ServerConfigGenerator::generate(const std::string& versio
     if(!jvmpPath) return tl::unexpected(jvmpPath.error());
     std::string jvmpLocation = mcsm::joinPath(jvmpPath.value(), defaultOption.getProfileName() + ".json");
     
-    mcsm::VoidResult res2 = this->optionHandle->setValue("name", mcsm::safeString(name));
+    mcsm::VoidResult res2 = this->optionHandle->setValue("name", valstr(mcsm::safeString(name)));
     if(!res2) return res2;
     
     if(!mcsm::isSafeString(version)){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {version});
         return tl::unexpected(err);
     }
-    mcsm::VoidResult res3 = this->optionHandle->setValue("version", version);
+    mcsm::VoidResult res3 = this->optionHandle->setValue("version", valstr(version));
     if(!res3) return res3;
     
-    mcsm::VoidResult res4 = this->optionHandle->setValue("default_launch_profile", jvmpLocation);
+    mcsm::VoidResult res4 = this->optionHandle->setValue("default_launch_profile", valstr(jvmpLocation));
     if(!res4) return res4;
 
-    mcsm::VoidResult res5 = this->optionHandle->setValue("server_jar", jarPath);
+    mcsm::VoidResult res5 = this->optionHandle->setValue("server_jar", valstr(jarPath));
     if(!res5) return res5;
 
-    mcsm::VoidResult res6 = this->optionHandle->setValue("server_build", build);
+    mcsm::VoidResult res6 = this->optionHandle->setValue("server_build", valstr(build));
     if(!res6) return res6;
 
-    mcsm::VoidResult res10 = this->optionHandle->setValue("auto_update", update);
+    toml::value<bool> val10(update);
+    mcsm::VoidResult res10 = this->optionHandle->setValue("auto_update", val10);
     if(!res10) return res10;
 
-    mcsm::VoidResult res7 = this->optionHandle->setValue("type", server->getTypeAsString());
+    mcsm::VoidResult res7 = this->optionHandle->setValue("type", valstr(server->getTypeAsString()));
     if(!res7) return res7;
 
     mcsm::VoidResult res8 = sDataOpt->updateServerTimeCreated();
@@ -83,7 +84,7 @@ mcsm::VoidResult mcsm::ServerConfigGenerator::generate(const std::string& versio
     return this->optionHandle->save();
 }
 
-mcsm::Option* mcsm::ServerConfigGenerator::getHandle(){
+mcsm::TomlOption* mcsm::ServerConfigGenerator::getHandle(){
     return this->optionHandle.get();
 }
 
@@ -92,6 +93,6 @@ std::string mcsm::ServerConfigGenerator::getPath() const {
 }
 
 mcsm::BoolResult mcsm::ServerConfigGenerator::validatePath(){
-    mcsm::Option opt(this->configPath, "server");
+    mcsm::TomlOption opt(this->configPath, "server");
     return !opt.exists();
 }

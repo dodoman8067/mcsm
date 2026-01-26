@@ -116,7 +116,7 @@ bool mcsm::TomlOption::isGlobal() const {
     return mcsm::startsWith(this->path, mcsm::getDataPathPerOS());
 }
 
-mcsm::VoidResult mcsm::TomlOption::setValue(const std::string& key, toml::node& value){
+mcsm::VoidResult mcsm::TomlOption::setValue(const std::string& key, const toml::node& value){
     if(!loaded){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, {700, "Option's get/set function called without being loaded.", ""}, {});
         return tl::unexpected(err);

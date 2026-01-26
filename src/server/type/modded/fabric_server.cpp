@@ -534,19 +534,19 @@ mcsm::VoidResult mcsm::FabricServer::update(const std::string& path, const std::
 
     mcsm::info("Checking updates...");
 
-
-    auto lVGRes = loader.get<std::string>("loader_version");
+    //TODO: FIX TYPE CHECK
+    auto lVGRes = loader.getHandle()->getValue("loader_version");
     if(!lVGRes) return tl::unexpected(lVGRes.error());
-    loaderVer = lVGRes.value();
+    loaderVer = gstr(lVGRes.value());
 
     if(loaderVer != "latest"){
         mcsm::warning("This server won't update to the latest loader version.");
         mcsm::warning("Change server.json into \"loader_version\": \"latest\" for automatic download.");
     }
 
-    auto iSTRes = loader.get<std::string>("installer_version");
+    auto iSTRes = loader.getHandle()->getValue("installer_version");
     if(!iSTRes) return tl::unexpected(iSTRes.error());
-    installerVer = iSTRes.value();
+    installerVer = gstr(iSTRes.value());
 
     if(installerVer != "latest"){
         mcsm::warning("This server won't update to the latest installer version.");
@@ -649,10 +649,10 @@ mcsm::VoidResult mcsm::FabricServer::generate(const std::string& name, mcsm::Jvm
     if(!generateRes) return generateRes;
 
     auto fabricOpt = generator.getHandle();
-    auto res9 = fabricOpt->setValue("loader_version", extraValues.find("server_loader_version")->second);
+    auto res9 = fabricOpt->setValue("loader_version", valstr(extraValues.find("server_loader_version")->second));
     if(!res9) return res9;
 
-    auto res10 = fabricOpt->setValue("installer_version", extraValues.find("server_installer_version")->second);
+    auto res10 = fabricOpt->setValue("installer_version", valstr(extraValues.find("server_installer_version")->second));
     if(!res10) return res10;
     
     auto fSaveRes = fabricOpt->save();

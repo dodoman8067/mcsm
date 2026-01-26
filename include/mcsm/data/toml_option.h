@@ -9,6 +9,17 @@
 #include <mcsm/util/cli/cli_utils.h>
 
 namespace mcsm {
+    inline std::string gstr(const toml::node* n){ return n->as_string()->get(); }
+    inline toml::value<std::string> valstr(const std::string& s){ return toml::value<std::string>(s); }
+    inline toml::array vectoarr(const std::vector<std::string>& vec){
+        toml::array tArray;
+        for (const auto& s : vec){
+            tArray.push_back(s); // implicit toml::value<std::string>
+        }
+        return tArray;
+    }
+
+
     class TomlOption {
     private:
         std::string path;
@@ -46,7 +57,7 @@ namespace mcsm {
         std::string getName() const;
 
         mcsm::Result<toml::node*> getValue(const std::string& key) const;
-        mcsm::VoidResult setValue(const std::string& key, toml::node& value);
+        mcsm::VoidResult setValue(const std::string& key, const toml::node& value);
         mcsm::BoolResult hasValue(const std::string& key) const;
 
         mcsm::BoolResult exists() const; // todo edit configurable or remove it too

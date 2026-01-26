@@ -1,16 +1,18 @@
 #ifndef __MCSM_SERVER_CONFIG_LOADER_H__
 #define __MCSM_SERVER_CONFIG_LOADER_H__
 
-#include <mcsm/data/option.h>
-#include <mcsm/server/server.h>
+#include <mcsm/data/toml_option.h>
 
 namespace mcsm {
+    class Server;
+    class JvmOption;
+    
     class ServerConfigLoader {
     public:
         explicit ServerConfigLoader(const std::string& path);
         ServerConfigLoader(const ServerConfigLoader& other)
             : configPath(other.configPath),
-              optionHandle(other.optionHandle ? std::make_unique<mcsm::Option>(*other.optionHandle) : nullptr),
+              optionHandle(other.optionHandle ? std::make_unique<mcsm::TomlOption>(*other.optionHandle) : nullptr),
               isLoaded(other.isLoaded){}
         ~ServerConfigLoader();
 
@@ -32,26 +34,7 @@ namespace mcsm {
                 return tl::unexpected(err);
             }
 
-            if constexpr(std::is_same<T, std::vector<int>>::value ||
-                        std::is_same<T, std::vector<double>>::value ||
-                        std::is_same<T, std::vector<bool>>::value ||
-                        std::is_same<T, std::vector<std::string>>::value){
-                if(value.type() != nlohmann::json::value_t::array){
-                    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"" + key + "\"", "array"});
-                    return tl::unexpected(err);
-                }
-            }else if (value.type() != getJsonType<T>()){
-                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"" + key + "\"", value.type_name()});
-                return tl::unexpected(err);
-            }
-            if constexpr (std::is_same<T, std::string>::value){
-                if(!mcsm::isSafeString(value)){
-                    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {value});
-                    return tl::unexpected(err);
-                }
-            }
-
-            return value.get<T>();
+            return value->as<T>();
         }
 
         mcsm::StringResult getServerName() const;
@@ -79,7 +62,7 @@ namespace mcsm {
         mcsm::BoolResult doesAutoUpdate() const;
         mcsm::VoidResult setAutoUpdate(const bool& update);
 
-        mcsm::Option* getHandle() const;
+        mcsm::TomlOption* getHandle() const;
 
         bool isFullyLoaded() const;
 
@@ -87,11 +70,8 @@ namespace mcsm {
         
     private:
         std::string configPath;
-        std::unique_ptr<mcsm::Option> optionHandle;
+        std::unique_ptr<mcsm::TomlOption> optionHandle;
         bool isLoaded;
-
-        template <typename T>
-        nlohmann::json::value_t getJsonType() const;
     };
 }
 

@@ -13,7 +13,7 @@ mcsm::ServerConfigLoader::~ServerConfigLoader(){
 }
 
 mcsm::VoidResult mcsm::ServerConfigLoader::loadConfig(){
-    this->optionHandle = std::make_unique<mcsm::Option>(this->configPath, "server");
+    this->optionHandle = std::make_unique<mcsm::TomlOption>(this->configPath, "server");
     auto optExists = this->optionHandle->exists();
     if(!optExists) return tl::unexpected(optExists.error());
 
@@ -29,48 +29,6 @@ mcsm::VoidResult mcsm::ServerConfigLoader::loadConfig(){
 
     this->isLoaded = true;
     return {};
-}
-
-template <>
-nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<int>() const {
-    return nlohmann::json::value_t::number_integer;
-}   
-
-template <>
-nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<unsigned int>() const {
-    return nlohmann::json::value_t::number_unsigned;
-}   
-
-template <>
-nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<float>() const {
-    return nlohmann::json::value_t::number_float;
-}   
-
-template <>
-nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<double>() const {
-    return nlohmann::json::value_t::number_float;
-}
-
-template <>
-nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<bool>() const {
-    return nlohmann::json::value_t::boolean;
-}
-
-template <>
-nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<std::string>() const {
-    return nlohmann::json::value_t::string;
-}
-
-// use json.is_array to get arrays
-
-template <>
-nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<nlohmann::json>() const {
-    return nlohmann::json::value_t::object;
-}
-
-template <>
-nlohmann::json::value_t mcsm::ServerConfigLoader::getJsonType<std::vector<nlohmann::json>>() const {
-    return nlohmann::json::value_t::array;
 }
 
 static std::filesystem::path resolveAgainstConfig(const std::string& raw, const std::string& configDir){
@@ -92,22 +50,22 @@ mcsm::StringResult mcsm::ServerConfigLoader::getServerName() const {
     auto valueRes = this->optionHandle->getValue("name");
     if(!valueRes) return tl::unexpected(valueRes.error());
 
-    nlohmann::json value = valueRes.value();
+    toml::node* value = valueRes.value();
 
     if(value == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"name\"", this->optionHandle->getName()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"name\"", this->optionHandle->getName()});
         return tl::unexpected(err);
     }
-    if(!value.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"name\"", "string"});
+    if(!value->is_string()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"name\"", "string"});
         return tl::unexpected(err);
     }
 
-    if(!mcsm::isSafeString(value)){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {value});
+    if(!mcsm::isSafeString(value->as_string()->get())){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {gstr(value)});
         return tl::unexpected(err);
     }
-    return value;
+    return gstr(value);
 }
 
 mcsm::VoidResult mcsm::ServerConfigLoader::setServerName(const std::string& name){
@@ -119,7 +77,7 @@ mcsm::VoidResult mcsm::ServerConfigLoader::setServerName(const std::string& name
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {name});
         return tl::unexpected(err);
     }
-    auto setRes = this->optionHandle->setValue("name", name);
+    auto setRes = this->optionHandle->setValue("name", valstr(name));
 
     if(!setRes) return setRes;
     return this->optionHandle->save();
@@ -134,22 +92,22 @@ mcsm::StringResult mcsm::ServerConfigLoader::getServerVersion() const {
     auto valueRes = this->optionHandle->getValue("version");
     if(!valueRes) return tl::unexpected(valueRes.error());
 
-    const nlohmann::json& value = valueRes.value();
+    toml::node* value = valueRes.value();
 
     if(value == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"version\"", this->optionHandle->getName()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"version\"", this->optionHandle->getName()});
         return tl::unexpected(err);
     }
-    if(!value.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"version\"", "string"});
+    if(!value->is_string()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"version\"", "string"});
         return tl::unexpected(err);
     }
 
-    if(!mcsm::isSafeString(value)){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {value});
+    if(!mcsm::isSafeString(gstr(value))){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {gstr(value)});
         return tl::unexpected(err);
     }
-    return value;
+    return gstr(value);
 }
 
 mcsm::VoidResult mcsm::ServerConfigLoader::setServerVersion(const std::string& version){
@@ -161,7 +119,7 @@ mcsm::VoidResult mcsm::ServerConfigLoader::setServerVersion(const std::string& v
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {version});
         return tl::unexpected(err);
     }
-    auto setRes = this->optionHandle->setValue("version", version);
+    auto setRes = this->optionHandle->setValue("version", valstr(version));
 
     if(!setRes) return setRes;
     return this->optionHandle->save();
@@ -174,27 +132,27 @@ tl::expected<std::unique_ptr<mcsm::JvmOption>, mcsm::Error> mcsm::ServerConfigLo
     }
 
     auto pORes = this->optionHandle->getValue("default_launch_profile");
-    const nlohmann::json& profileObj = pORes.value();
+    toml::node* profileObj = pORes.value();
 
     if(profileObj == nullptr){
-        auto customTemp = mcsm::errors::JSON_NOT_FOUND;
+        auto customTemp = mcsm::errors::TOML_NOT_FOUND;
         customTemp.message = "No default launch profile name specified in file " + this->optionHandle->getName();
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
     }
-    if(!profileObj.is_string()){
+    if(!profileObj->is_string()){
         // Don't use jsonWrongType
-        auto customTemp = mcsm::errors::JSON_WRONG_TYPE;
+        auto customTemp = mcsm::errors::TOML_WRONG_TYPE;
         customTemp.message = "Value \"default_launch_profile\" has to be a string, but it's not.\nManually editing the launch profile might have caused this issue.";
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
     }
 
-    std::filesystem::path path(profileObj.get<std::string>());
-    auto abs = resolveAgainstConfig(profileObj.get<std::string>(), this->configPath);
+    std::filesystem::path path(gstr(profileObj));
+    auto abs = resolveAgainstConfig(gstr(profileObj), this->configPath);
     if(!abs.has_filename()){
-        auto customTemp = mcsm::errors::JSON_WRONG_TYPE;
-        customTemp.message = "Value \"default_launch_profile\" in " + this->optionHandle->getName() + " does not contain valid file path: " + profileObj.get<std::string>();
+        auto customTemp = mcsm::errors::TOML_WRONG_TYPE;
+        customTemp.message = "Value \"default_launch_profile\" in " + this->optionHandle->getName() + " does not contain valid file path: " + gstr(profileObj);
         customTemp.solution = "Make sure proper value is given and the file is present.";
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
@@ -230,7 +188,7 @@ mcsm::VoidResult mcsm::ServerConfigLoader::setDefaultOption(mcsm::JvmOption& jvm
     std::string jvmpLocation = mcsm::joinPath(jvmpPath.value(), jvmOption.getProfileName() + ".json");
     std::filesystem::path p(jvmpLocation);
     std::string toStore = p.lexically_normal().generic_string();
-    auto setRes = this->optionHandle->setValue("default_launch_profile", toStore);
+    auto setRes = this->optionHandle->setValue("default_launch_profile", valstr(toStore));
 
     if(!setRes) return setRes;
     return this->optionHandle->save();
@@ -244,22 +202,22 @@ mcsm::StringResult mcsm::ServerConfigLoader::getServerType() const {
 
     auto valueRes = this->optionHandle->getValue("type");
     if(!valueRes) return tl::unexpected(valueRes.error());
-    const nlohmann::json& value = valueRes.value();
+    toml::node* value = valueRes.value();
 
     if(value == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"type\"", this->optionHandle->getName()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"type\"", this->optionHandle->getName()});
         return tl::unexpected(err);
     }
-    if(!value.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"type\"", "string"});
+    if(!value->is_string()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"type\"", "string"});
         return tl::unexpected(err);
     }
 
-    if(!mcsm::isSafeString(value.get<std::string>())){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {value.get<std::string>()});
+    if(!mcsm::isSafeString(gstr(value))){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {gstr(value)});
         return tl::unexpected(err);
     }
-    return value.get<std::string>();
+    return gstr(value);
 }
 
 mcsm::StringResult mcsm::ServerConfigLoader::getServerJar() const {
@@ -270,20 +228,20 @@ mcsm::StringResult mcsm::ServerConfigLoader::getServerJar() const {
 
     auto valueRes = this->optionHandle->getValue("server_jar");
     if(!valueRes) return tl::unexpected(valueRes.error());
-    const nlohmann::json& value = valueRes.value();
+    toml::node* value = valueRes.value();
 
     if(value == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"server_jar\"", this->optionHandle->getName()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"server_jar\"", this->optionHandle->getName()});
         return tl::unexpected(err);
     }
-    if(!value.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"server_jar\"", "string"});
+    if(!value->is_string()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"server_jar\"", "string"});
         return tl::unexpected(err);
     }
 
-    auto abs = resolveAgainstConfig(value.get<std::string>(), this->configPath);
+    auto abs = resolveAgainstConfig(gstr(value), this->configPath);
     if(!abs.has_filename()){
-        auto customTemp = mcsm::errors::JSON_WRONG_TYPE;
+        auto customTemp = mcsm::errors::TOML_WRONG_TYPE;
         customTemp.message = "Value \"server_jar\" in " + this->optionHandle->getName() + " does not contain valid file path: " + abs.string();
         customTemp.solution = "Make sure proper value is given and the file is present.";
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
@@ -300,7 +258,7 @@ mcsm::VoidResult mcsm::ServerConfigLoader::setServerJar(const std::string& fileP
     std::filesystem::path p(filePath);
     std::string toStore = p.lexically_normal().generic_string(); // keep forward slashes in JSON
 
-    auto setRes = this->optionHandle->setValue("server_jar", toStore);
+    auto setRes = this->optionHandle->setValue("server_jar", valstr(toStore));
     if(!setRes) return setRes;
     return this->optionHandle->save();
 }
@@ -312,7 +270,7 @@ mcsm::StringResult mcsm::ServerConfigLoader::getServerJarFile() const {
 
     std::filesystem::path path(file);
     if(!path.has_filename()){
-        auto customTemp = mcsm::errors::JSON_WRONG_TYPE;
+        auto customTemp = mcsm::errors::TOML_WRONG_TYPE;
         customTemp.message = "Value \"server_jar\" in " + this->optionHandle->getName() + " does not contain valid file path: " + file;
         customTemp.solution = "Make sure proper value is given and the file is present.";
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
@@ -336,23 +294,23 @@ mcsm::StringResult mcsm::ServerConfigLoader::getServerJarBuild() const {
 
     auto valueRes = this->optionHandle->getValue("server_build");
     if(!valueRes) return tl::unexpected(valueRes.error());
-    const nlohmann::json& value = valueRes.value();
+    toml::node* value = valueRes.value();
 
     if(value == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"server_build\"", this->optionHandle->getName()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"server_build\"", this->optionHandle->getName()});
         return tl::unexpected(err);
     }
-    if(!value.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"server_build\"", "string"});
-        return tl::unexpected(err);
-    }
-
-    if(!mcsm::isSafeString(value)){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {value});
+    if(!value->is_string()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"server_build\"", "string"});
         return tl::unexpected(err);
     }
 
-    return value;
+    if(!mcsm::isSafeString(gstr(value))){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {gstr(value)});
+        return tl::unexpected(err);
+    }
+
+    return gstr(value);
 }
 
 mcsm::VoidResult mcsm::ServerConfigLoader::setServerJarBuild(const std::string& build){
@@ -364,7 +322,7 @@ mcsm::VoidResult mcsm::ServerConfigLoader::setServerJarBuild(const std::string& 
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {build});
         return tl::unexpected(err);
     }
-    auto setRes =  this->optionHandle->setValue("server_build", build);
+    auto setRes =  this->optionHandle->setValue("server_build", valstr(build));
 
     if(!setRes) return setRes;
     return this->optionHandle->save();
@@ -378,18 +336,18 @@ mcsm::BoolResult mcsm::ServerConfigLoader::doesAutoUpdate() const {
 
     auto valueRes = this->optionHandle->getValue("auto_update");
     if(!valueRes) return tl::unexpected(valueRes.error());
-    const nlohmann::json& value = valueRes.value();
+    toml::node* value = valueRes.value();
 
     if(value == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"auto_update\"", this->optionHandle->getName()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"auto_update\"", this->optionHandle->getName()});
         return tl::unexpected(err);
     }
-    if(!value.is_boolean()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"auto_update\"", "boolean"});
+    if(!value->is_boolean()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"auto_update\"", "boolean"});
         return tl::unexpected(err);
     }
 
-    return value;
+    return value->as_boolean()->get();
 }
 
 mcsm::VoidResult mcsm::ServerConfigLoader::setAutoUpdate(const bool& update){
@@ -398,12 +356,13 @@ mcsm::VoidResult mcsm::ServerConfigLoader::setAutoUpdate(const bool& update){
         return tl::unexpected(err);
     }
     
-    auto setRes = this->optionHandle->setValue("auto_update", update);
+    toml::value<bool> v(update);
+    auto setRes = this->optionHandle->setValue("auto_update", v);
     if(!setRes) return setRes;
     return this->optionHandle->save();
 }
 
-mcsm::Option* mcsm::ServerConfigLoader::getHandle() const {
+mcsm::TomlOption* mcsm::ServerConfigLoader::getHandle() const {
     return this->optionHandle.get();
 }
 

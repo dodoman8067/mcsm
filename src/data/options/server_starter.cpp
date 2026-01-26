@@ -1,3 +1,5 @@
+#include <mcsm/jvm/jvm_option.h>
+#include <mcsm/server/server.h>
 #include <mcsm/data/options/server_starter.h>
 
 mcsm::ServerStarter::ServerStarter(mcsm::ServerConfigLoader* loader){
@@ -14,7 +16,7 @@ mcsm::VoidResult mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const
     auto sLoadRes = serverDataOpt.load();
     if(!sLoadRes) return sLoadRes;
 
-    auto fileExists = mcsm::fileExists(optionPath + "/server.json");
+    auto fileExists = mcsm::fileExists(optionPath + "/server.toml");
     if(!fileExists) return tl::unexpected(fileExists.error());
 
     if(!fileExists.value()){

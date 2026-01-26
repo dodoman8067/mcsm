@@ -1,7 +1,6 @@
 #include <mcsm/data/options/server_group_loader.h>
 #include <mcsm/data/options/general_option.h>
 #include <unordered_set>
-#include <regex>
 
 mcsm::ServerGroupLoader::ServerGroupLoader(const std::string& path){
     this->path = path;
@@ -14,44 +13,44 @@ mcsm::ServerGroupLoader::~ServerGroupLoader(){
     this->loaders.clear();
 }
 
-mcsm::VoidResult mcsm::ServerGroupLoader::removeDuplicateServers(mcsm::Option* handle) {
+mcsm::VoidResult mcsm::ServerGroupLoader::removeDuplicateServers(mcsm::TomlOption* handle) {
     std::unordered_set<std::string> uniqueServers;
     nlohmann::json uniqueServerList = nlohmann::json::array();
 
     auto existSRes = this->handle->getValue("servers");
     if(!existSRes) return tl::unexpected(existSRes.error());
-    const nlohmann::json& existingServers = existSRes.value();
+    toml::node* existingServers = existSRes.value();
 
     if(existingServers == nullptr){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"servers\"", this->handle->getName()});
         return tl::unexpected(err);
     }
-    if(!existingServers.is_array()){
+    if(!existingServers->is_array()){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"servers\"", "array of string"});
         return tl::unexpected(err);
     }
-    for(auto& j : existingServers){
+    for(auto& j : *existingServers->as_array()){
         if(!j.is_string()){
             mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"servers\"", "array of string"});
             return tl::unexpected(err);
         }
     }
     
-    for(const auto& server : existingServers){
-        std::string serverPath = mcsm::normalizePath(server);
+    for(auto& server : *existingServers->as_array()){
+        std::string serverPath = mcsm::normalizePath(server.as_string()->get());
         if(uniqueServers.insert(serverPath).second){
             uniqueServerList.push_back(serverPath);
         }
     }
     
-    mcsm::VoidResult setRes = handle->setValue("servers", uniqueServerList);
+    mcsm::VoidResult setRes = handle->setValue("servers", vectoarr(uniqueServerList));
     if(!setRes) return setRes;
 
     return handle->save();
 }
 
 mcsm::VoidResult mcsm::ServerGroupLoader::load() {
-    this->handle = std::make_unique<mcsm::Option>(this->path, "mcsm_server_group");
+    this->handle = std::make_unique<mcsm::TomlOption>(this->path, "mcsm_server_group");
 
     auto optExists = this->handle->exists();
     if(!optExists) return tl::unexpected(optExists.error());
@@ -72,13 +71,12 @@ mcsm::VoidResult mcsm::ServerGroupLoader::load() {
     auto eSRes = this->handle->getValue("servers");
     if(!eSRes) return tl::unexpected(eSRes.error());
 
-    const nlohmann::json& existingServers = eSRes.value();
+    toml::node* existingServers = eSRes.value();
     // existingServers vector contains an array of server paths
     // no need to check here. removeDuplicateServer does that
 
-    std::vector<std::string> rawServersVec = existingServers;
-    for(const std::string& serverStr : rawServersVec){
-        std::unique_ptr<mcsm::ServerConfigLoader> loaderPtr = std::make_unique<mcsm::ServerConfigLoader>(serverStr);
+    for(auto& serverStr : *existingServers->as_array()){
+        std::unique_ptr<mcsm::ServerConfigLoader> loaderPtr = std::make_unique<mcsm::ServerConfigLoader>(serverStr.as_string()->get());
         mcsm::VoidResult sprls = loaderPtr->loadConfig();
         if(!sprls) return sprls;
         this->loaders.push_back(std::move(loaderPtr));
@@ -101,13 +99,13 @@ mcsm::VoidResult mcsm::ServerGroupLoader::save(){
         strVec.push_back(v->getHandle()->getPath());
     }
     
-    mcsm::VoidResult setRes = this->handle->setValue("servers", strVec);
+    mcsm::VoidResult setRes = this->handle->setValue("servers", vectoarr(strVec));
     if(!setRes) return setRes;
 
     return this->handle->save();
 }
 
-const mcsm::Option* mcsm::ServerGroupLoader::getHandle() const {
+const mcsm::TomlOption* mcsm::ServerGroupLoader::getHandle() const {
     return this->handle.get();
 }
 
@@ -126,21 +124,21 @@ mcsm::StringResult mcsm::ServerGroupLoader::getName() const {
     auto valueRes = this->handle->getValue("name");
     if(!valueRes) return tl::unexpected(valueRes.error());
 
-    nlohmann::json value = valueRes.value();
+    toml::node* value = valueRes.value();
     if(value == nullptr){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"name\"", this->handle->getName()});
         return tl::unexpected(err);
     }
-    if(!value.is_string()){
+    if(!value->is_string()){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"name\"", "string"});
         return tl::unexpected(err);
     }
 
-    if(!mcsm::isSafeString(value)){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {value});
+    if(!mcsm::isSafeString(gstr(value))){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {gstr(value)});
         return tl::unexpected(err);
     }
-    return value.get<std::string>();
+    return gstr(value);
 }
 
 mcsm::VoidResult mcsm::ServerGroupLoader::setName(const std::string& name){
@@ -154,7 +152,7 @@ mcsm::VoidResult mcsm::ServerGroupLoader::setName(const std::string& name){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {name});
         return tl::unexpected(err);
     }
-    mcsm::VoidResult setRes = this->handle->setValue("name", name);
+    mcsm::VoidResult setRes = this->handle->setValue("name", valstr(name));
 
     if(!setRes) return setRes;
     return this->handle->save();
@@ -171,26 +169,26 @@ mcsm::StringResult mcsm::ServerGroupLoader::getMode() const {
     auto valueRes = this->handle->getValue("mode");
     if(!valueRes) return tl::unexpected(valueRes.error());
 
-    nlohmann::json value = valueRes.value();
+    toml::node* value = valueRes.value();
 
     if(value == nullptr){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"mode\"", this->handle->getName()});
         return tl::unexpected(err);
     }
-    if(!value.is_string()){
+    if(!value->is_string()){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"mode\"", "string"});
         return tl::unexpected(err);
     }
-    if(value != "screen" && value != "default"){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_GROUP_MODE_INVALID, {std::string(value)});
+    if(gstr(value) != "screen" && gstr(value) != "default"){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_GROUP_MODE_INVALID, {gstr(value)});
         return tl::unexpected(err);
     }
 
-    if(!mcsm::isSafeString(value)){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {value});
+    if(!mcsm::isSafeString(gstr(value))){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {gstr(value)});
         return tl::unexpected(err);
     }
-    return value;
+    return gstr(value);
 }
 
 mcsm::VoidResult mcsm::ServerGroupLoader::setMode(const std::string& mode){
@@ -204,7 +202,7 @@ mcsm::VoidResult mcsm::ServerGroupLoader::setMode(const std::string& mode){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {mode});
         return tl::unexpected(err);
     }
-    mcsm::VoidResult setRes = this->handle->setValue("mode", mode);
+    mcsm::VoidResult setRes = this->handle->setValue("mode", valstr(mode));
 
     if(!setRes) return setRes;
     return this->handle->save();

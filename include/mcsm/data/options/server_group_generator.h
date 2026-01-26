@@ -8,13 +8,13 @@ namespace mcsm {
     private:
         std::string name;
         std::string path;
-        std::unique_ptr<mcsm::Option> handle;
+        std::unique_ptr<mcsm::TomlOption> handle;
     public:
         ServerGroupGenerator(const std::string& name, const std::string& path) : name(name), path(path), handle(nullptr){}
         ServerGroupGenerator(const mcsm::ServerGroupGenerator& other)
             : name(other.name),
               path(other.path),
-              handle(other.handle ? std::make_unique<mcsm::Option>(*other.handle) : nullptr){}
+              handle(other.handle ? std::make_unique<mcsm::TomlOption>(*other.handle) : nullptr){}
         ~ServerGroupGenerator() = default;
 
         // fails if group file already configured
@@ -23,7 +23,7 @@ namespace mcsm {
 
         inline std::string getName() const { return this->name; } // do not call getHandle().getName(); does not return server group's name
 
-        const mcsm::Option* getHandle() const;
+        const mcsm::TomlOption* getHandle() const;
     };
 }
 
