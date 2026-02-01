@@ -5,6 +5,8 @@
 #include <mcsm/data/options/server_config_loader.h>
 
 namespace mcsm {
+    const int MIN_SINGLE_CONFIG_VERSION = 1;
+    const int SINGLE_CONFIG_VERSION = 1;
     class ServerConfigGenerator {
     public:
         explicit ServerConfigGenerator(const std::string& path);

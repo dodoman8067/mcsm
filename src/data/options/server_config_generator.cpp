@@ -39,6 +39,11 @@ mcsm::VoidResult mcsm::ServerConfigGenerator::generate(const std::string& versio
         return tl::unexpected(err);
     }
 
+    if(!mcsm::isSafeString(version)){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {version});
+        return tl::unexpected(err);
+    }
+
     this->optionHandle = std::make_unique<mcsm::TomlOption>(this->configPath, "server");
     bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
         
@@ -48,35 +53,43 @@ mcsm::VoidResult mcsm::ServerConfigGenerator::generate(const std::string& versio
     mcsm::VoidResult res1 = sDataOpt->create("none");
     if(!res1) return res1;
 
+    toml::table header;
+    toml::value<double> vint(mcsm::SINGLE_CONFIG_VERSION);
+    header.insert_or_assign("config_version", vint);
+
+    toml::table meta;
+    meta.insert_or_assign("name", valstr(mcsm::safeString(name)));
+    meta.insert_or_assign("type", valstr(server->getTypeAsString()));
+    meta.insert_or_assign("version", valstr(version));
+
     auto jvmpPath = defaultOption.getProfilePath();
     if(!jvmpPath) return tl::unexpected(jvmpPath.error());
     std::string jvmpLocation = mcsm::joinPath(jvmpPath.value(), defaultOption.getProfileName() + ".json");
-    
-    mcsm::VoidResult res2 = this->optionHandle->setValue("name", valstr(mcsm::safeString(name)));
-    if(!res2) return res2;
-    
-    if(!mcsm::isSafeString(version)){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {version});
-        return tl::unexpected(err);
-    }
-    mcsm::VoidResult res3 = this->optionHandle->setValue("version", valstr(version));
-    if(!res3) return res3;
-    
-    mcsm::VoidResult res4 = this->optionHandle->setValue("default_launch_profile", valstr(jvmpLocation));
-    if(!res4) return res4;
 
-    mcsm::VoidResult res5 = this->optionHandle->setValue("server_jar", valstr(jarPath));
-    if(!res5) return res5;
-
-    mcsm::VoidResult res6 = this->optionHandle->setValue("server_build", valstr(build));
-    if(!res6) return res6;
+    toml::table jvm;
+    jvm.insert_or_assign("profile", valstr(jvmpLocation));
 
     toml::value<bool> val10(update);
-    mcsm::VoidResult res10 = this->optionHandle->setValue("auto_update", val10);
-    if(!res10) return res10;
+    toml::table jar;
+    jar.insert_or_assign("path", valstr(jarPath));
+    jar.insert_or_assign("build", valstr(build));
+    jar.insert_or_assign("automatic_updates", val10);
 
-    mcsm::VoidResult res7 = this->optionHandle->setValue("type", valstr(server->getTypeAsString()));
-    if(!res7) return res7;
+    toml::table launch;
+    launch.insert_or_assign("run_before", "");
+    launch.insert_or_assign("run_command_wrapper", "");
+    launch.insert_or_assign("run_after", "");
+
+    toml::table servertoml;
+    servertoml.insert_or_assign("meta", meta);
+    servertoml.insert_or_assign("jar", jar);
+    servertoml.insert_or_assign("launch", launch);
+    
+    mcsm::VoidResult res2 = this->optionHandle->setValue("server", servertoml);
+    if(!res2) return res2;
+    
+    mcsm::VoidResult res5 = this->optionHandle->setValue("header", header);
+    if(!res5) return res5;
 
     mcsm::VoidResult res8 = sDataOpt->updateServerTimeCreated();
     if(!res8) return res8;
