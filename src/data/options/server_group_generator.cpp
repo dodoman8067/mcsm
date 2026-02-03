@@ -22,7 +22,7 @@ mcsm::VoidResult mcsm::ServerGroupGenerator::generate(const std::string& mode, c
         return tl::unexpected(err);
     }
 
-    auto singleConfigExists = mcsm::fileExists(this->path + "/server.json");
+    auto singleConfigExists = mcsm::fileExists(this->path + "/server.toml");
     if(!singleConfigExists) return tl::unexpected(singleConfigExists.error());
 
     if(singleConfigExists.value()){
@@ -39,11 +39,13 @@ mcsm::VoidResult mcsm::ServerGroupGenerator::generate(const std::string& mode, c
     auto lRes = this->handle->load(advp);
     if(!lRes) return lRes;
 
-    auto nameSetRes = this->handle->setValue("name", valstr(this->name));
-    if(!nameSetRes) return nameSetRes;
+    toml::table group;
 
-    auto modeSetRes = this->handle->setValue("mode", valstr(mode));
-    if(!modeSetRes) return modeSetRes;
+    toml::table meta;
+    meta.insert_or_assign("name", valstr(this->name));
+    meta.insert_or_assign("mode", valstr(mode));
+
+    toml::table serversToml;
 
     std::vector<std::string> serversStrVec;
     if(!servers.empty()){
@@ -62,9 +64,13 @@ mcsm::VoidResult mcsm::ServerGroupGenerator::generate(const std::string& mode, c
             serversStrVec.push_back(sPath);
         }
     }
+    serversToml.insert_or_assign("servers", vectoarr(serversStrVec));
 
-    auto serversSetRes = this->handle->setValue("servers", vectoarr(serversStrVec));
-    if(!serversSetRes) return serversSetRes;
+    group.insert_or_assign("meta", meta);
+    group.insert_or_assign("server", serversToml);
+
+    auto nameSetRes = this->handle->setValue("group", group);
+    if(!nameSetRes) return nameSetRes;
 
     return this->handle->save();
 }
