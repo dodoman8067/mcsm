@@ -8,6 +8,9 @@ namespace mcsm {
     class JvmOption;
     
     class ServerConfigLoader {
+    private:
+        toml::table configRoot;
+        toml::table configHeader;
     public:
         explicit ServerConfigLoader(const std::string& path);
         ServerConfigLoader(const ServerConfigLoader& other)

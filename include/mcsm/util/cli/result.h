@@ -403,6 +403,18 @@ namespace mcsm::errors {
         "Check the profile definition or create a new one."
     };
 
+    inline const ErrorTemplate SERVER_INVALID_CONFIG_HEADER = {
+        417,
+        "Invalid(or non existent) server configuration header detected on file %s.",
+        "Make sure the file is a valid server configuration."
+    };
+
+    inline const ErrorTemplate SERVER_INVALID_CONFIG_VERSION = {
+        418,
+        "Invalid server configuration version detected: %s. The minimum version supported for current mcsm version is %s.",
+        ""
+    };
+
     // ================================
     // Misc Errors
     // ================================

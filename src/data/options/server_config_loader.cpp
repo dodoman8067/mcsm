@@ -27,6 +27,40 @@ mcsm::VoidResult mcsm::ServerConfigLoader::loadConfig(){
     auto lRes = this->optionHandle->load(advp);
     if(!lRes) return lRes;
 
+    auto headerLoadRes = this->optionHandle->getValue("header");
+    if(!headerLoadRes){
+        return tl::unexpected(headerLoadRes.error());
+    }
+    if(headerLoadRes.value() == nullptr){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_INVALID_CONFIG_HEADER, {mcsm::joinPath(this->configPath, "server")});
+        return tl::unexpected(err);
+    }
+    if(!headerLoadRes.value()->is_table()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"[header]\"", "table"});
+        return tl::unexpected(err);
+    }
+    toml::table headerTable = *headerLoadRes.value()->as_table();
+
+    auto rootLoadRes = this->optionHandle->getValue("server");
+    if(!rootLoadRes){
+        return tl::unexpected(rootLoadRes.error());
+    }
+    if(rootLoadRes == nullptr){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"[server]\"", mcsm::joinPath(this->configPath, "server")});
+        return tl::unexpected(err);
+    }
+    if(!rootLoadRes.value()->is_table()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"[server]\"", "table"});
+        return tl::unexpected(err);
+    }
+
+    toml::table serverTable = *rootLoadRes.value()->as_table();
+
+    this->configRoot = serverTable;
+    this->configHeader = headerTable;
+
+    
+
     this->isLoaded = true;
     return {};
 }
