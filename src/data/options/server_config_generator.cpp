@@ -54,7 +54,7 @@ mcsm::VoidResult mcsm::ServerConfigGenerator::generate(const std::string& versio
     if(!res1) return res1;
 
     toml::table header;
-    toml::value<double> vint(mcsm::SINGLE_CONFIG_VERSION);
+    toml::value<long long> vint(mcsm::SINGLE_CONFIG_VERSION);
     header.insert_or_assign("config_version", vint);
 
     toml::table meta;
@@ -84,6 +84,7 @@ mcsm::VoidResult mcsm::ServerConfigGenerator::generate(const std::string& versio
     servertoml.insert_or_assign("meta", meta);
     servertoml.insert_or_assign("jar", jar);
     servertoml.insert_or_assign("launch", launch);
+    servertoml.insert_or_assign("jvm", jvm);
     
     mcsm::VoidResult res2 = this->optionHandle->setValue("server", servertoml);
     if(!res2) return res2;
