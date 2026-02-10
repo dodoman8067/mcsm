@@ -32,7 +32,7 @@ const std::vector<std::string> availableOptions = {
     "--jvmprofile",
     "-jvmprofile",
     "--jp",
-    "-jp"
+    "-jp",
     "--current",
     "-current",
     "--c",

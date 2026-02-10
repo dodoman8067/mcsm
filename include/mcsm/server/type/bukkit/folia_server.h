@@ -18,7 +18,7 @@ namespace mcsm {
     };
     class FoliaServer : public mcsm::BukkitServer, public mcsm::Downloadable, public std::enable_shared_from_this<FoliaServer> {
     private:
-        mcsm::ServerConfigLoader loader;
+        mcsm::ServerConfigLoader& loader;
     public:
         FoliaServer(mcsm::ServerConfigLoader& loader): BukkitServer(loader), loader(loader){};
         ~FoliaServer();

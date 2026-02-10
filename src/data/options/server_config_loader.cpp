@@ -1,3 +1,4 @@
+#include "mcsm/data/options/server_config_generator.h"
 #include <mcsm/data/options/server_config_loader.h>
 #include <mcsm/data/options/general_option.h>
 #include <mcsm/server/server_registry.h>
@@ -42,6 +43,10 @@ mcsm::VoidResult mcsm::ServerConfigLoader::loadConfig(){
     toml::table headerTable = *headerLoadRes.value()->as_table();
 
     if(!headerTable.contains("config_version") || !headerTable["config_version"].is_integer()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_INVALID_CONFIG_VERSION, {"file " + mcsm::joinPath(this->configPath, "server"), std::to_string(mcsm::MIN_SINGLE_CONFIG_VERSION)});
+        return tl::unexpected(err);
+    }
+    if(headerTable.get_as<long long>("config_version")->get() > (long long) mcsm::SINGLE_CONFIG_VERSION || headerTable.get_as<long long>("config_version")->get() < (long long) mcsm::MIN_SINGLE_CONFIG_VERSION){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_INVALID_CONFIG_VERSION, {"file " + mcsm::joinPath(this->configPath, "server"), std::to_string(mcsm::MIN_SINGLE_CONFIG_VERSION)});
         return tl::unexpected(err);
     }
@@ -102,7 +107,6 @@ mcsm::VoidResult mcsm::ServerConfigLoader::loadConfig(){
     this->rootJar = *serverTable["jar"].as_table();
     this->rootLaunch = *serverTable["launch"].as_table();
     this->rootJvm = *serverTable["jvm"].as_table();
-
     this->isLoaded = true;
     return {};
 }
@@ -488,7 +492,7 @@ bool mcsm::ServerConfigLoader::isFullyLoaded() const {
     return this->isLoaded;
 }
 
-tl::expected<mcsm::Server*, mcsm::Error> mcsm::ServerConfigLoader::getServerInstance(){
+tl::expected<std::unique_ptr<mcsm::Server>, mcsm::Error> mcsm::ServerConfigLoader::getServerInstance(){
     if(!this->isLoaded){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
         return tl::unexpected(err);
@@ -496,5 +500,5 @@ tl::expected<mcsm::Server*, mcsm::Error> mcsm::ServerConfigLoader::getServerInst
     auto sType = getServerType();
     if(!sType) return tl::unexpected(sType.error());
 
-    return mcsm::ServerRegistry::getServerRegistry().getServer(sType.value(), *this)->get();
+    return mcsm::ServerRegistry::getServerRegistry().getServer(sType.value(), *this);
 }

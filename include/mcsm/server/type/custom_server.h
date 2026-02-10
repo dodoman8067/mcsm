@@ -32,7 +32,7 @@ namespace mcsm {
     private:
         mcsm::BoolResult isFile(const std::string& location) const;
         bool isURL(const std::string& location) const;
-        mcsm::ServerConfigLoader loader;
+        mcsm::ServerConfigLoader& loader;
     public:
         CustomServer(mcsm::ServerConfigLoader& loader): Server(loader), loader(loader){};
         ~CustomServer();

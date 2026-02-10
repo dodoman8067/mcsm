@@ -1,6 +1,8 @@
+#include "tl/expected.hpp"
 #include <mcsm/jvm/jvm_option.h>
 #include <mcsm/server/server.h>
 #include <mcsm/data/options/server_starter.h>
+#include <mcsm/server/server_registry.h>
 
 mcsm::ServerStarter::ServerStarter(mcsm::ServerConfigLoader* loader){
     this->loader = loader;
@@ -23,10 +25,13 @@ mcsm::VoidResult mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const
         return tl::unexpected(err);
     }
 
-    auto server = this->loader->getServerInstance();
+    std::cout << this->loader->getServerJar().value() << "\n";
+
+    auto server = this->loader->getServerType();
     if(!server) return tl::unexpected(server.error());
 
-    mcsm::Server* sp = server.value();
+    auto sp = mcsm::ServerRegistry::getServerRegistry().getServer(server.value(), *loader);
+    if(!sp) return tl::unexpected(sp.error());
 
     auto name = this->loader->getServerName();
     if(!name) return tl::unexpected(name.error());
@@ -42,7 +47,7 @@ mcsm::VoidResult mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const
     mcsm::info("Server JVM launch profile : " + profileName);
     mcsm::VoidResult res = serverDataOpt.updateLastTimeLaunched();
     if(!res) return res;
-    mcsm::StringResult res2 = sp->start(option, mcsm::normalizePath(path), mcsm::normalizePath(optionPath), cliArgs);
+    mcsm::StringResult res2 = sp.value()->start(option, mcsm::normalizePath(path), mcsm::normalizePath(optionPath), cliArgs);
     if(!res2) return tl::unexpected(res2.error());
     return {};
 }

@@ -42,7 +42,7 @@ namespace mcsm {
     };
     class VelocityServer : public mcsm::Server, public mcsm::Downloadable, public std::enable_shared_from_this<VelocityServer> {
     private:
-        mcsm::ServerConfigLoader loader;
+        mcsm::ServerConfigLoader& loader;
     public:
         VelocityServer(mcsm::ServerConfigLoader& loader): Server(loader), loader(loader){};
         ~VelocityServer();

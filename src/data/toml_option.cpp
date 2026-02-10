@@ -80,7 +80,7 @@ mcsm::VoidResult mcsm::TomlOption::load(const bool& /* advancedParse */){
     if(parseRes.failed()){
         mcsm::ErrorTemplate et = mcsm::errors::TOML_PARSE_FAILED;
         et.solution = "";
-        et.message = std::string(parseRes.error().description());
+        et.message = "Parsing file " + fullPath + " failed with reason: " + std::string(parseRes.error().description());
         return tl::unexpected(mcsm::makeError(ErrorStatus::MCSM_FAIL, et));
     }
 

@@ -236,7 +236,13 @@ mcsm::VoidResult mcsm::ServerGroupLoader::setServers(const std::vector<mcsm::Ser
             mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
             return tl::unexpected(err);
         }
-        this->loaders.push_back(std::make_unique<mcsm::ServerConfigLoader>(*loader));
+        const std::string p = loader->getHandle()->getPath();
+        // serverconfigloader is not copiable
+        auto newLoader = std::make_unique<mcsm::ServerConfigLoader>(p);
+        auto loadRes = newLoader->loadConfig();
+        if (!loadRes) return loadRes;
+
+        this->loaders.push_back(std::move(newLoader));
     }
 
     return this->save();
@@ -285,7 +291,12 @@ mcsm::VoidResult mcsm::ServerGroupLoader::addServer(mcsm::ServerConfigLoader* se
             return tl::unexpected(err);
         }
     }
-    this->loaders.push_back(std::make_unique<mcsm::ServerConfigLoader>(*server));
+    // serverconfigloader is not copiable
+    auto newLoader = std::make_unique<mcsm::ServerConfigLoader>(nPath);
+    auto loadRes = newLoader->loadConfig();
+    if (!loadRes) return loadRes;
+
+    this->loaders.push_back(std::move(newLoader));
     return this->save();
 }
 
@@ -341,7 +352,10 @@ mcsm::VoidResult mcsm::ServerGroupLoader::addServer(const std::vector<std::uniqu
                 return tl::unexpected(err);
             }
         }
-        this->loaders.push_back(std::make_unique<mcsm::ServerConfigLoader>(*serv));
+        auto newLoader = std::make_unique<mcsm::ServerConfigLoader>(serv->getHandle()->getPath());
+        auto loadRes = newLoader->loadConfig();
+        if(!loadRes) return loadRes;
+        this->loaders.push_back(std::move(newLoader));
     }
     return this->save();
 }

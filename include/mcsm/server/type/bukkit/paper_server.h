@@ -41,7 +41,7 @@ namespace mcsm {
 
     class PaperServer : public mcsm::BukkitServer, public mcsm::Downloadable, public std::enable_shared_from_this<PaperServer> {
     private:
-        mcsm::ServerConfigLoader loader;
+        mcsm::ServerConfigLoader& loader;
     public:
         PaperServer(mcsm::ServerConfigLoader& loader): BukkitServer(loader), loader(loader){};
         ~PaperServer();

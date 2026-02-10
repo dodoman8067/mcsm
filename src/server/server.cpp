@@ -26,11 +26,11 @@ SOFTWARE.
 mcsm::StringResult mcsm::Server::start(mcsm::JvmOption& option){
     auto cPath = mcsm::getCurrentPath();
     if(!cPath) return cPath;
-    return start(option, cPath.value(), cPath.value(), {});
+    return Server::start(option, cPath.value(), cPath.value(), {}); // do not remvove Server:: in front or it will invoke the child class' start method resulting in a loop
 }
 
 mcsm::StringResult mcsm::Server::start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
-    return start(option, path, optionPath, {});
+    return Server::start(option, path, optionPath, {}); // do not remvove Server:: in front or it will invoke the child class' start method resulting in a loop
 }
 
 mcsm::StringResult mcsm::Server::start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& /* cliArgs */){

@@ -35,7 +35,7 @@ namespace mcsm {
         std::unique_ptr<std::map<const std::string, const std::string>> versions;
         mcsm::StringResult getVersionObject(const std::string& ver) const;
         mcsm::StringResult getServerJarURL(const std::string& ver) const;
-        mcsm::ServerConfigLoader loader;
+        mcsm::ServerConfigLoader& loader;
     public:
         VanillaServer(mcsm::ServerConfigLoader& loader): Server(loader), loader(loader){};
         ~VanillaServer();

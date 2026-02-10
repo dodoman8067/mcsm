@@ -33,7 +33,7 @@ SOFTWARE.
 namespace mcsm {
     class FabricServer : public mcsm::Server, public mcsm::Downloadable, public std::enable_shared_from_this<FabricServer> {
     private:
-        mcsm::ServerConfigLoader loader;
+        mcsm::ServerConfigLoader& loader;
     public:
         FabricServer(mcsm::ServerConfigLoader& loader): Server(loader), loader(loader){};
         ~FabricServer();

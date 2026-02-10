@@ -56,7 +56,7 @@ namespace mcsm {
      */
     class Server {
     private:
-        mcsm::ServerConfigLoader loader;
+        mcsm::ServerConfigLoader& loader;
     public:
         Server(mcsm::ServerConfigLoader& loader) : loader(loader){};
         virtual ~Server() = default;            // MUST be virtual

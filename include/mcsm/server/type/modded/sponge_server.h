@@ -35,7 +35,7 @@ SOFTWARE.
 namespace mcsm {
     class SpongeServer : public mcsm::Server, public mcsm::Downloadable, public std::enable_shared_from_this<SpongeServer> {
     private:
-        mcsm::ServerConfigLoader loader;
+        mcsm::ServerConfigLoader& loader;
     public:
         SpongeServer(mcsm::ServerConfigLoader& loader): Server(loader), loader(loader){};
         ~SpongeServer();

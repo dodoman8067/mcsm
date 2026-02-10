@@ -19,11 +19,14 @@ namespace mcsm {
         toml::table rootLaunch;
     public:
         explicit ServerConfigLoader(const std::string& path);
-        ServerConfigLoader(const ServerConfigLoader& other)
-            : configPath(other.configPath),
-              optionHandle(other.optionHandle ? std::make_unique<mcsm::TomlOption>(*other.optionHandle) : nullptr),
-              isLoaded(other.isLoaded){}
         ~ServerConfigLoader();
+
+        ServerConfigLoader(const ServerConfigLoader&) = delete;
+        ServerConfigLoader& operator=(const ServerConfigLoader&) = delete;
+
+        // (optional but recommended)
+        ServerConfigLoader(ServerConfigLoader&&) = default;
+        ServerConfigLoader& operator=(ServerConfigLoader&&) = default;
 
         mcsm::VoidResult loadConfig();
 
@@ -78,7 +81,7 @@ namespace mcsm {
 
         bool isFullyLoaded() const;
 
-        tl::expected<mcsm::Server*, mcsm::Error> getServerInstance();
+        tl::expected<std::unique_ptr<mcsm::Server>, mcsm::Error> getServerInstance();
         
     private:
         std::string configPath;
