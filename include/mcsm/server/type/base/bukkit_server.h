@@ -30,8 +30,10 @@ namespace mcsm {
      * Represents a server that uses Bukkit API.
      */
     class BukkitServer : public mcsm::Server {
+    private:
+        mcsm::ServerConfigLoader loader;
     public:
-        BukkitServer();
+        BukkitServer(mcsm::ServerConfigLoader& loader): Server(loader), loader(loader){};
         ~BukkitServer();
         /**
          * Returns current server type.

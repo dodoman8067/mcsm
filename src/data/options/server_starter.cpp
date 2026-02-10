@@ -42,7 +42,7 @@ mcsm::VoidResult mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const
     mcsm::info("Server JVM launch profile : " + profileName);
     mcsm::VoidResult res = serverDataOpt.updateLastTimeLaunched();
     if(!res) return res;
-    mcsm::StringResult res2 = sp->start(this->loader, option, mcsm::normalizePath(path), mcsm::normalizePath(optionPath), cliArgs);
+    mcsm::StringResult res2 = sp->start(option, mcsm::normalizePath(path), mcsm::normalizePath(optionPath), cliArgs);
     if(!res2) return tl::unexpected(res2.error());
     return {};
 }

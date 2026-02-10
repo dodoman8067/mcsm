@@ -24,8 +24,6 @@ SOFTWARE.
 
 #include <mcsm/server/type/modded/sponge_server.h>
 
-mcsm::SpongeServer::SpongeServer(){}
-
 mcsm::SpongeServer::~SpongeServer(){}
 
 // TODO: Use Velocity API (Instead of Paper)
@@ -454,22 +452,22 @@ mcsm::StringResult mcsm::SpongeServer::getDownloadLink(const std::string& build)
     return "";
 }
 
-mcsm::StringResult mcsm::SpongeServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
+mcsm::StringResult mcsm::SpongeServer::start(mcsm::JvmOption& option){
     // ServerOption class handles the data file stuff
 
-    mcsm::StringResult cJarPath = loader->getServerJarPath();
+    mcsm::StringResult cJarPath = loader.getServerJarPath();
     if(!cJarPath) return cJarPath;
-    return start(loader, option, cJarPath.value(), loader->getHandle()->getPath(), {});
+    return start(option, cJarPath.value(), loader.getHandle()->getPath(), {});
 }
 
-mcsm::StringResult mcsm::SpongeServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
-    return start(loader, option, path, optionPath, {});
+mcsm::StringResult mcsm::SpongeServer::start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
+    return start(option, path, optionPath, {});
 }
 
-mcsm::StringResult mcsm::SpongeServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& /* cliArgs */){
+mcsm::StringResult mcsm::SpongeServer::start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& /* cliArgs */){
     // ServerOption class handles the data file stuff
     
-    mcsm::StringResult jar = loader->getServerJarFile();
+    mcsm::StringResult jar = loader.getServerJarFile();
     if(!jar) return jar;
 
     mcsm::BoolResult fileExists = mcsm::fileExists(path + "/" + jar.value());
@@ -477,13 +475,13 @@ mcsm::StringResult mcsm::SpongeServer::start(mcsm::ServerConfigLoader* loader, m
 
     if(!fileExists.value()){
         mcsm::info("Downloading " + mcsm::joinPath(path, jar.value()) + "...");
-        mcsm::StringResult sVer = loader->getServerVersion();
+        mcsm::StringResult sVer = loader.getServerVersion();
         if(!sVer) return sVer;
 
         mcsm::VoidResult res = download(sVer.value(), path, jar.value(), optionPath);
         if(!res) return tl::unexpected(res.error());
     }else{
-        mcsm::BoolResult doesUpdate = loader->doesAutoUpdate();
+        mcsm::BoolResult doesUpdate = loader.doesAutoUpdate();
         if(!doesUpdate) return tl::unexpected(doesUpdate.error());
 
         if(doesUpdate.value()){
@@ -491,7 +489,7 @@ mcsm::StringResult mcsm::SpongeServer::start(mcsm::ServerConfigLoader* loader, m
             if(!res) return tl::unexpected(res.error());
         }
     }
-    return Server::start(loader, option, path, optionPath);
+    return Server::start(option, path, optionPath);
 }
 
 mcsm::VoidResult mcsm::SpongeServer::update(){

@@ -30,13 +30,14 @@ SOFTWARE.
 #include <map>
 
 namespace mcsm {
-    class VanillaServer : public mcsm::Server, public mcsm::Downloadable, public std::enable_shared_from_this<VanillaServer> {
+    class VanillaServer : public mcsm::Server, public mcsm::Downloadable {
     private:
         std::unique_ptr<std::map<const std::string, const std::string>> versions;
         mcsm::StringResult getVersionObject(const std::string& ver) const;
         mcsm::StringResult getServerJarURL(const std::string& ver) const;
+        mcsm::ServerConfigLoader loader;
     public:
-        VanillaServer();
+        VanillaServer(mcsm::ServerConfigLoader& loader): Server(loader), loader(loader){};
         ~VanillaServer();
 
         std::string getSupportedVersions() const override;
@@ -56,9 +57,9 @@ namespace mcsm {
 
         mcsm::VoidResult obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
 
-        mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option) override;
-        mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
-        mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& cliArgs) override;
+        mcsm::StringResult start(mcsm::JvmOption& option) override;
+        mcsm::StringResult start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
+        mcsm::StringResult start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& cliArgs) override;
         
         mcsm::BoolResult hasVersion(const std::string& version) const override;
 

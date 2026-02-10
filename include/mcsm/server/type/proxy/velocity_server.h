@@ -42,8 +42,9 @@ namespace mcsm {
     };
     class VelocityServer : public mcsm::Server, public mcsm::Downloadable, public std::enable_shared_from_this<VelocityServer> {
     private:
+        mcsm::ServerConfigLoader loader;
     public:
-        VelocityServer();
+        VelocityServer(mcsm::ServerConfigLoader& loader): Server(loader), loader(loader){};
         ~VelocityServer();
 
         mcsm::Result<mcsm::VelocityMetaData> getVersionData() const;
@@ -60,9 +61,9 @@ namespace mcsm {
         
         std::string getGitHub() const override;
 
-        mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option) override;
-        mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
-        mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& cliArgs) override;
+        mcsm::StringResult start(mcsm::JvmOption& option) override;
+        mcsm::StringResult start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
+        mcsm::StringResult start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& cliArgs) override;
 
         mcsm::VoidResult download(const std::string& version) override;
         mcsm::VoidResult download(const std::string& version, const std::string& path) override;

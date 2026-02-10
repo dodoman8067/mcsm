@@ -27,10 +27,10 @@ SOFTWARE.
 #include <mcsm/jvm/jvm_option.h>
 #include <mcsm/util/cli/cli_utils.h>
 #include <mcsm/data/options/server_data_option.h>
+#include <mcsm/data/options/server_config_loader.h>
 #include <optional>
 
 namespace mcsm {
-    class ServerConfigLoader;
 
     enum class OptionType {
         STRING,
@@ -55,7 +55,10 @@ namespace mcsm {
      * Represents base of server.
      */
     class Server {
+    private:
+        mcsm::ServerConfigLoader loader;
     public:
+        Server(mcsm::ServerConfigLoader& loader) : loader(loader){};
         virtual ~Server() = default;            // MUST be virtual
 
         // (ASan-friendly) neutralize sized delete on base deletions
@@ -122,7 +125,7 @@ namespace mcsm {
          * Called by `ServerStarter#start`
          * @param option JVM launch profile
         */
-        virtual mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option);
+        virtual mcsm::StringResult start(mcsm::JvmOption& option);
 
         /**
          * Starts the configured server in `optionPath` with following launch profile `option`.
@@ -130,9 +133,9 @@ namespace mcsm {
          * @param option JVM launch profile
          * @param optionPath server.json path
         */
-        virtual mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath);
+        virtual mcsm::StringResult start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath);
 
-        virtual mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& cliArgs);
+        virtual mcsm::StringResult start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& cliArgs);
 
         virtual const tl::expected<std::map<std::string, std::string>, mcsm::Error> getRequiredValues() const;
 

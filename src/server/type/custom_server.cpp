@@ -23,10 +23,6 @@ SOFTWARE.
 #include <mcsm/server/type/custom_server.h>
 #include <mcsm/data/options/general_option.h>
 
-mcsm::CustomServer::CustomServer(){
-
-}
-
 mcsm::CustomServer::~CustomServer(){
 
 }
@@ -199,14 +195,14 @@ mcsm::VoidResult mcsm::CustomServer::generate(const std::string& name, mcsm::Jvm
     return {};
 }
 
-mcsm::StringResult mcsm::CustomServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
-    return start(loader, option, path, optionPath, {});
+mcsm::StringResult mcsm::CustomServer::start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
+    return start(option, path, optionPath, {});
 }
 
-mcsm::StringResult mcsm::CustomServer::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& cliArgs){
+mcsm::StringResult mcsm::CustomServer::start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& cliArgs){
     // ServerOption class handles the data file stuff
 
-    mcsm::StringResult customCommand = getCustomStartCommand(loader->getHandle()->getPath());
+    mcsm::StringResult customCommand = getCustomStartCommand(loader.getHandle()->getPath());
     if(!customCommand) return customCommand;
 
     bool hasIgnoreFlag = false;
@@ -230,7 +226,7 @@ mcsm::StringResult mcsm::CustomServer::start(mcsm::ServerConfigLoader* loader, m
         mcsm::warning("\"custom_run_command\" value temporarily ignored by --force-default-launch-command flag.");
     }
     
-    mcsm::StringResult jar = loader->getServerJarFile();
+    mcsm::StringResult jar = loader.getServerJarFile();
     if(!jar) return jar;
 
     mcsm::BoolResult fileExists = mcsm::fileExists(path + "/" + jar.value());
@@ -243,13 +239,13 @@ mcsm::StringResult mcsm::CustomServer::start(mcsm::ServerConfigLoader* loader, m
     if(!fileExists.value()){
         mcsm::info("Setting up jarfile in " + path + "/" + jar.value() + " from " + location + "...");
         mcsm::info("\"server_jar\" will be used as the copied/downloaded file path. File's name must be included at the end in order to store the file at specified path.");
-        mcsm::StringResult sVer = loader->getServerVersion();
+        mcsm::StringResult sVer = loader.getServerVersion();
         if(!sVer) return sVer;
 
         mcsm::VoidResult res = setupServerJarFile(jar.value(), path, optionPath);
         if(!res) return tl::unexpected(res.error());
     }
-    return Server::start(loader, option, path, optionPath, cliArgs);
+    return Server::start(option, path, optionPath, cliArgs);
 }
 
 mcsm::BoolResult mcsm::CustomServer::isFile(const std::string& location) const {

@@ -32,8 +32,9 @@ namespace mcsm {
     private:
         mcsm::BoolResult isFile(const std::string& location) const;
         bool isURL(const std::string& location) const;
+        mcsm::ServerConfigLoader loader;
     public:
-        CustomServer();
+        CustomServer(mcsm::ServerConfigLoader& loader): Server(loader), loader(loader){};
         ~CustomServer();
 
         mcsm::ServerType getType() const override;
@@ -56,8 +57,8 @@ namespace mcsm {
 
         mcsm::VoidResult obtainJarFile(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath) override;
 
-        mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
-        mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& cliArgs) override;
+        mcsm::StringResult start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
+        mcsm::StringResult start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& cliArgs) override;
 
         const tl::expected<std::map<std::string, std::string>, mcsm::Error> getRequiredValues() const override;
         const tl::expected<std::vector<mcsm::ServerOptionSpec>, mcsm::Error> getRequiredOptions() const override;

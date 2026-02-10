@@ -18,8 +18,9 @@ namespace mcsm {
     };
     class FoliaServer : public mcsm::BukkitServer, public mcsm::Downloadable, public std::enable_shared_from_this<FoliaServer> {
     private:
+        mcsm::ServerConfigLoader loader;
     public:
-        FoliaServer();
+        FoliaServer(mcsm::ServerConfigLoader& loader): BukkitServer(loader), loader(loader){};
         ~FoliaServer();
 
         mcsm::Result<mcsm::FoliaMetaData> getVersionData(const std::string& ver) const;
@@ -35,9 +36,9 @@ namespace mcsm {
         
         std::string getGitHub() const override;
 
-        mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option) override;
-        mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
-        mcsm::StringResult start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& cliArgs) override;
+        mcsm::StringResult start(mcsm::JvmOption& option) override;
+        mcsm::StringResult start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath) override;
+        mcsm::StringResult start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& cliArgs) override;
 
         mcsm::VoidResult download(const std::string& version) override;
         mcsm::VoidResult download(const std::string& version, const std::string& path) override;
