@@ -38,7 +38,7 @@ void mcsm::ViewServerCommand::execute(const std::vector<std::string>& /* args */
 
 inline bool mcsm::ViewServerCommand::isConfigured(){
     std::string path = mcsm::unwrapOrExit(mcsm::getCurrentPath());
-    bool fileExists = mcsm::unwrapOrExit(mcsm::fileExists(path + "/server.json"));
+    bool fileExists = mcsm::unwrapOrExit(mcsm::fileExists(path + "/server.toml"));
     return fileExists;
 }
 

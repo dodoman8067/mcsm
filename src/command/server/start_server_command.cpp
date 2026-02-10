@@ -188,6 +188,6 @@ std::string mcsm::StartServerCommand::getServerPath(const std::vector<std::strin
 }
 
 inline bool mcsm::StartServerCommand::isConfigured(){
-    bool fileExists = mcsm::unwrapOrExit(mcsm::fileExists(executionPath + "/server.json"));
+    bool fileExists = mcsm::unwrapOrExit(mcsm::fileExists(executionPath + "/server.toml"));
     return fileExists;
 }

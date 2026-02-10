@@ -47,6 +47,6 @@ void mcsm::ClearServerCommand::execute(const std::vector<std::string>& /* args *
 
 inline bool mcsm::ClearServerCommand::isConfigured(){
     std::string path = mcsm::unwrapOrExit(mcsm::getCurrentPath());
-    bool fileExists = mcsm::unwrapOrExit(mcsm::fileExists(path + "/server.json"));
+    bool fileExists = mcsm::unwrapOrExit(mcsm::fileExists(path + "/server.toml"));
     return fileExists;
 }
