@@ -44,6 +44,29 @@ mcsm::ServerType mcsm::getServerType(const std::string& name){
 }
 
 mcsm::StringResult mcsm::getServerType(const mcsm::ServerType& type){
-    auto typeS = mcsm::ServerRegistry::getServerRegistry().getServerTypeString(type);
-    return typeS;
+    switch(type){
+        case ServerType::VANILLA:
+            return "vanilla";
+        case ServerType::BUKKIT:
+            return "bukkit";
+        case ServerType::SPONGE_VANILLA:
+            return "sponge";
+        case ServerType::BUNGEECORD:
+            return "bungeecord";
+        case ServerType::VELOCITY:
+            return "velocity";
+        case ServerType::FORGE:
+            return "forge";
+        case ServerType::FABRIC:
+            return "fabric";
+        default:
+            break;
+    }
+
+    return tl::unexpected(
+        mcsm::makeError(
+            mcsm::ErrorStatus::MCSM_FAIL,
+            {700, "Unknown server type", ""}
+        )
+    );
 }

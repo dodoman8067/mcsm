@@ -23,17 +23,17 @@ SOFTWARE.
 #include <mcsm/server/server.h>
 #include <mcsm/data/options/general_option.h>
 
-mcsm::StringResult mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option){
+mcsm::StringResult mcsm::Server::start(mcsm::JvmOption& option){
     auto cPath = mcsm::getCurrentPath();
     if(!cPath) return cPath;
-    return start(loader, option, cPath.value(), cPath.value(), {});
+    return start(option, cPath.value(), cPath.value(), {});
 }
 
-mcsm::StringResult mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
-    return Server::start(loader, option, path, optionPath, {});
+mcsm::StringResult mcsm::Server::start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath){
+    return start(option, path, optionPath, {});
 }
 
-mcsm::StringResult mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& /* cliArgs */){
+mcsm::StringResult mcsm::Server::start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& /* cliArgs */){
     std::string jvmOpt = " ";
     auto jArgs = option.getJvmArguments();
     if(!jArgs) return tl::unexpected(jArgs.error());
@@ -53,7 +53,7 @@ mcsm::StringResult mcsm::Server::start(mcsm::ServerConfigLoader* loader, mcsm::J
     mcsm::StringResult jPath = option.getJvmPath();
     if(!jPath) return jPath;
 
-    mcsm::StringResult jar = loader->getServerJarFile();
+    mcsm::StringResult jar = loader.getServerJarFile();
     if(!jar) return jar;
 
     std::string command = jPath.value() + jvmOpt + mcsm::normalizePath(path) + "/" + jar.value() + svrOpt;

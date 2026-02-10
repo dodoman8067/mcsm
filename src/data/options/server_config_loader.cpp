@@ -496,5 +496,5 @@ tl::expected<mcsm::Server*, mcsm::Error> mcsm::ServerConfigLoader::getServerInst
     auto sType = getServerType();
     if(!sType) return tl::unexpected(sType.error());
 
-    return mcsm::ServerRegistry::getServerRegistry().getServer(sType.value());
+    return mcsm::ServerRegistry::getServerRegistry().getServer(sType.value(), *this)->get();
 }

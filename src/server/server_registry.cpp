@@ -22,9 +22,12 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include "mcsm/data/options/server_config_loader.h"
 #include <mcsm/server/server_registry.h>
+#include <memory>
+#include <unordered_map>
 
-std::unordered_map<std::string, std::unique_ptr<mcsm::Server>> mcsm::ServerRegistry::serverFactories;
+std::unordered_map<std::string, mcsm::ServerFactory> mcsm::ServerRegistry::serverFactories;
 std::unordered_map<std::string, std::unique_ptr<mcsm::GeneralProperty>> mcsm::ServerRegistry::generalProperties;
 
 mcsm::ServerRegistry& mcsm::ServerRegistry::getServerRegistry(){
@@ -32,9 +35,14 @@ mcsm::ServerRegistry& mcsm::ServerRegistry::getServerRegistry(){
     return instance;
 }
 
-void mcsm::ServerRegistry::registerServer(const std::string& name, std::unique_ptr<mcsm::Server> server){
-    this->serverFactories[name] = std::move(server);
+void mcsm::ServerRegistry::registerServer(const std::string& name, mcsm::ServerFactory factory){
+    this->serverFactories[name] = factory;
 }
+
+bool mcsm::ServerRegistry::isRegistered(const std::string& id) const {
+    return this->serverFactories.find(id) != this->serverFactories.end();
+}
+
 
 void mcsm::ServerRegistry::registerGeneralProperty(const std::string& name, std::unique_ptr<mcsm::GeneralProperty> property){
     this->generalProperties[name] = std::move(property);
@@ -58,21 +66,11 @@ std::vector<mcsm::GeneralProperty*> mcsm::ServerRegistry::getRegisteredPropertie
     return properties;
 }
 
-tl::expected<mcsm::Server*, mcsm::Error> mcsm::ServerRegistry::getServer(const std::string& name) const {
+tl::expected<std::unique_ptr<mcsm::Server>, mcsm::Error> mcsm::ServerRegistry::getServer(const std::string& name, mcsm::ServerConfigLoader& loader) const {
     auto it = this->serverFactories.find(name);
     if(it != this->serverFactories.end()){
-        return it->second.get();
+        return it->second(loader);
     }
     mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, {700, "Server type not found: " + name, ""});
-    return tl::unexpected(err);
-}
-
-mcsm::StringResult mcsm::ServerRegistry::getServerTypeString(const mcsm::ServerType& type) const {
-    for(const auto&[id, server]: serverFactories){
-        if(server->getType() == type){
-            return id;
-        }
-    }
-    mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, {700, "Server type not found(likely unregistered)", ""});
     return tl::unexpected(err);
 }

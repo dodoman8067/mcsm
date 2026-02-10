@@ -102,32 +102,28 @@ void mcsm::init::initCommands(const std::string& version){
     mcsm::CommandManager::addCommand(std::move(jvmCommand));
 }
 
+template<typename T>
+void registerServerType(mcsm::ServerRegistry& sr, const std::string& name){
+    sr.registerServer(
+        name,
+        [](mcsm::ServerConfigLoader& loader) {
+            return std::make_unique<T>(loader);
+        }
+    );
+}
+
+
 void mcsm::init::initServers(){
     auto& sr = mcsm::ServerRegistry::getServerRegistry();
 
-    auto vanilla = std::make_unique<mcsm::VanillaServer>();
-    sr.registerServer("vanilla", std::move(vanilla));
-    
-    auto paper = std::make_unique<mcsm::PaperServer>();
-    sr.registerServer("paper", std::move(paper));
-
-    auto purpur = std::make_unique<mcsm::PurpurServer>();
-    sr.registerServer("purpur", std::move(purpur));
-
-    auto fabric = std::make_unique<mcsm::FabricServer>();
-    sr.registerServer("fabric", std::move(fabric));
-
-    auto velocity = std::make_unique<mcsm::VelocityServer>();
-    sr.registerServer("velocity", std::move(velocity));
-
-    auto sponge = std::make_unique<mcsm::SpongeServer>();
-    sr.registerServer("sponge", std::move(sponge));
-
-    auto custom = std::make_unique<mcsm::CustomServer>();
-    sr.registerServer("custom", std::move(custom));
-
-    auto folia = std::make_unique<mcsm::FoliaServer>();
-    sr.registerServer("folia", std::move(folia));
+    registerServerType<mcsm::VanillaServer>(sr, "vanilla");
+    registerServerType<mcsm::PaperServer>(sr, "paper");
+    registerServerType<mcsm::PurpurServer>(sr, "purpur");
+    registerServerType<mcsm::FabricServer>(sr, "fabric");
+    registerServerType<mcsm::VelocityServer>(sr, "velocity");
+    registerServerType<mcsm::SpongeServer>(sr, "sponge");
+    registerServerType<mcsm::CustomServer>(sr, "custom");
+    registerServerType<mcsm::FoliaServer>(sr, "folia");
 
     std::unique_ptr<mcsm::SkipVersionCheckProperty> p1 = std::make_unique<mcsm::SkipVersionCheckProperty>("skip_version_check_while_configuring");
     sr.registerGeneralProperty("skip_version_check_while_configuring", std::move(p1));

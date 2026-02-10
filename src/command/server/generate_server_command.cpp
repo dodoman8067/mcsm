@@ -20,6 +20,8 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include "mcsm/data/options/server_config_loader.h"
+#include "mcsm/util/cli/cli_utils.h"
 #include <mcsm/command/server/generate_server_command.h>
 
 mcsm::GenerateServerCommand::GenerateServerCommand(const std::string& name, const std::string& description) : Command(name, description) {}
@@ -82,7 +84,7 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& /
         
         std::getline(std::cin, type);
 
-        auto serv = mcsm::ServerRegistry::getServerRegistry().getServer(type);
+        auto serv = mcsm::ServerRegistry::getServerRegistry().isRegistered(type);
         if(serv){
             break;
         }else{
@@ -91,8 +93,8 @@ void mcsm::GenerateServerCommand::detectServer(const std::vector<std::string>& /
     }
 
     std::map<std::string, std::string> extras;
-
-    auto sPtr = mcsm::unwrapOrExit(mcsm::ServerRegistry::getServerRegistry().getServer(type));
+    mcsm::ServerConfigLoader dummy(mcsm::getCurrentPath().value());
+    auto sPtr = mcsm::unwrapOrExit(mcsm::ServerRegistry::getServerRegistry().getServer(type, dummy));
 
     auto vecRes = sPtr->getRequiredOptions();
     if(!vecRes){

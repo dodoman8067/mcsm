@@ -22,8 +22,6 @@ SOFTWARE.
 
 #include <mcsm/server/type/base/bukkit_server.h>
 
-mcsm::BukkitServer::BukkitServer() {}
-
 mcsm::BukkitServer::~BukkitServer() {}
 
 mcsm::ServerType mcsm::BukkitServer::getType() const { return mcsm::ServerType::BUKKIT; }

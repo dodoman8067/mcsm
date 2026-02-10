@@ -25,6 +25,7 @@ SOFTWARE.
 #ifndef __MCSM_SERVER_REGISTRY_H__
 #define __MCSM_SERVER_REGISTRY_H__
 
+#include "mcsm/data/options/server_config_loader.h"
 #include <unordered_map>
 #include <functional>
 #include <memory>
@@ -34,15 +35,15 @@ SOFTWARE.
 #include <mcsm/data/options/general_property.h>
 
 namespace mcsm {
+    using ServerFactory = std::function<std::unique_ptr<mcsm::Server>(mcsm::ServerConfigLoader&)>;
 
     class ServerRegistry {
     public:
         static mcsm::ServerRegistry& getServerRegistry();
-        void registerServer(const std::string& name, std::unique_ptr<mcsm::Server> server);
+        void registerServer(const std::string& name, mcsm::ServerFactory factory);
 
-        tl::expected<mcsm::Server*, mcsm::Error> getServer(const std::string& name) const;
-
-        mcsm::StringResult getServerTypeString(const mcsm::ServerType& type) const;
+        bool isRegistered(const std::string& id) const;
+        tl::expected<std::unique_ptr<mcsm::Server>, mcsm::Error> getServer(const std::string& name, mcsm::ServerConfigLoader& loader) const;
 
         void registerGeneralProperty(const std::string& name, std::unique_ptr<mcsm::GeneralProperty> property);
 
@@ -50,7 +51,7 @@ namespace mcsm {
 
         std::vector<mcsm::GeneralProperty*> getRegisteredProperties();
     private:
-        static std::unordered_map<std::string, std::unique_ptr<mcsm::Server>> serverFactories;
+        static std::unordered_map<std::string, mcsm::ServerFactory> serverFactories;
         static std::unordered_map<std::string, std::unique_ptr<mcsm::GeneralProperty>> generalProperties;
 
         ServerRegistry() = default;
