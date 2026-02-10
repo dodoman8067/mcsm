@@ -1,6 +1,7 @@
 #ifndef __MCSM_SERVER_CONFIG_LOADER_H__
 #define __MCSM_SERVER_CONFIG_LOADER_H__
 
+#include "mcsm/util/cli/result.h"
 #include <mcsm/data/toml_option.h>
 
 namespace mcsm {
@@ -11,6 +12,11 @@ namespace mcsm {
     private:
         toml::table configRoot;
         toml::table configHeader;
+
+        toml::table rootMeta;
+        toml::table rootJar;
+        toml::table rootJvm;
+        toml::table rootLaunch;
     public:
         explicit ServerConfigLoader(const std::string& path);
         ServerConfigLoader(const ServerConfigLoader& other)
@@ -64,6 +70,9 @@ namespace mcsm {
 
         mcsm::BoolResult doesAutoUpdate() const;
         mcsm::VoidResult setAutoUpdate(const bool& update);
+
+        mcsm::IntResult getConfigVersion() const;
+        mcsm::VoidResult setConfigVersion(const int& ver);
 
         mcsm::TomlOption* getHandle() const;
 

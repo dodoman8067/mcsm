@@ -41,6 +41,11 @@ mcsm::VoidResult mcsm::ServerConfigLoader::loadConfig(){
     }
     toml::table headerTable = *headerLoadRes.value()->as_table();
 
+    if(!headerTable.contains("config_version") || !headerTable["config_version"].is_integer()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_INVALID_CONFIG_VERSION, {"file " + mcsm::joinPath(this->configPath, "server"), std::to_string(mcsm::MIN_SINGLE_CONFIG_VERSION)});
+        return tl::unexpected(err);
+    }
+
     auto rootLoadRes = this->optionHandle->getValue("server");
     if(!rootLoadRes){
         return tl::unexpected(rootLoadRes.error());
@@ -59,7 +64,44 @@ mcsm::VoidResult mcsm::ServerConfigLoader::loadConfig(){
     this->configRoot = serverTable;
     this->configHeader = headerTable;
 
-    
+    if(!serverTable.contains("meta")){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"[server.meta]\"", mcsm::joinPath(this->configPath, "server")});
+        return tl::unexpected(err);
+    }
+    if(!serverTable.contains("jar")){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"[server.jar]\"", mcsm::joinPath(this->configPath, "server")});
+        return tl::unexpected(err);
+    }
+    if(!serverTable.contains("jvm")){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"[server.jvm]\"", mcsm::joinPath(this->configPath, "server")});
+        return tl::unexpected(err);
+    }
+    if(!serverTable.contains("launch")){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"[server.launch]\"", mcsm::joinPath(this->configPath, "server")});
+        return tl::unexpected(err);
+    }
+
+    if(!serverTable["meta"].is_table()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"[server.meta]\"", "table"});
+        return tl::unexpected(err);
+    }
+    if(!serverTable["jar"].is_table()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"[server.jar]\"", "table"});
+        return tl::unexpected(err);
+    }
+    if(!serverTable["jvm"].is_table()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"[server.jvm]\"", "table"});
+        return tl::unexpected(err);
+    }
+    if(!serverTable["launch"].is_table()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"[server.launch]\"", "table"});
+        return tl::unexpected(err);
+    }
+
+    this->rootMeta = *serverTable["meta"].as_table();
+    this->rootJar = *serverTable["jar"].as_table();
+    this->rootLaunch = *serverTable["launch"].as_table();
+    this->rootJvm = *serverTable["jvm"].as_table();
 
     this->isLoaded = true;
     return {};
@@ -81,17 +123,14 @@ mcsm::StringResult mcsm::ServerConfigLoader::getServerName() const {
         return tl::unexpected(err);
     }
 
-    auto valueRes = this->optionHandle->getValue("name");
-    if(!valueRes) return tl::unexpected(valueRes.error());
-
-    toml::node* value = valueRes.value();
+    auto value = this->rootMeta.get("name");
 
     if(value == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"name\"", this->optionHandle->getName()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"[server.meta]->name\"", this->optionHandle->getName()});
         return tl::unexpected(err);
     }
     if(!value->is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"name\"", "string"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"[server.meta]->name\"", "string"});
         return tl::unexpected(err);
     }
 
@@ -111,7 +150,14 @@ mcsm::VoidResult mcsm::ServerConfigLoader::setServerName(const std::string& name
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {name});
         return tl::unexpected(err);
     }
-    auto setRes = this->optionHandle->setValue("name", valstr(name));
+
+    toml::table metaTable = this->rootMeta;
+    metaTable.insert_or_assign("name", valstr(name));
+
+    toml::table servTable = this->configRoot;
+    servTable.insert_or_assign("meta", metaTable);
+
+    auto setRes = this->optionHandle->setValue("server", servTable);
 
     if(!setRes) return setRes;
     return this->optionHandle->save();
@@ -123,17 +169,13 @@ mcsm::StringResult mcsm::ServerConfigLoader::getServerVersion() const {
         return tl::unexpected(err);
     }
 
-    auto valueRes = this->optionHandle->getValue("version");
-    if(!valueRes) return tl::unexpected(valueRes.error());
-
-    toml::node* value = valueRes.value();
-
+    auto value = this->rootMeta.get("version");
     if(value == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"version\"", this->optionHandle->getName()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"[server.meta]->version\"", this->optionHandle->getName()});
         return tl::unexpected(err);
     }
     if(!value->is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"version\"", "string"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"[server.meta]->version\"", "string"});
         return tl::unexpected(err);
     }
 
@@ -153,7 +195,13 @@ mcsm::VoidResult mcsm::ServerConfigLoader::setServerVersion(const std::string& v
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {version});
         return tl::unexpected(err);
     }
-    auto setRes = this->optionHandle->setValue("version", valstr(version));
+    toml::table metaTable = this->rootMeta;
+    metaTable.insert_or_assign("version", valstr(version));
+
+    toml::table servTable = this->configRoot;
+    servTable.insert_or_assign("meta", metaTable);
+
+    auto setRes = this->optionHandle->setValue("server", servTable);
 
     if(!setRes) return setRes;
     return this->optionHandle->save();
@@ -165,9 +213,7 @@ tl::expected<std::unique_ptr<mcsm::JvmOption>, mcsm::Error> mcsm::ServerConfigLo
         return tl::unexpected(err);
     }
 
-    auto pORes = this->optionHandle->getValue("default_launch_profile");
-    toml::node* profileObj = pORes.value();
-
+    auto profileObj = this->rootJvm.get("profile");
     if(profileObj == nullptr){
         auto customTemp = mcsm::errors::TOML_NOT_FOUND;
         customTemp.message = "No default launch profile name specified in file " + this->optionHandle->getName();
@@ -177,7 +223,7 @@ tl::expected<std::unique_ptr<mcsm::JvmOption>, mcsm::Error> mcsm::ServerConfigLo
     if(!profileObj->is_string()){
         // Don't use jsonWrongType
         auto customTemp = mcsm::errors::TOML_WRONG_TYPE;
-        customTemp.message = "Value \"default_launch_profile\" has to be a string, but it's not.\nManually editing the launch profile might have caused this issue.";
+        customTemp.message = "Value \"[server.jvm]->profile\" has to be a string, but it's not.\nManually editing the launch profile might have caused this issue.";
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
     }
@@ -186,7 +232,7 @@ tl::expected<std::unique_ptr<mcsm::JvmOption>, mcsm::Error> mcsm::ServerConfigLo
     auto abs = resolveAgainstConfig(gstr(profileObj), this->configPath);
     if(!abs.has_filename()){
         auto customTemp = mcsm::errors::TOML_WRONG_TYPE;
-        customTemp.message = "Value \"default_launch_profile\" in " + this->optionHandle->getName() + " does not contain valid file path: " + gstr(profileObj);
+        customTemp.message = "Value \"[server.jvm]->profile\" in " + this->optionHandle->getName() + " does not contain valid file path: " + gstr(profileObj);
         customTemp.solution = "Make sure proper value is given and the file is present.";
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
@@ -202,7 +248,7 @@ tl::expected<std::unique_ptr<mcsm::JvmOption>, mcsm::Error> mcsm::ServerConfigLo
 
     if(!jvmExts.value() || jvmOption == nullptr){
         auto customTemp = mcsm::errors::SERVER_DEFAULT_PROFILE_NOT_FOUND;
-        customTemp.message = "Invalid default launch profile.\nFile server.json may be corrupted or the profile is removed.";
+        customTemp.message = "Invalid default launch profile.\nFile server.toml may be corrupted or the profile is removed.";
         customTemp.solution = "Please change the profile or create a new server.json file.";
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, customTemp, {});
         return tl::unexpected(err);
@@ -222,8 +268,14 @@ mcsm::VoidResult mcsm::ServerConfigLoader::setDefaultOption(mcsm::JvmOption& jvm
     std::string jvmpLocation = mcsm::joinPath(jvmpPath.value(), jvmOption.getProfileName() + ".json");
     std::filesystem::path p(jvmpLocation);
     std::string toStore = p.lexically_normal().generic_string();
-    auto setRes = this->optionHandle->setValue("default_launch_profile", valstr(toStore));
 
+    toml::table jvmTable = this->rootJvm;
+    jvmTable.insert_or_assign("profile", valstr(toStore));
+
+    toml::table servTable = this->configRoot;
+    servTable.insert_or_assign("jar", jvmTable);
+
+    auto setRes = this->optionHandle->setValue("server", servTable);
     if(!setRes) return setRes;
     return this->optionHandle->save();
 }
@@ -234,16 +286,14 @@ mcsm::StringResult mcsm::ServerConfigLoader::getServerType() const {
         return tl::unexpected(err);
     }
 
-    auto valueRes = this->optionHandle->getValue("type");
-    if(!valueRes) return tl::unexpected(valueRes.error());
-    toml::node* value = valueRes.value();
+    auto value = this->rootMeta.get("type");
 
     if(value == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"type\"", this->optionHandle->getName()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"[server.meta]->type\"", this->optionHandle->getName()});
         return tl::unexpected(err);
     }
     if(!value->is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"type\"", "string"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"[server.meta]->type\"", "string"});
         return tl::unexpected(err);
     }
 
@@ -260,16 +310,13 @@ mcsm::StringResult mcsm::ServerConfigLoader::getServerJar() const {
         return tl::unexpected(err);
     }
 
-    auto valueRes = this->optionHandle->getValue("server_jar");
-    if(!valueRes) return tl::unexpected(valueRes.error());
-    toml::node* value = valueRes.value();
-
+    auto value = this->rootJar.get("path");
     if(value == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"server_jar\"", this->optionHandle->getName()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"[server.jar]->path\"", this->optionHandle->getName()});
         return tl::unexpected(err);
     }
     if(!value->is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"server_jar\"", "string"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"[server.jar]->path", "string"});
         return tl::unexpected(err);
     }
 
@@ -292,7 +339,13 @@ mcsm::VoidResult mcsm::ServerConfigLoader::setServerJar(const std::string& fileP
     std::filesystem::path p(filePath);
     std::string toStore = p.lexically_normal().generic_string(); // keep forward slashes in JSON
 
-    auto setRes = this->optionHandle->setValue("server_jar", valstr(toStore));
+    toml::table jarTable = this->rootJar;
+    jarTable.insert_or_assign("path", valstr(toStore));
+
+    toml::table servTable = this->configRoot;
+    servTable.insert_or_assign("jar", jarTable);
+
+    auto setRes = this->optionHandle->setValue("server", servTable);
     if(!setRes) return setRes;
     return this->optionHandle->save();
 }
@@ -326,16 +379,13 @@ mcsm::StringResult mcsm::ServerConfigLoader::getServerJarBuild() const {
         return tl::unexpected(err);
     }
 
-    auto valueRes = this->optionHandle->getValue("server_build");
-    if(!valueRes) return tl::unexpected(valueRes.error());
-    toml::node* value = valueRes.value();
-
+    auto value = this->rootJar.get("build");
     if(value == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"server_build\"", this->optionHandle->getName()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"[server.jar]->build\"", this->optionHandle->getName()});
         return tl::unexpected(err);
     }
     if(!value->is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"server_build\"", "string"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"[server.jar]->build", "string"});
         return tl::unexpected(err);
     }
 
@@ -356,7 +406,14 @@ mcsm::VoidResult mcsm::ServerConfigLoader::setServerJarBuild(const std::string& 
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {build});
         return tl::unexpected(err);
     }
-    auto setRes =  this->optionHandle->setValue("server_build", valstr(build));
+
+    toml::table jarTable = this->rootJar;
+    jarTable.insert_or_assign("build", valstr(build));
+
+    toml::table servTable = this->configRoot;
+    servTable.insert_or_assign("jar", jarTable);
+
+    auto setRes = this->optionHandle->setValue("server", servTable);
 
     if(!setRes) return setRes;
     return this->optionHandle->save();
@@ -368,16 +425,13 @@ mcsm::BoolResult mcsm::ServerConfigLoader::doesAutoUpdate() const {
         return tl::unexpected(err);
     }
 
-    auto valueRes = this->optionHandle->getValue("auto_update");
-    if(!valueRes) return tl::unexpected(valueRes.error());
-    toml::node* value = valueRes.value();
-
+    auto value = this->rootJar.get("automatic_updates");
     if(value == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"auto_update\"", this->optionHandle->getName()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"[server.jar]->automatic_updates\"", this->optionHandle->getName()});
         return tl::unexpected(err);
     }
     if(!value->is_boolean()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"auto_update\"", "boolean"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"[server.jar]->automatic_updates\"", "boolean"});
         return tl::unexpected(err);
     }
 
@@ -391,7 +445,37 @@ mcsm::VoidResult mcsm::ServerConfigLoader::setAutoUpdate(const bool& update){
     }
     
     toml::value<bool> v(update);
-    auto setRes = this->optionHandle->setValue("auto_update", v);
+    toml::table jarTable = this->rootJar;
+    jarTable.insert_or_assign("automatic_updates", v);
+
+    toml::table servTable = this->configRoot;
+    servTable.insert_or_assign("jar", jarTable);
+
+    auto setRes = this->optionHandle->setValue("server", servTable);
+    if(!setRes) return setRes;
+    return this->optionHandle->save();
+}
+
+mcsm::IntResult mcsm::ServerConfigLoader::getConfigVersion() const {
+    if(!this->isLoaded){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
+        return tl::unexpected(err);
+    }
+
+    auto v = *this->configHeader["config_version"].as_integer(); 
+    return v.get();
+}
+
+mcsm::VoidResult mcsm::ServerConfigLoader::setConfigVersion(const int& ver){
+    if(!this->isLoaded){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
+        return tl::unexpected(err);
+    }
+
+    toml::value<long long> v(ver);
+    toml::table tbl = this->configHeader;
+    tbl.insert_or_assign("config_version", v);
+    auto setRes = this->optionHandle->setValue("header", tbl);
     if(!setRes) return setRes;
     return this->optionHandle->save();
 }
