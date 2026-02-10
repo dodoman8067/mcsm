@@ -48,7 +48,7 @@ mcsm::StringResult mcsm::CustomServer::getFileLocation(const std::string& option
     auto exists = option.exists();
     if(!exists) return tl::unexpected(exists.error());
     if(!exists.value()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_NOT_CONFIGURED, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_NOT_CONFIGURED, {optionPath});
         return tl::unexpected(err);
     }
 

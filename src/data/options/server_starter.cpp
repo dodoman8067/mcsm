@@ -15,7 +15,6 @@ mcsm::VoidResult mcsm::ServerStarter::startServer(mcsm::JvmOption& option, const
 
     auto sLoadRes = serverDataOpt.load();
     if(!sLoadRes) return sLoadRes;
-
     auto fileExists = mcsm::fileExists(optionPath + "/server.toml");
     if(!fileExists) return tl::unexpected(fileExists.error());
 

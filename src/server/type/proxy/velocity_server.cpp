@@ -520,7 +520,7 @@ mcsm::VoidResult mcsm::VelocityServer::download(const std::string& version, cons
 
     bool optExists = optExistsResult.value();
     if(!optExists){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_NOT_CONFIGURED, {});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_NOT_CONFIGURED, {optionPath});
         return tl::unexpected(err);
     }
 
