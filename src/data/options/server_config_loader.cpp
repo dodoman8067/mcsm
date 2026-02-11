@@ -46,7 +46,7 @@ mcsm::VoidResult mcsm::ServerConfigLoader::loadConfig(){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_INVALID_CONFIG_VERSION, {"file " + mcsm::joinPath(this->configPath, "server"), std::to_string(mcsm::MIN_SINGLE_CONFIG_VERSION)});
         return tl::unexpected(err);
     }
-    if(headerTable.get_as<long long>("config_version")->get() > (long long) mcsm::SINGLE_CONFIG_VERSION || headerTable.get_as<long long>("config_version")->get() < (long long) mcsm::MIN_SINGLE_CONFIG_VERSION){
+    if(*headerTable.get_as<int64_t>("config_version") > (int64_t) mcsm::SINGLE_CONFIG_VERSION || *headerTable.get_as<int64_t>("config_version") < (int64_t) mcsm::MIN_SINGLE_CONFIG_VERSION){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_INVALID_CONFIG_VERSION, {"file " + mcsm::joinPath(this->configPath, "server"), std::to_string(mcsm::MIN_SINGLE_CONFIG_VERSION)});
         return tl::unexpected(err);
     }
@@ -476,7 +476,7 @@ mcsm::VoidResult mcsm::ServerConfigLoader::setConfigVersion(const int& ver){
         return tl::unexpected(err);
     }
 
-    toml::value<long long> v(ver);
+    toml::value<int64_t> v(ver);
     toml::table tbl = this->configHeader;
     tbl.insert_or_assign("config_version", v);
     auto setRes = this->optionHandle->setValue("header", tbl);

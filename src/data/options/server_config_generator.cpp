@@ -54,7 +54,7 @@ mcsm::VoidResult mcsm::ServerConfigGenerator::generate(const std::string& versio
     if(!res1) return res1;
 
     toml::table header;
-    toml::value<long long> vint(mcsm::SINGLE_CONFIG_VERSION);
+    toml::value<int64_t> vint(mcsm::SINGLE_CONFIG_VERSION);
     header.insert_or_assign("config_version", vint);
 
     toml::table meta;
