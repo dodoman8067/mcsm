@@ -73,7 +73,7 @@ jobs:
         if: matrix.os == 'windows-latest'
         shell: msys2 {0}
         run: |
-          cmake -B build -G "MinGW Makefiles" -DCMAKE_BUILD_TYPE=Release -DUSE_SYSTEM_DEPS=0 -DCMAKE_MAKE_PROGRAM=mingw32-make
+          cmake -B build -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DUSE_SYSTEM_DEPS=0
           cmake --build build --config Release
 
       # --- 4. Upload Result ---
