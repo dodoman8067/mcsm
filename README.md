@@ -9,7 +9,7 @@ MCSM (MineCraft Server Manager) is a command-line program designed to configure 
 
 * OS:
   * Windows (10 or newer)
-  * macOS (Big Sur or newer)
+  * macOS (Big Sur or newer, Intel and Apple Silicon)
   * Linux
     * Android (via Termux)
 
@@ -26,7 +26,7 @@ This project uses the following dependencies :
 * [nlohmann/json](https://github.com/nlohmann/json)
 * [toml++](https://github.com/marzer/tomlplusplus)
 * [tl/expected](https://github.com/TartanLlama/expected)
-* [backward-cpp](https://github.com/bombela/backward-cpp) (DEBUG)
+* [backward-cpp](https://github.com/bombela/backward-cpp) (For debugging)
 
 ## Usage
 
