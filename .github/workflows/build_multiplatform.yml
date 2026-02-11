@@ -1,0 +1,72 @@
+name: Build mcsm
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    name: ${{ matrix.os }} (${{ matrix.arch }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            arch: x86_64
+            compiler: gcc
+          - os: macos-latest
+            arch: arm64
+            compiler: clang
+          - os: macos-13
+            arch: x86_64
+            compiler: clang
+          - os: windows-latest
+            arch: x86_64
+            compiler: mingw
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # --- 1. Install Dependencies ---
+    - name: Install Linux Dependencies
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y libcurl4-openssl-dev
+
+    - name: Set up MSYS2 (Windows/MinGW)
+      if: matrix.compiler == 'mingw'
+      uses: msys2/setup-msys2@v2
+      with:
+        msystem: MINGW64
+        install: >-
+          mingw-w64-x86_64-gcc
+          mingw-w64-x86_64-cmake
+          mingw-w64-x86_64-curl
+          mingw-w64-x86_64-ninja
+
+    # --- 2. Configure ---
+    - name: Configure CMake
+      shell: ${{ matrix.compiler == 'mingw' && 'msys2 {0}' || 'bash' }}
+      run: |
+        cmake -B build \
+          -DCMAKE_BUILD_TYPE=Release \
+          -DBUILD_STATIC_EXE=OFF \
+          ${{ matrix.compiler == 'mingw' && '-G Ninja' || '' }}
+
+    # --- 3. Build ---
+    - name: Build
+      shell: ${{ matrix.compiler == 'mingw' && 'msys2 {0}' || 'bash' }}
+      run: cmake --build build --config Release
+
+    # --- 4. Upload Artifacts ---
+    - name: Upload Build
+      uses: actions/upload-artifact@v4
+      with:
+        name: mcsm-${{ matrix.os }}-${{ matrix.arch }}
+        path: |
+          build/mcsm
+          build/mcsm.exe
