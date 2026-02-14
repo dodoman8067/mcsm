@@ -42,7 +42,7 @@ mcsm::StringResult mcsm::SpongeServer::getVersion(const std::string& ver) const 
     auto cPath = mcsm::getCurrentPath();
     if(!cPath) return cPath;
 
-    mcsm::Option opt(cPath.value(), "server");
+    mcsm::TomlOption opt(cPath.value(), "server");
 
     bool bRecommended = false;
     
@@ -55,17 +55,29 @@ mcsm::StringResult mcsm::SpongeServer::getVersion(const std::string& ver) const 
         auto loadRes = opt.load(advp);
         if(!loadRes) return tl::unexpected(loadRes.error());
         
-        auto nRecommended = opt.getValue("api_search_recommended");
+        auto nRecommended = opt.getValue("sponge");
         if(!nRecommended) return tl::unexpected(nRecommended.error());
         if(nRecommended.value() == nullptr){
-            bRecommended = false;
-        }else{
-            if(!nRecommended.value().is_boolean()){
-                mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"api_search_recommended\"", "boolean"});
-                return tl::unexpected(err);
-            }
-            bRecommended = nRecommended.value();
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"sponge\"", opt.getName()});
+            return tl::unexpected(err);
         }
+        if(!nRecommended.value()->is_table()){
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"sponge\"", "table"});
+            return tl::unexpected(err);
+        }
+
+        toml::table tSponge = *nRecommended.value()->as_table();
+        if(!tSponge.contains("api_search_recommended")){
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"api_search_recommended\"", opt.getName()});
+            return tl::unexpected(err);     
+        }
+        if(!tSponge.get("api_search_recommended")->is_boolean()){
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"api_search_recommened\"", "boolean"});
+            return tl::unexpected(err);
+        }
+
+        bRecommended = tSponge.get("api_search_recommended")->as_boolean();
+        
     }else{
         auto* property = mcsm::GeneralOption::getGeneralOption().getProperty("sponge_api_search_recommended_versions");
         if(property == nullptr){
@@ -120,7 +132,7 @@ mcsm::StringResult mcsm::SpongeServer::getVersion(const std::string& ver, const 
     auto cPath = mcsm::getCurrentPath();
     if(!cPath) return cPath;
 
-    mcsm::Option opt(cPath.value(), "server");
+    mcsm::TomlOption opt(cPath.value(), "server");
     
     auto optExists = opt.exists();
     if(!optExists) return tl::unexpected(optExists.error());
@@ -190,25 +202,36 @@ mcsm::StringResult mcsm::SpongeServer::getVersion(const std::string& ver, const 
     if(!cPathRes) return cPathRes;
     auto cPath = cPathRes.value();
 
-    mcsm::Option opt(cPath, "server");
+    mcsm::TomlOption opt(cPath, "server");
 
     bool advp = mcsm::GeneralOption::getGeneralOption().advancedParseEnabled();
 
     auto opLoadRes = opt.load(advp);
     if(!opLoadRes) return tl::unexpected(opLoadRes.error());
 
-    auto nRecommended = opt.getValue("api_search_recommended");
+    auto nRecommended = opt.getValue("sponge");
     if(!nRecommended) return tl::unexpected(nRecommended.error());
     if(nRecommended.value() == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"api_search_recommended\"", opt.getName()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"sponge\"", opt.getName()});
         return tl::unexpected(err);
     }
-    if(!nRecommended.value().is_boolean()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"api_search_recommended\"", "boolean"});
+    if(!nRecommended.value()->is_table()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"sponge\"", "table"});
         return tl::unexpected(err);
     }
 
-    bool bRecommended = nRecommended.value();
+    toml::table tSponge = *nRecommended.value()->as_table();
+    if(!tSponge.contains("api_search_recommended")){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"api_search_recommended\"", opt.getName()});
+        return tl::unexpected(err);     
+    }
+    if(!tSponge.get("api_search_recommended")->is_boolean()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"api_search_recommened\"", "boolean"});
+        return tl::unexpected(err);
+    }
+
+
+    bool bRecommended = tSponge.get("api_search_recommended")->as_boolean();
 
     std::string recommended = bRecommended ? "true" : "false";
 
@@ -317,58 +340,25 @@ mcsm::VoidResult mcsm::SpongeServer::download(const std::string& version, const 
 }
 
 mcsm::VoidResult mcsm::SpongeServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
-    mcsm::Option opt(optionPath, "server");
-    auto optExists = opt.exists();
-    if(!optExists) return tl::unexpected(optExists.error());
-    if(!optExists.value()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_NOT_CONFIGURED, {optionPath});
+    auto typeGRes = this->loader.getServerType();
+    if(!typeGRes) return tl::unexpected(typeGRes.error());
+    if(typeGRes.value() != "paper"){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_WRONG_INSTANCE_GENERATED, {"Paper"});
         return tl::unexpected(err);
     }
-
-    auto lRes = opt.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
-    if(!lRes) return lRes;
 
     mcsm::ServerDataOption sDataOpt(optionPath);
+    auto sLoadRes = sDataOpt.load();
+    if(!sLoadRes) return sLoadRes;
 
-    auto sdoLRes = sDataOpt.load();
-    if(!sdoLRes) return sdoLRes;
-
-    auto tVGRes = opt.getValue("type");
-    if(!tVGRes) return tl::unexpected(tVGRes.error());
-
-    nlohmann::json typeValue = tVGRes.value();
-    if(typeValue == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"type\"", opt.getName(), "change it into \"type\": \"[yourtype]\""});
-        return tl::unexpected(err);
-    }
-    if(!typeValue.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"type\"", opt.getName(), "string", "change it into \"type\": \"[yourtype]\""});
-        return tl::unexpected(err);
-    }
-    if(typeValue != "sponge"){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_WRONG_INSTANCE_GENERATED, {"Sponge"});
-        return tl::unexpected(err);
-    }
-
-    auto sBVGRes = opt.getValue("server_build");
-    if(!sBVGRes) return tl::unexpected(sBVGRes.error());
-
-    nlohmann::json serverBuildValue = sBVGRes.value();
-    
-    if(serverBuildValue == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"server_build\"", opt.getName(), "add \"server_build\": \"latest\" to server.json for automatic download"});
-        return tl::unexpected(err);
-    }
-    if(!serverBuildValue.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"server_build\"", opt.getName(), "string", "change it into \"server_build\": \"latest\""});
-        return tl::unexpected(err);
-    }
+    auto sBVRes = this->loader.getServerJarBuild();
+    if(!sBVRes) return tl::unexpected(sBVRes.error());
 
     std::string url, build;
-    if(serverBuildValue != "latest"){
+    if(sBVRes.value() != "latest"){
         mcsm::warning("Sponge release version does not match the actual order of the file names. The program will NOT use the \"server_build\" value to match the release name.");
         mcsm::warning("Example: SpongeVanilla 1.12.2 build #2 is named '1.12.2-7.0.0-BETA-330', while the first build is named '1.12.2-7.0.0-BETA-1'.");
-        auto bR = getVersion(version, serverBuildValue, false);
+        auto bR = getVersion(version, sBVRes.value(), false);
         if(!bR) return tl::unexpected(bR.error());
         build = bR.value();
         if(mcsm::isWhitespaceOrEmpty(build)){
@@ -602,12 +592,13 @@ mcsm::VoidResult mcsm::SpongeServer::generate(const std::string& name, mcsm::Jvm
     auto cPath = mcsm::getCurrentPath();
     if(!cPath) return tl::unexpected(cPath.error());
 
-    mcsm::Option sOpt(cPath.value(), "server");
+    mcsm::TomlOption sOpt = *this->loader.getHandle();
 
-    auto sOptLoadRes = sOpt.load();
-    if(!sOptLoadRes) return sOptLoadRes;
+    toml::table spongeTweaks;
+    toml::value<bool> apiBool(bApi);
+    spongeTweaks.insert_or_assign("api_search_recommended", apiBool);
 
-    auto setRes = sOpt.setValue("api_search_recommended", bApi);
+    auto setRes = sOpt.setValue("sponge", spongeTweaks);
     if(!setRes) return setRes;
 
     return sOpt.save();

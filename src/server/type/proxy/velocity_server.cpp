@@ -512,56 +512,22 @@ mcsm::VoidResult mcsm::VelocityServer::download(const std::string& version, cons
 }
 
 mcsm::VoidResult mcsm::VelocityServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
-    mcsm::Option opt(optionPath, "server");
-    auto optExistsResult = opt.exists();
-    if(!optExistsResult) return tl::unexpected(optExistsResult.error());
-
-    bool optExists = optExistsResult.value();
-    if(!optExists){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_NOT_CONFIGURED, {optionPath});
+    auto typeGRes = this->loader.getServerType();
+    if(!typeGRes) return tl::unexpected(typeGRes.error());
+    if(typeGRes.value() != "velocity"){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_WRONG_INSTANCE_GENERATED, {"Paper"});
         return tl::unexpected(err);
     }
-
-    auto optLRes = opt.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
-    if(!optLRes) return optLRes;
 
     mcsm::ServerDataOption sDataOpt(optionPath);
+    auto sLoadRes = sDataOpt.load();
+    if(!sLoadRes) return sLoadRes;
 
-    auto sdoLRes = sDataOpt.load();
-    if(!sdoLRes) return sdoLRes;
+    auto sBVRes = this->loader.getServerJarBuild();
+    if(!sBVRes) return tl::unexpected(sBVRes.error());
 
-    auto typeValueRes = opt.getValue("type");
-    if(!typeValueRes) return tl::unexpected(typeValueRes.error());
-
-    nlohmann::json typeValue = typeValueRes.value();
-
-    if(typeValue == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"type\"", opt.getName(), "change it into \"type\": \"[yourtype]\""});
-        return tl::unexpected(err);
-    }
-    if(!typeValue.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"type\"", opt.getName(), "string", "change it into \"type\": \"[yourtype]\""});
-        return tl::unexpected(err);
-    }
-    if(typeValue != "velocity"){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_WRONG_INSTANCE_GENERATED, {"Velocity"});
-        return tl::unexpected(err);
-    }
-
-    auto serverBuildValueRes = opt.getValue("server_build");
-    if(!serverBuildValueRes) return tl::unexpected(serverBuildValueRes.error());
-    nlohmann::json serverBuildValue = serverBuildValueRes.value();
-    
-    if(serverBuildValue == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"server_build\"", opt.getName(), "add \"server_build\": \"latest\" to server.json for automatic download"});
-        return tl::unexpected(err);
-    }
-    if(!serverBuildValue.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"server_build\"", opt.getName(), "string", "change it into \"server_build\": \"latest\""});
-        return tl::unexpected(err);
-    }
-    if(serverBuildValue != "latest"){
-        std::string build = serverBuildValue.get<std::string>();
+    if(sBVRes.value() != "latest"){
+        std::string build = sBVRes.value();
         auto ver = getVersionData(version, build);
         if(!ver) return tl::unexpected(ver.error());
 
