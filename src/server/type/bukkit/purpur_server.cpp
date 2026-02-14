@@ -121,54 +121,22 @@ mcsm::VoidResult mcsm::PurpurServer::download(const std::string& version, const 
 }
 
 mcsm::VoidResult mcsm::PurpurServer::download(const std::string& version, const std::string& path, const std::string& name, const std::string& optionPath){
-    mcsm::Option opt(optionPath, "server");
-    auto optExists = opt.exists();
-    if(!optExists) return tl::unexpected(optExists.error());
-    if(!optExists.value()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_NOT_CONFIGURED, {optionPath});
+    auto typeGRes = this->loader.getServerType();
+    if(!typeGRes) return tl::unexpected(typeGRes.error());
+    if(typeGRes.value() != "purpur"){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_WRONG_INSTANCE_GENERATED, {"Paper"});
         return tl::unexpected(err);
     }
-
-    auto optLRes1 = opt.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
-    if(!optLRes1) return optLRes1;
 
     mcsm::ServerDataOption sDataOpt(optionPath);
-
-    mcsm::VoidResult sLoadRes = sDataOpt.load();
+    auto sLoadRes = sDataOpt.load();
     if(!sLoadRes) return sLoadRes;
 
-    auto tVRes = opt.getValue("type");
-    if(!tVRes) return tl::unexpected(tVRes.error());
-
-    nlohmann::json typeValue = tVRes.value();
-    if(typeValue == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"type\"", opt.getName(), "change it into \"type\": \"[yourtype]\""});
-        return tl::unexpected(err);
-    }
-    if(!typeValue.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"type\"", opt.getName(), "string", "change it into \"type\": \"[yourtype]\""});
-        return tl::unexpected(err);
-    }
-    if(typeValue != "purpur"){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_WRONG_INSTANCE_GENERATED, {"Purpur"});
-        return tl::unexpected(err);
-    }
-
-    auto sBVRes = opt.getValue("server_build");
+    auto sBVRes = this->loader.getServerJarBuild();
     if(!sBVRes) return tl::unexpected(sBVRes.error());
 
-    nlohmann::json serverBuildValue = sBVRes.value();
-
-    if(serverBuildValue == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND_PLUS_FIX, {"\"server_build\"", opt.getName(), "add \"server_build\": \"latest\" to server.json for automatic download"});
-        return tl::unexpected(err);
-    }
-    if(!serverBuildValue.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE_PLUS_FIX, {"\"server_build\"", opt.getName(), "string", "change it into \"server_build\": \"latest\""});
-        return tl::unexpected(err);
-    }
-    if(serverBuildValue != "latest"){
-        std::string build = serverBuildValue.get<std::string>();
+    if(sBVRes.value() != "latest"){
+        std::string build = sBVRes.value();
         auto ver = getVersion(version, build);
         if(!ver) return tl::unexpected(ver.error());
 
