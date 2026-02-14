@@ -50,7 +50,7 @@ static int progressCallback(void * /* clientp */, curl_off_t dltotal, curl_off_t
                 mcsm::setcol(mcsm::NamedColor::BLUE);
         }
 
-        std::cout << "\r[";
+        std::cout << " \r[mcsm/INFO] [";
         for(int i = 0; i < barWidth; i++){
             if(i < progress) std::cout << "=";
             else std::cout << " ";
