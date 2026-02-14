@@ -453,7 +453,7 @@ mcsm::VoidResult mcsm::FoliaServer::download(const std::string& version, const s
     auto typeGRes = this->loader.getServerType();
     if(!typeGRes) return tl::unexpected(typeGRes.error());
     if(typeGRes.value() != "folia"){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_WRONG_INSTANCE_GENERATED, {"Paper"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_WRONG_INSTANCE_GENERATED, {"Folia"});
         return tl::unexpected(err);
     }
 

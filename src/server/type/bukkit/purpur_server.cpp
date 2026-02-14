@@ -124,7 +124,7 @@ mcsm::VoidResult mcsm::PurpurServer::download(const std::string& version, const 
     auto typeGRes = this->loader.getServerType();
     if(!typeGRes) return tl::unexpected(typeGRes.error());
     if(typeGRes.value() != "purpur"){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_WRONG_INSTANCE_GENERATED, {"Paper"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_WRONG_INSTANCE_GENERATED, {"Purpur"});
         return tl::unexpected(err);
     }
 

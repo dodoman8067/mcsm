@@ -515,7 +515,7 @@ mcsm::VoidResult mcsm::VelocityServer::download(const std::string& version, cons
     auto typeGRes = this->loader.getServerType();
     if(!typeGRes) return tl::unexpected(typeGRes.error());
     if(typeGRes.value() != "velocity"){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_WRONG_INSTANCE_GENERATED, {"Paper"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_WRONG_INSTANCE_GENERATED, {"Velocity"});
         return tl::unexpected(err);
     }
 
