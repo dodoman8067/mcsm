@@ -169,11 +169,6 @@ mcsm::VoidResult mcsm::CustomServer::generate(const std::string& name, mcsm::Jvm
     mcsm::VoidResult fileRes = setFileLocation(serverOption.getHandle(), fileLocation);
     if(!fileRes) return fileRes;
 
-    std::string customCommand = extraValues.find("custom_run_command")->second;
-
-    mcsm::VoidResult cRCRes = setCustomStartCommand(serverOption.getHandle(), customCommand);
-    if(!cRCRes) return cRCRes;
-
     mcsm::ServerConfigLoader loader(path);
     
     mcsm::VoidResult loadRes = loader.loadConfig();
@@ -182,16 +177,7 @@ mcsm::VoidResult mcsm::CustomServer::generate(const std::string& name, mcsm::Jvm
     mcsm::success("Custom configured server's information : ");
     mcsm::info("Server name : " + mcsm::safeString(name));
     mcsm::info("Server type : custom");
-    if(!mcsm::isWhitespaceOrEmpty(customCommand)){
-        mcsm::info("Server run command : " + customCommand);
-        mcsm::warning("This overrides JVM launch profile based server launch system.");
-        mcsm::warning("Please leave it empty if you don't know what you're doing.");
-    }else{
-        mcsm::info("Server JVM launch profile : " + option.getProfileName());
-    }
-    mcsm::warning("NOTE: Custom servers are currently in beta state.");
-    mcsm::warning("We are not responsible for the consequences of using beta features.");
-
+    mcsm::info("Server JVM launch profile : " + option.getProfileName());
     return {};
 }
 
@@ -311,12 +297,6 @@ const tl::expected<std::vector<mcsm::ServerOptionSpec>, mcsm::Error> mcsm::Custo
             .required = true,
             .defaultValue = "",
             .enumValues = {"url", "filepath"}
-        },
-        {
-            .key = "custom_run_command",
-            .type = mcsm::OptionType::STRING,
-            .required = false,
-            .defaultValue = ""
         }
     };
     return spec;
