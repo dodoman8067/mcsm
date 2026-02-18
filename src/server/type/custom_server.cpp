@@ -22,6 +22,7 @@ SOFTWARE.
 
 #include <mcsm/server/type/custom_server.h>
 #include <mcsm/data/options/general_option.h>
+#include <toml++/impl/table.hpp>
 
 mcsm::CustomServer::~CustomServer(){
 
@@ -40,7 +41,7 @@ std::string mcsm::CustomServer::getSupportedVersions() const {
 }
 
 mcsm::StringResult mcsm::CustomServer::getFileLocation(const std::string& optionPath) const {
-    mcsm::Option option(optionPath, "server");
+    mcsm::TomlOption option(optionPath, "server");
     auto exists = option.exists();
     if(!exists) return tl::unexpected(exists.error());
     if(!exists.value()){
@@ -51,27 +52,38 @@ mcsm::StringResult mcsm::CustomServer::getFileLocation(const std::string& option
     auto optLoadRes = option.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
     if(!optLoadRes) return tl::unexpected(optLoadRes.error());
 
-    auto jarLocVal = option.getValue("jarfile_source_location");
-    if(!jarLocVal) return tl::unexpected(jarLocVal.error());
-
-    nlohmann::json jarLoc = jarLocVal.value();
-
-    if(jarLoc == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"jarfile_source_location\"", "server.json"});
+    auto customSpecific = option.getValue("custom");
+    if(!customSpecific) return tl::unexpected(customSpecific.error());
+    if(customSpecific.value() == nullptr){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"custom\"", option.getName()});
         return tl::unexpected(err);
     }
-    if(!jarLoc.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"jarfile_source_location\"", "string"});
+    if(!customSpecific.value()->is_table()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"custom\"", "table"});
         return tl::unexpected(err);
     }
-    if(jarLoc != nullptr && (mcsm::startsWith(jarLoc.get<std::string>(), "current") && mcsm::endsWith(jarLoc.get<std::string>(), "current"))){
+
+    toml::table tCustom = *customSpecific.value()->as_table();
+    if(!tCustom.contains("jarfile_source_location")){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"jarfile_source_location\"", option.getName()});
+        return tl::unexpected(err);     
+    }
+    if(!tCustom.get("jarfile_source_location")->is_string()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"jarfile_source_location\"", "string"});
+        return tl::unexpected(err);
+    }
+
+    auto jarLocVal = *tCustom.get("jarfile_source_location")->as_string();
+    if(mcsm::startsWith(jarLocVal.get(), "current") && mcsm::endsWith(jarLocVal.get(), "current")){
         return mcsm::getCurrentPath();
     }
-    return jarLoc.get<std::string>();
+    return jarLocVal.get();
 }
 
 mcsm::VoidResult mcsm::CustomServer::setFileLocation(mcsm::TomlOption* option, const std::string& location) {
-    mcsm::VoidResult setRes = option->setValue("jarfile_source_location", valstr(location));
+    toml::table tCustom;
+    tCustom.insert_or_assign("jarfile_source_location", location);
+    mcsm::VoidResult setRes = option->setValue("custom", tCustom);
     if(!setRes) return setRes;
     return option->save();
 }
@@ -187,7 +199,7 @@ mcsm::StringResult mcsm::CustomServer::start(mcsm::JvmOption& option, const std:
 
 mcsm::StringResult mcsm::CustomServer::start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& cliArgs){
     // ServerOption class handles the data file stuff
-
+/*
     mcsm::StringResult customCommand = getCustomStartCommand(loader.getHandle()->getPath());
     if(!customCommand) return customCommand;
 
@@ -211,6 +223,7 @@ mcsm::StringResult mcsm::CustomServer::start(mcsm::JvmOption& option, const std:
     }else if(hasIgnoreFlag){
         mcsm::warning("\"custom_run_command\" value temporarily ignored by --force-default-launch-command flag.");
     }
+        */
     
     mcsm::StringResult jar = loader.getServerJarFile();
     if(!jar) return jar;
