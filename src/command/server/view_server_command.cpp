@@ -47,12 +47,18 @@ inline void mcsm::ViewServerCommand::printServerInfo(){
 
     mcsm::unwrapOrExit(sOpt.loadConfig());
 
-    std::string name, version, type;
+    std::string name, version, type, run_after, run_before, run_command_wrapper;
     name = mcsm::unwrapOrExit(sOpt.getServerName());
 
     version = mcsm::unwrapOrExit(sOpt.getServerVersion());
 
     type = mcsm::unwrapOrExit(sOpt.getServerType());
+
+    run_before = mcsm::unwrapOrExit(sOpt.getRunBefore());
+
+    run_command_wrapper = mcsm::unwrapOrExit(sOpt.getRunCommandWrapper());
+
+    run_after = mcsm::unwrapOrExit(sOpt.getRunAfter());
 
     mcsm::ServerDataOption* sDataOpt = nullptr;
     if(type == "fabric"){
@@ -82,4 +88,8 @@ inline void mcsm::ViewServerCommand::printServerInfo(){
     mcsm::info("Last server launch date : " + timeLaunched);
     delete sDataOpt;
     sDataOpt = nullptr;
+
+    if(!mcsm::isWhitespaceOrEmpty(run_before)) mcsm::info("Command executed before : " + run_before);
+    if(!mcsm::isWhitespaceOrEmpty(run_command_wrapper)) mcsm::info("Command wrapper for server execution : " + run_command_wrapper);
+    if(!mcsm::isWhitespaceOrEmpty(run_after)) mcsm::info("Command executed after : " + run_after);
 }

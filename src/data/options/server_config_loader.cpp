@@ -484,6 +484,118 @@ mcsm::VoidResult mcsm::ServerConfigLoader::setConfigVersion(const int& ver){
     return this->optionHandle->save();
 }
 
+mcsm::StringResult mcsm::ServerConfigLoader::getRunBefore() const {
+    if(!this->isLoaded){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
+        return tl::unexpected(err);
+    }
+
+    auto value = this->rootLaunch.get("run_before");
+    if(value == nullptr){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"[server.launch]->run_before\"", this->optionHandle->getName()});
+        return tl::unexpected(err);
+    }
+    if(!value->is_string()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"[server.launch]->run_before", "string"});
+        return tl::unexpected(err);
+    }
+
+    return gstr(value);
+}
+
+
+mcsm::VoidResult mcsm::ServerConfigLoader::setRunBefore(const std::string& runBefore){
+    if(!this->isLoaded){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
+        return tl::unexpected(err);
+    }
+
+    toml::table launchTable = this->rootLaunch;
+    launchTable.insert_or_assign("run_before", valstr(runBefore));
+
+    toml::table servTable = this->configRoot;
+    servTable.insert_or_assign("launch", launchTable);
+
+    auto setRes = this->optionHandle->setValue("server", servTable);
+
+    if(!setRes) return setRes;
+    return this->optionHandle->save();
+}
+
+mcsm::StringResult mcsm::ServerConfigLoader::getRunCommandWrapper() const {
+    if(!this->isLoaded){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
+        return tl::unexpected(err);
+    }
+
+    auto value = this->rootLaunch.get("run_command_wrapper");
+    if(value == nullptr){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"[server.launch]->run_command_wrapper\"", this->optionHandle->getName()});
+        return tl::unexpected(err);
+    }
+    if(!value->is_string()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"[server.launch]->run_command_wrapper", "string"});
+        return tl::unexpected(err);
+    }
+
+    return gstr(value);
+}
+
+mcsm::VoidResult mcsm::ServerConfigLoader::setRunCommandWrapper(const std::string& runWrapper){
+    if(!this->isLoaded){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
+        return tl::unexpected(err);
+    }
+
+    toml::table launchTable = this->rootLaunch;
+    launchTable.insert_or_assign("run_command_wrapper", valstr(runWrapper));
+
+    toml::table servTable = this->configRoot;
+    servTable.insert_or_assign("launch", launchTable);
+
+    auto setRes = this->optionHandle->setValue("server", servTable);
+
+    if(!setRes) return setRes;
+    return this->optionHandle->save();
+}
+
+mcsm::StringResult mcsm::ServerConfigLoader::getRunAfter() const {
+    if(!this->isLoaded){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
+        return tl::unexpected(err);
+    }
+
+    auto value = this->rootLaunch.get("run_after");
+    if(value == nullptr){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"[server.launch]->run_after\"", this->optionHandle->getName()});
+        return tl::unexpected(err);
+    }
+    if(!value->is_string()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"[server.launch]->run_after", "string"});
+        return tl::unexpected(err);
+    }
+
+    return gstr(value);
+}
+
+mcsm::VoidResult mcsm::ServerConfigLoader::setRunAfter(const std::string& runAfter){
+    if(!this->isLoaded){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_DATA_ACCESSED_WITHOUT_LOAD, {});
+        return tl::unexpected(err);
+    }
+
+    toml::table launchTable = this->rootLaunch;
+    launchTable.insert_or_assign("run_after", valstr(runAfter));
+
+    toml::table servTable = this->configRoot;
+    servTable.insert_or_assign("launch", launchTable);
+
+    auto setRes = this->optionHandle->setValue("server", servTable);
+
+    if(!setRes) return setRes;
+    return this->optionHandle->save();
+}
+
 mcsm::TomlOption* mcsm::ServerConfigLoader::getHandle() const {
     return this->optionHandle.get();
 }

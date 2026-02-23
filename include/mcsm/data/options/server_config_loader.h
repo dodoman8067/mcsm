@@ -74,6 +74,15 @@ namespace mcsm {
         mcsm::BoolResult doesAutoUpdate() const;
         mcsm::VoidResult setAutoUpdate(const bool& update);
 
+        mcsm::StringResult getRunBefore() const;
+        mcsm::VoidResult setRunBefore(const std::string& runBefore);
+
+        mcsm::StringResult getRunCommandWrapper() const;
+        mcsm::VoidResult setRunCommandWrapper(const std::string& runWrapper);
+
+        mcsm::StringResult getRunAfter() const;
+        mcsm::VoidResult setRunAfter(const std::string& runAfter);
+
         mcsm::IntResult getConfigVersion() const;
         mcsm::VoidResult setConfigVersion(const int& ver);
 
