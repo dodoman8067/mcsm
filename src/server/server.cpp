@@ -20,6 +20,9 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
 
+#include "mcsm/util/cli/cli_utils.h"
+#include "mcsm/util/cli/result.h"
+#include "mcsm/util/string_utils.h"
 #include <mcsm/server/server.h>
 #include <mcsm/data/options/general_option.h>
 
@@ -34,6 +37,26 @@ mcsm::StringResult mcsm::Server::start(mcsm::JvmOption& option, const std::strin
 }
 
 mcsm::StringResult mcsm::Server::start(mcsm::JvmOption& option, const std::string& path, const std::string& optionPath, const std::vector<std::string>& /* cliArgs */){
+    auto preRes = this->loader.getRunBefore();
+    auto wrapRes = this->loader.getRunCommandWrapper();
+    auto afterRes = this->loader.getRunAfter();
+    
+    if(!preRes) return preRes;
+    if(!wrapRes) return wrapRes;
+    if(!afterRes) return afterRes;
+
+    std::string pre = preRes.value();
+    std::string wrapper = wrapRes.value();
+    std::string after = afterRes.value();
+
+    if(!mcsm::isWhitespaceOrEmpty(pre)){
+        mcsm::info("Executing pre-launch command: " + pre);
+        auto preRunRes = mcsm::runCommand(pre);
+        if(!preRunRes){
+            mcsm::printError(preRunRes.error());
+        }
+    }
+    
     std::string jvmOpt = " ";
     auto jArgs = option.getJvmArguments();
     if(!jArgs) return tl::unexpected(jArgs.error());
@@ -57,7 +80,9 @@ mcsm::StringResult mcsm::Server::start(mcsm::JvmOption& option, const std::strin
     if(!jar) return jar;
 
     std::string command = jPath.value() + jvmOpt + mcsm::normalizePath(path) + "/" + jar.value() + svrOpt;
-    mcsm::info("Running command : " + command);
+    
+    wrapper = wrapper + " " + command;
+    mcsm::info("Running command : " + wrapper);
     
     std::error_code ec;
     std::filesystem::current_path(optionPath, ec);
@@ -66,11 +91,19 @@ mcsm::StringResult mcsm::Server::start(mcsm::JvmOption& option, const std::strin
         return tl::unexpected(err);
     }
 
-    auto result = mcsm::runCommand(command);
+    auto result = mcsm::runCommand(wrapper);
+    if(!mcsm::isWhitespaceOrEmpty(after)){
+        mcsm::info("Executing after-launch command: " + after);
+        auto afterRunRes = mcsm::runCommand(after);
+        if(!afterRunRes){
+            mcsm::printError(afterRunRes.error());
+        }
+    }
     if(!result) return tl::unexpected(result.error());
     if(result.value() != 0){
         return "\033[38;2;255;0;0mServer exited with error code : " + std::to_string(result.value());
     }
+
     return "\033[38;2;0;255;0mServer exited with error code : 0";
 }
 
