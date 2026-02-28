@@ -44,9 +44,6 @@ namespace mcsm {
         mcsm::VoidResult setFileLocation(mcsm::TomlOption* option, const std::string& location);
         mcsm::VoidResult setupServerJarFile(const std::string& jarName, const std::string& path, const std::string& optionPath);
 
-        mcsm::StringResult getCustomStartCommand(const std::string& optionPath) const;
-        mcsm::VoidResult setCustomStartCommand(mcsm::TomlOption* option, const std::string& command);
-
         std::string getSupportedVersions() const override;
 
         std::string getBasedServer() const override;

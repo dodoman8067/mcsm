@@ -88,41 +88,6 @@ mcsm::VoidResult mcsm::CustomServer::setFileLocation(mcsm::TomlOption* option, c
     return option->save();
 }
 
-mcsm::StringResult mcsm::CustomServer::getCustomStartCommand(const std::string& optionPath) const {
-    mcsm::Option option(optionPath, "server");
-    auto exists = option.exists();
-    if(!exists) return tl::unexpected(exists.error());
-    if(!exists.value()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_NOT_CONFIGURED, {});
-        return tl::unexpected(err);
-    }
-
-    auto optLRes = option.load(mcsm::GeneralOption::getGeneralOption().advancedParseEnabled());
-    if(!optLRes) return tl::unexpected(optLRes.error());
-
-    auto crcRes = option.getValue("custom_run_command");
-    if(!crcRes) return tl::unexpected(crcRes.error());
-
-    nlohmann::json crcVal = crcRes.value();
-
-    if(crcVal == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"custom_run_command\"", "server.json"});
-        return tl::unexpected(err);
-    }
-    if(!crcVal.is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"custom_run_command\"", "string"});
-        return tl::unexpected(err);
-    }
-    std::string value = crcVal;
-    return value;
-}
-
-mcsm::VoidResult mcsm::CustomServer::setCustomStartCommand(mcsm::TomlOption* option, const std::string& command){
-    mcsm::VoidResult setRes = option->setValue("custom_run_command", valstr(command));
-    if(!setRes) return setRes;
-    return option->save();
-}
-
 mcsm::VoidResult mcsm::CustomServer::setupServerJarFile(const std::string& jarName, const std::string& path, const std::string& optionPath){
     auto locRes = getFileLocation(optionPath);
     if(!locRes) return tl::unexpected(locRes.error());
@@ -169,7 +134,7 @@ mcsm::VoidResult mcsm::CustomServer::generate(const std::string& name, mcsm::Jvm
     return generate(name, option, path, version, autoUpdate, extraValues.find("server_file_location")->second, extraValues);
 }
 
-mcsm::VoidResult mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& /* version */, const bool& /* autoUpdate */, const std::string& fileLocation, const std::map<std::string, std::string>& extraValues){
+mcsm::VoidResult mcsm::CustomServer::generate(const std::string& name, mcsm::JvmOption& option, const std::string& path, const std::string& /* version */, const bool& /* autoUpdate */, const std::string& fileLocation, const std::map<std::string, std::string>& /* extraValues */){
     mcsm::ServerConfigGenerator serverOption(path);
     mcsm::ServerDataOption sDOpt(path);
 
