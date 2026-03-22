@@ -4,6 +4,8 @@
 #include <mcsm/data/options/server_config_loader.h>
 
 namespace mcsm {
+    const int MIN_GROUP_CONFIG_VERSION = 1;
+    const int GROUP_CONFIG_VERSION = 1;
     class ServerGroupLoader {
     private:
         std::string path, mode;
@@ -11,7 +13,15 @@ namespace mcsm {
         std::vector<std::unique_ptr<mcsm::ServerConfigLoader>> loaders;
         bool loaded;
 
-        mcsm::VoidResult removeDuplicateServers(mcsm::TomlOption* handle);
+        toml::table configRoot;
+        toml::table configHeader;
+
+        toml::table rootMeta;
+        toml::table rootServers;
+
+        toml::array serversList;
+
+        mcsm::VoidResult removeDuplicateServers(mcsm::TomlOption* handle, toml::array& servers);
     public: 
         ServerGroupLoader(const std::string& path);
         ~ServerGroupLoader();

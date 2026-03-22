@@ -39,6 +39,10 @@ mcsm::VoidResult mcsm::ServerGroupGenerator::generate(const std::string& mode, c
     auto lRes = this->handle->load(advp);
     if(!lRes) return lRes;
 
+    toml::table header;
+    toml::value<int64_t> vint(mcsm::SINGLE_CONFIG_VERSION);
+    header.insert_or_assign("config_version", vint);
+
     toml::table group;
 
     toml::table meta;
@@ -71,6 +75,9 @@ mcsm::VoidResult mcsm::ServerGroupGenerator::generate(const std::string& mode, c
 
     auto nameSetRes = this->handle->setValue("group", group);
     if(!nameSetRes) return nameSetRes;
+
+    mcsm::VoidResult res5 = this->handle->setValue("header", header);
+    if(!res5) return res5;
 
     return this->handle->save();
 }

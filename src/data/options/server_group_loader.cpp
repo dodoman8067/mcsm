@@ -1,5 +1,7 @@
+#include "mcsm/data/toml_option.h"
 #include <mcsm/data/options/server_group_loader.h>
 #include <mcsm/data/options/general_option.h>
+#include <toml++/impl/array.hpp>
 #include <unordered_set>
 
 mcsm::ServerGroupLoader::ServerGroupLoader(const std::string& path){
@@ -13,37 +15,32 @@ mcsm::ServerGroupLoader::~ServerGroupLoader(){
     this->loaders.clear();
 }
 
-mcsm::VoidResult mcsm::ServerGroupLoader::removeDuplicateServers(mcsm::TomlOption* handle) {
+mcsm::VoidResult mcsm::ServerGroupLoader::removeDuplicateServers(mcsm::TomlOption* handle, toml::array& servers) {
     std::unordered_set<std::string> uniqueServers;
-    nlohmann::json uniqueServerList = nlohmann::json::array();
+    toml::array uniqueServerList = toml::array();
 
-    auto existSRes = this->handle->getValue("servers");
-    if(!existSRes) return tl::unexpected(existSRes.error());
-    toml::node* existingServers = existSRes.value();
-
-    if(existingServers == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"servers\"", this->handle->getName()});
-        return tl::unexpected(err);
-    }
-    if(!existingServers->is_array()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"servers\"", "array of string"});
-        return tl::unexpected(err);
-    }
-    for(auto& j : *existingServers->as_array()){
+    for(auto& j : servers){
         if(!j.is_string()){
-            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"servers\"", "array of string"});
+            mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"[group.servers]", "array of string"});
             return tl::unexpected(err);
         }
     }
     
-    for(auto& server : *existingServers->as_array()){
+    for(auto& server : servers){
         std::string serverPath = mcsm::normalizePath(server.as_string()->get());
         if(uniqueServers.insert(serverPath).second){
             uniqueServerList.push_back(serverPath);
         }
     }
     
-    mcsm::VoidResult setRes = handle->setValue("servers", vectoarr(uniqueServerList));
+    toml::table servsTable;
+    servsTable.insert_or_assign("servers", uniqueServerList);
+
+    toml::table groupTable = this->configRoot;
+    groupTable.insert_or_assign("server", servsTable);
+    groupTable.insert_or_assign("meta", this->rootMeta);
+
+    mcsm::VoidResult setRes = handle->setValue("group", groupTable);
     if(!setRes) return setRes;
 
     return handle->save();
@@ -65,17 +62,85 @@ mcsm::VoidResult mcsm::ServerGroupLoader::load() {
     mcsm::VoidResult lRes = this->handle->load(advp);
     if(!lRes) return lRes;
 
-    mcsm::VoidResult rmDupRes = removeDuplicateServers(this->handle.get());
+    auto headerLoadRes = this->handle->getValue("header");
+    if(!headerLoadRes){
+        return tl::unexpected(headerLoadRes.error());
+    }
+    if(headerLoadRes.value() == nullptr){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_INVALID_CONFIG_HEADER, {mcsm::joinPath(this->path, "server")});
+        return tl::unexpected(err);
+    }
+    if(!headerLoadRes.value()->is_table()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"[header]\"", "table"});
+        return tl::unexpected(err);
+    }
+    toml::table headerTable = *headerLoadRes.value()->as_table();
+
+    if(!headerTable.contains("config_version") || !headerTable["config_version"].is_integer()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_INVALID_CONFIG_VERSION, {"file " + mcsm::joinPath(this->path, "server"), std::to_string(mcsm::MIN_GROUP_CONFIG_VERSION)});
+        return tl::unexpected(err);
+    }
+    if(*headerTable.get_as<int64_t>("config_version") > (int64_t) mcsm::GROUP_CONFIG_VERSION || *headerTable.get_as<int64_t>("config_version") < (int64_t) mcsm::MIN_GROUP_CONFIG_VERSION){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::SERVER_INVALID_CONFIG_VERSION, {"file " + mcsm::joinPath(this->path, "server"), std::to_string(mcsm::MIN_GROUP_CONFIG_VERSION)});
+        return tl::unexpected(err);
+    }
+
+    auto rootLoadRes = this->handle->getValue("group");
+    if(!rootLoadRes){
+        return tl::unexpected(rootLoadRes.error());
+    }
+    if(rootLoadRes == nullptr){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"[group]\"", mcsm::joinPath(this->path, "server")});
+        return tl::unexpected(err);
+    }
+    if(!rootLoadRes.value()->is_table()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"[group]\"", "table"});
+        return tl::unexpected(err);
+    }
+
+    toml::table groupTable = *rootLoadRes.value()->as_table();
+
+    this->configRoot = groupTable;
+    this->configHeader = headerTable;
+
+    if(!groupTable.contains("meta")){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"[group.meta]\"", mcsm::joinPath(this->path, "group")});
+        return tl::unexpected(err);
+    }
+    if(!groupTable.contains("server")){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"\"[group.server]\"", mcsm::joinPath(this->path, "group")});
+        return tl::unexpected(err);
+    }
+
+    if(!groupTable["meta"].is_table()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"[group.meta]\"", "table"});
+        return tl::unexpected(err);
+    }
+    if(!groupTable["server"].is_table()){
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"\"[group.server]\"", "table"});
+        return tl::unexpected(err);
+    }
+
+    this->rootMeta = *groupTable["meta"].as_table();
+    this->rootServers = *groupTable["server"].as_table();
+
+    auto listRes = this->rootServers.get("servers");
+    if(!this->rootServers.contains("servers")){
+
+    }
+    if(!listRes->is_array()){
+
+    }
+
+    toml::array serversCopy = *listRes->as_array();
+    mcsm::VoidResult rmDupRes = removeDuplicateServers(this->handle.get(), serversCopy);
     if(!rmDupRes) return rmDupRes;
 
-    auto eSRes = this->handle->getValue("servers");
-    if(!eSRes) return tl::unexpected(eSRes.error());
+    listRes = &serversCopy;
 
-    toml::node* existingServers = eSRes.value();
-    // existingServers vector contains an array of server paths
-    // no need to check here. removeDuplicateServer does that
+    this->serversList = *listRes->as_array();
 
-    for(auto& serverStr : *existingServers->as_array()){
+    for(auto& serverStr : serversCopy){
         std::unique_ptr<mcsm::ServerConfigLoader> loaderPtr = std::make_unique<mcsm::ServerConfigLoader>(serverStr.as_string()->get());
         mcsm::VoidResult sprls = loaderPtr->loadConfig();
         if(!sprls) return sprls;
@@ -98,8 +163,15 @@ mcsm::VoidResult mcsm::ServerGroupLoader::save(){
         }
         strVec.push_back(v->getHandle()->getPath());
     }
-    
-    mcsm::VoidResult setRes = this->handle->setValue("servers", vectoarr(strVec));
+
+    toml::table servsTable;
+    servsTable.insert_or_assign("servers", vectoarr(strVec));
+
+    toml::table groupTable = this->configRoot;
+    groupTable.insert_or_assign("server", servsTable);
+    groupTable.insert_or_assign("meta", this->rootMeta);
+
+    mcsm::VoidResult setRes = handle->setValue("group", groupTable);
     if(!setRes) return setRes;
 
     return this->handle->save();
@@ -121,16 +193,14 @@ mcsm::StringResult mcsm::ServerGroupLoader::getName() const {
         return tl::unexpected(err);
     }
 
-    auto valueRes = this->handle->getValue("name");
-    if(!valueRes) return tl::unexpected(valueRes.error());
+    auto value = this->rootMeta.get("name");
 
-    toml::node* value = valueRes.value();
     if(value == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"name\"", this->handle->getName()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"[group.meta]->name", this->handle->getName()});
         return tl::unexpected(err);
     }
     if(!value->is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"name\"", "string"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"[group.meta]->name", "string"});
         return tl::unexpected(err);
     }
 
@@ -152,8 +222,12 @@ mcsm::VoidResult mcsm::ServerGroupLoader::setName(const std::string& name){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {name});
         return tl::unexpected(err);
     }
-    mcsm::VoidResult setRes = this->handle->setValue("name", valstr(name));
+    toml::table metaTable = this->rootMeta;
+    metaTable.insert_or_assign("name", name);
 
+    toml::table groupTable = this->configRoot;
+    groupTable.insert_or_assign("meta", metaTable);
+    mcsm::VoidResult setRes = handle->setValue("group", groupTable);
     if(!setRes) return setRes;
     return this->handle->save();
 }
@@ -166,17 +240,14 @@ mcsm::StringResult mcsm::ServerGroupLoader::getMode() const {
         return tl::unexpected(err);
     }
 
-    auto valueRes = this->handle->getValue("mode");
-    if(!valueRes) return tl::unexpected(valueRes.error());
-
-    toml::node* value = valueRes.value();
+    auto value = this->rootMeta.get("mode");
 
     if(value == nullptr){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_NOT_FOUND, {"\"mode\"", this->handle->getName()});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_NOT_FOUND, {"[group.meta]->mode", this->handle->getName()});
         return tl::unexpected(err);
     }
     if(!value->is_string()){
-        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::JSON_WRONG_TYPE, {"\"mode\"", "string"});
+        mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::TOML_WRONG_TYPE, {"[group.meta]->mode", "string"});
         return tl::unexpected(err);
     }
     if(gstr(value) != "screen" && gstr(value) != "default"){
@@ -202,8 +273,12 @@ mcsm::VoidResult mcsm::ServerGroupLoader::setMode(const std::string& mode){
         mcsm::Error err = mcsm::makeError(mcsm::ErrorStatus::MCSM_FAIL, mcsm::errors::UNSAFE_STRING, {mode});
         return tl::unexpected(err);
     }
-    mcsm::VoidResult setRes = this->handle->setValue("mode", valstr(mode));
+    toml::table metaTable = this->rootMeta;
+    metaTable.insert_or_assign("mode", mode);
 
+    toml::table groupTable = this->configRoot;
+    groupTable.insert_or_assign("meta", metaTable);
+    mcsm::VoidResult setRes = handle->setValue("group", groupTable);
     if(!setRes) return setRes;
     return this->handle->save();
 }
