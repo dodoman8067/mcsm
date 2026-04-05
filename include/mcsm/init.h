@@ -9,7 +9,6 @@
 #include <mcsm/command/server/start_server_command.h>
 #include <mcsm/command/server/jvm/jvm_test_command.h>
 #include <mcsm/command/server/view_server_command.h>
-#include <mcsm/command/server/view_server_type_command.h>
 #include <mcsm/command/server/clear_server_command.h>
 #include <mcsm/command/server/group/group_command.h>
 #include <mcsm/command/server/jvm/jvm_command.h>
